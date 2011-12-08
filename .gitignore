@@ -1,0 +1,6 @@
+
+*.suo
+/obj
+/bin
+/OpenTK/Binaries
+/OpenTK/Source/OpenTK/obj
