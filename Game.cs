@@ -1,4 +1,4 @@
-// Released to the public domain. Use, modify and relicense at will.
+// Copyright 2012 U5 Designs
 
 using System;
 
@@ -13,73 +13,185 @@ namespace StarterKit
 {
     class Game : GameWindow
     {
-        /// <summary>Creates a 800x600 window with the specified title.</summary>
+		protected bool enable3d, spaceDown;
+        protected Vector3 eye, lookat, forward, right;
+
+        protected float[,] cubeVertices = new[,] {{1.0f, -1.0f, 1.0f},   {1.0f, -1.0f, -1.0f},  {-1.0f, -1.0f, -1.0f}, {-1.0f, -1.0f, 1.0f},
+							                    {1.0f, 1.0f, -1.0f},   {1.0f, -1.0f, -1.0f},  {1.0f, -1.0f, 1.0f},   {1.0f, 1.0f, 1.0f},
+							                    {1.0f, -1.0f, -1.0f},  {1.0f, 1.0f, -1.0f},   {-1.0f, 1.0f, -1.0f},  {-1.0f, -1.0f, -1.0f},
+							                    {-1.0f, -1.0f, -1.0f}, {-1.0f, 1.0f, -1.0f},  {-1.0f, 1.0f, 1.0f},   {-1.0f, -1.0f, 1.0f},
+							                    {-1.0f, 1.0f, 1.0f},   {-1.0f, 1.0f, -1.0f},  {1.0f, 1.0f, -1.0f},   {1.0f, 1.0f, 1.0f},
+							                    {1.0f, -1.0f, 1.0f},   {-1.0f, -1.0f, 1.0f},  {-1.0f, 1.0f, 1.0f},   {1.0f, 1.0f, 1.0f}};
+
+        protected float[,] cubeNormals = new[,] {{0.0f, -1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, -1.0f, 0.0f},
+							                   {1.0f, 0.0f, 0.0f},  {1.0f, 0.0f, 0.0f},  {1.0f, 0.0f, 0.0f},  {1.0f, 0.0f, 0.0f},
+							                   {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f},
+							                   {-1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f},
+							                   {0.0f, 1.0f, 0.0f},  {0.0f, 1.0f, 0.0f},  {0.0f, 1.0f, 0.0f},  {0.0f, 1.0f, 0.0f},
+							                   {0.0f, 0.0f, 1.0f},  {0.0f, 0.0f, 1.0f},  {0.0f, 0.0f, 1.0f},  {0.0f, 0.0f, 1.0f}};
+
+        protected byte[] cubeIndices = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 };
+
+		protected float[] groundAmbient = {0.0215f, 0.1745f, 0.0215f}; //{0.40f, 0.53f, 0.13f, 1.0f};
+		protected float[] groundDiffuse = {0.07568f, 0.61424f, 0.07568f}; //{0.5f, 0.5f, 0.5f, 1.0f};
+        protected float[] groundSpecular = {0.633f, 0.727811f, 0.633f}; //{0.0f, 0.0f, 0.0f, 1.0f};
+        protected float[] groundShininess = {76.8f}; //{0.0f};
+
+		protected float[] redAmbient = {0.4f, 0.0f, 0.0f, 1.0f};
+		protected float[] redDiffuse = {0.4f, 0.0f, 0.0f, 1.0f};
+		protected float[] redSpecular = {1.0f, 1.0f, 1.0f, 1.0f};
+		protected float[] redShininess = {0.5f};
+
+        protected float[] noglow = {0.0f, 0.0f, 0.0f, 1.0f};
+        protected float[] lightPos = {25.0f, 50.0f, 250.0f};
+        protected float[] whitelight = {0.5f, 0.5f, 0.5f, 0.5f};
+
+        /// <summary>Creates a 1280x720 window.</summary>
+        //TODO: Change this to a dynamic screen resolution
         public Game()
-            : base(800, 600, GraphicsMode.Default, "OpenTK Quick Start Sample")
-        {
+            : base(1280, 720, GraphicsMode.Default, "U5 Designs Untitled Project") {
             VSync = VSyncMode.On;
         }
 
         /// <summary>Load resources here.</summary>
         /// <param name="e">Not used.</param>
-        protected override void OnLoad(EventArgs e)
-        {
+        protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
 
-            GL.ClearColor(0.1f, 0.2f, 0.5f, 0.0f);
+            enable3d = false;
+			spaceDown = false;
+
+            //eye = new Vector3(0, 50, 250);
+            //lookat = new Vector3(0, 50, 200);
+			eye = new Vector3(0, 0, 0); //gets initialized in updateView
+			lookat = new Vector3(0, 50, 200);
+
+            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.Normalize);
+            GL.Enable(EnableCap.Lighting);
+            GL.Enable(EnableCap.Light0);
+        }
+
+        /// <summary>Updates the projection matrix for the current view (2D/3D)</summary>
+        protected void updateView() {
+			//TODO: Animate view transition
+            GL.MatrixMode(MatrixMode.Projection);
+            if (enable3d) {
+                Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 6, ClientRectangle.Width / (float)ClientRectangle.Height, 1.0f, 6400.0f);
+				GL.LoadMatrix(ref projection);
+				//eye.X = lookat.X - 500;
+				//eye.Y = lookat.Y + 75;
+				//eye.Z = lookat.Z;
+				//TODO: Make these constants into #defines
+				//TODO: Make these constants resolution-independent
+				lookat.X -= 400;
+				lookat.Y -= 200;
+				eye.X = lookat.X - 500;
+				eye.Y = lookat.Y + 75;
+				eye.Z = lookat.Z;
+				GL.Enable(EnableCap.Fog);
+            } else { //2d
+                Matrix4 projection = Matrix4.CreateOrthographic(ClientRectangle.Width, ClientRectangle.Height, 1.0f, 6400.0f);
+				GL.LoadMatrix(ref projection);
+				//TODO: Make these constants into #defines
+				//TODO: Make these constants resolution-independent
+				lookat.X += 400;
+				lookat.Y += 200;
+				eye.X = lookat.X;
+				eye.Y = lookat.Y;
+				eye.Z = lookat.Z + 200;
+				GL.Disable(EnableCap.Fog);
+            }
         }
 
         /// <summary>
-        /// Called when your window is resized. Set your viewport here. It is also
-        /// a good place to set up your projection matrix (which probably changes
-        /// along when the aspect ratio of your window).
+        /// Called when the window is resized. Sets viewport and updates projection matrix.
         /// </summary>
         /// <param name="e">Not used.</param>
-        protected override void OnResize(EventArgs e)
-        {
+        protected override void OnResize(EventArgs e) {
             base.OnResize(e);
 
             GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
-
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, Width / (float)Height, 1.0f, 64.0f);
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref projection);
+            updateView();
         }
 
         /// <summary>
-        /// Called when it is time to setup the next frame. Add you game logic here.
+        /// Called once per frame.  Contains game logic, etc.
         /// </summary>
         /// <param name="e">Contains timing information for framerate independent logic.</param>
-        protected override void OnUpdateFrame(FrameEventArgs e)
-        {
+        protected override void OnUpdateFrame(FrameEventArgs e) {
             base.OnUpdateFrame(e);
 
-            if (Keyboard[Key.Escape])
-                Exit();
+			//TODO: Change these keys to their final mappings when determined
+            if(Keyboard[Key.Escape]) {
+				Exit();
+			}
+			if(Keyboard[Key.Space] && !spaceDown) {
+				enable3d = !enable3d;
+				updateView();
+				spaceDown = true;
+			} else if(!Keyboard[Key.Space]) {
+				spaceDown = false;
+			}
         }
 
         /// <summary>
-        /// Called when it is time to render the next frame. Add your rendering code here.
+        /// Renders the current frame.
         /// </summary>
         /// <param name="e">Contains timing information.</param>
-        protected override void OnRenderFrame(FrameEventArgs e)
-        {
+        protected override void OnRenderFrame(FrameEventArgs e) {
             base.OnRenderFrame(e);
+
+			//Origin is the left edge of the level, at the ground and the back wall
+			//This means that all valid game coordinates will be positive
+			//Ground is from 0 to 100 along the z-axis
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            Matrix4 modelview = Matrix4.LookAt(Vector3.Zero, Vector3.UnitZ, Vector3.UnitY);
+            Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref modelview);
 
-            GL.Begin(BeginMode.Triangles);
+			//TODO: Do lights and fog need to happen every frame?
+            //Light
+            GL.ShadeModel(ShadingModel.Smooth);
+            GL.Light(LightName.Light0, LightParameter.Position, lightPos);
+            GL.Light(LightName.Light0, LightParameter.Diffuse, whitelight);
+            GL.Light(LightName.Light0, LightParameter.Specular, whitelight);
+            GL.Light(LightName.Light0, LightParameter.Ambient, whitelight);
+            GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Emission, noglow);
 
-            GL.Color3(1.0f, 1.0f, 0.0f); GL.Vertex3(-1.0f, -1.0f, 4.0f);
-            GL.Color3(1.0f, 0.0f, 0.0f); GL.Vertex3(1.0f, -1.0f, 4.0f);
-            GL.Color3(0.2f, 0.9f, 1.0f); GL.Vertex3(0.0f, 1.0f, 4.0f);
+			//Fog
+			GL.Fog(FogParameter.FogDensity, 0.0005f);
 
-            GL.End();
+            //Set up for rendering using arrays
+            GL.EnableClientState(ArrayCap.VertexArray);
+            GL.EnableClientState(ArrayCap.NormalArray);
+
+            //Ground
+			GL.VertexPointer(3, VertexPointerType.Float, 0, cubeVertices);
+			GL.NormalPointer(NormalPointerType.Byte, 0, cubeNormals);
+            GL.PushMatrix();
+            GL.Scale(5000.0f, 500.0f, 200.0f);
+            GL.Translate(0.0f, -1.0f, 1.0f);
+            GL.Material(MaterialFace.Front, MaterialParameter.Specular, groundSpecular);
+            GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, groundDiffuse);
+            GL.Material(MaterialFace.Front, MaterialParameter.Ambient, groundAmbient);
+            GL.Material(MaterialFace.Front, MaterialParameter.Shininess, groundShininess);
+            GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
+            GL.PopMatrix();
+
+			//Test cube
+			GL.PushMatrix();
+			GL.Translate(50.0f, 12.5f, 50.0f);
+			GL.Scale(12.5f, 12.5f, 12.5f);
+			GL.Material(MaterialFace.Front, MaterialParameter.Specular, redSpecular);
+			GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, redDiffuse);
+			GL.Material(MaterialFace.Front, MaterialParameter.Ambient, redAmbient);
+			GL.Material(MaterialFace.Front, MaterialParameter.Shininess, redShininess);
+			GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
+			GL.PopMatrix();
 
             SwapBuffers();
         }
@@ -88,8 +200,7 @@ namespace StarterKit
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
-        {
+        static void Main() {
             // The 'using' idiom guarantees proper resource cleanup.
             // We request 30 UpdateFrame events per second, and unlimited
             // RenderFrame events (as fast as the computer can handle).
