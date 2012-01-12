@@ -9,11 +9,11 @@ using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
 using OpenTK.Input;
 
-namespace StarterKit
+namespace U5Designs
 {
     class Game : GameWindow
     {
-		protected bool enable3d, spaceDown;
+		internal bool enable3d;
         protected Vector3 eye, lookat, forward, right;
 
         protected float[,] cubeVertices = new[,] {{1.0f, -1.0f, 1.0f},   {1.0f, -1.0f, -1.0f},  {-1.0f, -1.0f, -1.0f}, {-1.0f, -1.0f, 1.0f},
@@ -46,25 +46,29 @@ namespace StarterKit
         protected float[] lightPos = {25.0f, 50.0f, 250.0f};
         protected float[] whitelight = {0.5f, 0.5f, 0.5f, 0.5f};
 
+        //game logic class
+        internal Logic logic;
+
         /// <summary>Creates a 1280x720 window.</summary>
         //TODO: Change this to a dynamic screen resolution
         public Game()
             : base(1280, 720, GraphicsMode.Default, "U5 Designs Untitled Project") {
             VSync = VSyncMode.On;
+            
         }
 
-        /// <summary>Load resources here.</summary>
+        /// <summary>Load resources here. This gets called ONCE</summary>
         /// <param name="e">Not used.</param>
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
-
+            logic = new Logic(this);
             enable3d = false;
-			spaceDown = false;
 
             //eye = new Vector3(0, 50, 250);
             //lookat = new Vector3(0, 50, 200);
 			eye = new Vector3(0, 0, 0); //gets initialized in updateView
 			lookat = new Vector3(0, 50, 200);
+
 
             GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             GL.Enable(EnableCap.DepthTest);
@@ -74,7 +78,7 @@ namespace StarterKit
         }
 
         /// <summary>Updates the projection matrix for the current view (2D/3D)</summary>
-        protected void updateView() {
+        internal void updateView() {
 			//TODO: Animate view transition
             GL.MatrixMode(MatrixMode.Projection);
             if (enable3d) {
@@ -106,34 +110,13 @@ namespace StarterKit
         }
 
         /// <summary>
-        /// Called when the window is resized. Sets viewport and updates projection matrix.
-        /// </summary>
-        /// <param name="e">Not used.</param>
-        protected override void OnResize(EventArgs e) {
-            base.OnResize(e);
-
-            GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
-            updateView();
-        }
-
-        /// <summary>
         /// Called once per frame.  Contains game logic, etc.
+        /// Unless something specifically needs to be here, it belongs in the Logic class.
         /// </summary>
         /// <param name="e">Contains timing information for framerate independent logic.</param>
         protected override void OnUpdateFrame(FrameEventArgs e) {
             base.OnUpdateFrame(e);
-
-			//TODO: Change these keys to their final mappings when determined
-            if(Keyboard[Key.Escape]) {
-				Exit();
-			}
-			if(Keyboard[Key.Space] && !spaceDown) {
-				enable3d = !enable3d;
-				updateView();
-				spaceDown = true;
-			} else if(!Keyboard[Key.Space]) {
-				spaceDown = false;
-			}
+            logic.update(e);
         }
 
         /// <summary>
@@ -196,18 +179,18 @@ namespace StarterKit
             SwapBuffers();
         }
 
+
         /// <summary>
-        /// The main entry point for the application.
+        /// Called when the window is resized. Sets viewport and updates projection matrix.
         /// </summary>
-        [STAThread]
-        static void Main() {
-            // The 'using' idiom guarantees proper resource cleanup.
-            // We request 30 UpdateFrame events per second, and unlimited
-            // RenderFrame events (as fast as the computer can handle).
-            using (Game game = new Game())
-            {
-                game.Run(30.0);
-            }
+        /// <param name="e">Not used.</param>
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+
+            GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
+            updateView();
         }
+
     }
 }
