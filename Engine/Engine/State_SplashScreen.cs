@@ -5,14 +5,14 @@ using System.Text;
 
 namespace Engine
 {
-    class State_SplashScreen : GameObject
+    class State_SplashScreen : GameState
     {
-        public void Update(double elapsedTime)
+        public void Update()
         {
             System.Console.WriteLine("Updating Splash Screen");
         }
 
-        public void Render()
+        public void Draw()
         {
             System.Console.WriteLine("Rendering Splash Screen");
         }
