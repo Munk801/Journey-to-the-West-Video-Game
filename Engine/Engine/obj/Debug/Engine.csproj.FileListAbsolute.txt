@@ -1,0 +1,8 @@
+C:\Users\Munk\Desktop\U5Designs_SeniorProject\u5designs\Engine\Engine\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Munk\Desktop\U5Designs_SeniorProject\u5designs\Engine\Engine\bin\Debug\Engine.dll
+C:\Users\Munk\Desktop\U5Designs_SeniorProject\u5designs\Engine\Engine\bin\Debug\Engine.pdb
+C:\Users\Munk\Desktop\U5Designs_SeniorProject\u5designs\Engine\Engine\bin\Debug\OpenTK.dll
+C:\Users\Munk\Desktop\U5Designs_SeniorProject\u5designs\Engine\Engine\bin\Debug\OpenTK.pdb
+C:\Users\Munk\Desktop\U5Designs_SeniorProject\u5designs\Engine\Engine\bin\Debug\OpenTK.xml
+C:\Users\Munk\Desktop\U5Designs_SeniorProject\u5designs\Engine\Engine\obj\Debug\Engine.dll
+C:\Users\Munk\Desktop\U5Designs_SeniorProject\u5designs\Engine\Engine\obj\Debug\Engine.pdb
