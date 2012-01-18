@@ -13,23 +13,21 @@ namespace U5Designs
         [STAThread]
         static void Main()
         {
-            /** Create the StateManager that will manage the State of the Game **/
-            GameEngine engine = new GameEngine();
-
-
-            /** Initialize the Game Engine here **/
-            engine.Init();
-
-            /** Load the Intro State **/
-            MainMenuState ms = new MainMenuState();
-            engine.ChangeState(ms);
-            
             // The 'using' idiom guarantees proper resource cleanup.
             // We request 30 UpdateFrame events per second, and unlimited
             // RenderFrame events (as fast as the computer can handle).
-            using (Game game = new Game())
+            using (GameEngine engine = new GameEngine())
             {
-                game.Run(30.0);
+                //Tells opentk side to run
+                engine.Run(30.0);
+
+                /** Initialize the Game Engine here **/
+             //   engine.Init(); //OnLoad gets called when we call engine.run, same thing
+
+                /** Load the Intro State **/
+                // In onload we should set the first state.
+               // MainMenuState ms = new MainMenuState();
+               // engine.ChangeState(ms);
             }
         }
     }

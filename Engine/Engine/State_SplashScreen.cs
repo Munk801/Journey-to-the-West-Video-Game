@@ -5,7 +5,8 @@ using System.Text;
 
 namespace Engine
 {
-    class State_SplashScreen : GameState
+     //Note, this has to be in U5Designs namespace if its going to pull from GameState
+    class State_SplashScreen //: GameState
     {
         public void Update()
         {

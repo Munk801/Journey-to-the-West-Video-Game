@@ -1,7 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Windows.Forms;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Audio;
+using OpenTK.Audio.OpenAL;
+using Engine;
+using Engine.Input;
 
 namespace U5Designs
 {
@@ -11,6 +16,7 @@ namespace U5Designs
         // Initialize graphics here for the game playing
         public override void Init()
         {
+            //
         }
 
         // Cleanup any resources you created here
@@ -38,11 +44,11 @@ namespace U5Designs
             //eng.PushState(is);
         }
 
-        public override void Update(GameEngine eng)
+        public override void Update(GameEngine eng, FrameEventArgs e)
         {
         }
 
-        public override void Draw(GameEngine eng)
+        public override void Draw(GameEngine eng, FrameEventArgs e)
         {
         }
     }

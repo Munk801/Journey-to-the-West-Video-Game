@@ -34,9 +34,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Engine">
-      <HintPath>Engine\Engine\bin\Debug\Engine.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -51,12 +48,18 @@
     <Compile Include="Enemy.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="EntryPoint.cs" />
-    <Compile Include="Logic.cs" />
+    <Compile Include="GameEngine.cs" />
+    <Compile Include="GameState.cs" />
+    <Compile Include="MainMenuState.cs" />
     <Compile Include="Player.cs" />
-    <Compile Include="Game.cs" />
+    <Compile Include="PlayState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Engine\Engine\Engine.csproj">
+      <Project>{46A0D2E5-D034-4149-A0C0-8FAA7CFCB361}</Project>
+      <Name>Engine</Name>
+    </ProjectReference>
     <ProjectReference Include="OpenTK\Source\OpenTK\OpenTK.csproj">
       <Project>{A37A7E14-0000-0000-0000-000000000000}</Project>
       <Name>OpenTK</Name>

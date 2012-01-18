@@ -1,7 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Windows.Forms;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Audio;
+using OpenTK.Audio.OpenAL;
+using Engine;
+using Engine.Input;
 
 namespace U5Designs
 {
@@ -39,17 +44,21 @@ namespace U5Designs
         {
         }
 
-        public virtual void Update(GameEngine eng)
+        public virtual void Update(GameEngine gameEng, FrameEventArgs e)
         {
         }
 
-        public virtual void Draw(GameEngine eng)
+        public virtual void Draw(GameEngine gameEng, FrameEventArgs e)
         {
         }
 
         void ChangeState(GameEngine eng, GameState state)
         {
             eng.ChangeState(state);
-        }        
+        }
+
+        public virtual void updateView(GameEngine eng)
+        {
+        }
     }
 }

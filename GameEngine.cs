@@ -25,19 +25,47 @@ namespace U5Designs
          * 
          * */
 
-        /** Init and Cleanup are to be used to initialize the Game and Cleanup the game when done **/
-        public void Init()
-        {
-            states = new Stack<GameState>();
+        /// <summary>Creates a 1280x720 window.</summary>
+        //TODO: Change this to a dynamic screen resolution
+        public GameEngine() : base(1280, 720, GraphicsMode.Default, "U5 Designs Untitled Project") {
+            VSync = VSyncMode.On;
+        }
 
-            // Set the running flag
-            m_running = true;
+        /// <summary>Load resources here. This gets called ONCE at the start of the entire process(not once a state)</summary>
+        /// <param name="e">Not used.</param>
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.Normalize);
+            GL.Enable(EnableCap.Lighting);
+            GL.Enable(EnableCap.Light0);
+            
+            states = new Stack<GameState>();
+            MainMenuState ms = new MainMenuState();
+            this.ChangeState(ms);
 
             // Set the screen resolution (Fullscreen / windowed)
 
             // Set the title bar of the window etc
+
         }
 
+        /** Init and Cleanup are to be used to initialize the Game and Cleanup the game when done **
+         * 
+         * Init is for initilizing stuff in each individual state, either when they start, or when they
+         * come out of being paused and need to redraw their stuff. THings like setting the resolution,
+         * and creating the state stack should only be done once at the very beginning, so I moved that
+         * to OnLoad
+        */
+        
+        public void Init()
+        {
+            // Set the running flag
+            m_running = true;
+        }
+        
         public void Cleanup()
         {
             while (states.Count > 0)
@@ -47,7 +75,7 @@ namespace U5Designs
                 st.Cleanup();
             }
         }
-
+        
 
         /** These 3 methods are for State handling **/
         public void ChangeState(GameState state)
@@ -96,25 +124,56 @@ namespace U5Designs
             }
         }
 
+        /// <summary>
+        /// Called once per frame.  Contains game logic, etc.
+        /// If its not drawing, and it needs to happen in the game loop, call it from here.
+        /// </summary>
+        /// <param name="e">Contains timing information for framerate independent logic.</param>
+        protected override void OnUpdateFrame(FrameEventArgs e)
+        {
+            base.OnUpdateFrame(e);
+
+            // let the state handle events
+            states.Peek().HandleEvents(this);
+
+            // let the state update the game
+            states.Peek().Update(this, e);
+        }
+
+        /// <summary>
+        /// Renders the current frame.
+        /// </summary>
+        /// <param name="e">Contains timing information.</param>
+        protected override void OnRenderFrame(FrameEventArgs e) {
+            base.OnRenderFrame(e);
+
+            // let the state draw the screen
+            states.Peek().Draw(this, e);
+
+
+
+            SwapBuffers();
+        }
+
         /** These are the methods to process game stuff most likely where the game logic or calls will go**/
+
+        // Handle Events and Update both happen in OnUpdateFrame, where Draw is literally OnRenderFrame
+        /*
         public void HandleEvents()
         {
             // let the state handle events
-            states.Peek().HandleEvents(this);
         }
 
-        public void Update()
+        public void Update(GameEngine gameEng, FrameEventArgs e)
         {
             // let the state update the game
-            states.Peek().Update(this);
         }
 
-        public void Draw()
+        public void Draw(GameEngine gameEng, FrameEventArgs e)
         {
             // let the state draw the screen
-            states.Peek().Draw(this);
         }
-
+        */
 
         /** Use these 2 methods in the Main() loop in EntryPoint to check if the game is still running and to Quit**/
         public bool Running()
@@ -132,5 +191,17 @@ namespace U5Designs
 
         // FLAG that tells if the game is running or not
         bool m_running;
+
+        /// <summary>
+        /// Called when the window is resized. Sets viewport and updates projection matrix.
+        /// </summary>
+        /// <param name="e">Not used.</param>
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+
+            GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
+            states.Peek().updateView(this);
+        }
     }
 }
