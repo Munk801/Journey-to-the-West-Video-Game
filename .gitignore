@@ -4,3 +4,5 @@
 /bin
 /OpenTK/Binaries
 /OpenTK/Source/OpenTK/obj
+/Engine/Engine/obj
+/Engine/Engine/bin
