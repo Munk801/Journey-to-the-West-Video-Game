@@ -54,12 +54,11 @@ namespace U5Designs
 
         /** Init and Cleanup are to be used to initialize the Game and Cleanup the game when done **
          * 
-         * Init is for initilizing stuff in each individual state, either when they start, or when they
-         * come out of being paused and need to redraw their stuff. THings like setting the resolution,
-         * and creating the state stack should only be done once at the very beginning, so I moved that
-         * to OnLoad
+         * Init as far as being in the Engine, is literally OnLoad, and Cleanup for the game engine is 
+         * irrelivant since were in c# not c++, managed memory ftw!
         */
-        
+
+        /*
         public void Init()
         {
             // Set the running flag
@@ -75,7 +74,7 @@ namespace U5Designs
                 st.Cleanup();
             }
         }
-        
+        */
 
         /** These 3 methods are for State handling **/
         public void ChangeState(GameState state)
