@@ -13,6 +13,17 @@ namespace U5Designs
         [STAThread]
         static void Main()
         {
+            /** Create the StateManager that will manage the State of the Game **/
+            GameEngine engine = new GameEngine();
+
+
+            /** Initialize the Game Engine here **/
+            engine.Init();
+
+            /** Load the Intro State **/
+            MainMenuState ms = new MainMenuState();
+            engine.ChangeState(ms);
+            
             // The 'using' idiom guarantees proper resource cleanup.
             // We request 30 UpdateFrame events per second, and unlimited
             // RenderFrame events (as fast as the computer can handle).
