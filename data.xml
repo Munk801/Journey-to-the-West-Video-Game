@@ -1,0 +1,40 @@
+<! -- U5 Designs -->
+
+<levels>
+	<level>
+		<index>0</index>
+		<name>Zoo</name>
+		<description>The beginning training level</description>
+		<bgmusic></bgmusic>
+	</level>
+	<level>
+		<index>1</index>
+		<name>City</name>
+		<description>Escape from the City level</description>
+		<bgmusic></bgmusic>
+	</level>
+	<level>
+		<index>2</index>
+		<name>Jungle</name>
+		<description>Enter into the Jungle levevl</description>
+		<bgmusic></bgmusic>
+	</level>
+</levels>
+
+<enemies>
+	<enemy>
+		<index>0</index>
+		<levellocation>2</levellocation>
+		<name>Ninja Wasp</name>
+		<moblevel>3</moblevel>
+		<texture></texture>
+		<sfx></sfx>
+		<abilityname>Flying Sting</abilityname>
+		<abilitypwr>3</abilitypwr>
+		<abilityrng>10</abilityrng>
+		<health>20</health>
+		<flight>1</flight>
+		<itemdrop>2<itemdrop>
+		<expval>10</expval>
+	</enemy>
+</enemies>
