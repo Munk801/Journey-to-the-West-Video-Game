@@ -26,6 +26,7 @@
 		<index>0</index>
 		<levellocation>2</levellocation>
 		<name>Ninja Wasp</name>
+		<description>A flying Wasp trained in the mystical art of Ninjitsu and bad attitude</description>
 		<moblevel>3</moblevel>
 		<texture></texture>
 		<sfx></sfx>
@@ -38,3 +39,12 @@
 		<expval>10</expval>
 	</enemy>
 </enemies>
+
+<items>
+	<item>
+		<index>0</index>
+		<name>Health10</name>
+		<description>Gives the player 10 health points when picked up</description>
+		<levellocation>3</levellocation>
+	</item>
+</items>
