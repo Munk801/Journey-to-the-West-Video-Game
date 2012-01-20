@@ -41,6 +41,7 @@ namespace U5Designs
             GL.Enable(EnableCap.Normalize);
             GL.Enable(EnableCap.Lighting);
             GL.Enable(EnableCap.Light0);
+			GL.Enable(EnableCap.Texture2D);
             
             states = new Stack<GameState>();
             MainMenuState ms = new MainMenuState();
