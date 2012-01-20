@@ -9,6 +9,9 @@ using Engine;
 using Engine.Input;
 using OpenTK.Input;
 
+// XML parser
+using System.Xml;
+
 namespace U5Designs
 {
     /** Main Menu State of the game that will be active while the Main Menu is up **/
@@ -18,6 +21,9 @@ namespace U5Designs
         public override void Init()
         {
             enable3d = false;
+
+            // Load saved game data
+            LoadSavedGame();
 
             //eye = new Vector3(0, 50, 250);
             //lookat = new Vector3(0, 50, 200);
@@ -53,8 +59,8 @@ namespace U5Designs
             //eng.Quit();
 
             // Otherwise if the player starts up the game then move to the next state
-         //   PlayState ps = new PlayState();
-         //   eng.ChangeState(ps);
+            //   PlayState ps = new PlayState();
+            //   eng.ChangeState(ps);
         }
 
         public override void Update(GameEngine eng, FrameEventArgs e)
@@ -63,7 +69,7 @@ namespace U5Designs
 
         public override void Draw(GameEngine eng, FrameEventArgs e)
         {
-            
+
 
             //Origin is the left edge of the level, at the ground and the back wall
             //This means that all valid game coordinates will be positive
@@ -241,6 +247,28 @@ namespace U5Designs
                 GL.Disable(EnableCap.Fog);
             }
         }
-        
+
+        /**
+         * This will load the saved game data into memory.  The player can then choose from a list of available saved games if they choose during the menu state
+         * */
+        public void LoadSavedGame()
+        {
+            // Parse XML saved game data file and store the information
+            using (XmlReader reader = XmlReader.Create("save.xml"))
+            {
+                reader.Read();
+
+                // Read to start <element> that you are looking to parse
+                reader.ReadStartElement("pname");
+
+                // Debug
+                Console.WriteLine(reader.ReadString());
+
+                // finish with the current <element> and move to the next
+                reader.ReadEndElement();
+
+
+            }
+        }
     }
 }
