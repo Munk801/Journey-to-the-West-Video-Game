@@ -9,17 +9,26 @@ using Engine;
 using Engine.Input;
 using OpenTK.Input;
 
+
 // XML parser
 using System.Xml;
+using System.Collections.Generic;
 
 namespace U5Designs
 {
     /** Main Menu State of the game that will be active while the Main Menu is up **/
     class MainMenuState : GameState
     {
+        // A container which will hold the list of available saved games
+        Stack<PlayerState> savedGames;
+
+
         // Initialize graphics, etc here
         public override void Init()
         {
+            // Initialize the saved games stack
+            savedGames = new Stack<PlayerState>();
+
             enable3d = false;
 
             // Load saved game data
@@ -253,22 +262,37 @@ namespace U5Designs
          * */
         public void LoadSavedGame()
         {
+            
             // Parse XML saved game data file and store the information
+            
             using (XmlReader reader = XmlReader.Create("save.xml"))
             {
+                string str;
+                int val;
+                double dval;
+
                 reader.Read();
 
-                // Read to start <element> that you are looking to parse
-                reader.ReadStartElement("pname");
+                // Read to start <element> that you are looking to parse                
+                reader.ReadToFollowing("pname");
 
                 // Debug
                 Console.WriteLine(reader.ReadString());
+                str = reader.ReadString();
 
-                // finish with the current <element> and move to the next
-                reader.ReadEndElement();
+                if (!String.IsNullOrEmpty(str))
+                {
+                    PlayerState ps = new PlayerState(reader.ReadString());
 
 
+                    // finish with the current <element> and move to the next
+                    reader.ReadEndElement();
+
+                    reader.ReadToFollowing("level");
+                    Console.WriteLine("Level: " + reader.ReadString());
+                }                
             }
+            
         }
     }
 }
