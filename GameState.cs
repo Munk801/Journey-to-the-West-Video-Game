@@ -24,7 +24,7 @@ namespace U5Designs
      * */
     public abstract class GameState
     {
-        public virtual void Init()
+        public virtual void Init(GameEngine eng)
         {
         }
 

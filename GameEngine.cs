@@ -16,14 +16,15 @@ namespace U5Designs
     {
         /**
          * Only the current state can know when it’s time to change to the next state.
-         * 
-         * 
          * HandleEvents()
          * Update()
          * Draw()
          * will call the corresponding methods in the State class that is on the "stack" List<>
          * 
          * */
+
+        Stack<GameState> states;// This is the "Stack" of states with an LIFO structure mimicing an actual memory Stack
+        internal bool GameInProgress;// this bool tracks if a game is in progress, mostly for the menu state to know if its the first menu, or has been brought up ingame
 
         /// <summary>Creates a 1280x720 window.</summary>
         //TODO: Change this to a dynamic screen resolution
@@ -53,31 +54,8 @@ namespace U5Designs
 
         }
 
-        /** Init and Cleanup are to be used to initialize the Game and Cleanup the game when done **
-         * 
-         * Init as far as being in the Engine, is literally OnLoad, and Cleanup for the game engine is 
-         * irrelivant since were in c# not c++, managed memory ftw!
-        */
-
-        /*
-        public void Init()
-        {
-            // Set the running flag
-            m_running = true;
-        }
-        
-        public void Cleanup()
-        {
-            while (states.Count > 0)
-            {
-                // Pop off the top of the Stack and clean it up
-                GameState st = states.Pop();
-                st.Cleanup();
-            }
-        }
-        */
-
         /** These 3 methods are for State handling **/
+        // Pushes a new state onto the stack, calls the states Init method, deletes old state(ie launch game, nuke menu)
         public void ChangeState(GameState state)
         {
             // Cleanup the current state
@@ -89,9 +67,9 @@ namespace U5Designs
 
             // Store and INIT the new state
             states.Push(state);
-            state.Init();
+            state.Init(this);
         }
-
+        // same as changestate but doesnt delete old state(ie pause game, bringup menu)
         public void PushState(GameState state)
         {
             // pause the current state
@@ -103,9 +81,9 @@ namespace U5Designs
 
             // store and INIT the new state
             states.Push(state);
-            state.Init();
+            state.Init(this);
         }
-
+        // pops the current state off and lets the next state have control(menu nukes self, resumes game)
         public void PopState()
         {
             // cleanup the current state
@@ -149,48 +127,9 @@ namespace U5Designs
 
             // let the state draw the screen
             states.Peek().Draw(this, e);
-
-
-
             SwapBuffers();
         }
 
-        /** These are the methods to process game stuff most likely where the game logic or calls will go**/
-
-        // Handle Events and Update both happen in OnUpdateFrame, where Draw is literally OnRenderFrame
-        /*
-        public void HandleEvents()
-        {
-            // let the state handle events
-        }
-
-        public void Update(GameEngine gameEng, FrameEventArgs e)
-        {
-            // let the state update the game
-        }
-
-        public void Draw(GameEngine gameEng, FrameEventArgs e)
-        {
-            // let the state draw the screen
-        }
-        */
-
-        /** Use these 2 methods in the Main() loop in EntryPoint to check if the game is still running and to Quit**/
-        public bool Running()
-        {
-            return m_running;
-        }
-
-        public void Quit()
-        {
-            m_running = false;
-        }
-             
-        // This is the "Stack" of states with an LIFO structure mimicing an actual memory Stack
-        Stack<GameState> states;
-
-        // FLAG that tells if the game is running or not
-        bool m_running;
 
         /// <summary>
         /// Called when the window is resized. Sets viewport and updates projection matrix.

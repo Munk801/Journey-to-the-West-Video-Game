@@ -24,16 +24,16 @@ namespace Engine
 
         }
 
-        public Sound PlaySound(string soundID)
+        internal Sound PlaySound(string soundID)
         {
             return null;
         }
 
-        public void StopSound(Sound sound)
+        internal void StopSound(Sound sound)
         {
         }
 
-        public bool isSoundPlaying(Sound sound)
+        internal bool isSoundPlaying(Sound sound)
         {
             return false;
         }
