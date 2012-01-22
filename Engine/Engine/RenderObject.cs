@@ -19,6 +19,7 @@ namespace Engine {
 		SpriteSheet getSpriteSheet(); //returns sprite sheet, or null for 3d objects
 		bool isAnimated(); //true if more than one frame (probably only applies to sprites)
 		int getFrameNumber(); //returns index of the current animation frame
+		void setFrameNumber(); //sets index of the current animation frame
 		void doScaleAndTranslate(); //pushes matrix, then adds scale and translate to model view stack
 	}
 }
