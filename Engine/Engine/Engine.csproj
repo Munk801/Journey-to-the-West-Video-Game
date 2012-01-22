@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analyze.cs" />
     <Compile Include="FastLoop.cs" />
     <Compile Include="Geometry3D.cs" />
     <Compile Include="Input\Input.cs" />

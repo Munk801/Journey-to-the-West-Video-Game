@@ -6,7 +6,8 @@ using System.Text;
 namespace Engine
 {
     /* Represents a sound that is made in the game.*/
-    class Sound
+    public class Sound
     {
+        // TO DO:  Check what format sound should be set up a
     }
 }

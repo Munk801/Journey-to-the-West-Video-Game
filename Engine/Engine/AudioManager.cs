@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenAL = OpenTK.Audio.OpenAL;
+using Audio = OpenTK.Audio;
 
 namespace Engine
 {
@@ -13,10 +14,97 @@ namespace Engine
         readonly int maxSoundChannels = 256;
         List<int> soundChannels = new List<int>();
         
+        // Grab the default Audio Device from OpenAL
+        public static string DefaultAudioDevice
+        {
+            get
+            {
+                try
+                {
+                    return Audio.AudioContext.DefaultDevice;
+                }
+                catch
+                {
+                    return string.Empty;
+                }
+            }
+        }
+
+        static internal Audio.AudioContext CurrentAudioContext
+        {
+            get;
+            private set;
+        }
+
+
+        public static List<string> AllAudioDevices
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(DefaultAudioDevice))
+                    return new List<string>();
+
+                return new List<string>(Audio.AudioContext.AvailableDevices);
+            }
+        }
+
+        public static bool isAudioDeviceInitialized
+        {
+            get;
+            private set;
+        }
+
         public AudioManager()
         {
             // If there is no default device, return
+            if (!string.IsNullOrEmpty(DefaultAudioDevice)
+            {
+                return;
+            }
 
+        }
+
+        /// <summary>
+        /// Creates an audio context
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        public static bool CreateAudioDevice(string device)
+        {
+            // Release current audio context
+            if (CurrentAudioContext != null)
+            {
+                ReleaseAudioDevice();
+            }
+
+            // Check  if device contains anything
+            if (string.IsNullOrEmpty(device))
+            {
+                return false;
+            }
+
+            // Create a new audio context
+            try
+            {
+                CurrentAudioContext = new Audio.AudioContext(device);
+            }
+            catch (Exception e)
+            {
+                // TO DO: WRITE TO FILE THE EXCEPTION
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Release the current audio context
+        /// </summary>
+        public static void ReleaseAudioDevice()
+        {
+            if (CurrentAudioContext != null)
+            {
+                CurrentAudioContext.Dispose();
+            }
         }
 
         public void LoadSound(string soundID, string path)
