@@ -7,7 +7,7 @@ namespace U5Designs
 {
     class Player
     {
-        /** This struct will contain the Players State **/
+        /** This struct will contain the Players State
         struct PlayerState
         {
             public int p_health;
@@ -19,7 +19,7 @@ namespace U5Designs
             // texture...
 
         };
-
+         **/
         PlayerState p_state;
 
         //player globals here
