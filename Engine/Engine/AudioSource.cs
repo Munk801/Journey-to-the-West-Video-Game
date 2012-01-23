@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.IO;
+using AL = OpenTK.Audio.OpenAL.AL;
+using csogg;
+using csvorbis;
+using AudioState = Engine.AudioManager.AudioState;
 
 namespace Engine
 {
@@ -11,11 +15,55 @@ namespace Engine
     /* Represents a sound that is made in the game.*/
     public class AudioSource
     {
+        #region Member Properties
+        // Member variables
         static List<AudioSource> AudioSources;
+        int[] audioBuffer;
+        int sourceID;
+        Dictionary<int, byte[]> bufferData;
+        OggInputStream oggStream;
+        Stream byteStream;
+        string audioFileName;
+        public bool isLooping;
+        public string audioName
+        {
+            get;
+            set;
+        }
+
+
+        public AudioManager.AudioState audioState
+        {
+            get
+            {
+                if (sourceID == 0) return AudioState.Audio_Initial;
+                return (AudioState)AL.GetSourceState(sourceID);
+            }
+        }
+
+        #endregion
 
         public AudioSource()
         {
-            // TO DO
+            // If audio stream isn't initialized, initialize the list, and add this stream to the list
+            if (AudioSources == null)
+            {
+                AudioSources = new List<AudioSource>();
+                
+            }
+            AudioSources.Add(this);
+
+            // Initialize buffers
+            audioBuffer = AL.GenBuffers(2);
+
+            // Initialize the source
+            sourceID = AL.GenSource();
+
+            // Stream the buffers to the buffer data
+            bufferData = new Dictionary<int, byte[]>();
+            bufferData[audioBuffer[0]] = new byte[44100];
+            bufferData[audioBuffer[1]] = new byte[44100];
+
         }
 
         ~AudioSource()
@@ -30,22 +78,75 @@ namespace Engine
 
         public bool LoadSource(Stream stream)
         {
+            if(!AudioManager.isAudioDeviceInitialized || byteStream == null)
             return false;
+
+            byteStream = stream;
+
+            oggStream = new OggInputStream(byteStream);
+
+            return true;
+
         }
+
+        public bool LoadSource(string fileName)
+        {
+            byte[] convString = ReadFile(fileName);
+            Stream path = new MemoryStream(convString);
+
+            return LoadSource(path);
+        }
+
+        public static byte[] ReadFile(string filePath)
+        {
+            byte[] buffer;
+            FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            try
+            {
+                int length = (int)fileStream.Length;  // get file length
+                buffer = new byte[length];            // create buffer
+                int count;                            // actual number of bytes read
+                int sum = 0;                          // total number of bytes read
+
+                // read until Read method returns 0 (end of the stream has been reached)
+                while ((count = fileStream.Read(buffer, sum, length - sum)) > 0)
+                    sum += count;  // sum is a buffer offset for next reading
+            }
+            finally
+            {
+                fileStream.Close();
+            }
+            return buffer;
+        }
+
+
+
 
         public void PlaySource()
         {
+            // Check to make sure the Audio Manager is initialized or the 
+            // source is set or we actually have something in the stream
 
+            // Fill buffers ????
+
+            // Add buffers to the queue ????
+
+            // Play Source
+            AL.SourcePlay(sourceID);
         }
 
         public void StopSource()
         {
+            // Check to make sure Audio Manager is initialized
 
+            AL.SourceStop(sourceID);
+            RewindSource();
         }
 
         public void PauseSource()
         {
-
+            // Same as stop but no need to rewind
+            AL.SourceStop(sourceID);
         }
 
         public void RewindSource()

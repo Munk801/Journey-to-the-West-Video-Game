@@ -43,7 +43,13 @@ namespace U5Designs
             GL.Enable(EnableCap.Lighting);
             GL.Enable(EnableCap.Light0);
 			GL.Enable(EnableCap.Texture2D);
-            
+
+            AudioManager.CreateAudioDevice();
+            AudioSource test = new AudioSource();
+            test.LoadSource("sound/Hydrate-Kenny_Beltrey.ogg");
+            test.PlaySource();
+
+
             states = new Stack<GameState>();
             MainMenuState ms = new MainMenuState();
             this.ChangeState(ms);
