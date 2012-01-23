@@ -107,23 +107,27 @@ namespace Engine
             }
         }
 
-        public void LoadSound(string soundID, string path)
+        /// <summary>
+        /// State of Audio.
+        /// </summary>
+        public enum AudioState
         {
-
+            Audio_Initial = OpenAL.ALSourceState.Initial,
+            Audio_Playing = OpenAL.ALSourceState.Playing,
+            Audio_Paused = OpenAL.ALSourceState.Paused,
+            Audio_Stopped = OpenAL.ALSourceState.Stopped
         }
 
-        internal Sound PlaySound(string soundID)
+        public static bool playMusic
         {
-            return null;
+            get;
+            set;
         }
 
-        internal void StopSound(Sound sound)
+        public static bool playSound
         {
-        }
-
-        internal bool isSoundPlaying(Sound sound)
-        {
-            return false;
+            get;
+            set;
         }
     }
 }
