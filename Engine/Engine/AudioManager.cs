@@ -57,7 +57,7 @@ namespace Engine
         public AudioManager()
         {
             // If there is no default device, return
-            if (!string.IsNullOrEmpty(DefaultAudioDevice)
+            if (!string.IsNullOrEmpty(DefaultAudioDevice))
             {
                 return;
             }
