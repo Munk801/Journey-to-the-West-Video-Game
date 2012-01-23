@@ -31,13 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="csogg, Version=1.0.3908.17877, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\csogg.dll</HintPath>
+    <Reference Include="csogg">
+      <HintPath>OGG\csogg.dll</HintPath>
     </Reference>
-    <Reference Include="csvorbis, Version=1.0.3908.17878, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\csvorbis.dll</HintPath>
+    <Reference Include="csvorbis">
+      <HintPath>OGG\csvorbis.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
