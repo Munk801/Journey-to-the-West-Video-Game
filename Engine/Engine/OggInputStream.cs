@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using csogg;
 using csvorbis;
-
 //taken from http://home.halden.net/tombr/ogg/ogg.html
 
 /*
@@ -514,16 +513,16 @@ namespace Engine
 		/// <summary>
 		/// Gets the format of the ogg file. Is either AudioFormat.Mono16 or AudioFormat.Stereo16
 		/// </summary>
-        //public AudioFormat Format
-        //{
-        //    get
-        //    {
-        //        if (Info.channels == 1)
-        //            return AudioFormat.Mono16;
-        //        else
-        //            return AudioFormat.Stereo16;
-        //    }
-        //}
+        public AudioManager.AudioFormat Format
+        {
+            get
+            {
+                if (Info.channels == 1)
+                    return AudioManager.AudioFormat.Mono16;
+                else
+                    return AudioManager.AudioFormat.Stereo16;
+            }
+        }
 
 
 

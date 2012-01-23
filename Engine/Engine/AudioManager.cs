@@ -134,5 +134,30 @@ namespace Engine
             get;
             set;
         }
+
+        public enum AudioFormat
+        {
+            /// <summary>
+            /// The stereo 16 bits format
+            /// </summary>
+            Stereo16 = OpenAL.ALFormat.Stereo16,
+
+            /// <summary>
+            /// The mono 16 bits format
+            /// </summary>
+            Mono16 = OpenAL.ALFormat.Mono16,
+
+
+            /// <summary>
+            /// The mono 8 bits format
+            /// </summary>
+            Mono8 = OpenAL.ALFormat.Mono8,
+
+
+            /// <summary>
+            /// The stereo 8 bits format
+            /// </summary>
+            Stereo8 = OpenAL.ALFormat.Stereo8,
+        }
     }
 }

@@ -126,10 +126,15 @@ namespace Engine
         {
             // Check to make sure the Audio Manager is initialized or the 
             // source is set or we actually have something in the stream
-
+            if (!AudioManager.isAudioDeviceInitialized || audioState == AudioState.Audio_Playing || sourceID == null) return;
+            
             // Fill buffers ????
+            if (!AudioBuffer(audioBuffer[0], bufferData[audioBuffer[0]])) return;
+
+            if (!AudioBuffer(audioBuffer[1], bufferData[audioBuffer[1]])) return;
 
             // Add buffers to the queue ????
+            AL.SourceQueueBuffers(sourceID, audioBuffer.Length, audioBuffer);
 
             // Play Source
             AL.SourcePlay(sourceID);
@@ -155,17 +160,69 @@ namespace Engine
         }
         bool AudioBuffer(int id, byte[] data)
         {
-            return false;
-        }
+            if (data == null | data.Length == 0)
+                return false;
 
+            int size = 0;
+            while (size < data.Length)
+            {
+                int result = oggStream.Read(data, size, data.Length - size);
+                if (result > 0)
+                {
+                    size += result;
+                }
+                else
+                {
+                    // End of stream
+                    //if (Stream.Position == Stream.Length)
+                    if (oggStream.Available == 0)
+                    {
+                        if (isLooping)
+                        {
+                            RewindSource();
+                        }
+                        else
+                            StopSource();
+                    }
+
+                    return false;
+                }
+            }
+
+            if (size == 0)
+            {
+                return false;
+            }
+
+            AL.BufferData(id, (OpenTK.Audio.OpenAL.ALFormat)oggStream.Format, data, data.Length, oggStream.Rate);
+            return true;
+        }
         internal void ProcessAudioBuffer()
         {
+            int buffersProcessed = 0;
+            AL.GetSource(sourceID, OpenTK.Audio.OpenAL.ALGetSourcei.BuffersProcessed, out buffersProcessed);
 
+            while (buffersProcessed-- != 0)
+            {
+                // Enqueue Buffer
+                int currentBuffer = AL.SourceUnqueueBuffer(sourceID);
+                
+                // Update Buffer
+                AudioBuffer(currentBuffer, bufferData[currentBuffer]);
+
+                // Queue up buffer
+                AL.SourceQueueBuffer(sourceID, currentBuffer);
+            }
         }
 
-        static internal void Update()
+        public static void Update()
         {
+            if (AudioSources == null) return;
 
+            foreach (AudioSource source in AudioSources)
+            {
+                source.ProcessAudioBuffer();
+            }
         }
     }
 }

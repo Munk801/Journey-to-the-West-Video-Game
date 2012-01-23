@@ -23,6 +23,7 @@ namespace U5Designs
         // A container which will hold the list of available saved games
         Stack<XmlNodeList> savedGameStates;
         Stack<string> savedGameChoices;
+        AudioSource test;
 
         // Initialize graphics here for the game playing
         public override void Init(GameEngine eng)
@@ -39,6 +40,11 @@ namespace U5Designs
 
             // TEST //
             LoadSavedState(1);
+
+            //AudioManager.CreateAudioDevice();
+            //test = new AudioSource();
+            //test.LoadSource("sound/Hydrate-Kenny_Beltrey.ogg");
+            //test.PlaySource();
         }
 
         // Cleanup any resources you created here
@@ -61,6 +67,7 @@ namespace U5Designs
 
         public override void Update(GameEngine eng, FrameEventArgs e)
         {
+            //AudioSource.Update();
         }
 
         public override void Draw(GameEngine eng, FrameEventArgs e)
