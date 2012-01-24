@@ -1,0 +1,12 @@
+<levels>
+	<level>
+		<l_name>Zoo Training Grounds</l_name>
+		<l_index>0</l_index>
+		<l_has_boss>0</l_has_boss>
+	</level>
+	<level>
+		<l_name>Downtown City</l_name>
+		<l_index>1</l_index>
+		<l_has_boss>1</l_has_boss>
+	</level>
+</levels>
