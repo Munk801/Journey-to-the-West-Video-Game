@@ -17,10 +17,15 @@ namespace U5Designs
     /** Main State of the game that will be active while the player is Playing **/
     class PlayState : GameState
     {
-        
+        internal GameEngine eng;
+        internal Player player;
+        internal bool enable3d;
+
         // Initialize graphics, etc here
-        public override void Init(GameEngine eng)
+        public PlayState(GameEngine engine)
         {
+            eng = engine;
+            player = new Player();
 
             enable3d = false;
 
@@ -36,39 +41,16 @@ namespace U5Designs
             GL.Enable(EnableCap.Lighting);
             GL.Enable(EnableCap.Light0);
 
-            updateView(eng);
+            updateView();
         }
 
-        // Cleanup anything here like freeing up graphics you loaded in Init
-        public override void Cleanup()
+        public override void Update(FrameEventArgs e)
         {
+            DealWithInput();
+            player.updateState(enable3d, a, s, d, w);
         }
 
-        public override void Pause()
-        {
-        }
-
-        public override void Resume()
-        {
-        }
-
-        public override void HandleEvents(GameEngine eng)
-        {
-            // Handle keyboard and other events here during the Main Menu state
-            DealWithKeys(eng);
-            // If the player decides to quit here then quit
-            //eng.Quit();
-
-            // Otherwise if the player starts up the game then move to the next state
-            //   PlayState ps = new PlayState();
-            //   eng.ChangeState(ps);
-        }
-
-        public override void Update(GameEngine eng, FrameEventArgs e)
-        {
-        }
-
-        public override void Draw(GameEngine eng, FrameEventArgs e)
+        public override void Draw(FrameEventArgs e)
         {
 
 
@@ -111,34 +93,25 @@ namespace U5Designs
             GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
             GL.PopMatrix();
 
-            //Test cube
-            GL.PushMatrix();
-            GL.Translate(50.0f, 12.5f, 50.0f);
-            GL.Scale(12.5f, 12.5f, 12.5f);
-            GL.Material(MaterialFace.Front, MaterialParameter.Specular, redSpecular);
-            GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, redDiffuse);
-            GL.Material(MaterialFace.Front, MaterialParameter.Ambient, redAmbient);
-            GL.Material(MaterialFace.Front, MaterialParameter.Shininess, redShininess);
-            GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
-            GL.PopMatrix();
+            player.draw();
         }
 
-        bool spaceDown, a, s, d;
+        bool spaceDown, a, s, d, w;
         //if its inconvenent to have key detection outside of the update method, move it back in
-        private void DealWithKeys(GameEngine eng)
+        private void DealWithInput()
         {
             //TODO: Change these keys to their final mappings when determined
 
             if (eng.Keyboard[Key.Escape])
             {
-                MainMenuState ms = new MainMenuState();
+                MainMenuState ms = new MainMenuState(eng);
                 eng.PushState(ms);
             }
             //********************** space
             if (eng.Keyboard[Key.Space] && !spaceDown)
             {
                 enable3d = !enable3d;
-                updateView(eng);
+                updateView();
                 spaceDown = true;
             }
             else if (!eng.Keyboard[Key.Space])
@@ -149,7 +122,6 @@ namespace U5Designs
             //********************** a
             if (eng.Keyboard[Key.A] && !a)
             {
-                Console.Out.WriteLine("a pushed");
                 a = true;
             }
             else if (!eng.Keyboard[Key.A])
@@ -160,7 +132,6 @@ namespace U5Designs
             //*********************** s
             if (eng.Keyboard[Key.S] && !s)
             {
-                Console.Out.WriteLine("s pushed");
                 s = true;
             }
             else if (!eng.Keyboard[Key.S])
@@ -170,17 +141,24 @@ namespace U5Designs
             //********************** d
             if (eng.Keyboard[Key.D] && !d)
             {
-                Console.Out.WriteLine("d pushed");
                 d = true;
             }
             else if (!eng.Keyboard[Key.D])
             {
                 d = false;
             }
+            //********************** w
+            if (eng.Keyboard[Key.W] && !w)
+            {
+                w = true;
+            }
+            else if (!eng.Keyboard[Key.W])
+            {
+                w = false;
+            }
         }
 
 
-        internal bool enable3d;
         protected Vector3 eye, lookat, forward, right;
 
         protected float[,] cubeVertices = new[,] {{1.0f, -1.0f, 1.0f},   {1.0f, -1.0f, -1.0f},  {-1.0f, -1.0f, -1.0f}, {-1.0f, -1.0f, 1.0f},
@@ -204,10 +182,6 @@ namespace U5Designs
         protected float[] groundSpecular = { 0.633f, 0.727811f, 0.633f }; //{0.0f, 0.0f, 0.0f, 1.0f};
         protected float[] groundShininess = { 76.8f }; //{0.0f};
 
-        protected float[] redAmbient = { 0.4f, 0.0f, 0.0f, 1.0f };
-        protected float[] redDiffuse = { 0.4f, 0.0f, 0.0f, 1.0f };
-        protected float[] redSpecular = { 1.0f, 1.0f, 1.0f, 1.0f };
-        protected float[] redShininess = { 0.5f };
 
         protected float[] noglow = { 0.0f, 0.0f, 0.0f, 1.0f };
         protected float[] lightPos = { 25.0f, 50.0f, 250.0f };
@@ -215,7 +189,7 @@ namespace U5Designs
 
 
         /// <summary>Updates the projection matrix for the current view (2D/3D)</summary>
-        public override void updateView(GameEngine eng)
+        public override void updateView()
         {
             //TODO: Animate view transition
             GL.MatrixMode(MatrixMode.Projection);

@@ -48,7 +48,7 @@ namespace U5Designs
 
 
             states = new Stack<GameState>();
-            MainMenuState ms = new MainMenuState();
+            MainMenuState ms = new MainMenuState(this);
             this.ChangeState(ms);
 
             // Set the screen resolution (Fullscreen / windowed)
@@ -65,26 +65,15 @@ namespace U5Designs
             if (states.Count != 0)
             {
                 GameState st = states.Pop();
-                st.Cleanup();
             }
-
-            // Store and INIT the new state
+            // Store new state
             states.Push(state);
-            state.Init(this);
         }
         // same as changestate but doesnt delete old state(ie pause game, bringup menu)
         public void PushState(GameState state)
         {
-            // pause the current state
-            if (states.Count != 0)
-            {
-                GameState st = states.Peek();
-                st.Pause();
-            }
-
             // store and INIT the new state
             states.Push(state);
-            state.Init(this);
         }
         // pops the current state off and lets the next state have control(menu nukes self, resumes game)
         public void PopState()
@@ -93,15 +82,7 @@ namespace U5Designs
             if (states.Count != 0)
             {
                 GameState st = states.Peek();
-                st.Cleanup();
                 states.Pop();
-            }
-
-            // resume the previous state
-            if (states.Count != 0)
-            {
-                GameState st = states.Peek();
-                st.Resume();
             }
         }
 
@@ -113,16 +94,9 @@ namespace U5Designs
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             AudioSource.Update();
-
             base.OnUpdateFrame(e);
-
-            // let the state handle events
-            states.Peek().HandleEvents(this);
-
             // let the state update the game
-            states.Peek().Update(this, e);
-
-            
+            states.Peek().Update(e);      
         }
 
         /// <summary>
@@ -133,7 +107,7 @@ namespace U5Designs
             base.OnRenderFrame(e);
 
             // let the state draw the screen
-            states.Peek().Draw(this, e);
+            states.Peek().Draw(e);
             SwapBuffers();
         }
 
@@ -147,7 +121,7 @@ namespace U5Designs
             base.OnResize(e);
 
             GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
-            states.Peek().updateView(this);
+            states.Peek().updateView();
         }
     }
 }

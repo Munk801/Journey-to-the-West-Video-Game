@@ -24,31 +24,12 @@ namespace U5Designs
      * */
     public abstract class GameState
     {
-        public virtual void Init(GameEngine eng)
+
+        public virtual void Update(FrameEventArgs e)
         {
         }
 
-        public virtual void Cleanup()
-        {
-        }
-
-        public virtual void Pause()
-        {
-        }
-
-        public virtual void Resume()
-        {
-        }
-
-        public virtual void HandleEvents(GameEngine eng)
-        {
-        }
-
-        public virtual void Update(GameEngine gameEng, FrameEventArgs e)
-        {
-        }
-
-        public virtual void Draw(GameEngine gameEng, FrameEventArgs e)
+        public virtual void Draw(FrameEventArgs e)
         {
         }
 
@@ -57,7 +38,7 @@ namespace U5Designs
             eng.ChangeState(state);
         }
 
-        public virtual void updateView(GameEngine eng)
+        public virtual void updateView()
         {
         }
     }

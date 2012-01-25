@@ -19,16 +19,17 @@ namespace U5Designs
     /** Main Menu State of the game that will be active while the Main Menu is up **/
     class MainMenuState : GameState
     {
+        internal GameEngine eng;
 
         // A container which will hold the list of available saved games
         Stack<XmlNodeList> savedGameStates;
         Stack<string> savedGameChoices;
         //AudioSource test;
 
-        // Initialize graphics here for the game playing
-        public override void Init(GameEngine eng)
+        public MainMenuState(GameEngine engine)
         {
-            // Initialize the saved games stack
+            eng = engine;
+
             savedGameStates = new Stack<XmlNodeList>();
             savedGameChoices = new Stack<string>();
 
@@ -36,11 +37,10 @@ namespace U5Designs
             SavedGameDataSetup();
 
             // Display available saved game states
-            DisplayAvailableSaves(); 
+            DisplayAvailableSaves();
 
             // TEST //
             LoadSavedState(1);
-
 
             //AudioManager.CreateAudioDevice();
             //test = new AudioSource();
@@ -48,37 +48,20 @@ namespace U5Designs
             //test.PlaySource();
         }
 
-        // Cleanup any resources you created here
-        public override void Cleanup()
+        public override void Update(FrameEventArgs e)
         {
-        }
-
-        public override void Pause()
-        {
-        }
-
-        public override void Resume()
-        {
-        }
-
-        public override void HandleEvents(GameEngine eng)
-        {
-            DealWithKeys(eng);
-        }
-
-        public override void Update(GameEngine eng, FrameEventArgs e)
-        {
+            DealWithInput();
             //AudioSource.Update();
             //test.PlaySource();
         }
 
-        public override void Draw(GameEngine eng, FrameEventArgs e)
+        public override void Draw(FrameEventArgs e)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             
         }
 
-        private void DealWithKeys(GameEngine eng)
+        private void DealWithInput()
         {
             //TODO: Change these keys to their final mappings when determined
 
@@ -97,7 +80,7 @@ namespace U5Designs
                 }
                 else
                 {
-                    PlayState ps = new PlayState();
+                    PlayState ps = new PlayState(eng);
                     eng.ChangeState(ps);
                     eng.GameInProgress = true;
                 }
