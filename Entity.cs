@@ -8,6 +8,6 @@ namespace U5Designs
     class Entity
     {
 
-        // powerups, health things? stuff thats not a player, projectile or monster
+        
     }
 }

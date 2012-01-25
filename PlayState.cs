@@ -11,6 +11,7 @@ using OpenTK.Input;
 
 // XML parser
 using System.Xml;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace U5Designs
@@ -21,6 +22,8 @@ namespace U5Designs
         internal GameEngine eng;
         internal Player player;
         internal bool enable3d;
+        internal ArrayList ObjList;
+
         int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
 
         // Initialize graphics, etc here
@@ -240,7 +243,8 @@ namespace U5Designs
          * */
         public override void loadGameObjects()
         {
-            
+            //TODO: pass this the right file to load from
+            ObjList = LoadLevel.Load();
         }
 
         public override List<GameObject> getGameObjects()

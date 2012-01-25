@@ -50,6 +50,7 @@
     <Compile Include="EntryPoint.cs" />
     <Compile Include="GameEngine.cs" />
     <Compile Include="GameState.cs" />
+    <Compile Include="LoadLevel.cs" />
     <Compile Include="MainMenuState.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerState.cs" />
