@@ -62,10 +62,13 @@ namespace U5Designs
         {
         }
 
-        public virtual List<GameObject> loadGameObjects()
+        public virtual void loadGameObjects()
+        {            
+        }
+
+        public virtual List<GameObject> getGameObjects()
         {
             List<GameObject> gameData = new List<GameObject>();
-
             return gameData;
         }
     }

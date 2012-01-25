@@ -18,6 +18,13 @@ namespace U5Designs
     /** Main State of the game that will be active while the player is Playing **/
     class PlayState : GameState
     {
+        // Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
+        int current_level = -1;
+
+        public PlayState(int lvl)
+        {
+            current_level = lvl;
+        }
         
         // Initialize graphics, etc here
         public override void Init(GameEngine eng)
@@ -251,7 +258,24 @@ namespace U5Designs
             }
         }
 
-        public List<GameObject> loadGameData()
+        /**
+         * Change the current level being played to the parameter
+         * */
+        public void changeCurrentLevel(int l)
+        {
+            current_level = l;
+        }
+
+        /**
+         * Load the current_level .dat file information
+         * 
+         * */
+        public override void loadGameObjects()
+        {
+            
+        }
+
+        public override List<GameObject> getGameObjects()
         {
             List<GameObject> gameData = new List<GameObject>();
 
