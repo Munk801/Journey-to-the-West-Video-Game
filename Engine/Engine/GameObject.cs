@@ -9,7 +9,7 @@ using OpenTK;
  * things that are common for everything, like location
  */
 namespace Engine {
-	class GameObject {
+	public class GameObject {
 		//does this object exist when the game is
 		bool existsIn2d() {
 

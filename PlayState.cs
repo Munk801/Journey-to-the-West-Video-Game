@@ -8,6 +8,7 @@ using OpenTK.Audio.OpenAL;
 using Engine;
 using Engine.Input;
 using OpenTK.Input;
+
 // XML parser
 using System.Xml;
 using System.Collections.Generic;
@@ -20,9 +21,10 @@ namespace U5Designs
         internal GameEngine eng;
         internal Player player;
         internal bool enable3d;
+        int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
 
         // Initialize graphics, etc here
-        public PlayState(GameEngine engine)
+        public PlayState(GameEngine engine, int lvl)
         {
             eng = engine;
             player = new Player();
@@ -224,6 +226,28 @@ namespace U5Designs
             }
         }
 
-       
+        /**
+         * Change the current level being played to the parameter
+         * */
+        public void changeCurrentLevel(int l)
+        {
+            current_level = l;
+        }
+
+        /**
+         * Load the current_level .dat file information
+         * 
+         * */
+        public override void loadGameObjects()
+        {
+            
+        }
+
+        public override List<GameObject> getGameObjects()
+        {
+            List<GameObject> gameData = new List<GameObject>();
+
+            return gameData;
+        }
     }
 }

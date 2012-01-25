@@ -24,6 +24,8 @@ namespace U5Designs
         // A container which will hold the list of available saved games
         Stack<XmlNodeList> savedGameStates;
         Stack<string> savedGameChoices;
+        int saved_level_index = -1;
+
         //AudioSource test;
 
         public MainMenuState(GameEngine engine)
@@ -80,7 +82,12 @@ namespace U5Designs
                 }
                 else
                 {
-                    PlayState ps = new PlayState(eng);
+
+                    // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
+                    PlayState ps = new PlayState(eng, 0);
+
+                    // Otherwise pass the level index from the saved game
+                    //PlayState ps = new PlayState(saved_level_index);
                     eng.ChangeState(ps);
                     eng.GameInProgress = true;
                 }
@@ -153,7 +160,10 @@ namespace U5Designs
                 if (n.Name.CompareTo("p_name") == 0)
                     ps.setName(n.InnerText);
                 if (n.Name.CompareTo("p_current_zone") == 0)
+                {
                     ps.setZone(Convert.ToInt32(n.InnerText));
+                    saved_level_index = Convert.ToInt32(n.InnerText);
+                }
                 if (n.Name.CompareTo("p_health") == 0)
                     ps.setHealth(Convert.ToInt32(n.InnerText));
                 if (n.Name.CompareTo("p_speed") == 0)
