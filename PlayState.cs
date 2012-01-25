@@ -8,6 +8,7 @@ using OpenTK.Audio.OpenAL;
 using Engine;
 using Engine.Input;
 using OpenTK.Input;
+
 // XML parser
 using System.Xml;
 using System.Collections.Generic;
@@ -250,6 +251,11 @@ namespace U5Designs
             }
         }
 
-       
+        public List<GameObject> loadGameData()
+        {
+            List<GameObject> gameData = new List<GameObject>();
+
+            return gameData;
+        }
     }
 }

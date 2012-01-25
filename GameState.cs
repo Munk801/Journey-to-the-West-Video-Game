@@ -7,6 +7,7 @@ using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
 using Engine;
 using Engine.Input;
+using System.Collections.Generic;
 
 namespace U5Designs
 {
@@ -59,6 +60,13 @@ namespace U5Designs
 
         public virtual void updateView(GameEngine eng)
         {
+        }
+
+        public virtual List<GameObject> loadGameObjects()
+        {
+            List<GameObject> gameData = new List<GameObject>();
+
+            return gameData;
         }
     }
 }
