@@ -1,0 +1,15 @@
+<level>
+	<l_name>Zoo Training Grounds</l_name>
+	<l_index>0</l_index>
+	<l_has_boss>0</l_has_boss>
+	<objects>		
+		<object>
+			<o_type>Yeti1</o_type>
+			<interact>1</interact>
+			<loc>2 2 0
+			3 3 0
+			4 4 0
+			5 5 0</loc>
+		</object>
+	</objects>
+</level>

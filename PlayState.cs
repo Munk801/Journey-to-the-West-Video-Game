@@ -47,6 +47,9 @@ namespace U5Designs
             GL.Enable(EnableCap.Light0);
 
             updateView();
+
+            // Testing...remove when done //
+            loadGameObjects();
         }
 
         public override void Update(FrameEventArgs e)
@@ -244,14 +247,8 @@ namespace U5Designs
         public override void loadGameObjects()
         {
             //TODO: pass this the right file to load from
-            ObjList = LoadLevel.Load();
-        }
-
-        public override List<GameObject> getGameObjects()
-        {
-            List<GameObject> gameData = new List<GameObject>();
-
-            return gameData;
-        }
+            // undo this when done testing ObjList = LoadLevel.Load(current_level);
+            ObjList = LoadLevel.Load(0);
+        }        
     }
 }

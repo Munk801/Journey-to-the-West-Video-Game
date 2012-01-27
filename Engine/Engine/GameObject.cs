@@ -20,6 +20,11 @@ namespace Engine
         public float posy;
         public float posz;
         // ...etc all the things that all game objects will have
+        public string sfx_path;
+        public string texture_path;
+        public string obj_name_text;
+        public int health;
+        public string ability;
 
         public GameObject()
         {

@@ -13,6 +13,8 @@ using OpenTK.Input;
 // XML parser
 using System.Xml;
 using System.Collections.Generic;
+using System.Reflection;
+using System.IO;
 
 namespace U5Designs
 {
@@ -101,9 +103,13 @@ namespace U5Designs
         public void SavedGameDataSetup()
         {
             // Parse XML saved game data file and store the information             
-            XmlDocument doc = new XmlDocument();
-            doc.Load("test.sav");
+            XmlDocument doc = new XmlDocument();            
+            
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            Stream fstream = assembly.GetManifestResourceStream("U5Designs.Resources.test.sav");           
+            doc.Load(fstream);
             XmlNodeList games = doc.GetElementsByTagName("save");            
+            
             foreach(XmlNode n in games)
             {
                 // Create a new list of nodes that will contain each data element from a particular saved game state
