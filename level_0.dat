@@ -6,10 +6,29 @@
 		<object>
 			<o_type>tree</o_type>
 			<interact>0</interact>
+			<loc>
+			0 0 0
+			1 1 0
+			2 2 0
+			</loc>
 		</object>
 		<object>
 			<o_type>rock</o_type>
 			<interact>0</interact>
+			<loc>
+			3 3 0
+			5 5 1
+			</loc>
+		</object>
+		<object>
+			<o_type>Yeti</o_type>
+			<interact>1</interact>
+			<loc>
+			2 2 0
+			3 3 0
+			4 4 0
+			5 5 0
+			</loc>
 		</object>
 	</objects>
 </level>
