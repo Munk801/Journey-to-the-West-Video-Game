@@ -5,9 +5,9 @@ using System.Text;
 
 using OpenTK.Graphics.OpenGL;
 
-/* Contains the geometry, textures, etc. for a particular in-game object which is to be
- * rendered in 3D.  Different in-game objects that share geometry may also share a single
- * Geometry3D object.
+/* DEPRECATED - This class will be deleted soon.  It has been
+ * replaced by ObjMesh.  It is being kept temporarily until
+ * the draw() code has been moved elsewhere.
  */
 
 namespace Engine {
