@@ -54,6 +54,8 @@
     <Compile Include="Geometry3D.cs" />
     <Compile Include="Input\Input.cs" />
     <Compile Include="Input\Keyboard.cs" />
+    <Compile Include="ObjMesh.cs" />
+    <Compile Include="ObjMeshLoader.cs" />
     <Compile Include="OggInputStream.cs" />
     <Compile Include="PreciseTimer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
