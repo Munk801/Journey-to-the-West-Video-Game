@@ -12,15 +12,26 @@ using System.Drawing;
  */
 
 namespace Engine {
-	interface RenderObject {
-		ObjMesh getMesh(); //null for sprites
-		Bitmap getTexture(); //null for sprites
-		SpriteSheet getSprite(); //null for 3d objects
+	public interface RenderObject {
+		ObjMesh mesh { //null for sprites
+			get;
+		}
+
+		Bitmap texture { //null for sprites
+			get;
+		}
+
+		SpriteSheet sprite { //null for 3d objects
+			get;
+		}
+
+		int frameNumber { //index of the current animation frame
+			get;
+			set;
+		}
 
 		bool is3d(); //returns true if item has 3d geometry, false if sprite
 		bool isAnimated(); //true if more than one frame (probably only applies to sprites)
-		int getFrameNumber(); //returns index of the current animation frame
-		void setFrameNumber(); //sets index of the current animation frame
 		void doScaleTranslateAndTexture(); //pushes matrix, adds scale and translate to model view stack, and sets texture pointer
 	}
 }

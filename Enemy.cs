@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
+
+using OpenTK;
+
+using Engine;
 
 namespace U5Designs
 {
-    class Enemy
+    class Enemy : GameObject, AIObject, RenderObject
     {
         /** This struct will contain the Players Status **/
         struct EnemyState
@@ -43,6 +48,72 @@ namespace U5Designs
             e_state.e_speed = speed;
 
             // Add in the other State elements that will need to be maintained here..
-        }
-    }
+		}
+
+		private ObjMesh _mesh; //null for sprites
+		ObjMesh RenderObject.mesh {
+			get { return _mesh; }
+		}
+
+		private Bitmap _texture; //null for sprites
+		Bitmap RenderObject.texture {
+			get { return _texture; }
+		}
+
+		private SpriteSheet _sprite; //null for 3d objects
+		SpriteSheet RenderObject.sprite {
+			get { return _sprite; }
+		}
+
+		private int _frameNum; //index of the current animation frame
+		int RenderObject.frameNumber {
+			get { return _frameNum; }
+			set { _frameNum = value; }
+		}
+
+		bool RenderObject.is3d() {
+			throw new Exception("The method or operation is not implemented.");
+		}
+
+		bool RenderObject.isAnimated() {
+			throw new Exception("The method or operation is not implemented.");
+		}
+
+		void RenderObject.doScaleTranslateAndTexture() {
+			throw new Exception("The method or operation is not implemented.");
+		}
+
+		void PhysicsObject.physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
+			throw new NotImplementedException();
+		}
+
+		void PhysicsObject.accelerate(double acceleration) {
+			throw new NotImplementedException();
+		}
+
+		private float _health;
+		float CombatObject.health {
+			get { return _health; }
+			set { _health = value; }
+		}
+
+		private float _damage;
+		float CombatObject.damage {
+			get { return _damage; }
+		}
+
+		private bool _alive;
+		bool CombatObject.alive {
+			get { return _alive; }
+			set { _alive = value; }
+		}
+
+		void AIObject.aiUpdate(FrameEventArgs e) {
+			throw new NotImplementedException();
+		}
+
+		void CombatObject.reset() {
+			throw new NotImplementedException();
+		}
+	}
 }

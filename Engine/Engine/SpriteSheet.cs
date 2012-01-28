@@ -13,7 +13,7 @@ using OpenTK.Graphics.OpenGL;
  */
 
 namespace Engine {
-	class SpriteSheet {
+	public class SpriteSheet {
 
 		private static readonly float[] vertices = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f};
 		private static readonly float[] texverts = {0.0f, 0.0f,        1.0f, 0.0f,        1.0f, 1.0f,        0.0f, 1.0f};

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.Drawing;
+using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -11,7 +13,7 @@ using OpenTK.Input;
 
 namespace U5Designs
 {
-    class Player
+    class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
         public PlayerState p_state;
         public bool shifter; 
@@ -78,6 +80,69 @@ namespace U5Designs
             GL.Material(MaterialFace.Front, MaterialParameter.Shininess, redShininess);
             GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
             GL.PopMatrix();
-        }
-    }
+		}
+
+		private ObjMesh _mesh; //null for sprites
+		ObjMesh RenderObject.mesh {
+			get { return _mesh; }
+		}
+
+		private Bitmap _texture; //null for sprites
+		Bitmap RenderObject.texture {
+			get { return _texture; }
+		}
+
+		private SpriteSheet _sprite; //null for 3d objects
+		SpriteSheet RenderObject.sprite {
+			get { return _sprite; }
+		}
+
+		private int _frameNum; //index of the current animation frame
+		int RenderObject.frameNumber {
+			get { return _frameNum; }
+			set { _frameNum = value; }
+		}
+
+		bool RenderObject.is3d() {
+			throw new Exception("The method or operation is not implemented.");
+		}
+
+		bool RenderObject.isAnimated() {
+			throw new Exception("The method or operation is not implemented.");
+		}
+
+		void RenderObject.doScaleTranslateAndTexture() {
+			throw new Exception("The method or operation is not implemented.");
+		}
+
+		void PhysicsObject.physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
+			throw new Exception("The method or operation is not implemented.");
+		}
+
+		void PhysicsObject.accelerate(double acceleration) {
+			throw new Exception("The method or operation is not implemented.");
+		}
+
+		private float _health;
+		float CombatObject.health {
+			get { return _health; }
+			set { _health = value; }
+		}
+
+		private float _damage;
+		float CombatObject.damage {
+			get { return _damage; }
+		}
+
+		private bool _alive;
+		bool CombatObject.alive {
+			get { return _alive; }
+			set { _alive = value; }
+		}
+
+		//TODO: Don't know if reset really applies to player or not...
+		void CombatObject.reset() {
+			throw new NotImplementedException();
+		}
+	}
 }

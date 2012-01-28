@@ -12,13 +12,15 @@ using System.IO;
 // String splitter
 using System.Text.RegularExpressions;
 
+using System.Collections.Generic;
+
 namespace U5Designs
 {
     class LoadLevel
     {
-        public static ArrayList Load(int level_to_load)
+        public static List<GameObject> Load(int level_to_load)
         {
-            ArrayList objects = new ArrayList();
+            List<GameObject> objects = new List<GameObject>();
             //TODO write xml parser to populate this array list with all the objects in a level
             //TODO wire up subclasses of GameObject to inheriate from it, extend it where needed
 
@@ -71,18 +73,20 @@ namespace U5Designs
 
                     XmlNodeList abil_0 = obj_doc.GetElementsByTagName("e_ability_0");
 
-                    GameObject go = new GameObject();
-                    go.posx = Convert.ToInt32(locations[x]);
-                    go.posy = Convert.ToInt32(locations[x + 1]);
-                    go.posz = Convert.ToInt32(locations[x + 2]);
-
-                    go.health = Convert.ToInt32(health[0].InnerText);
-                    go.sfx_path = sfx_0[0].InnerText;
-                    go.texture_path = texture[0].InnerText;
-                    go.ability = abil_0[0].InnerText;
-
-                    // Add it to the master list
-                    objects.Add(go);
+					//GameObject is abstract - this must be initialized to
+					//the proper subclass instead
+//                     GameObject go = new GameObject();
+//                     go.posx = Convert.ToInt32(locations[x]);
+//                     go.posy = Convert.ToInt32(locations[x + 1]);
+//                     go.posz = Convert.ToInt32(locations[x + 2]);
+// 
+//                     go.health = Convert.ToInt32(health[0].InnerText);
+//                     go.sfx_path = sfx_0[0].InnerText;
+//                     go.texture_path = texture[0].InnerText;
+//                     go.ability = abil_0[0].InnerText;
+// 
+//                     // Add it to the master list
+//                     objects.Add(go);
                 }
             } 
 

@@ -22,7 +22,13 @@ namespace U5Designs
         internal GameEngine eng;
         internal Player player;
         internal bool enable3d;
-        internal ArrayList ObjList;
+
+		//everything is in objList, and then also pointed to from the appropriate interface lists
+        internal List<GameObject> objList;
+		internal List<RenderObject> renderList;
+		internal List<PhysicsObject> physList;
+		internal List<AIObject> aiList;
+		internal List<CombatObject> combatList;
 
         int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
 
@@ -248,7 +254,7 @@ namespace U5Designs
         {
             //TODO: pass this the right file to load from
             // undo this when done testing ObjList = LoadLevel.Load(current_level);
-            ObjList = LoadLevel.Load(0);
+            objList = LoadLevel.Load(0);
         }        
     }
 }

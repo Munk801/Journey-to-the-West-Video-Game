@@ -12,29 +12,36 @@ using OpenTK;
  */
 namespace Engine 
 {
-	public class GameObject 
+	public abstract class GameObject 
     {
-        //IF you want to change it in LoadLevel it MUST BE PUBLIC!!!
-        public bool shown3d;
-        public float posx;
-        public float posy;
-        public float posz;
-        // ...etc all the things that all game objects will have
-        public string sfx_path;
-        public string texture_path;
-        public string obj_name_text;
-        public int health;
-        public string ability;
+		//Note: GameObject should only have fields that are applicable
+		//      to ALL types of objects.  If it only applies to some
+		//      objects, it should be in the appropriate subclass.
 
-        public GameObject()
-        {
+		//Does this object exist when viewed in 3d?
+		protected bool _existsIn3d;
+		public bool existsIn3d {
+			get { return _existsIn3d; }
+			protected set { _existsIn3d = value; }
+		}
 
-        }
+		//Does this object exist when viewed in 2d?
+		protected bool _existsIn2d;
+		public bool existsIn2d {
+			get { return _existsIn2d; }
+			protected set { _existsIn2d = value; }
+		}
 
+		protected Vector3 _location;
+		public Vector3 location {
+			get { return _location; }
+			protected set { _location = value; }
+		}
 
-		Vector3 getLocation() {
-
-			return new Vector3(0,0,0);
+		protected string _obj_name_text;
+		public string obj_name_text {
+			get { return _obj_name_text; }
+			private set { _obj_name_text = value; }
 		}
 	}
 }

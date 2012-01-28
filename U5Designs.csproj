@@ -45,8 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Decoration.cs" />
     <Compile Include="Enemy.cs" />
-    <Compile Include="Entity.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="GameEngine.cs" />
     <Compile Include="GameState.cs" />
@@ -55,6 +55,7 @@
     <Compile Include="Player.cs" />
     <Compile Include="PlayerState.cs" />
     <Compile Include="PlayState.cs" />
+    <Compile Include="Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
