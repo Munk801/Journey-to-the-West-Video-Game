@@ -22,15 +22,15 @@ namespace Engine
     public class AudioManager
     {
         // Public variables needed for Audio Manager.  The number of channels, buffers per channel, and bytes per buffer
-        int NumOfChannels { get;  set; }
-        int BuffersPerChannel { get;  set; }
-        int BytesPerBuffer { get;  set; }
+        public int NumOfChannels { get;  private set; }
+        public int BuffersPerChannel { get;  private set; }
+        public int BytesPerBuffer { get;  set; }
 
         // Stores all the channels we have
-        AudioSource[] AudioSources { get; set; }
+        public AudioSource[] AudioSources { get; set; }
 
         // Audio threading
-        Thread ThreadCall { get; set; }
+        public Thread ThreadCall { get; private set; }
 
         // Checks if we need updating
         public bool needsUpdate { get; set; }
@@ -128,7 +128,6 @@ namespace Engine
                     {
                         // POSSIBLE THERE NEEDS TO BE A SLEEP CALL IN THREAD
                         source.Update();
-                        Thread.Sleep(1);
                     }
                 }
             }

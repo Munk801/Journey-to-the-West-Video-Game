@@ -27,7 +27,7 @@ namespace U5Designs
         Stack<XmlNodeList> savedGameStates;
         Stack<string> savedGameChoices;
         int saved_level_index = -1;
-        AudioFile testFile = new AudioFile("sound/Hydrate-Kenny_Beltrey.ogg");
+        AudioFile testFile = new AudioFile("GuitarSample.ogg");
 
         public MainMenuState(GameEngine engine)
         {
@@ -53,7 +53,7 @@ namespace U5Designs
         public override void Update(FrameEventArgs e)
         {
             DealWithInput();
-            AudioManager.Manager.Update();
+            //AudioManager.Manager.Update();
 
         }
 
