@@ -5,224 +5,261 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using AL = OpenTK.Audio.OpenAL.AL;
+using OpenTK.Audio;
+using OpenTK.Audio.OpenAL;
 using csogg;
 using csvorbis;
-using AudioState = Engine.AudioManager.AudioState;
 
 namespace Engine
 {
-    
-    /* Represents a sound that is made in the game.*/
-    public class AudioSource
+    /// <summary>
+    /// Every audio source that is created is managed by Audio Manager 
+    /// and will be placed on its own channel for buffering, updating, and playing.
+    /// </summary>
+    public class AudioSource : IDisposable
     {
-        #region Member Properties
-        // Member variables
-        static List<AudioSource> AudioSources;
-        int[] audioBuffer;
-        int sourceID;
-        Dictionary<int, byte[]> bufferData;
-        OggInputStream oggStream;
-        Stream byteStream;
-        string audioFileName;
-        public bool isLooping;
-        public string audioName
-        {
-            get;
-            set;
-        }
+        // Local variables
+        public byte[] SegmentBuffer { get; private set; }
+        public int[] Buffers { get; private set; }
+        public int BufferCount { get; private set; }
+        public int BufferSize { get; private set; }
+        public int Source { get; private set; }
+        public VorbisFileInstance SourceFile {get; private set;}
 
+        public ALFormat AudioFormat {get; private set;}
+        public int AudioRate {get; private set;}
 
-        public AudioManager.AudioState audioState
+        private bool FileHasEnded; 
+
+        public bool IsFree
         {
             get
             {
-                if (sourceID == 0) return AudioState.Audio_Initial;
-                return (AudioState)AL.GetSourceState(sourceID);
+                return SourceFile == null;
             }
         }
 
-        #endregion
+        private const int _BIGENDIANREADMODE = 0;
+        private const int _WORDREADMODE = 2;
+        private const int _SGNEDREADMODE = 1;
 
-        public AudioSource()
+        // CONSTRUCTOR
+        public AudioSource(int bufferCount, int bufferSize)
         {
-            // If audio stream isn't initialized, initialize the list, and add this stream to the list
-            if (AudioSources == null)
+            Buffers = new int[bufferCount];
+            BufferCount = bufferCount;
+            BufferSize = bufferSize;
+            SourceFile = null;
+
+            SegmentBuffer = new byte[bufferSize];
+
+            // Create the source
+            Source = AL.GenSource();
+
+            // Create buffers
+            for (int i = 0; i < BufferCount; i++)
             {
-                AudioSources = new List<AudioSource>();
-                
+                Buffers[i] = AL.GenBuffer();
             }
-            AudioSources.Add(this);
-
-            // Initialize buffers
-            audioBuffer = AL.GenBuffers(2);
-
-            // Initialize the source
-            sourceID = AL.GenSource();
-
-            // Stream the buffers to the buffer data
-            bufferData = new Dictionary<int, byte[]>();
-            bufferData[audioBuffer[0]] = new byte[44100];
-            bufferData[audioBuffer[1]] = new byte[44100];
-
         }
 
+        // DESTRUCTOR
         ~AudioSource()
         {
-
+            Dispose();
         }
 
-        public void Release()
+        // DISPOSE METHOD FOR REMOVING UNUSED RESOURCES
+        public void Dispose()
         {
-
-        }
-
-        public bool LoadSource(Stream stream)
-        {
-            if(!AudioManager.isAudioDeviceInitialized || byteStream == null)
-            return false;
-
-            byteStream = stream;
-
-            oggStream = new OggInputStream(byteStream);
-
-            return true;
-
-        }
-
-        public bool LoadSource(string fileName)
-        {
-            byte[] convString = ReadFile(fileName);
-            Stream path = new MemoryStream(convString);
-
-            return LoadSource(path);
-        }
-
-        public static byte[] ReadFile(string filePath)
-        {
-            byte[] buffer;
-            FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            try
+            AL.SourceStop(Source);
+            if (Buffers != null)
             {
-                int length = (int)fileStream.Length;  // get file length
-                buffer = new byte[length];            // create buffer
-                int count;                            // actual number of bytes read
-                int sum = 0;                          // total number of bytes read
-
-                // read until Read method returns 0 (end of the stream has been reached)
-                while ((count = fileStream.Read(buffer, sum, length - sum)) > 0)
-                    sum += count;  // sum is a buffer offset for next reading
+                AL.DeleteBuffers(Buffers);
             }
-            finally
+
+            Buffers = null;
+            SourceFile = null;
+        }
+
+        // REMOVE EMPTY BUFFERS FROM QUEUE
+        protected void RemoveEmptyBuffers()
+        {
+            int buffersProcessed;
+            AL.GetSource(Source, ALGetSourcei.BuffersProcessed, out buffersProcessed);
+
+            int[] buffersRemoved = new int[buffersProcessed];
+
+            AL.SourceUnqueueBuffers(Source, buffersProcessed, buffersRemoved);
+
+        }
+
+        // DETERMINES THE ALFORMAT FOR A GIVEN SOURCE
+        public ALFormat DetermineSourceFormat(VorbisFileInstance source)
+        {
+            Info sourceInfo = RetrieveSourceInfo(source);
+
+            if (sourceInfo.channels == 1)
             {
-                fileStream.Close();
+                return ALFormat.Mono16;
             }
-            return buffer;
-        }
-
-
-
-
-        public void PlaySource()
-        {
-            // Check to make sure the Audio Manager is initialized or the 
-            // source is set or we actually have something in the stream
-            if (!AudioManager.isAudioDeviceInitialized || audioState == AudioState.Audio_Playing || sourceID == null) return;
-            
-            // Fill buffers ????
-            if (!AudioBuffer(audioBuffer[0], bufferData[audioBuffer[0]])) return;
-
-            if (!AudioBuffer(audioBuffer[1], bufferData[audioBuffer[1]])) return;
-
-            // Add buffers to the queue ????
-            AL.SourceQueueBuffers(sourceID, audioBuffer.Length, audioBuffer);
-
-            // Play Source
-            AL.SourcePlay(sourceID);
-        }
-
-        public void StopSource()
-        {
-            // Check to make sure Audio Manager is initialized
-
-            AL.SourceStop(sourceID);
-            RewindSource();
-        }
-
-        public void PauseSource()
-        {
-            // Same as stop but no need to rewind
-            AL.SourceStop(sourceID);
-        }
-
-        public void RewindSource()
-        {
+            else return ALFormat.Stereo16;
 
         }
 
-        bool AudioBuffer(int id, byte[] data)
+        // DETERMINE THE RATE OF A GIVEN SOURCE
+        public int DetermineSourceRate(VorbisFileInstance source)
         {
-            if (data == null | data.Length == 0)
-                return false;
+            Info sourceInfo = RetrieveSourceInfo(source);
 
-            int size = 0;
-            while (size < data.Length)
+            return sourceInfo.rate;
+        }
+
+        /// <summary>
+        /// Retrive the source info from a vorbis file
+        /// </summary>
+        /// <param name="source">the source file to retrieve data from</param>
+        /// <returns></returns>
+        public Info RetrieveSourceInfo(VorbisFileInstance source)
+        {
+            Info[] formatInfo = source.vorbisFile.getInfo();
+            if (formatInfo.Length < 1 || formatInfo[0] == null)
+                throw new ArgumentException("NO CLIP INFORMATION");
+
+            Info sourceInfo = formatInfo[0];
+            return sourceInfo;
+        }
+
+        // PLAY
+        public void PlaySource(VorbisFileInstance source)
+        {
+            // Remove any empty buffers
+            RemoveEmptyBuffers();
+
+            // Set up all the source parameters
+            AudioFormat = DetermineSourceFormat(source);
+            AudioRate = DetermineSourceRate(source);
+
+            // Initialize the source to play
+            SourceFile = source;
+            FileHasEnded = false;
+
+
+            // Start buffer
+            int processedBuffers = 0;
+            for (int i = 0; i < BufferCount; i++)
             {
-                int result = oggStream.Read(data, size, data.Length - size);
-                if (result > 0)
+                int bytesRead = source.read(SegmentBuffer, SegmentBuffer.Length, _BIGENDIANREADMODE, _WORDREADMODE, _SGNEDREADMODE, null);
+
+                if (bytesRead > 0)
                 {
-                    size += result;
+                    AL.BufferData(Buffers[i], AudioFormat, SegmentBuffer, bytesRead, AudioRate); 
+                }
+                else if (bytesRead == 0)
+                {
+                    break;
                 }
                 else
                 {
-                    // End of stream
-                    //if (Stream.Position == Stream.Length)
-                    if (oggStream.Available == 0)
-                    {
-                        if (isLooping)
-                        {
-                            RewindSource();
-                        }
-                        else
-                            StopSource();
-                    }
-
-                    return false;
+                    throw new System.IO.IOException("Unable to open OGG File");
                 }
             }
 
-            if (size == 0)
-            {
-                return false;
-            }
+            // Play buffered clip
+            AL.SourceQueueBuffers(Source, processedBuffers, Buffers);
 
-            AL.BufferData(id, (OpenTK.Audio.OpenAL.ALFormat)oggStream.Format, data, data.Length, oggStream.Rate);
-            return true;
-        }
-        internal void ProcessAudioBuffer()
-        {
-            int buffersProcessed = 0;
-            AL.GetSource(sourceID, OpenTK.Audio.OpenAL.ALGetSourcei.BuffersProcessed, out buffersProcessed);
-
-            while (buffersProcessed-- != 0)
-            {
-                // Enqueue Buffer
-                int currentBuffer = AL.SourceUnqueueBuffer(sourceID);
-                
-                // Update Buffer
-                AudioBuffer(currentBuffer, bufferData[currentBuffer]);
-
-                // Queue up buffer
-                AL.SourceQueueBuffer(sourceID, currentBuffer);
-            }
+            AL.SourcePlay(Source);
         }
 
-        public static void Update()
+        // PAUSE
+        public void PauseSource(VorbisFileInstance source)
         {
-            if (AudioSources == null) return;
+            // TO DO
+        }
 
-            foreach (AudioSource source in AudioSources)
+        // UPDATE 
+        public void Update()
+        {
+            // Make sure we are you trying to update a NULL Source
+            if (Source != null)
             {
-                source.ProcessAudioBuffer();
+                int queuedBuffers;
+                AL.GetSource(Source, ALGetSourcei.BuffersQueued, out queuedBuffers);
+
+                int processedBuffers;
+                AL.GetSource(Source, ALGetSourcei.BuffersProcessed, out processedBuffers);
+
+                // Check if we reached an end of file situation
+                if (FileHasEnded)
+                {
+                    if (queuedBuffers <= processedBuffers)
+                    {
+                        // Source is done
+                        AL.SourceStop(Source);
+                        SourceFile = null;
+
+                        RemoveEmptyBuffers();
+
+                        return;
+                    }
+                    // Buffering isn't done so continue
+                    else
+                    {
+                        if (queuedBuffers - processedBuffers > 0 && AL.GetError() == ALError.NoError)
+                        {
+                            // Continue playing
+                            if (AL.GetSourceState(Source) != ALSourceState.Playing)
+                            {
+                                AL.SourcePlay(Source);
+                            }
+                        }
+
+                        bool underFlow = (processedBuffers >= BufferCount);
+
+                        while (processedBuffers > 0)
+                        {
+                            int removedBuffers = 0;
+
+                            AL.SourceUnqueueBuffers(Source, 1, ref removedBuffers);
+
+                            // If we reached the end of the clip, remove and continue
+                            if (FileHasEnded)
+                            {
+                                processedBuffers--;
+                                continue;
+                            }
+
+                            int bytesRead = SourceFile.read(SegmentBuffer, SegmentBuffer.Length, _BIGENDIANREADMODE, _WORDREADMODE, _SGNEDREADMODE, null);
+
+                            if (bytesRead > 0)
+                            {
+                                AL.BufferData(removedBuffers, AudioFormat, SegmentBuffer, bytesRead, AudioRate);
+                                AL.SourceQueueBuffer(Source, removedBuffers);
+                            }
+
+                            else if (bytesRead == 0)
+                            {
+                                FileHasEnded = true;
+                            }
+
+                            else
+                            {
+                                AL.SourceStop(Source);
+                                SourceFile = null;
+                                break;
+                            }
+
+                            if (AL.GetError() != ALError.NoError)
+                            {
+                                AL.SourceStop(Source);
+                                SourceFile = null;
+                                break;
+                            }
+
+                            processedBuffers--;
+                        }
+                    }
+                }
             }
         }
     }

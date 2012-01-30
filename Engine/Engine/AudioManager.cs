@@ -1,163 +1,143 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using OpenAL = OpenTK.Audio.OpenAL;
 using Audio = OpenTK.Audio;
 
 namespace Engine
 {
-    /* Managemenet class for sounds that are to be produced in game.  Stores all the sounds and will played based on triggers in game*/
-    public class AudioManager
+    /// <summary>
+    /// Audio manager provides all the resources for queueing audio sources into 
+    /// appropriate channels and handles playing them.  There will  only be one 
+    /// audio manager that runs when the application is run but many channels can
+    /// be created in this manager instance.
+    /// </summary>
+    public class AudioManager : IDisposable
     {
-        /* Hardware can only allow 256 sound channels to be processed at a single time.  Track the max channels and the channels that are being passed through*/
-        readonly int maxSoundChannels = 256;
-        List<int> soundChannels = new List<int>();
+        // Public variables needed for Audio Manager.  The number of channels, buffers per channel, and bytes per buffer
+        int NumOfChannels { get; private set; }
+        int BuffersPerChannel { get; private set; }
+        int BytesPerBuffer { get; private set; }
+
+        // Stores all the channels we have
+        AudioSource[] AudioSources { get; private set; }
+
+        // Audio threading
+        Thread ThreadCall { get; private set; }
+
+        // Checks if we need updating
+        public bool needsUpdate { get; set; }
+
+        // Initialize our audio manager
+        private static AudioManager _manager = null;
+
+        public static AudioManager Manager
+        {
+            get
+            {
+                if (_manager == null) _manager = new AudioManager();
+
+                return _manager;
+            }
+
+            set
+            {
+                _manager = value;
+            }
+        }
+        // Constructor.
+        /// <summary>
+        /// Constructor for Audio Manager
+        /// </summary>
+        /// <param name="numOfChannels">Number of channels</param>
+        /// <param name="buffersPerChannel">Number of buffers to use per channel</param>
+        /// <param name="bytesPerBuffer">Number of bytes to use per buffer</param>
+        /// <param name="threadCall">Determines whether to thread audio channels</param>
+        public AudioManager(int numOfChannels, int buffersPerChannel, int bytesPerBuffer, bool threadCall)
+        {
+            InitializeManager(numOfChannels, buffersPerChannel, bytesPerBuffer, threadCall);
+        }
         
-        // Grab the default Audio Device from OpenAL
-        public static string DefaultAudioDevice
-        {
-            get
-            {
-                try
-                {
-                    return Audio.AudioContext.DefaultDevice;
-                }
-                catch
-                {
-                    return string.Empty;
-                }
-            }
-        }
-
-        static internal Audio.AudioContext CurrentAudioContext
-        {
-            get;
-            private set;
-        }
-
-
-        public static List<string> AllAudioDevices
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(DefaultAudioDevice))
-                    return new List<string>();
-
-                return new List<string>(Audio.AudioContext.AvailableDevices);
-            }
-        }
-
-        public static bool isAudioDeviceInitialized
-        {
-            get;
-            private set;
-        }
-
+        /// <summary>
+        /// Default Constructor.  Initializes with a 16 channels, 32 buffer, 4 kb threaded call
+        /// </summary>
         public AudioManager()
         {
-            // If there is no default device, return
-            if (!string.IsNullOrEmpty(DefaultAudioDevice))
+            InitializeManager(16, 32, 4096, true);
+        }
+
+        private void InitializeManager(int numOfChannels, int buffersPerChannel, int bytesPerBuffer, bool threadCall)
+        {
+            // Set the local variables to parameters
+            NumOfChannels = numOfChannels;
+            BuffersPerChannel = buffersPerChannel;
+            BytesPerBuffer = bytesPerBuffer;
+
+            // Create a new Audio channel for every channel specified in local array
+            for (int i = 0; i < numOfChannels; i++)
             {
-                return;
+                AudioSources[i] = new AudioSource(buffersPerChannel, bytesPerBuffer);
+            }
+            
+            Manager = this;
+
+            // If we are looking for a threaded call, create a new thread
+            if (threadCall)
+            {
+                // Create a new thread
+                ThreadCall = new Thread(Update);
+                // Thread should be background
+                ThreadCall.IsBackground = true;
+                // Start the thread
+                ThreadCall.Start();
             }
 
+            else
+            {
+                // No thread so NULL
+                ThreadCall = null;
+            }
         }
 
-
-        public static bool CreateAudioDevice()
+        // Update
+        public void Update()
         {
-            return CreateAudioDevice(DefaultAudioDevice);
+            // While we need to update
+            while (needsUpdate)
+            {
+                // For every source in our sources, lock the source and update it.
+                foreach (AudioSource source in AudioSources)
+                {
+                    lock (this)
+                    {
+                        // POSSIBLE THERE NEEDS TO BE A SLEEP CALL IN THREAD
+                        source.Update();
+                        Thread.Sleep(1);
+                    }
+                }
+            }
         }
+
+
+        // Play Call
+
+
+        // Destructor
+        ~AudioManager()
+        {
+            DisposeResources();
+        }
+
+
         /// <summary>
-        /// Creates an audio context
+        /// Removes any unused audio sources
         /// </summary>
-        /// <param name="device"></param>
-        /// <returns></returns>
-        public static bool CreateAudioDevice(string device)
+        public void DisposeResources()
         {
-            // Release current audio context
-            if (CurrentAudioContext != null)
-            {
-                ReleaseAudioDevice();
-            }
-
-            // Check  if device contains anything
-            if (string.IsNullOrEmpty(device))
-            {
-                return false;
-            }
-
-            // Create a new audio context
-            try
-            {
-                CurrentAudioContext = new Audio.AudioContext(device);
-            }
-            catch (Exception e)
-            {
-                // TO DO: WRITE TO FILE THE EXCEPTION
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Release the current audio context
-        /// </summary>
-        public static void ReleaseAudioDevice()
-        {
-            if (CurrentAudioContext != null)
-            {
-                CurrentAudioContext.Dispose();
-            }
-        }
-
-        /// <summary>
-        /// State of Audio.
-        /// </summary>
-        public enum AudioState
-        {
-            Audio_Initial = OpenAL.ALSourceState.Initial,
-            Audio_Playing = OpenAL.ALSourceState.Playing,
-            Audio_Paused = OpenAL.ALSourceState.Paused,
-            Audio_Stopped = OpenAL.ALSourceState.Stopped
-        }
-
-        public static bool playMusic
-        {
-            get;
-            set;
-        }
-
-        public static bool playSound
-        {
-            get;
-            set;
-        }
-
-        public enum AudioFormat
-        {
-            /// <summary>
-            /// The stereo 16 bits format
-            /// </summary>
-            Stereo16 = OpenAL.ALFormat.Stereo16,
-
-            /// <summary>
-            /// The mono 16 bits format
-            /// </summary>
-            Mono16 = OpenAL.ALFormat.Mono16,
-
-
-            /// <summary>
-            /// The mono 8 bits format
-            /// </summary>
-            Mono8 = OpenAL.ALFormat.Mono8,
-
-
-            /// <summary>
-            /// The stereo 8 bits format
-            /// </summary>
-            Stereo8 = OpenAL.ALFormat.Stereo8,
+            // TO DO:  REMOVE AUDIO RESOURCES
         }
     }
 }

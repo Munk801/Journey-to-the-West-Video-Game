@@ -28,7 +28,7 @@ namespace U5Designs
         Stack<string> savedGameChoices;
         int saved_level_index = -1;
 
-        //AudioSource test;
+        AudioSource test;
 
         public MainMenuState(GameEngine engine)
         {
@@ -47,16 +47,16 @@ namespace U5Designs
             LoadSavedState(1);
 
             //AudioManager.CreateAudioDevice();
-            //test = new AudioSource();
-            //test.LoadSource("sound/Hydrate-Kenny_Beltrey.ogg");
-            //test.PlaySource();
+            test = new AudioSource();
+            test.LoadSource("sound/Hydrate-Kenny_Beltrey.ogg");
+            test.PlaySource();
         }
 
         public override void Update(FrameEventArgs e)
         {
             DealWithInput();
             //AudioSource.Update();
-            //test.PlaySource();
+            test.PlaySource();
         }
 
         public override void Draw(FrameEventArgs e)
@@ -194,5 +194,6 @@ namespace U5Designs
             // Return the fully loaded PlayerState which can be used to fill out the rest of the GameState
             return ps;
         }
+
     }
 }

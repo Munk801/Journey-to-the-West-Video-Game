@@ -44,7 +44,7 @@ namespace U5Designs
             GL.Enable(EnableCap.Light0);
 			GL.Enable(EnableCap.Texture2D);
 
-            
+            AudioManager.CreateAudioDevice();
 
 
             states = new Stack<GameState>();
@@ -93,7 +93,6 @@ namespace U5Designs
         /// <param name="e">Contains timing information for framerate independent logic.</param>
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            AudioSource.Update();
             base.OnUpdateFrame(e);
             // let the state update the game
             states.Peek().Update(e);      
