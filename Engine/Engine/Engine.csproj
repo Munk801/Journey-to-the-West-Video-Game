@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="AIObject.cs" />
     <Compile Include="Analyze.cs" />
+    <Compile Include="AudioFile.cs" />
     <Compile Include="CombatObject.cs" />
     <Compile Include="Audio\csogg\Buffer.cs" />
     <Compile Include="Audio\csogg\Packet.cs" />
@@ -87,7 +88,6 @@
     <Compile Include="Input\Keyboard.cs" />
     <Compile Include="ObjMesh.cs" />
     <Compile Include="ObjMeshLoader.cs" />
-    <Compile Include="OggInputStream.cs" />
     <Compile Include="PhysicsObject.cs" />
     <Compile Include="PreciseTimer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

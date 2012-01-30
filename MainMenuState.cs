@@ -22,17 +22,18 @@ namespace U5Designs
     class MainMenuState : GameState
     {
         internal GameEngine eng;
-
+        
         // A container which will hold the list of available saved games
         Stack<XmlNodeList> savedGameStates;
         Stack<string> savedGameChoices;
         int saved_level_index = -1;
-
-        AudioSource test;
+        AudioFile testFile = new AudioFile("sound/Hydrate-Kenny_Beltrey.ogg");
 
         public MainMenuState(GameEngine engine)
         {
             eng = engine;
+
+            AudioManager.Manager.StartAudioServices();
 
             savedGameStates = new Stack<XmlNodeList>();
             savedGameChoices = new Stack<string>();
@@ -46,17 +47,14 @@ namespace U5Designs
             // TEST //
             LoadSavedState(1);
 
-            //AudioManager.CreateAudioDevice();
-            test = new AudioSource();
-            test.LoadSource("sound/Hydrate-Kenny_Beltrey.ogg");
-            test.PlaySource();
+            testFile.Play();
         }
 
         public override void Update(FrameEventArgs e)
         {
             DealWithInput();
-            //AudioSource.Update();
-            test.PlaySource();
+            AudioManager.Manager.Update();
+
         }
 
         public override void Draw(FrameEventArgs e)

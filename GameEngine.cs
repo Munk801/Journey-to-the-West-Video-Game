@@ -44,7 +44,7 @@ namespace U5Designs
             GL.Enable(EnableCap.Light0);
 			GL.Enable(EnableCap.Texture2D);
 
-            AudioManager.CreateAudioDevice();
+            AudioManager.Manager.StartAudioServices();
 
 
             states = new Stack<GameState>();

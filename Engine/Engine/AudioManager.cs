@@ -6,6 +6,10 @@ using System.Text;
 using System.Threading;
 using OpenAL = OpenTK.Audio.OpenAL;
 using Audio = OpenTK.Audio;
+using OpenTK.Audio;
+using OpenTK.Audio.OpenAL;
+using csogg;
+using csvorbis;
 
 namespace Engine
 {
@@ -15,18 +19,18 @@ namespace Engine
     /// audio manager that runs when the application is run but many channels can
     /// be created in this manager instance.
     /// </summary>
-    public class AudioManager : IDisposable
+    public class AudioManager
     {
         // Public variables needed for Audio Manager.  The number of channels, buffers per channel, and bytes per buffer
-        int NumOfChannels { get; private set; }
-        int BuffersPerChannel { get; private set; }
-        int BytesPerBuffer { get; private set; }
+        int NumOfChannels { get;  set; }
+        int BuffersPerChannel { get;  set; }
+        int BytesPerBuffer { get;  set; }
 
         // Stores all the channels we have
-        AudioSource[] AudioSources { get; private set; }
+        AudioSource[] AudioSources { get; set; }
 
         // Audio threading
-        Thread ThreadCall { get; private set; }
+        Thread ThreadCall { get; set; }
 
         // Checks if we need updating
         public bool needsUpdate { get; set; }
@@ -69,12 +73,21 @@ namespace Engine
             InitializeManager(16, 32, 4096, true);
         }
 
+
+        public void StartAudioServices()
+        {
+            AudioContext ac = new AudioContext();
+            XRamExtension xram = new XRamExtension();
+        }
+
         private void InitializeManager(int numOfChannels, int buffersPerChannel, int bytesPerBuffer, bool threadCall)
         {
             // Set the local variables to parameters
             NumOfChannels = numOfChannels;
-            BuffersPerChannel = buffersPerChannel;
-            BytesPerBuffer = bytesPerBuffer;
+            //BuffersPerChannel = buffersPerChannel;
+            //BytesPerBuffer = bytesPerBuffer;
+            needsUpdate = threadCall;
+            AudioSources = new AudioSource[numOfChannels];
 
             // Create a new Audio channel for every channel specified in local array
             for (int i = 0; i < numOfChannels; i++)
@@ -123,7 +136,24 @@ namespace Engine
 
 
         // Play Call
-
+        public void PlayFile(VorbisFileInstance audioFile)
+        {
+            foreach (AudioSource source in AudioSources)
+            {
+                try
+                {
+                    if (source.IsFree)
+                    {
+                        source.PlaySource(audioFile);
+                        return;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.StackTrace);
+                }
+            }
+        }
 
         // Destructor
         ~AudioManager()
