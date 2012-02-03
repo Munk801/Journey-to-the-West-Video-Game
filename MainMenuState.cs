@@ -27,13 +27,16 @@ namespace U5Designs
         Stack<XmlNodeList> savedGameStates;
         Stack<string> savedGameChoices;
         int saved_level_index = -1;
-        AudioFile testFile = new AudioFile("GuitarSample.ogg");
+
+
+   
 
         public MainMenuState(GameEngine engine)
         {
             eng = engine;
 
-            AudioManager.Manager.StartAudioServices();
+            //AudioManager.Manager.StartAudioServices();
+
 
             savedGameStates = new Stack<XmlNodeList>();
             savedGameChoices = new Stack<string>();
@@ -47,7 +50,6 @@ namespace U5Designs
             // TEST //
             LoadSavedState(1);
 
-            testFile.Play();
         }
 
         public override void Update(FrameEventArgs e)

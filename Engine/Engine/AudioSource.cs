@@ -103,8 +103,14 @@ namespace Engine
             {
                 return ALFormat.Mono16;
             }
-            else return ALFormat.Stereo16;
-
+            else if (sourceInfo.channels == 2)
+            {
+                return ALFormat.Stereo16;
+            }
+            else
+            {
+                throw new NotImplementedException("Only mono and stereo are implemented.  Audio has too many channels.");
+            }
         }
 
         // DETERMINE THE RATE OF A GIVEN SOURCE
@@ -153,7 +159,8 @@ namespace Engine
 
                 if (bytesRead > 0)
                 {
-                    AL.BufferData(Buffers[i], AudioFormat, SegmentBuffer, bytesRead, AudioRate); 
+                    AL.BufferData(Buffers[i], AudioFormat, SegmentBuffer, bytesRead, AudioRate);
+                    processedBuffers++;
                 }
                 else if (bytesRead == 0)
                 {
@@ -181,7 +188,7 @@ namespace Engine
         public void Update()
         {
             // Make sure we are you trying to update a NULL Source
-            if (Source != null)
+            if (SourceFile != null)
             {
                 int queuedBuffers;
                 AL.GetSource(Source, ALGetSourcei.BuffersQueued, out queuedBuffers);
@@ -202,62 +209,62 @@ namespace Engine
 
                         return;
                     }
-                    // Buffering isn't done so continue
-                    else
+                }
+                // Buffering isn't done so continue
+                else
+                {
+                    if (queuedBuffers - processedBuffers > 0 && AL.GetError() == ALError.NoError)
                     {
-                        if (queuedBuffers - processedBuffers > 0 && AL.GetError() == ALError.NoError)
+                        // Continue playing
+                        if (AL.GetSourceState(Source) != ALSourceState.Playing)
                         {
-                            // Continue playing
-                            if (AL.GetSourceState(Source) != ALSourceState.Playing)
-                            {
-                                AL.SourcePlay(Source);
-                            }
+                            AL.SourcePlay(Source);
                         }
+                    }
 
-                        bool underFlow = (processedBuffers >= BufferCount);
+                    bool underFlow = (processedBuffers >= BufferCount);
 
-                        while (processedBuffers > 0)
+                    while (processedBuffers > 0)
+                    {
+                        int removedBuffers = 0;
+
+                        AL.SourceUnqueueBuffers(Source, 1, ref removedBuffers);
+
+                        // If we reached the end of the clip, remove and continue
+                        if (FileHasEnded)
                         {
-                            int removedBuffers = 0;
-
-                            AL.SourceUnqueueBuffers(Source, 1, ref removedBuffers);
-
-                            // If we reached the end of the clip, remove and continue
-                            if (FileHasEnded)
-                            {
-                                processedBuffers--;
-                                continue;
-                            }
-
-                            int bytesRead = SourceFile.read(SegmentBuffer, SegmentBuffer.Length, _BIGENDIANREADMODE, _WORDREADMODE, _SGNEDREADMODE, null);
-
-                            if (bytesRead > 0)
-                            {
-                                AL.BufferData(removedBuffers, AudioFormat, SegmentBuffer, bytesRead, AudioRate);
-                                AL.SourceQueueBuffer(Source, removedBuffers);
-                            }
-
-                            else if (bytesRead == 0)
-                            {
-                                FileHasEnded = true;
-                            }
-
-                            else
-                            {
-                                AL.SourceStop(Source);
-                                SourceFile = null;
-                                break;
-                            }
-
-                            if (AL.GetError() != ALError.NoError)
-                            {
-                                AL.SourceStop(Source);
-                                SourceFile = null;
-                                break;
-                            }
-
                             processedBuffers--;
+                            continue;
                         }
+
+                        int bytesRead = SourceFile.read(SegmentBuffer, SegmentBuffer.Length, _BIGENDIANREADMODE, _WORDREADMODE, _SGNEDREADMODE, null);
+
+                        if (bytesRead > 0)
+                        {
+                            AL.BufferData(removedBuffers, AudioFormat, SegmentBuffer, bytesRead, AudioRate);
+                            AL.SourceQueueBuffer(Source, removedBuffers);
+                        }
+
+                        else if (bytesRead == 0)
+                        {
+                            FileHasEnded = true;
+                        }
+
+                        else
+                        {
+                            AL.SourceStop(Source);
+                            SourceFile = null;
+                            break;
+                        }
+
+                        if (AL.GetError() != ALError.NoError)
+                        {
+                            AL.SourceStop(Source);
+                            SourceFile = null;
+                            break;
+                        }
+
+                        processedBuffers--;
                     }
                 }
             }

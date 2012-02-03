@@ -32,9 +32,14 @@ namespace U5Designs
 
         int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
 
+        //static string testFile = "Retribution.ogg";
+        //AudioFile test = new AudioFile(testFile);
+
         // Initialize graphics, etc here
         public PlayState(GameEngine engine, int lvl)
         {
+
+            //AudioManager.Manager.StartAudioServices();
             eng = engine;
             player = new Player();
 
@@ -51,8 +56,10 @@ namespace U5Designs
             GL.Enable(EnableCap.Normalize);
             GL.Enable(EnableCap.Lighting);
             GL.Enable(EnableCap.Light0);
-
+            test.Play();
             updateView();
+
+            //AudioManager.Manager.StartAudioServices();
 
             // Testing...remove when done //
             loadGameObjects();
@@ -62,6 +69,8 @@ namespace U5Designs
         {
             DealWithInput();
             player.updateState(enable3d, a, s, d, w);
+            
+
         }
 
         public override void Draw(FrameEventArgs e)

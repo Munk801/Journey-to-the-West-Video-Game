@@ -101,7 +101,7 @@ namespace Engine
             if (threadCall)
             {
                 // Create a new thread
-                ThreadCall = new Thread(Update);
+                ThreadCall = new Thread(UpdateLoop);
                 // Thread should be background
                 ThreadCall.IsBackground = true;
                 // Start the thread
@@ -118,9 +118,6 @@ namespace Engine
         // Update
         public void Update()
         {
-            // While we need to update
-            while (needsUpdate)
-            {
                 // For every source in our sources, lock the source and update it.
                 foreach (AudioSource source in AudioSources)
                 {
@@ -130,9 +127,16 @@ namespace Engine
                         source.Update();
                     }
                 }
-            }
         }
 
+        public void UpdateLoop()
+        {
+            while (needsUpdate)
+            {
+                Update();
+                Thread.Sleep(1);
+            }
+        }
 
         // Play Call
         public void PlayFile(VorbisFileInstance audioFile)
