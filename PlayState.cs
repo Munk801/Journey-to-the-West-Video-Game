@@ -27,7 +27,8 @@ namespace U5Designs
 		//everything is in objList, and then also pointed to from the appropriate interface lists
         internal List<GameObject> objList;
 		internal List<RenderObject> renderList;
-		internal List<PhysicsObject> physList;
+        internal List<PhysicsObject> colisionList; // colision list = only things that are moving that need to detect colisions
+		internal List<PhysicsObject> physList; // physList is a list of everything that has a bounding box
 		internal List<AIObject> aiList;// aka list of enemies
 		internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
         //TODO: projectile list
@@ -35,7 +36,6 @@ namespace U5Designs
         int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
 
 		bool tabDown;
-		bool spaceDown;
 
 		protected Vector3 eye, lookat;
 		protected Vector4 lightPos;
@@ -55,7 +55,6 @@ namespace U5Designs
             player = new Player();
 
             enable3d = false;
-			spaceDown = false;
 			tabDown = false;
 
             GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -89,9 +88,13 @@ namespace U5Designs
 			//TODO: parallax background based on player movement
 
 			player.physUpdate(e, physList); //TODO: Should player be first or last?
-//             foreach (PhysicsObject po in physList) {
-// 				po.physUpdate(e, physList);
-//             }
+             foreach (PhysicsObject po in colisionList) {
+ 				po.physUpdate(e, physList);
+             }
+
+             foreach (AIObject aio in aiList) {
+                 aio.aiUpdate(e, player.location);
+             }
 
         }
 

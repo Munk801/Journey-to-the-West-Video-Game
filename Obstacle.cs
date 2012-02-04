@@ -94,7 +94,7 @@ namespace U5Designs {
 		}
 
 		void PhysicsObject.physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
-			throw new Exception("The method or operation is not implemented.");
+			//throw new Exception("The method or operation is not implemented.");
 		}
 
 		void PhysicsObject.accelerate(Vector3 acceleration) {

@@ -14,7 +14,14 @@ namespace U5Designs
 {
     class Enemy : GameObject, AIObject, RenderObject, PhysicsObject, CombatObject
     {
-		public Enemy(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, ObjMesh mesh, Bitmap texture) {
+
+        private int texID;
+        private int AItype;
+        private Vector3 velocity;
+        private Vector3 accel;
+        private bool doesGravity; //true if gravity affects this object
+
+		public Enemy(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, Bitmap texture) {
 			_location = location;
             _scale = scale;
 			_existsIn3d = existsIn3d;
@@ -23,6 +30,7 @@ namespace U5Designs
             _damage = damage;
             _speed = speed;
             _alive = true;
+            this.AItype = AItype;
 
 			_mesh = mesh;
 			_texture = texture;
@@ -30,10 +38,14 @@ namespace U5Designs
 			_frameNum = 0;
 			_is3dGeo = true;
             texID = GL.GenTexture();
+
+            velocity = new Vector3(0, 0, 0);
+            accel = new Vector3(0, 0, 0);
+            doesGravity = true;
 		}
 
 
-        public Enemy(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, SpriteSheet sprite)
+        public Enemy(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, SpriteSheet sprite)
         {
 			_location = location;
 			_scale = scale;
@@ -43,6 +55,7 @@ namespace U5Designs
             _damage = damage;
             _speed = speed;
             _alive = true;
+            this.AItype = AItype;
 
 			_mesh = null;
 			_texture = null;
@@ -50,9 +63,11 @@ namespace U5Designs
 			_frameNum = 0;
 			_is3dGeo = false;
 			texID = GL.GenTexture();
-		}
 
-        private int texID;
+            velocity = new Vector3(0, 0, 0);
+            accel = new Vector3(0, 0, 0);
+            doesGravity = true;
+		}
 
 
         /** Like the Player Status update call this every time you need to update an Enemies State before saving **/
@@ -113,23 +128,42 @@ namespace U5Designs
 		}
 
 		void PhysicsObject.physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
+			
+            //TODO: impliment gravity, colisions etc...
+
+
+
+		}
+
+		void AIObject.aiUpdate(FrameEventArgs e, Vector3 playerposn) {
+            if (AItype == 1) {
+
+
+
+
+
+            }
+
+		}
+
+		void CombatObject.reset() {
 			throw new NotImplementedException();
 		}
 
-		void PhysicsObject.accelerate(Vector3 acceleration) {
-			throw new NotImplementedException();
-		}
+        public void accelerate(Vector3 acceleration) {
+            accel += acceleration;
+        }
 
-		private float _health;
-		float CombatObject.health {
-			get { return _health; }
-			set { _health = value; }
-		}
+        private float _health;
+        float CombatObject.health {
+            get { return _health; }
+            set { _health = value; }
+        }
 
-		private float _damage;
-		float CombatObject.damage {
-			get { return _damage; }
-		}
+        private float _damage;
+        float CombatObject.damage {
+            get { return _damage; }
+        }
 
         private float _speed;
         float CombatObject.speed {
@@ -137,18 +171,10 @@ namespace U5Designs
             set { _speed = value; }
         }
 
-		private bool _alive;
-		bool CombatObject.alive {
-			get { return _alive; }
-			set { _alive = value; }
-		}
-
-		void AIObject.aiUpdate(FrameEventArgs e) {
-			throw new NotImplementedException();
-		}
-
-		void CombatObject.reset() {
-			throw new NotImplementedException();
-		}
+        private bool _alive;
+        bool CombatObject.alive {
+            get { return _alive; }
+            set { _alive = value; }
+        }
 	}
 }

@@ -187,6 +187,10 @@ namespace U5Designs
 			set { _alive = value; }
 		}
 
+        public Vector3 location {
+            get { return _location; }
+        }
+
 		//TODO: Don't know if reset really applies to player or not...
 		public void reset() {
 			throw new NotImplementedException();

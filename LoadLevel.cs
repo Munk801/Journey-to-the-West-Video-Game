@@ -28,6 +28,7 @@ namespace U5Designs
             ps.aiList = new List<AIObject>();
             ps.combatList = new List<CombatObject>();
             ps.physList = new List<PhysicsObject>();
+            ps.colisionList = new List<PhysicsObject>();
 
 
             //First we need to pull the location of the meshes.(or keep this hardcoded one?..)
@@ -69,9 +70,10 @@ namespace U5Designs
             Vector3 enscale = new Vector3(5, 5, 5);
             Bitmap enmap = new Bitmap("../../Textures/enemy.png");
 
-            Enemy testenemy = new Enemy(enloc, enscale, true, true, 10, 10, 1f, cubemesh, enmap);
+            Enemy testenemy = new Enemy(enloc, enscale, true, true, 10, 10, 1f, 1, cubemesh, enmap);
             ps.objList.Add(testenemy);
             ps.physList.Add(testenemy);
+            ps.colisionList.Add(testenemy);
             ps.renderList.Add(testenemy);
             ps.aiList.Add(testenemy);
 
@@ -83,6 +85,7 @@ namespace U5Designs
             //int health
             // int damage
             // float speed
+            // int AItype
             // obj file
             // bitmap file
 
