@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Drawing;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using System.Runtime.InteropServices;
+
+using BitmapData = System.Drawing.Imaging.BitmapData;
+using ImageLockMode = System.Drawing.Imaging.ImageLockMode;
 
 /* Contains the sprite sheet for a particular in-game object which is to be rendered
  * in 2D.  Different in-game objects that share a sprite sheet may also share a single
@@ -22,10 +27,26 @@ namespace Engine {
 		private byte[][][] tex; //tex[cycleNumber][frameNumber][y*w + x]
 		private int texw, texh;
 
-		public SpriteSheet(byte[][][] _tex, int _texw, int _texh) {
-			tex = _tex;
+		public SpriteSheet(Bitmap texbmp, int[] cycleStartNums, int[] cycleLengths, int _texw, int _texh) {
 			texw = _texw;
 			texh = _texh;
+
+			BitmapData bmp_data = texbmp.LockBits(new Rectangle(0, 0, texbmp.Width, texbmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+			tex = new byte[cycleStartNums.Length][][];
+			for(int cycleNum = 0; cycleNum < cycleStartNums.Length; cycleNum++) {
+				tex[cycleNum] = new byte[cycleLengths[cycleNum]][];
+				for(int frameNum = 0; frameNum < cycleLengths[cycleNum]; frameNum++) {
+					IntPtr tex_addr = IntPtr.Add(bmp_data.Scan0, (cycleStartNums[cycleNum]+frameNum) * texw * texh * 4);
+					tex[cycleNum][frameNum] = new byte[texw * texh * 4];
+					for(int i = 0; i < texw * texh*4; i += 4) {
+						tex[cycleNum][frameNum][i + 3] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i), typeof(byte));
+						tex[cycleNum][frameNum][i + 0] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i+1), typeof(byte));
+						tex[cycleNum][frameNum][i + 1] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i+2), typeof(byte));
+						tex[cycleNum][frameNum][i + 2] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i+3), typeof(byte));
+					}
+				}
+			}
+			texbmp.UnlockBits(bmp_data);
 		}
 
 		/*

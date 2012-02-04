@@ -141,12 +141,15 @@ namespace U5Designs
 				if(obj.is3dGeo) {
 					obj.mesh.Render();
 				} else {
-					obj.sprite.draw(0, 0);
+					i = obj.sprite.draw(0, ++i);
 				}
 			}
+			Console.WriteLine(i);
 
 			player.draw();
         }
+
+		int i = 0;
 
         //if its inconvenient to have key detection outside of the update method, move it back in
         private void DealWithInput()

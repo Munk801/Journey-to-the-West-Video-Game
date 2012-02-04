@@ -40,7 +40,7 @@ namespace U5Designs
             Vector3 testloc = new Vector3(50, -50, 50);
 			Vector3 testscale = new Vector3(50, 50, 50);
             Bitmap testmap = new Bitmap("../../Textures/test.png");
-
+			//Bitmap testmap = new Bitmap("../../Geometry/test_sprite.png");
             Obstacle testfloor = new Obstacle(testloc, testscale, true, true, cubemesh, testmap);
 
             ps.objList.Add(testfloor);
@@ -88,6 +88,17 @@ namespace U5Designs
             // int AItype
             // obj file
             // bitmap file
+
+
+
+			//testing sprite sheet....
+			int[] cycleStarts = {0, 4};
+			int[] cycleLengths = {4, 4};
+			SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/test_sprite.png"), cycleStarts, cycleLengths, 512, 512);
+			Obstacle testSprite = new Obstacle(new Vector3(50, 50, 50), testscale, true, true, ss);
+			ps.objList.Add(testSprite);
+			ps.physList.Add(testSprite);
+			ps.renderList.Add(testSprite);
 
 
 
