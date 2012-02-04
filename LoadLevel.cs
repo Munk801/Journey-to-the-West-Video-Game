@@ -21,15 +21,6 @@ namespace U5Designs
 {
     class LoadLevel
     {
-
-        /* ps different lists
-        		internal List<RenderObject> renderList;
-		internal List<PhysicsObject> physList;
-		internal List<AIObject> aiList;// aka list of enemies
-		internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
-        //TODO: projectile list
-        */
-
         public static void Load(int level_to_load, PlayState ps)
         {
             ps.renderList = new List<RenderObject>();
@@ -37,14 +28,15 @@ namespace U5Designs
             ps.combatList = new List<CombatObject>();
             ps.physList = new List<PhysicsObject>();
 
+
+            //First we need to pull the location of the meshes.(or keep this hardcoded one?..)
             ObjMesh cubemesh = new ObjMesh("../../Geometry/box.obj");
-            
-            System.Console.WriteLine(cubemesh.Vertices);
+
+
+            //example obstacle load
             //use ps to access object lists!!
             Vector3 testloc = new Vector3(2500, -250, 50);
 			Vector3 testscale = new Vector3(2500, 250, 50);
-			//Vector3 testloc = new Vector3(0, 0, 200);
-            //Vector3 testscale = new Vector3(1000, 20, 125);
             Bitmap testmap = new Bitmap("test.png");
 
             Obstacle testfloor = new Obstacle(testloc, testscale, true, true, cubemesh, testmap);
@@ -115,35 +107,8 @@ namespace U5Designs
                     XmlNodeList health = obj_doc.GetElementsByTagName("e_health");                    
 
                     XmlNodeList abil_0 = obj_doc.GetElementsByTagName("e_ability_0");
-
-					//GameObject is abstract - this must be initialized to
-					//the proper subclass instead
-//                     GameObject go = new GameObject();
-//                     go.posx = Convert.ToInt32(locations[x]);
-//                     go.posy = Convert.ToInt32(locations[x + 1]);
-//                     go.posz = Convert.ToInt32(locations[x + 2]);
-// 
-//                     go.health = Convert.ToInt32(health[0].InnerText);
-//                     go.sfx_path = sfx_0[0].InnerText;
-//                     go.texture_path = texture[0].InnerText;
-//                     go.ability = abil_0[0].InnerText;
-// 
-//                     // Add it to the master list
-//                     objects.Add(go);
                 }
             } 
-
-            //EXAMPLE: just loaded a background object from xml ( this code would be a loop or something)
-            /*{
-                GameObject obj = new GameObject(); // make new object ( not an actual GameObject like here, but a Enemy, or Box or whatever)
-                // initilize what needs to be initilized based on what the xml says
-                obj.posx = 23f;
-                obj.posy = 233f;
-                obj.posz = 96f;
-                // put the obj in the list, repeat till everything loaded
-                objects.Add(obj);
-            }
-            */
         }
 
         public static string[] split_locations(string xml_loc_str)

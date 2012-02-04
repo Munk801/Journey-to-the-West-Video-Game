@@ -143,26 +143,12 @@ namespace U5Designs
 			}
 
 			player.draw();
-
-            //Ground
-//             GL.VertexPointer(3, VertexPointerType.Float, 0, cubeVertices);
-//             GL.NormalPointer(NormalPointerType.Byte, 0, cubeNormals);
-//             GL.PushMatrix();
-//             GL.Scale(5000.0f, 500.0f, 200.0f);
-//             GL.Translate(0.0f, -1.0f, 1.0f);
-//             GL.Material(MaterialFace.Front, MaterialParameter.Specular, groundSpecular);
-//             GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, groundDiffuse);
-//             GL.Material(MaterialFace.Front, MaterialParameter.Ambient, groundAmbient);
-//             GL.Material(MaterialFace.Front, MaterialParameter.Shininess, groundShininess);
-//             GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
-// 			GL.PopMatrix();
         }
 
         //if its inconvenient to have key detection outside of the update method, move it back in
         private void DealWithInput()
         {
             //TODO: Change these keys to their final mappings when determined
-
             if (eng.Keyboard[Key.Escape])
             {
                 MainMenuState ms = new MainMenuState(eng);
@@ -181,28 +167,6 @@ namespace U5Designs
                 tabDown = false;
             }
         }
-
-//         protected float[,] cubeVertices = new[,] {{1.0f, -1.0f, 1.0f},   {1.0f, -1.0f, -1.0f},  {-1.0f, -1.0f, -1.0f}, {-1.0f, -1.0f, 1.0f},
-// 							                    {1.0f, 1.0f, -1.0f},   {1.0f, -1.0f, -1.0f},  {1.0f, -1.0f, 1.0f},   {1.0f, 1.0f, 1.0f},
-// 							                    {1.0f, -1.0f, -1.0f},  {1.0f, 1.0f, -1.0f},   {-1.0f, 1.0f, -1.0f},  {-1.0f, -1.0f, -1.0f},
-// 							                    {-1.0f, -1.0f, -1.0f}, {-1.0f, 1.0f, -1.0f},  {-1.0f, 1.0f, 1.0f},   {-1.0f, -1.0f, 1.0f},
-// 							                    {-1.0f, 1.0f, 1.0f},   {-1.0f, 1.0f, -1.0f},  {1.0f, 1.0f, -1.0f},   {1.0f, 1.0f, 1.0f},
-// 							                    {1.0f, -1.0f, 1.0f},   {-1.0f, -1.0f, 1.0f},  {-1.0f, 1.0f, 1.0f},   {1.0f, 1.0f, 1.0f}};
-// 
-//         protected float[,] cubeNormals = new[,] {{0.0f, -1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, -1.0f, 0.0f},
-// 							                   {1.0f, 0.0f, 0.0f},  {1.0f, 0.0f, 0.0f},  {1.0f, 0.0f, 0.0f},  {1.0f, 0.0f, 0.0f},
-// 							                   {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f},
-// 							                   {-1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f},
-// 							                   {0.0f, 1.0f, 0.0f},  {0.0f, 1.0f, 0.0f},  {0.0f, 1.0f, 0.0f},  {0.0f, 1.0f, 0.0f},
-// 							                   {0.0f, 0.0f, 1.0f},  {0.0f, 0.0f, 1.0f},  {0.0f, 0.0f, 1.0f},  {0.0f, 0.0f, 1.0f}};
-// 
-//         protected byte[] cubeIndices = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 };
-// 
-//         protected float[] groundAmbient = { 0.0215f, 0.1745f, 0.0215f }; //{0.40f, 0.53f, 0.13f, 1.0f};
-//         protected float[] groundDiffuse = { 0.07568f, 0.61424f, 0.07568f }; //{0.5f, 0.5f, 0.5f, 1.0f};
-//         protected float[] groundSpecular = { 0.633f, 0.727811f, 0.633f }; //{0.0f, 0.0f, 0.0f, 1.0f};
-//         protected float[] groundShininess = { 76.8f }; //{0.0f};
-
 
         protected float[] noglow = { 0.0f, 0.0f, 0.0f, 1.0f };
 /*        protected float[] lightPos = { 25.0f, 50.0f, 250.0f };*/

@@ -87,27 +87,8 @@ namespace U5Designs
 			return playerMovement;
         }
 
-
-//         protected float[] redAmbient = { 0.4f, 0.0f, 0.0f, 1.0f };
-//         protected float[] redDiffuse = { 0.4f, 0.0f, 0.0f, 1.0f };
-//         protected float[] redSpecular = { 1.0f, 1.0f, 1.0f, 1.0f };
-//         protected float[] redShininess = { 0.5f };
-//         protected byte[] cubeIndices = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 };
-
         public void draw()
         {
-            //Test cube
- /*            GL.PushMatrix();
-             GL.Translate(x, y, z);
-             GL.Scale(12.5f, 12.5f, 12.5f);
-             GL.Material(MaterialFace.Front, MaterialParameter.Specular, redSpecular);
-             GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, redDiffuse);
-             GL.Material(MaterialFace.Front, MaterialParameter.Ambient, redAmbient);
-             GL.Material(MaterialFace.Front, MaterialParameter.Shininess, redShininess);
-             GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
-             GL.PopMatrix();
-            */
-
 			doScaleTranslateAndTexture();
             cubemesh.Render();
 		}
