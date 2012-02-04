@@ -70,6 +70,12 @@ namespace U5Designs
 			get { return _sprite; }
 		}
 
+        private Vector3 _scale;
+        Vector3 RenderObject.scale
+        {
+            get { return _scale; }
+        }
+
 		private int _frameNum; //index of the current animation frame
 		int RenderObject.frameNumber {
 			get { return _frameNum; }

@@ -111,13 +111,11 @@ namespace U5Designs
 				// 				GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, groundDiffuse);
 				// 				GL.Material(MaterialFace.Front, MaterialParameter.Ambient, groundAmbient);
 				// 				GL.Material(MaterialFace.Front, MaterialParameter.Shininess, groundShininess);
+                obj.doScaleTranslateAndTexture(); //TODO FIX. BROKE.
 				if(obj.is3dGeo) {
-					GL.PushMatrix();
-					obj.mesh.DoTexture();
 					obj.mesh.Render();
-					GL.PopMatrix();
 				} else {
-					obj.sprite.draw(0, 0); //change later
+					obj.sprite.draw(0, 0); //change later. must call pop
 				}
 			}
 
@@ -133,7 +131,6 @@ namespace U5Designs
 //             GL.Material(MaterialFace.Front, MaterialParameter.Shininess, groundShininess);
 //             GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
 // 			GL.PopMatrix();
-
 			player.draw();
         }
 

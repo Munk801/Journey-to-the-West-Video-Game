@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
@@ -16,20 +17,19 @@ namespace U5Designs
     class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
         public PlayerState p_state;
-        public bool shifter; 
-
-        //position
-        float x = 0;
-        float y = 0;
-        float z = 0;
+        public bool shifter;
+        ObjMesh cubemesh;
+        int id;
 
         public Player()
         {
             p_state = new PlayerState("TEST player");
             p_state.setSpeed(3);
-            x = 50f;
-            y = 12.5f;
-            z = 50f;
+            _location = new Vector3(50, 50f, 20f);
+            _scale = new Vector3(5, 5, 5);
+            cubemesh = new ObjMesh("../../Geometry/box.obj");
+            _texture = new Bitmap("test.png");
+            id = GL.GenTexture();
         }
 
         /**
@@ -42,20 +42,20 @@ namespace U5Designs
             if (enable3d)
             {
                 if (w)
-                    x = x + (1f *(float)p_state.getSpeed());
+                    _location += (Vector3.UnitX *(float)p_state.getSpeed());
                 if (s)
-                    x = x - (1f * (float)p_state.getSpeed());
+                    _location -= (Vector3.UnitX * (float)p_state.getSpeed());
                 if (d)
-                    z = z + (1f * (float)p_state.getSpeed());
+                    _location += (Vector3.UnitZ * (float)p_state.getSpeed());
                 if (a)
-                    z = z - (1f * (float)p_state.getSpeed());
+                    _location -= (Vector3.UnitZ * (float)p_state.getSpeed());
             }
             else
             {
                 if (d)
-                    x = x + (1f * (float)p_state.getSpeed());
+                    _location += (Vector3.UnitX * (float)p_state.getSpeed());
                 if (a)
-                    x = x - (1f * (float)p_state.getSpeed());
+                    _location -= (Vector3.UnitX * (float)p_state.getSpeed());
             }
 
 
@@ -71,15 +71,38 @@ namespace U5Designs
         public void draw()
         {
             //Test cube
-//             GL.PushMatrix();
-//             GL.Translate(x, y, z);
-//             GL.Scale(12.5f, 12.5f, 12.5f);
-//             GL.Material(MaterialFace.Front, MaterialParameter.Specular, redSpecular);
-//             GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, redDiffuse);
-//             GL.Material(MaterialFace.Front, MaterialParameter.Ambient, redAmbient);
-//             GL.Material(MaterialFace.Front, MaterialParameter.Shininess, redShininess);
-//             GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
-//             GL.PopMatrix();
+ /*            GL.PushMatrix();
+             GL.Translate(x, y, z);
+             GL.Scale(12.5f, 12.5f, 12.5f);
+             GL.Material(MaterialFace.Front, MaterialParameter.Specular, redSpecular);
+             GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, redDiffuse);
+             GL.Material(MaterialFace.Front, MaterialParameter.Ambient, redAmbient);
+             GL.Material(MaterialFace.Front, MaterialParameter.Shininess, redShininess);
+             GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
+             GL.PopMatrix();
+            */
+            GL.PushMatrix();
+            GL.BindTexture(TextureTarget.Texture2D, id);
+
+            BitmapData bmp_data = _texture.LockBits(new Rectangle(0, 0, _texture.Width, _texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+
+            _texture.UnlockBits(bmp_data);
+
+            // We haven't uploaded mipmaps, so disable mipmapping (otherwise the texture will not appear).
+            // On newer video cards, we can use GL.GenerateMipmaps() or GL.Ext.GenerateMipmaps() to create
+            // mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.Translate(_location);
+            GL.Scale(_scale);
+
+            cubemesh.Render();
+
+
+
 		}
 
 		private bool _is3dGeo;
@@ -101,6 +124,11 @@ namespace U5Designs
 		SpriteSheet RenderObject.sprite {
 			get { return _sprite; }
 		}
+        private Vector3 _scale;
+        Vector3 RenderObject.scale
+        {
+            get { return _scale; }
+        }
 
 		private int _frameNum; //index of the current animation frame
 		int RenderObject.frameNumber {
@@ -112,9 +140,10 @@ namespace U5Designs
 			throw new Exception("The method or operation is not implemented.");
 		}
 
-		void RenderObject.doScaleTranslateAndTexture() {
-			throw new Exception("The method or operation is not implemented.");
-		}
+        void RenderObject.doScaleTranslateAndTexture()
+        {
+
+        }
 
 		void PhysicsObject.physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
 			throw new Exception("The method or operation is not implemented.");

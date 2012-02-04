@@ -29,7 +29,7 @@ namespace U5Designs
             // RenderFrame events (as fast as the computer can handle). (may change this in the future, or set it as an option)
             using (GameEngine engine = new GameEngine())
             {
-                engine.Run(30.0);
+                engine.Run(60, 60);
             }
         }
     }

@@ -24,7 +24,6 @@ namespace Engine
                 System.Console.WriteLine("FAIL TO LOAD " + fileName);
 		}
 
-		public Bitmap texture;
 
 		public Vector3[] JustVertices {
 			get { return justvertices; }
@@ -93,26 +92,6 @@ namespace Engine
 	        }
 	    }
 
-		public void DoTexture() {
-
-			int id = GL.GenTexture();
-			GL.BindTexture(TextureTarget.Texture2D, id);
-
-			BitmapData bmp_data = texture.LockBits(new Rectangle(0, 0, texture.Width, texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
-				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
-
-			texture.UnlockBits(bmp_data);
-
-			// We haven't uploaded mipmaps, so disable mipmapping (otherwise the texture will not appear).
-			// On newer video cards, we can use GL.GenerateMipmaps() or GL.Ext.GenerateMipmaps() to create
-			// mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-
- 
-		}
 	
 	    public void Render()
 	    {
@@ -133,6 +112,8 @@ namespace Engine
 	        }
 	
 	        GL.PopClientAttrib();
+
+            GL.PopMatrix();
 	    }
 
 

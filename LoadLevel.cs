@@ -43,17 +43,17 @@ namespace U5Designs
             System.Console.WriteLine(cubemesh.Vertices);
             //use ps to access object lists!!
             //Vector3 testloc = new Vector3(2500, -250, 50);
-			Vector3 testloc = new Vector3(0, 50, 200);
+			Vector3 testloc = new Vector3(0, 0, 200);
+            Vector3 testscale = new Vector3(1000, 20, 125);
             Bitmap testmap = new Bitmap("test.png");
-			cubemesh.texture = testmap;
 
-            Obstacle testfloor = new Obstacle("derp", testloc, true, true, true, null, cubemesh, null);
+            Obstacle testfloor = new Obstacle(testloc, testscale, true, true, true, null, cubemesh, testmap);
 
             ps.physList.Add(testfloor);
             ps.renderList.Add(testfloor);
             //xml file needs to contain for 3d object:
-            // string name
             // vector3 location (( x, y, z) cords)
+            // vector3 scale
             // bool existsin2d?
             // bool exsistsin3d?
             // bitmap file
