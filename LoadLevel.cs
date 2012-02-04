@@ -3,6 +3,9 @@ using System.Collections;
 using System.Linq;
 using System.Text;
 using Engine;
+using System.Drawing;
+using OpenTK;
+using Engine;
 
 // XML Parser
 using System.Xml;
@@ -18,9 +21,40 @@ namespace U5Designs
 {
     class LoadLevel
     {
-        public static List<GameObject> Load(int level_to_load)
+
+        /* ps different lists
+        internal List<GameObject> objList;
+		internal List<RenderObject> renderList;
+		internal List<PhysicsObject> physList;
+		internal List<AIObject> aiList;
+		internal List<CombatObject> combatList;
+        */
+
+        public static void Load(int level_to_load, PlayState ps)
         {
-            List<GameObject> objects = new List<GameObject>();
+            ObjMesh cubemesh = new ObjMesh("Geometry/box.obj"); // this will be the same in almost every load
+
+
+            System.Console.WriteLine(cubemesh.Vertices);
+            //use ps to access object lists!!
+            Vector3 testloc = new Vector3(2500, -250, 50);
+            Bitmap testmap = new Bitmap("test.png");
+            Obstacle testfloor = new Obstacle("test", testloc, true, true, null, cubemesh, testmap);
+
+            ps.physList.Add(testfloor);
+            ps.renderList.Add(testfloor);
+            //xml file needs to contain for 3d object:
+            // string name
+            // vector3 location (( x, y, z) cords)
+            // bool existsin2d?
+            // bool exsistsin3d?
+            // bitmap file
+
+
+
+
+
+
             //TODO write xml parser to populate this array list with all the objects in a level
             //TODO wire up subclasses of GameObject to inheriate from it, extend it where needed
 
@@ -101,7 +135,6 @@ namespace U5Designs
                 objects.Add(obj);
             }
             */
-            return objects;
         }
 
         public static string[] split_locations(string xml_loc_str)

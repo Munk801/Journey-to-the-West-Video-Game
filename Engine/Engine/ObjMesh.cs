@@ -16,7 +16,9 @@ namespace Engine
 	{
 	    public ObjMesh(string fileName)
 	    {
-	        ObjMeshLoader.Load(this, fileName);
+	        bool test = ObjMeshLoader.Load(this, fileName);
+            if (!test)
+                System.Console.WriteLine("FAIL TO LOAD " + fileName);
 	    }
 	
 	    public ObjVertex[] Vertices

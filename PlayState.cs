@@ -24,11 +24,12 @@ namespace U5Designs
         internal bool enable3d;
 
 		//everything is in objList, and then also pointed to from the appropriate interface lists
-        internal List<GameObject> objList;
+        //internal List<GameObject> objList;
 		internal List<RenderObject> renderList;
 		internal List<PhysicsObject> physList;
-		internal List<AIObject> aiList;
-		internal List<CombatObject> combatList;
+		internal List<AIObject> aiList;// aka list of enemies
+		internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
+        //TODO: projectile list
 
         int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
 
@@ -56,26 +57,40 @@ namespace U5Designs
             GL.Enable(EnableCap.Normalize);
             GL.Enable(EnableCap.Lighting);
             GL.Enable(EnableCap.Light0);
-            test.Play();
+            //test.Play();
             updateView();
 
             //AudioManager.Manager.StartAudioServices();
 
             // Testing...remove when done //
-            loadGameObjects();
+
+            //TODO: pass this the right file to load from
+            // undo this when done testing ObjList = LoadLevel.Load(current_level);
+            LoadLevel.Load(0, this);
         }
 
         public override void Update(FrameEventArgs e)
         {
             DealWithInput();
             player.updateState(enable3d, a, s, d, w);
-            
+            //TODO: deal with physics list
 
         }
 
         public override void Draw(FrameEventArgs e)
         {
-
+            player.draw();
+            foreach (RenderObject obj in renderList)
+            {
+                if (obj.is3d)
+                {
+                    obj.objMesh.draw();
+                }
+                else
+                {
+                    obj.spriteSheet.draw();
+                }
+            }
 
             //Origin is the left edge of the level, at the ground and the back wall
             //This means that all valid game coordinates will be positive
@@ -115,8 +130,6 @@ namespace U5Designs
             GL.Material(MaterialFace.Front, MaterialParameter.Shininess, groundShininess);
             GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
             GL.PopMatrix();
-
-            player.draw();
         }
 
         bool spaceDown, a, s, d, w;
@@ -253,17 +266,6 @@ namespace U5Designs
         public void changeCurrentLevel(int l)
         {
             current_level = l;
-        }
-
-        /**
-         * Load the current_level .dat file information
-         * 
-         * */
-        public override void loadGameObjects()
-        {
-            //TODO: pass this the right file to load from
-            // undo this when done testing ObjList = LoadLevel.Load(current_level);
-            objList = LoadLevel.Load(0);
-        }        
+        }      
     }
 }

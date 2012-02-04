@@ -30,7 +30,10 @@ namespace Engine {
 			set;
 		}
 
-		bool is3d(); //returns true if item has 3d geometry, false if sprite
+        bool is3d {
+            get;
+        }
+
 		bool isAnimated(); //true if more than one frame (probably only applies to sprites)
 		void doScaleTranslateAndTexture(); //pushes matrix, adds scale and translate to model view stack, and sets texture pointer
 	}

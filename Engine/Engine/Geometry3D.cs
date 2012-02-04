@@ -11,7 +11,7 @@ using OpenTK.Graphics.OpenGL;
  */
 
 namespace Engine {
-	class Geometry3D {
+	public class Geometry3D {
 
 		private double[] vertices;
 		private double[] normals;

@@ -10,7 +10,7 @@ using Engine;
 
 namespace U5Designs {
 	class Obstacle : GameObject, RenderObject, PhysicsObject{
-		public Obstacle(string name, Vector3 location, bool existsIn2d, bool existsIn3d, ObjMesh mesh = null, Bitmap texture = null, SpriteSheet sprite = null) {
+		public Obstacle(string name, Vector3 location, bool existsIn2d, bool existsIn3d,SpriteSheet sprite = null, ObjMesh mesh = null, Bitmap texture = null) {
 			_obj_name_text = name;
 			_location = location;
 			_existsIn3d = existsIn3d;
@@ -40,10 +40,6 @@ namespace U5Designs {
 		int RenderObject.frameNumber {
 			get { return _frameNum; }
 			set { _frameNum = value; }
-		}
-
-		bool RenderObject.is3d() {
-			throw new Exception("The method or operation is not implemented.");
 		}
 
 		bool RenderObject.isAnimated() {
