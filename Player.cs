@@ -27,7 +27,7 @@ namespace U5Designs
         public Player()
         {
             p_state = new PlayerState("TEST player");
-            p_state.setSpeed(4);
+            p_state.setSpeed(300);
             _location = new Vector3(50, 5f, 50f);
             _scale = new Vector3(5, 5, 5);
             cubemesh = new ObjMesh("../../Geometry/box.obj");
@@ -101,7 +101,7 @@ namespace U5Designs
             {
                 if (velocity.Y < 0.000001f && velocity.Y > -0.0000001f)
                 {
-                    accelerate(Vector3.UnitY * 3);
+                    accelerate(Vector3.UnitY * 230);
                 }
                 spaceDown = true;
             }
@@ -174,13 +174,13 @@ namespace U5Designs
 
 		public void physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
 			if(doesGravity && _location.Y != 0) {
-				accel.Y -= (float)(5*e.Time); //TODO: turn this into a constant somewhere
+				accel.Y -= (float)(400*e.Time); //TODO: turn this into a constant somewhere
 			}
 			velocity += accel;
 			accel.X = 0;
 			accel.Y = 0;
 			accel.Z = 0;
-			_location += velocity;
+			_location += velocity*(float)e.Time;
 			if(_location.Y-5 <= 0) {
 				_location.Y = 5;
 				velocity.Y = 0;
