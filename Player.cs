@@ -71,15 +71,15 @@ namespace U5Designs
         public void draw()
         {
             //Test cube
-            GL.PushMatrix();
-            GL.Translate(x, y, z);
-            GL.Scale(12.5f, 12.5f, 12.5f);
-            GL.Material(MaterialFace.Front, MaterialParameter.Specular, redSpecular);
-            GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, redDiffuse);
-            GL.Material(MaterialFace.Front, MaterialParameter.Ambient, redAmbient);
-            GL.Material(MaterialFace.Front, MaterialParameter.Shininess, redShininess);
-            GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
-            GL.PopMatrix();
+//             GL.PushMatrix();
+//             GL.Translate(x, y, z);
+//             GL.Scale(12.5f, 12.5f, 12.5f);
+//             GL.Material(MaterialFace.Front, MaterialParameter.Specular, redSpecular);
+//             GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, redDiffuse);
+//             GL.Material(MaterialFace.Front, MaterialParameter.Ambient, redAmbient);
+//             GL.Material(MaterialFace.Front, MaterialParameter.Shininess, redShininess);
+//             GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
+//             GL.PopMatrix();
 		}
 
 		private bool _is3dGeo;

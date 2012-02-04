@@ -105,6 +105,21 @@ namespace Engine
 	        }
 	
 	        mesh.Vertices = objVertices.ToArray();
+
+			Vector3[] verts = new Vector3[objVertices.Count];
+			Vector3[] norms = new Vector3[objVertices.Count];
+			Vector2[] tex = new Vector2[objVertices.Count];
+			int i = 0;
+			foreach(ObjMesh.ObjVertex v in objVertices) {
+				verts[i] = v.Vertex;
+				norms[i] = v.Normal;
+				tex[i] = v.TexCoord;
+			}
+			mesh.JustVertices = verts;
+			mesh.Normals = norms;
+			mesh.TexCoords = tex;
+
+
 	        mesh.Triangles = objTriangles.ToArray();
 	        mesh.Quads = objQuads.ToArray();
 	

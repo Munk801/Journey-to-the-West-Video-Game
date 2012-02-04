@@ -42,10 +42,12 @@ namespace U5Designs
 
             System.Console.WriteLine(cubemesh.Vertices);
             //use ps to access object lists!!
-            Vector3 testloc = new Vector3(2500, -250, 50);
+            //Vector3 testloc = new Vector3(2500, -250, 50);
+			Vector3 testloc = new Vector3(0, 50, 200);
             Bitmap testmap = new Bitmap("test.png");
+			cubemesh.texture = testmap;
 
-            Obstacle testfloor = new Obstacle("derp", testloc, true, true, true, null, cubemesh, testmap);
+            Obstacle testfloor = new Obstacle("derp", testloc, true, true, true, null, cubemesh, null);
 
             ps.physList.Add(testfloor);
             ps.renderList.Add(testfloor);
