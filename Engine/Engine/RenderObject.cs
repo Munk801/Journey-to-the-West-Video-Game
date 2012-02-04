@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using OpenTK;
 
 /*
  * RenderObject will be implemented by anything in the game which will be
@@ -24,6 +25,11 @@ namespace Engine {
 		SpriteSheet sprite { //null for 3d objects
 			get;
 		}
+
+        Vector3 scale
+        {
+            get;
+        }
 
 		int frameNumber { //index of the current animation frame
 			get;

@@ -3,6 +3,9 @@ using System.Collections;
 using System.Linq;
 using System.Text;
 using Engine;
+using System.Drawing;
+using OpenTK;
+using Engine;
 
 // XML Parser
 using System.Xml;
@@ -18,9 +21,48 @@ namespace U5Designs
 {
     class LoadLevel
     {
-        public static List<GameObject> Load(int level_to_load)
+
+        /* ps different lists
+        		internal List<RenderObject> renderList;
+		internal List<PhysicsObject> physList;
+		internal List<AIObject> aiList;// aka list of enemies
+		internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
+        //TODO: projectile list
+        */
+
+        public static void Load(int level_to_load, PlayState ps)
         {
-            List<GameObject> objects = new List<GameObject>();
+            ps.renderList = new List<RenderObject>();
+            ps.aiList = new List<AIObject>();
+            ps.combatList = new List<CombatObject>();
+            ps.physList = new List<PhysicsObject>();
+
+            ObjMesh cubemesh = new ObjMesh("../../Geometry/box.obj"); // this will be the same in almost every load
+            
+
+            System.Console.WriteLine(cubemesh.Vertices);
+            //use ps to access object lists!!
+            //Vector3 testloc = new Vector3(2500, -250, 50);
+			Vector3 testloc = new Vector3(0, 0, 200);
+            Vector3 testscale = new Vector3(1000, 20, 125);
+            Bitmap testmap = new Bitmap("test.png");
+
+            Obstacle testfloor = new Obstacle(testloc, testscale, true, true, true, null, cubemesh, testmap);
+
+            ps.physList.Add(testfloor);
+            ps.renderList.Add(testfloor);
+            //xml file needs to contain for 3d object:
+            // vector3 location (( x, y, z) cords)
+            // vector3 scale
+            // bool existsin2d?
+            // bool exsistsin3d?
+            // bitmap file
+
+
+
+
+
+
             //TODO write xml parser to populate this array list with all the objects in a level
             //TODO wire up subclasses of GameObject to inheriate from it, extend it where needed
 
@@ -101,7 +143,6 @@ namespace U5Designs
                 objects.Add(obj);
             }
             */
-            return objects;
         }
 
         public static string[] split_locations(string xml_loc_str)

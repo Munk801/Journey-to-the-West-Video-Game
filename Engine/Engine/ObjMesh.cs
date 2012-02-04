@@ -10,6 +10,9 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
+using System.Drawing;
+using System.Drawing.Imaging;
+
 namespace Engine
 {
 	public class ObjMesh
@@ -19,7 +22,26 @@ namespace Engine
 	        bool test = ObjMeshLoader.Load(this, fileName);
             if (!test)
                 System.Console.WriteLine("FAIL TO LOAD " + fileName);
-	    }
+		}
+
+
+		public Vector3[] JustVertices {
+			get { return justvertices; }
+			set { justvertices = value; }
+		}
+		Vector3[] justvertices;
+
+		public Vector3[] Normals {
+			get { return normals; }
+			set { normals = value; }
+		}
+		Vector3[] normals;
+
+		public Vector2[] TexCoords {
+			get { return texcoords; }
+			set { texcoords = value; }
+		}
+		Vector2[] texcoords;
 	
 	    public ObjVertex[] Vertices
 	    {
@@ -69,6 +91,7 @@ namespace Engine
 	            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(quads.Length * Marshal.SizeOf(typeof(ObjQuad))), quads, BufferUsageHint.StaticDraw);
 	        }
 	    }
+
 	
 	    public void Render()
 	    {
@@ -89,7 +112,19 @@ namespace Engine
 	        }
 	
 	        GL.PopClientAttrib();
+
+            GL.PopMatrix();
 	    }
+
+
+		public void Draw() {
+			GL.VertexPointer(3, VertexPointerType.Float, 0, justvertices);
+			GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, texcoords);
+			GL.NormalPointer(NormalPointerType.Float, 0, normals);
+
+			GL.DrawElements(BeginMode.Triangles, 3*triangles.Length, DrawElementsType.UnsignedInt, triangles);
+			GL.DrawElements(BeginMode.Quads, 4*quads.Length, DrawElementsType.UnsignedInt, quads);
+		}
 	
 	    [StructLayout(LayoutKind.Sequential)]
 	    public struct ObjVertex

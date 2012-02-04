@@ -79,19 +79,6 @@ namespace U5Designs
 
         public override void Draw(FrameEventArgs e)
         {
-            player.draw();
-            foreach (RenderObject obj in renderList)
-            {
-                if (obj.is3dGeo)
-                {
-					obj.mesh.Render();
-                }
-                else
-                {
-					obj.sprite.draw(0, 0); //change later
-                }
-            }
-
             //Origin is the left edge of the level, at the ground and the back wall
             //This means that all valid game coordinates will be positive
             //Ground is from 0 to 100 along the z-axis
@@ -118,18 +105,33 @@ namespace U5Designs
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.NormalArray);
 
+			foreach(RenderObject obj in renderList) {
+
+				// 				GL.Material(MaterialFace.Front, MaterialParameter.Specular, groundSpecular);
+				// 				GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, groundDiffuse);
+				// 				GL.Material(MaterialFace.Front, MaterialParameter.Ambient, groundAmbient);
+				// 				GL.Material(MaterialFace.Front, MaterialParameter.Shininess, groundShininess);
+                obj.doScaleTranslateAndTexture(); //TODO FIX. BROKE.
+				if(obj.is3dGeo) {
+					obj.mesh.Render();
+				} else {
+					obj.sprite.draw(0, 0); //change later. must call pop
+				}
+			}
+
             //Ground
-            GL.VertexPointer(3, VertexPointerType.Float, 0, cubeVertices);
-            GL.NormalPointer(NormalPointerType.Byte, 0, cubeNormals);
-            GL.PushMatrix();
-            GL.Scale(5000.0f, 500.0f, 200.0f);
-            GL.Translate(0.0f, -1.0f, 1.0f);
-            GL.Material(MaterialFace.Front, MaterialParameter.Specular, groundSpecular);
-            GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, groundDiffuse);
-            GL.Material(MaterialFace.Front, MaterialParameter.Ambient, groundAmbient);
-            GL.Material(MaterialFace.Front, MaterialParameter.Shininess, groundShininess);
-            GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
-            GL.PopMatrix();
+//             GL.VertexPointer(3, VertexPointerType.Float, 0, cubeVertices);
+//             GL.NormalPointer(NormalPointerType.Byte, 0, cubeNormals);
+//             GL.PushMatrix();
+//             GL.Scale(5000.0f, 500.0f, 200.0f);
+//             GL.Translate(0.0f, -1.0f, 1.0f);
+//             GL.Material(MaterialFace.Front, MaterialParameter.Specular, groundSpecular);
+//             GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, groundDiffuse);
+//             GL.Material(MaterialFace.Front, MaterialParameter.Ambient, groundAmbient);
+//             GL.Material(MaterialFace.Front, MaterialParameter.Shininess, groundShininess);
+//             GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
+// 			GL.PopMatrix();
+			player.draw();
         }
 
         bool spaceDown, a, s, d, w;

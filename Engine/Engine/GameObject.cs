@@ -38,10 +38,5 @@ namespace Engine
 			protected set { _location = value; }
 		}
 
-		protected string _obj_name_text;
-		public string obj_name_text {
-			get { return _obj_name_text; }
-			private set { _obj_name_text = value; }
-		}
 	}
 }

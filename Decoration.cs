@@ -10,8 +10,7 @@ using Engine;
 
 namespace U5Designs {
 	class Decoration : GameObject, RenderObject {
-		public Decoration(string name, Vector3 location, bool existsIn2d, bool existsIn3d, bool is3dGeo, ObjMesh mesh = null, Bitmap texture = null, SpriteSheet sprite = null) {
-			_obj_name_text = name;
+		public Decoration(Vector3 location, bool existsIn2d, bool existsIn3d, bool is3dGeo, ObjMesh mesh = null, Bitmap texture = null, SpriteSheet sprite = null) {
 			_location = location;
 			_existsIn3d = existsIn3d;
 			_existsIn2d = existsIn2d;
@@ -41,6 +40,12 @@ namespace U5Designs {
 		SpriteSheet RenderObject.sprite {
 			get { return _sprite; }
 		}
+
+        private Vector3 _scale;
+        Vector3 RenderObject.scale
+        {
+            get { return _scale; }
+        }
 
 		private int _frameNum; //index of the current animation frame
 		int RenderObject.frameNumber {
