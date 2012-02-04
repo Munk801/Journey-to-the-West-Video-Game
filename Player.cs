@@ -32,6 +32,7 @@ namespace U5Designs
             _scale = new Vector3(5, 5, 5);
             cubemesh = new ObjMesh("../../Geometry/box.obj");
             _texture = new Bitmap("test.png");
+            _damage = 0;
             texID = GL.GenTexture();
 			velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);
@@ -70,7 +71,6 @@ namespace U5Designs
             //********************** space
             if (space && !spaceDown)
             {
-                System.Console.WriteLine(accel.Y);
                 if (velocity.Y < 0.000001f && velocity.Y > -0.0000001f)
                 {
                     accelerate(Vector3.UnitY * 3);

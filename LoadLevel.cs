@@ -35,8 +35,8 @@ namespace U5Designs
 
             //example obstacle load
             //use ps to access object lists!!
-            Vector3 testloc = new Vector3(2500, -250, 50);
-			Vector3 testscale = new Vector3(2500, 250, 50);
+            Vector3 testloc = new Vector3(50, -50, 50);
+			Vector3 testscale = new Vector3(50, 50, 50);
             Bitmap testmap = new Bitmap("test.png");
 
             Obstacle testfloor = new Obstacle(testloc, testscale, true, true, cubemesh, testmap);
@@ -51,6 +51,13 @@ namespace U5Designs
 			// obj file
             // bitmap file
 
+            for (int i = 0; i < 5; i++)
+            {
+                
+                testfloor = new Obstacle(testloc+(new Vector3(i*100, 0,0)), testscale, true, true, cubemesh, testmap);
+                ps.physList.Add(testfloor);
+                ps.renderList.Add(testfloor);
+            }
 
 
 
