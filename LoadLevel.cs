@@ -23,23 +23,29 @@ namespace U5Designs
     {
 
         /* ps different lists
-        internal List<GameObject> objList;
-		internal List<RenderObject> renderList;
+        		internal List<RenderObject> renderList;
 		internal List<PhysicsObject> physList;
-		internal List<AIObject> aiList;
-		internal List<CombatObject> combatList;
+		internal List<AIObject> aiList;// aka list of enemies
+		internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
+        //TODO: projectile list
         */
 
         public static void Load(int level_to_load, PlayState ps)
         {
-            ObjMesh cubemesh = new ObjMesh("Geometry/box.obj"); // this will be the same in almost every load
+            ps.renderList = new List<RenderObject>();
+            ps.aiList = new List<AIObject>();
+            ps.combatList = new List<CombatObject>();
+            ps.physList = new List<PhysicsObject>();
 
+            ObjMesh cubemesh = new ObjMesh("../../Geometry/box.obj"); // this will be the same in almost every load
+            
 
             System.Console.WriteLine(cubemesh.Vertices);
             //use ps to access object lists!!
             Vector3 testloc = new Vector3(2500, -250, 50);
             Bitmap testmap = new Bitmap("test.png");
-            Obstacle testfloor = new Obstacle("box.obj", testloc, true, true, true, null, cubemesh, testmap);
+
+            Obstacle testfloor = new Obstacle("derp", testloc, true, true, true, null, cubemesh, testmap);
 
             ps.physList.Add(testfloor);
             ps.renderList.Add(testfloor);
