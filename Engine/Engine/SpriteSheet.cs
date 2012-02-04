@@ -40,15 +40,19 @@ namespace Engine {
 					IntPtr tex_addr = IntPtr.Add(bmp_data.Scan0, (cycleStartNums[cycleNum]+frameNum) * texw * texh * 4);
 					tex[cycleNum][frameNum] = new byte[texw * texh * 4];
 					for(int i = 0; i < texw * texh*4; i += 4) {
-						tex[cycleNum][frameNum][i + 3] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i), typeof(byte));
-						tex[cycleNum][frameNum][i + 0] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i+1), typeof(byte));
-						tex[cycleNum][frameNum][i + 1] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i+2), typeof(byte));
-						tex[cycleNum][frameNum][i + 2] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i+3), typeof(byte));
+						tex[cycleNum][frameNum][i + 0] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i), typeof(byte));
+						tex[cycleNum][frameNum][i + 1] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i+1), typeof(byte));
+						tex[cycleNum][frameNum][i + 2] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i+2), typeof(byte));
+						tex[cycleNum][frameNum][i + 3] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i+3), typeof(byte));
 					}
 				}
 			}
 			texbmp.UnlockBits(bmp_data);
+
+			//CORasterSaveToBMP(tex[0][2], (uint)texw, (uint)texh, "C:\\Users\\Kendal\\Desktop\\test.bmp");
 		}
+
+
         public void CORasterSaveToBMP(byte[] rasterPixels, uint rasterWidth, uint rasterHeight, String path)
         {
             //BMP (Windows V3)
@@ -100,34 +104,37 @@ namespace Engine {
             
             //Write BMP header (Windows V3, 32bbp)
             file.Write(magicNumber);
-            file.Write(fileSize, sizeof(fileSize), 1, file);
-            file.Write(reserved0, sizeof(reserved0), 1, file);
-            file.Write(reserved1, sizeof(reserved1), 1, file);
-            file.Write(dataOffset, sizeof(dataOffset), 1, file);
-            file.Write(infoHeaderSize, sizeof(infoHeaderSize), 1, file);
-            file.Write(width, sizeof(width), 1, file);
-            file.Write(height, sizeof(height), 1, file);
-            file.Write(colorPlanes, sizeof(colorPlanes), 1, file);
-            file.Write(bitsPerPixel, sizeof(bitsPerPixel), 1, file);
-            file.Write(compression, sizeof(compression), 1, file);
-            file.Write(dataSize, sizeof(dataSize), 1, file);
-            file.Write(horizontalResolution, sizeof(horizontalResolution), 1, file);
-            file.Write(verticalResolution, sizeof(verticalResolution), 1, file);
-            file.Write(paletteColorCount, sizeof(paletteColorCount), 1, file);
-            file.Write(importantPaletteColorCount, sizeof(importantPaletteColorCount), 1, file);
+            file.Write(fileSize);
+            file.Write(reserved0);
+            file.Write(reserved1);
+            file.Write(dataOffset);
+            file.Write(infoHeaderSize);
+            file.Write(width);
+            file.Write(height);
+            file.Write(colorPlanes);
+            file.Write(bitsPerPixel);
+            file.Write(compression);
+            file.Write(dataSize);
+            file.Write(horizontalResolution);
+            file.Write(verticalResolution);
+            file.Write(paletteColorCount);
+			file.Write(importantPaletteColorCount);
 
             //Write BMP body (XXRRGGBB)
-            for (int y = rasterHeight - 1; y >= 0; y--)
-            {
-                for (int x = 0; x < rasterWidth; x++)
-                {
-                    COColorARGB color = rasterPixels[y * rasterWidth + x];
-                    file.Write(color, sizeof(color), 1, file);
-                }
-            }
+			for(int i = 0; i < rasterPixels.Length; i++) {
+				file.Write(rasterPixels[i]);
+			}
+				//             for (uint y = rasterHeight - 1; y >= 0; y--)
+				//             {
+				//                 for (uint x = 0; x < rasterWidth; x++)
+				//                 {
+				//                     uint color = rasterPixels[y * rasterWidth + x];
+				// 					file.Write(color);
+				//                 }
+				//             }
 
-            //Cleanup
-            fclose(file);
+				//Cleanup
+			file.Close();
         }
 		/*
 		 * draw - Uses OpenGL to render this sprite.  Requires that
@@ -161,6 +168,7 @@ namespace Engine {
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[cycleNumber][frameNumber]);
 			GL.VertexPointer(3, VertexPointerType.Float, 0, vertices);
 			GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, texverts);
+			//CORasterSaveToBMP(tex[cycleNumber][frameNumber], (uint)texw, (uint)texh, "C:\\Users\\Kendal\\Desktop\\test.bmp");
 			GL.DrawElements(BeginMode.Quads, indices.Length, DrawElementsType.UnsignedByte, indices);
 			GL.PopMatrix(); //this matches to the push in RenderObject.doScaleAndTranslate()
 

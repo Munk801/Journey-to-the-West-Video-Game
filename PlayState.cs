@@ -137,19 +137,21 @@ namespace U5Designs
 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 
 			foreach(RenderObject obj in renderList) {
-				obj.doScaleTranslateAndTexture();
 				if(obj.is3dGeo) {
-					obj.mesh.Render();
+ 					obj.doScaleTranslateAndTexture();
+ 					obj.mesh.Render();
 				} else {
+					GL.PushMatrix();
+					GL.Scale(50, 50, 1);
 					i = obj.sprite.draw(0, ++i);
 				}
 			}
-			Console.WriteLine(i);
+			//Console.WriteLine(i);
 
 			player.draw();
         }
 
-		int i = 0;
+		int i = -1;
 
         //if its inconvenient to have key detection outside of the update method, move it back in
         private void DealWithInput()
