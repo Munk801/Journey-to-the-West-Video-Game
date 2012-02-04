@@ -19,54 +19,64 @@ namespace U5Designs
         public PlayerState p_state;
         public bool shifter;
         ObjMesh cubemesh;
-        int id;
+        int texID;
+		private Vector3 velocity;
+		private Vector3 accel;
+		private bool doesGravity; //true if gravity affects this object
 
         public Player()
         {
             p_state = new PlayerState("TEST player");
-            p_state.setSpeed(3);
-            _location = new Vector3(50, 50f, 20f);
+            p_state.setSpeed(300);
+            _location = new Vector3(50, 5f, 50f);
             _scale = new Vector3(5, 5, 5);
             cubemesh = new ObjMesh("../../Geometry/box.obj");
             _texture = new Bitmap("test.png");
-            id = GL.GenTexture();
+            texID = GL.GenTexture();
+			velocity = new Vector3(0, 0, 0);
+			accel = new Vector3(0, 0, 0);
+			doesGravity = true;
         }
 
         /**
          * Sets the PlayerState elements to the current Player values.  Call this method every update or simply when the state changes.  This will be used to store
          * the Players State when saving the game.
+		 * 
+		 * Returns the movement of the player to be used in updating camera, etc.
          * */
-        public void updateState(bool enable3d, bool a, bool s, bool d, bool w)
-        {
+        public Vector3 updateState(bool enable3d, bool a, bool s, bool d, bool w, FrameEventArgs e) {
+			Vector3 playerMovement = new Vector3(0, 0, 0);
             //TODO: add control for other buttons, jump, projectile etc
             if (enable3d)
             {
                 if (w)
-                    _location += (Vector3.UnitX *(float)p_state.getSpeed());
+                    playerMovement += (Vector3.UnitX *(float)p_state.getSpeed());
                 if (s)
-                    _location -= (Vector3.UnitX * (float)p_state.getSpeed());
+                    playerMovement -= (Vector3.UnitX * (float)p_state.getSpeed());
                 if (d)
-                    _location += (Vector3.UnitZ * (float)p_state.getSpeed());
+                    playerMovement += (Vector3.UnitZ * (float)p_state.getSpeed());
                 if (a)
-                    _location -= (Vector3.UnitZ * (float)p_state.getSpeed());
+                    playerMovement -= (Vector3.UnitZ * (float)p_state.getSpeed());
             }
             else
             {
                 if (d)
-                    _location += (Vector3.UnitX * (float)p_state.getSpeed());
+                    playerMovement += (Vector3.UnitX * (float)p_state.getSpeed());
                 if (a)
-                    _location -= (Vector3.UnitX * (float)p_state.getSpeed());
+                    playerMovement -= (Vector3.UnitX * (float)p_state.getSpeed());
             }
 
-
+			playerMovement *= (float)e.Time;
+			_location += playerMovement;
+			return playerMovement;
         }
 
 
-        protected float[] redAmbient = { 0.4f, 0.0f, 0.0f, 1.0f };
-        protected float[] redDiffuse = { 0.4f, 0.0f, 0.0f, 1.0f };
-        protected float[] redSpecular = { 1.0f, 1.0f, 1.0f, 1.0f };
-        protected float[] redShininess = { 0.5f };
-        protected byte[] cubeIndices = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 };
+//         protected float[] redAmbient = { 0.4f, 0.0f, 0.0f, 1.0f };
+//         protected float[] redDiffuse = { 0.4f, 0.0f, 0.0f, 1.0f };
+//         protected float[] redSpecular = { 1.0f, 1.0f, 1.0f, 1.0f };
+//         protected float[] redShininess = { 0.5f };
+//         protected byte[] cubeIndices = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 };
 
         public void draw()
         {
@@ -81,97 +91,101 @@ namespace U5Designs
              GL.DrawElements(BeginMode.Quads, 24, DrawElementsType.UnsignedByte, cubeIndices);
              GL.PopMatrix();
             */
-            GL.PushMatrix();
-            GL.BindTexture(TextureTarget.Texture2D, id);
 
-            BitmapData bmp_data = _texture.LockBits(new Rectangle(0, 0, _texture.Width, _texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
-                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
-
-            _texture.UnlockBits(bmp_data);
-
-            // We haven't uploaded mipmaps, so disable mipmapping (otherwise the texture will not appear).
-            // On newer video cards, we can use GL.GenerateMipmaps() or GL.Ext.GenerateMipmaps() to create
-            // mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            GL.Translate(_location);
-            GL.Scale(_scale);
-
+			doScaleTranslateAndTexture();
             cubemesh.Render();
-
-
-
 		}
 
 		private bool _is3dGeo;
-		bool RenderObject.is3dGeo {
+		public bool is3dGeo {
 			get { return _is3dGeo; }
 		}
 
 		private ObjMesh _mesh; //null for sprites
-		ObjMesh RenderObject.mesh {
+		public ObjMesh mesh {
 			get { return _mesh; }
 		}
 
 		private Bitmap _texture; //null for sprites
-		Bitmap RenderObject.texture {
+		public Bitmap texture {
 			get { return _texture; }
 		}
 
 		private SpriteSheet _sprite; //null for 3d objects
-		SpriteSheet RenderObject.sprite {
+		public SpriteSheet sprite {
 			get { return _sprite; }
 		}
+
         private Vector3 _scale;
-        Vector3 RenderObject.scale
+		public Vector3 scale
         {
             get { return _scale; }
         }
 
 		private int _frameNum; //index of the current animation frame
-		int RenderObject.frameNumber {
+		public int frameNumber {
 			get { return _frameNum; }
 			set { _frameNum = value; }
 		}
 
-		bool RenderObject.isAnimated() {
+		public bool isAnimated() {
 			throw new Exception("The method or operation is not implemented.");
 		}
 
-        void RenderObject.doScaleTranslateAndTexture()
-        {
+        public void doScaleTranslateAndTexture() {
+			GL.PushMatrix();
 
+			GL.BindTexture(TextureTarget.Texture2D, texID);
+			BitmapData bmp_data = _texture.LockBits(new Rectangle(0, 0, _texture.Width, _texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+			_texture.UnlockBits(bmp_data);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+
+			GL.Translate(_location);
+			GL.Scale(_scale);
         }
 
-		void PhysicsObject.physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
-			throw new Exception("The method or operation is not implemented.");
+		public void physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
+			if(doesGravity && _location.Y != 0) {
+				accel.Y -= (float)(5*e.Time); //TODO: turn this into a constant somewhere
+			}
+			velocity += accel;
+			accel.X = 0;
+			accel.Y = 0;
+			accel.Z = 0;
+			_location += velocity;
+			if(_location.Y-5 <= 0) {
+				_location.Y = 5;
+				velocity.Y = 0;
+				accel.Y = 0;
+			}
 		}
 
-		void PhysicsObject.accelerate(double acceleration) {
-			throw new Exception("The method or operation is not implemented.");
+		public void accelerate(Vector3 acceleration) {
+			accel += acceleration;
 		}
 
 		private float _health;
-		float CombatObject.health {
+		public float health {
 			get { return _health; }
 			set { _health = value; }
 		}
 
 		private float _damage;
-		float CombatObject.damage {
+		public float damage {
 			get { return _damage; }
 		}
 
 		private bool _alive;
-		bool CombatObject.alive {
+		public bool alive {
 			get { return _alive; }
 			set { _alive = value; }
 		}
 
 		//TODO: Don't know if reset really applies to player or not...
-		void CombatObject.reset() {
+		public void reset() {
 			throw new NotImplementedException();
 		}
 	}

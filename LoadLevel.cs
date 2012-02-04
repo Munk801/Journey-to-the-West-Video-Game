@@ -37,17 +37,17 @@ namespace U5Designs
             ps.combatList = new List<CombatObject>();
             ps.physList = new List<PhysicsObject>();
 
-            ObjMesh cubemesh = new ObjMesh("../../Geometry/box.obj"); // this will be the same in almost every load
+            ObjMesh cubemesh = new ObjMesh("../../Geometry/box.obj");
             
-
             System.Console.WriteLine(cubemesh.Vertices);
             //use ps to access object lists!!
-            //Vector3 testloc = new Vector3(2500, -250, 50);
-			Vector3 testloc = new Vector3(0, 0, 200);
-            Vector3 testscale = new Vector3(1000, 20, 125);
+            Vector3 testloc = new Vector3(2500, -250, 50);
+			Vector3 testscale = new Vector3(2500, 250, 50);
+			//Vector3 testloc = new Vector3(0, 0, 200);
+            //Vector3 testscale = new Vector3(1000, 20, 125);
             Bitmap testmap = new Bitmap("test.png");
 
-            Obstacle testfloor = new Obstacle(testloc, testscale, true, true, true, null, cubemesh, testmap);
+            Obstacle testfloor = new Obstacle(testloc, testscale, true, true, cubemesh, testmap);
 
             ps.physList.Add(testfloor);
             ps.renderList.Add(testfloor);
@@ -56,6 +56,7 @@ namespace U5Designs
             // vector3 scale
             // bool existsin2d?
             // bool exsistsin3d?
+			// obj file
             // bitmap file
 
 

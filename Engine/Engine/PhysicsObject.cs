@@ -15,7 +15,6 @@ namespace Engine {
 		private Vector3 boundOrigin; //corner of bounding box at min x,y,z corner
 		private Vector3 boundExtent; //width, length, height of bounding box
 		*/
-
         
 
 		//applies gravity/acceleration, then velocity, then collision detection
@@ -23,6 +22,6 @@ namespace Engine {
 
 		//allows other objects to cause this one to accelerate
 		//this could be AI accelerating itself, or the player accelerating projectiles, etc.
-		void accelerate(double acceleration);
+		void accelerate(Vector3 acceleration);
 	}
 }

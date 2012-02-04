@@ -80,7 +80,7 @@ namespace U5Designs {
 			throw new Exception("The method or operation is not implemented.");
 		}
 
-		void PhysicsObject.accelerate(double acceleration) {
+		void PhysicsObject.accelerate(Vector3 acceleration) {
 			throw new Exception("The method or operation is not implemented.");
 		}
 

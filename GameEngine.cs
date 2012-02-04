@@ -118,7 +118,9 @@ namespace U5Designs
             base.OnResize(e);
 
             GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
-            states.Peek().updateView();
+            //TODO: Something should happen here to handle this gracefully
+			
+			//states.Peek().updateView();
         }
     }
 }

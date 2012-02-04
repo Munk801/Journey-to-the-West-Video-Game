@@ -94,7 +94,7 @@ namespace U5Designs
 			throw new NotImplementedException();
 		}
 
-		void PhysicsObject.accelerate(double acceleration) {
+		void PhysicsObject.accelerate(Vector3 acceleration) {
 			throw new NotImplementedException();
 		}
 

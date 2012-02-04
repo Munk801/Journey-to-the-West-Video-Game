@@ -39,10 +39,6 @@ namespace U5Designs
             eng.ChangeState(state);
         }
 
-        public virtual void updateView()
-        {
-        }
-
         public virtual void loadGameObjects()
         {            
         }       
