@@ -81,9 +81,9 @@ namespace U5Designs
         public override void Update(FrameEventArgs e)
         {
             DealWithInput();
-			Vector3 playerMovement = player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.Space], e);
+			player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.Space], e);
 			
-			updateView(playerMovement);
+			updateView(); 
 
 			//TODO: parallax background based on player movement
 
@@ -114,9 +114,9 @@ namespace U5Designs
             //Light
             GL.ShadeModel(ShadingModel.Smooth);
             GL.Light(LightName.Light0, LightParameter.Position, lightPos);
-            GL.Light(LightName.Light0, LightParameter.Diffuse, Vector4.One*0.5f);
-			GL.Light(LightName.Light0, LightParameter.Specular, Vector4.One * 0.5f);
-            GL.Light(LightName.Light0, LightParameter.Ambient, new Vector4(0.2f, 0.2f, 0.2f, 1.0f));
+            GL.Light(LightName.Light0, LightParameter.Diffuse, new Vector4(1.0f, 1.0f, 1.0f, 1.0f) );
+			GL.Light(LightName.Light0, LightParameter.Specular, new Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+            GL.Light(LightName.Light0, LightParameter.Ambient, new Vector4(0.4f, 0.4f, 0.4f, 1.0f));
             GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Emission, noglow);
 
             //Fog
@@ -142,8 +142,9 @@ namespace U5Designs
  					obj.mesh.Render();
 				} else {
 					GL.PushMatrix();
+					GL.Translate(0, 50, 0);
 					GL.Scale(50, 50, 1);
-					i = obj.sprite.draw(0, ++i);
+					i = obj.sprite.draw(0, 2);
 				}
 			}
 			//Console.WriteLine(i);
@@ -182,12 +183,10 @@ namespace U5Designs
 
 
         /// <summary>Updates the projection matrix for the current view (2D/3D)</summary>
-		public void updateView(Vector3 playerMovement) {
-			playerMovement.Z = 0;
-			eye += playerMovement;
-			lookat += playerMovement;
-			lightPos.X += playerMovement.X;
-			lightPos.Y += playerMovement.Y;
+		public void updateView() {
+			eye.X += player.deltax;
+			lookat.X += player.deltax;
+			lightPos.X += player.deltax;
 
             //TODO: Animate view transition
 			if(switchingPerspective) {

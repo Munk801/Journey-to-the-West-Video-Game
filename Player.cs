@@ -24,6 +24,8 @@ namespace U5Designs
 		private Vector3 accel;
 		private bool doesGravity; //true if gravity affects this object
 
+		public float deltax; //used for updating position of camera, etc.
+
         public Player()
         {
             p_state = new PlayerState("TEST player");
@@ -46,8 +48,7 @@ namespace U5Designs
 		 * Returns the movement of the player to be used in updating camera, etc.
          * */
         bool spaceDown;
-        public Vector3 updateState(bool enable3d, bool a, bool s, bool d, bool w, bool space, FrameEventArgs e) {
-			Vector3 playerMovement = new Vector3(0, 0, 0);
+        public void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool space, FrameEventArgs e) {
             //TODO: add control for other buttons, jump, projectile etc
             if (enable3d)
             {
@@ -109,10 +110,6 @@ namespace U5Designs
             {
                 spaceDown = false;
             }
-
-			playerMovement *= (float)e.Time;
-			_location += playerMovement;
-			return playerMovement;
         }
 
         public void draw()
@@ -186,6 +183,7 @@ namespace U5Designs
 				velocity.Y = 0;
 				accel.Y = 0;
 			}
+			deltax = (velocity * (float)e.Time).X;
 		}
 
 		public void accelerate(Vector3 acceleration) {
