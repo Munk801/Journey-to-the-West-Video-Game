@@ -17,6 +17,11 @@ namespace Engine {
 			get;
 		}
 
+        float speed {
+            get;
+            set;
+        }
+
 		bool alive {
 			get;
 			set;

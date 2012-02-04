@@ -31,7 +31,7 @@ namespace U5Designs
             _location = new Vector3(50, 5f, 50f);
             _scale = new Vector3(5, 5, 5);
             cubemesh = new ObjMesh("../../Geometry/box.obj");
-            _texture = new Bitmap("test.png");
+            _texture = new Bitmap("player.png");
             _damage = 0;
             texID = GL.GenTexture();
 			velocity = new Vector3(0, 0, 0);
@@ -174,6 +174,12 @@ namespace U5Designs
 		public float damage {
 			get { return _damage; }
 		}
+
+        private float _speed;
+        float CombatObject.speed {
+            get { return _speed; }
+            set { _speed = value; }
+        }
 
 		private bool _alive;
 		public bool alive {

@@ -25,7 +25,7 @@ namespace U5Designs
 		internal bool switchingPerspective; //true when perspective is in process of switching
 
 		//everything is in objList, and then also pointed to from the appropriate interface lists
-        //internal List<GameObject> objList;
+        internal List<GameObject> objList;
 		internal List<RenderObject> renderList;
 		internal List<PhysicsObject> physList;
 		internal List<AIObject> aiList;// aka list of enemies

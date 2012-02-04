@@ -37,6 +37,11 @@ namespace U5Designs {
 			get { return _damage; }
 		}
 
+        private float _speed;
+        float CombatObject.speed {
+            get { return _speed; }
+            set { _speed = value; }
+        }
 		private bool _alive;
 		bool CombatObject.alive {
 			get { return _alive; }

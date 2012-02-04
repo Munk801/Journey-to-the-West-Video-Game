@@ -23,6 +23,7 @@ namespace U5Designs
     {
         public static void Load(int level_to_load, PlayState ps)
         {
+            ps.objList = new List<GameObject>();
             ps.renderList = new List<RenderObject>();
             ps.aiList = new List<AIObject>();
             ps.combatList = new List<CombatObject>();
@@ -41,6 +42,7 @@ namespace U5Designs
 
             Obstacle testfloor = new Obstacle(testloc, testscale, true, true, cubemesh, testmap);
 
+            ps.objList.Add(testfloor);
             ps.physList.Add(testfloor);
             ps.renderList.Add(testfloor);
             //xml file needs to contain for 3d object:
@@ -51,14 +53,38 @@ namespace U5Designs
 			// obj file
             // bitmap file
 
+
+            //tmp add 5 more floor boxes
             for (int i = 0; i < 5; i++)
-            {
-                
+            {  
                 testfloor = new Obstacle(testloc+(new Vector3(i*100, 0,0)), testscale, true, true, cubemesh, testmap);
+                ps.objList.Add(testfloor);
                 ps.physList.Add(testfloor);
                 ps.renderList.Add(testfloor);
             }
 
+
+            //example enemy load
+            Vector3 enloc = new Vector3(250, 5, 50);
+            Vector3 enscale = new Vector3(5, 5, 5);
+            Bitmap enmap = new Bitmap("enemy.png");
+
+            Enemy testenemy = new Enemy(enloc, enscale, true, true, 10, 10, 1f, cubemesh, enmap);
+            ps.objList.Add(testenemy);
+            ps.physList.Add(testenemy);
+            ps.renderList.Add(testenemy);
+            ps.aiList.Add(testenemy);
+
+            //XML for enemy needs to contain:
+            // vector3 location (( x, y, z) cords)
+            // vector3 scale
+            // bool existsin2d?
+            // bool exsistsin3d?
+            //int health
+            // int damage
+            // float speed
+            // obj file
+            // bitmap file
 
 
 

@@ -3,50 +3,61 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 using Engine;
 
 namespace U5Designs
 {
-    class Enemy : GameObject, AIObject, RenderObject
+    class Enemy : GameObject, AIObject, RenderObject, PhysicsObject, CombatObject
     {
-        /** This struct will contain the Players Status **/
-        struct EnemyState
+		public Enemy(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, ObjMesh mesh, Bitmap texture) {
+			_location = location;
+            _scale = scale;
+			_existsIn3d = existsIn3d;
+			_existsIn2d = existsIn2d;
+            _health = health;
+            _damage = damage;
+            _speed = speed;
+            _alive = true;
+
+			_mesh = mesh;
+			_texture = texture;
+			_sprite = null;
+			_frameNum = 0;
+			_is3dGeo = true;
+            texID = GL.GenTexture();
+		}
+
+
+        public Enemy(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, SpriteSheet sprite)
         {
-            public int e_health;
-            public int e_damage;
-            public double e_speed;
-            public string e_equip_ability;
-            public int e_current_zone;
+			_location = location;
+			_scale = scale;
+			_existsIn3d = existsIn3d;
+			_existsIn2d = existsIn2d;
+            _health = health;
+            _damage = damage;
+            _speed = speed;
+            _alive = true;
 
-            // texture...
+			_mesh = null;
+			_texture = null;
+			_sprite = sprite;
+			_frameNum = 0;
+			_is3dGeo = false;
+			texID = GL.GenTexture();
+		}
 
-        };
-
-        int health, damage;
-        double speed;
-        // texture = .... ;
-
-        EnemyState e_state;
-
-        public Enemy(int hp, int dam, double spd)
-        {
-            health = hp;
-            damage = dam;
-            speed = spd;
-            // type = ... ;
-        }
+        private int texID;
 
 
         /** Like the Player Status update call this every time you need to update an Enemies State before saving **/
         public void updateState()
         {
-            e_state.e_health = health;
-            e_state.e_damage = damage;
-            e_state.e_speed = speed;
-
             // Add in the other State elements that will need to be maintained here..
 		}
 
@@ -87,7 +98,18 @@ namespace U5Designs
 		}
 
 		void RenderObject.doScaleTranslateAndTexture() {
-			throw new Exception("The method or operation is not implemented.");
+            GL.PushMatrix();
+
+            GL.BindTexture(TextureTarget.Texture2D, texID);
+            BitmapData bmp_data = _texture.LockBits(new Rectangle(0, 0, _texture.Width, _texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+            _texture.UnlockBits(bmp_data);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+
+            GL.Translate(_location);
+            GL.Scale(_scale);
 		}
 
 		void PhysicsObject.physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
@@ -108,6 +130,12 @@ namespace U5Designs
 		float CombatObject.damage {
 			get { return _damage; }
 		}
+
+        private float _speed;
+        float CombatObject.speed {
+            get { return _speed; }
+            set { _speed = value; }
+        }
 
 		private bool _alive;
 		bool CombatObject.alive {
