@@ -82,7 +82,7 @@ namespace U5Designs
         public override void Update(FrameEventArgs e)
         {
             DealWithInput();
-			Vector3 playerMovement = player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], e);
+			Vector3 playerMovement = player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.Space], e);
 			
 			updateView(playerMovement);
 
@@ -169,13 +169,6 @@ namespace U5Designs
                 eng.PushState(ms);
             }
 
-			//********************** space
-			if(eng.Keyboard[Key.Space] && !spaceDown) {
-				player.accelerate(Vector3.UnitY * 3);
-				spaceDown = true;
-			} else if(!eng.Keyboard[Key.Space]) {
-				spaceDown = false;
-			}
 			//********************** tab
             if (eng.Keyboard[Key.Tab] && !tabDown)
             {

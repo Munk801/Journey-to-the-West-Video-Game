@@ -44,7 +44,8 @@ namespace U5Designs
 		 * 
 		 * Returns the movement of the player to be used in updating camera, etc.
          * */
-        public Vector3 updateState(bool enable3d, bool a, bool s, bool d, bool w, FrameEventArgs e) {
+        bool spaceDown;
+        public Vector3 updateState(bool enable3d, bool a, bool s, bool d, bool w, bool space, FrameEventArgs e) {
 			Vector3 playerMovement = new Vector3(0, 0, 0);
             //TODO: add control for other buttons, jump, projectile etc
             if (enable3d)
@@ -64,6 +65,21 @@ namespace U5Designs
                     playerMovement += (Vector3.UnitX * (float)p_state.getSpeed());
                 if (a)
                     playerMovement -= (Vector3.UnitX * (float)p_state.getSpeed());
+            }
+
+            //********************** space
+            if (space && !spaceDown)
+            {
+                System.Console.WriteLine(accel.Y);
+                if (velocity.Y < 0.000001f && velocity.Y > -0.0000001f)
+                {
+                    accelerate(Vector3.UnitY * 3);
+                }
+                spaceDown = true;
+            }
+            else if (!space)
+            {
+                spaceDown = false;
             }
 
 			playerMovement *= (float)e.Time;
