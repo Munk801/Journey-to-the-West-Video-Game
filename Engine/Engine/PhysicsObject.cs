@@ -16,6 +16,8 @@ namespace Engine {
 		private Vector3 boundExtent; //width, length, height of bounding box
 		*/
 
+        
+
 		//applies gravity/acceleration, then velocity, then collision detection
 		void physUpdate(FrameEventArgs e, List<PhysicsObject> objlist);
 

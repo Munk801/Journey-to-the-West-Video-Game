@@ -190,6 +190,8 @@ namespace Engine
             // Make sure we are you trying to update a NULL Source
             if (SourceFile != null)
             {
+                
+                // Initialize our queued buffers and our process buffers
                 int queuedBuffers;
                 AL.GetSource(Source, ALGetSourcei.BuffersQueued, out queuedBuffers);
 
@@ -197,10 +199,9 @@ namespace Engine
                 AL.GetSource(Source, ALGetSourcei.BuffersProcessed, out processedBuffers);
 
                 // Check if we reached an end of file situation
-                if (FileHasEnded)
+                // CHANGE BACK TO TWO SEPARATE IF CALLS IF DOESN'T WORK
+                if (FileHasEnded && queuedBuffers <= processedBuffers)
                 {
-                    if (queuedBuffers <= processedBuffers)
-                    {
                         // Source is done
                         AL.SourceStop(Source);
                         SourceFile = null;
@@ -208,8 +209,8 @@ namespace Engine
                         RemoveEmptyBuffers();
 
                         return;
-                    }
                 }
+
                 // Buffering isn't done so continue
                 else
                 {
@@ -224,6 +225,7 @@ namespace Engine
 
                     bool underFlow = (processedBuffers >= BufferCount);
 
+                    // Continue through the buffers until we don't have anymore
                     while (processedBuffers > 0)
                     {
                         int removedBuffers = 0;
@@ -267,7 +269,10 @@ namespace Engine
                         processedBuffers--;
                     }
                 }
+
             }
         }
+
+
     }
 }
