@@ -27,7 +27,7 @@ namespace U5Designs
         public Player()
         {
             p_state = new PlayerState("TEST player");
-            p_state.setSpeed(300);
+            p_state.setSpeed(4);
             _location = new Vector3(50, 5f, 50f);
             _scale = new Vector3(5, 5, 5);
             cubemesh = new ObjMesh("../../Geometry/box.obj");
@@ -51,21 +51,49 @@ namespace U5Designs
             //TODO: add control for other buttons, jump, projectile etc
             if (enable3d)
             {
-                if (w)
-                    playerMovement += (Vector3.UnitX *(float)p_state.getSpeed());
+                if (w) 
+                    velocity.X = (float)p_state.getSpeed();                
                 if (s)
-                    playerMovement -= (Vector3.UnitX * (float)p_state.getSpeed());
+                    velocity.X = -(float)p_state.getSpeed();
+                if ((s && w) || (!s && !w))
+                    velocity.X = 0f;
+
                 if (d)
-                    playerMovement += (Vector3.UnitZ * (float)p_state.getSpeed());
+                    velocity.Z = (float)p_state.getSpeed();
                 if (a)
-                    playerMovement -= (Vector3.UnitZ * (float)p_state.getSpeed());
+                    velocity.Z = -(float)p_state.getSpeed();
+                if ((d && a) || (!d && !a))
+                    velocity.Z = 0f;
+
+                if (w && d) {
+                    velocity.X = (float)p_state.getSpeed()/2;
+                    velocity.Z = (float)p_state.getSpeed()/2;
+                }
+                if (w && a) {
+                    velocity.X = (float)p_state.getSpeed() / 2;
+                    velocity.Z = -((float)p_state.getSpeed() / 2);
+                }
+                if (a && s) {
+                    velocity.X = -((float)p_state.getSpeed() / 2);
+                    velocity.Z = -((float)p_state.getSpeed() / 2);
+                }
+                if (d && s) {
+                    velocity.X =-((float)p_state.getSpeed() / 2);
+                    velocity.Z = ((float)p_state.getSpeed() / 2);
+                }
+                if (a && d)
+                    velocity.Z = 0;
+                if (w && s)
+                    velocity.X = 0;
             }
             else
             {
                 if (d)
-                    playerMovement += (Vector3.UnitX * (float)p_state.getSpeed());
+                    velocity.X = (float)p_state.getSpeed();
                 if (a)
-                    playerMovement -= (Vector3.UnitX * (float)p_state.getSpeed());
+                    velocity.X = -(float)p_state.getSpeed();
+                if ((d && a) || (!d && !a))
+                    velocity.X = 0f;
             }
 
             //********************** space
