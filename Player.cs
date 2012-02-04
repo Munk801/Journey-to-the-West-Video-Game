@@ -31,7 +31,7 @@ namespace U5Designs
             _location = new Vector3(50, 5f, 50f);
             _scale = new Vector3(5, 5, 5);
             cubemesh = new ObjMesh("../../Geometry/box.obj");
-            _texture = new Bitmap("player.png");
+            _texture = new Bitmap("../../Textures/player.png");
             _damage = 0;
             texID = GL.GenTexture();
 			velocity = new Vector3(0, 0, 0);

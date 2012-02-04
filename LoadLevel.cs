@@ -38,7 +38,7 @@ namespace U5Designs
             //use ps to access object lists!!
             Vector3 testloc = new Vector3(50, -50, 50);
 			Vector3 testscale = new Vector3(50, 50, 50);
-            Bitmap testmap = new Bitmap("test.png");
+            Bitmap testmap = new Bitmap("../../Textures/test.png");
 
             Obstacle testfloor = new Obstacle(testloc, testscale, true, true, cubemesh, testmap);
 
@@ -67,7 +67,7 @@ namespace U5Designs
             //example enemy load
             Vector3 enloc = new Vector3(250, 5, 50);
             Vector3 enscale = new Vector3(5, 5, 5);
-            Bitmap enmap = new Bitmap("enemy.png");
+            Bitmap enmap = new Bitmap("../../Textures/enemy.png");
 
             Enemy testenemy = new Enemy(enloc, enscale, true, true, 10, 10, 1f, cubemesh, enmap);
             ps.objList.Add(testenemy);
