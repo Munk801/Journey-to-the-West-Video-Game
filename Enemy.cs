@@ -50,6 +50,11 @@ namespace U5Designs
             // Add in the other State elements that will need to be maintained here..
 		}
 
+		private bool _is3dGeo;
+		bool RenderObject.is3dGeo {
+			get { return _is3dGeo; }
+		}
+
 		private ObjMesh _mesh; //null for sprites
 		ObjMesh RenderObject.mesh {
 			get { return _mesh; }
@@ -69,10 +74,6 @@ namespace U5Designs
 		int RenderObject.frameNumber {
 			get { return _frameNum; }
 			set { _frameNum = value; }
-		}
-
-		bool RenderObject.is3d() {
-			throw new Exception("The method or operation is not implemented.");
 		}
 
 		bool RenderObject.isAnimated() {

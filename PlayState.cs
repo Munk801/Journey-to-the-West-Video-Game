@@ -82,13 +82,13 @@ namespace U5Designs
             player.draw();
             foreach (RenderObject obj in renderList)
             {
-                if (obj.is3d)
+                if (obj.is3dGeo)
                 {
-                    obj.objMesh.draw();
+					obj.mesh.Render();
                 }
                 else
                 {
-                    obj.spriteSheet.draw();
+					obj.sprite.draw(0, 0); //change later
                 }
             }
 

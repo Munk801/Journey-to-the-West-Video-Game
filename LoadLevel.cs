@@ -39,7 +39,7 @@ namespace U5Designs
             //use ps to access object lists!!
             Vector3 testloc = new Vector3(2500, -250, 50);
             Bitmap testmap = new Bitmap("test.png");
-            Obstacle testfloor = new Obstacle("test", testloc, true, true, null, cubemesh, testmap);
+            Obstacle testfloor = new Obstacle("box.obj", testloc, true, true, true, null, cubemesh, testmap);
 
             ps.physList.Add(testfloor);
             ps.renderList.Add(testfloor);

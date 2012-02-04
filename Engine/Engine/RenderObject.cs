@@ -30,7 +30,7 @@ namespace Engine {
 			set;
 		}
 
-        bool is3d {
+        bool is3dGeo {
             get;
         }
 

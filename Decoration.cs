@@ -10,7 +10,7 @@ using Engine;
 
 namespace U5Designs {
 	class Decoration : GameObject, RenderObject {
-		public Decoration(string name, Vector3 location, bool existsIn2d, bool existsIn3d, ObjMesh mesh=null, Bitmap texture=null, SpriteSheet sprite=null) {
+		public Decoration(string name, Vector3 location, bool existsIn2d, bool existsIn3d, bool is3dGeo, ObjMesh mesh = null, Bitmap texture = null, SpriteSheet sprite = null) {
 			_obj_name_text = name;
 			_location = location;
 			_existsIn3d = existsIn3d;
@@ -19,6 +19,12 @@ namespace U5Designs {
 			_texture = texture;
 			_sprite = sprite;
 			_frameNum = 0;
+			_is3dGeo = is3dGeo;
+		}
+
+		private bool _is3dGeo;
+		bool RenderObject.is3dGeo {
+			get { return _is3dGeo; }
 		}
 
 		private ObjMesh _mesh; //null for sprites
@@ -40,10 +46,6 @@ namespace U5Designs {
 		int RenderObject.frameNumber {
 			get { return _frameNum; }
 			set { _frameNum = value; }
-		}
-
-		bool RenderObject.is3d() {
-			throw new Exception("The method or operation is not implemented.");
 		}
 
 		bool RenderObject.isAnimated() {
