@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Drawing;
@@ -48,7 +49,86 @@ namespace Engine {
 			}
 			texbmp.UnlockBits(bmp_data);
 		}
+        public void CORasterSaveToBMP(byte[] rasterPixels, uint rasterWidth, uint rasterHeight, String path)
+        {
+            //BMP (Windows V3)
+            //Offset    Size    Description
+            //0         2       the magic number u[]ed to identify the BMP file: 0x42 0x4D (Hex code points for B and M in big-endian order)
+            //2         4       the size of the BMP file in bytes
+            //6         2       reserved; actual value depends on the application that creates the image
+            //8         2       reserved; actual value depends on the application that creates the image
+            //10        4       the offset, i.e. starting address, of the byte where the bitmap data can be found.
+            //14        4       the size of this header (40 bytes)
+            //18        4       the bitmap width in pixels (signed integer).
+            //22        4       the bitmap height in pixels (signed integer).
+            //26        2       the number of color planes being used. Must be set to 1.
+            //28        2       the number of bits per pixel, which is the color samplesPerPixel of the image. Typical values are 1, 4, 8, 16, 24 and 32.
+            //30        4       the compression method being used. See the next table for a list of possible values.
+            //34        4       the image size. This is the size of the raw bitmap data (see below), and should not be confused with the file size.
+            //38        4       the horizontal resolution of the image. (pixel per meter, signed integer)
+            //42        4       the vertical resolution of the image. (pixel per meter, signed integer)
+            //46        4       the number of colors in the color palette, or 0 to default to 2n.
+            //50        4       the number of important colors used, or 0 when every color is important; generally ignored.
 
+            //Open file for writing
+            
+            System.IO.BinaryWriter file = new System.IO.BinaryWriter(File.Open(path, FileMode.Create));
+            
+
+            //FILE* file = fopen(path, "w");
+            //if (file == NULL)
+            //    return;
+            
+            //Define header data
+            ushort magicNumber = 0x4D42;
+            ushort reserved0 = 0;//0x4D41;
+            ushort reserved1 = 0;//0x5454;
+            uint dataOffset = 54;
+            uint infoHeaderSize = 40;
+            uint width = rasterWidth;
+            uint height = rasterHeight;
+            ushort colorPlanes = 1;
+            ushort bitsPerPixel = 32;
+            uint compression = 0;
+            uint dataSize = width * height * bitsPerPixel / 8;
+            uint horizontalResolution = 2835;
+            uint verticalResolution = 2835;
+            uint paletteColorCount = 0;
+            uint importantPaletteColorCount = 0;
+            uint fileSize = 54 + dataSize;
+
+            
+            //Write BMP header (Windows V3, 32bbp)
+            file.Write(magicNumber);
+            file.Write(fileSize, sizeof(fileSize), 1, file);
+            file.Write(reserved0, sizeof(reserved0), 1, file);
+            file.Write(reserved1, sizeof(reserved1), 1, file);
+            file.Write(dataOffset, sizeof(dataOffset), 1, file);
+            file.Write(infoHeaderSize, sizeof(infoHeaderSize), 1, file);
+            file.Write(width, sizeof(width), 1, file);
+            file.Write(height, sizeof(height), 1, file);
+            file.Write(colorPlanes, sizeof(colorPlanes), 1, file);
+            file.Write(bitsPerPixel, sizeof(bitsPerPixel), 1, file);
+            file.Write(compression, sizeof(compression), 1, file);
+            file.Write(dataSize, sizeof(dataSize), 1, file);
+            file.Write(horizontalResolution, sizeof(horizontalResolution), 1, file);
+            file.Write(verticalResolution, sizeof(verticalResolution), 1, file);
+            file.Write(paletteColorCount, sizeof(paletteColorCount), 1, file);
+            file.Write(importantPaletteColorCount, sizeof(importantPaletteColorCount), 1, file);
+
+            //Write BMP body (XXRRGGBB)
+            for (int y = rasterHeight - 1; y >= 0; y--)
+            {
+                for (int x = 0; x < rasterWidth; x++)
+                {
+                    COColorARGB color = rasterPixels[y * rasterWidth + x];
+                    file.Write(color, sizeof(color), 1, file);
+                }
+            }
+
+            //Cleanup
+            fclose(file);
+        }
 		/*
 		 * draw - Uses OpenGL to render this sprite.  Requires that
 		 *		  the modelview matrix has been properly set up previously
