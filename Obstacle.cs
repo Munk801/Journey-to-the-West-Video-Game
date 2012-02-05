@@ -81,6 +81,7 @@ namespace U5Designs {
 		void RenderObject.doScaleTranslateAndTexture() {
 			GL.PushMatrix();
 			if(_is3dGeo) {
+				GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 				GL.BindTexture(TextureTarget.Texture2D, texID);
 				BitmapData bmp_data = _texture.LockBits(new Rectangle(0, 0, _texture.Width, _texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,

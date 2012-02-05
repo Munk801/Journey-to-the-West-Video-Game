@@ -67,7 +67,7 @@ namespace U5Designs
             //AudioManager.Manager.StartAudioServices();
 
 			lookat = new Vector3(100, 75, 50);
-			eye = lookat + new Vector3(0, 0, 50);
+			eye = lookat + new Vector3(0, 0, 100);
 			lightPos = new Vector4(50, 50, 0, 1);
 			lightPos.X += eye.X;
 			lightPos.Y += eye.Y;
@@ -144,7 +144,10 @@ namespace U5Designs
 					GL.PushMatrix();
 					GL.Translate(0, 50, 0);
 					GL.Scale(50, 50, 1);
-					i = obj.sprite.draw(0, 2);
+					i += e.Time*4;
+					if(obj.sprite.draw(0, (int)i) == 0 && i > 1f) {
+						i = 0;
+					}
 				}
 			}
 			//Console.WriteLine(i);
@@ -152,7 +155,7 @@ namespace U5Designs
 			player.draw();
         }
 
-		int i = -1;
+		double i = 0;
 
         //if its inconvenient to have key detection outside of the update method, move it back in
         private void DealWithInput()

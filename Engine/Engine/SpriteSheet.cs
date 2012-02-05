@@ -24,6 +24,7 @@ namespace Engine {
 		private static readonly float[] vertices = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f};
 		private static readonly float[] texverts = {0.0f, 0.0f,        1.0f, 0.0f,        1.0f, 1.0f,        0.0f, 1.0f};
 		private static readonly byte[] indices = {0, 1, 2, 3};
+		public static ObjMesh quad;
 
 		private byte[][][] tex; //tex[cycleNumber][frameNumber][y*w + x]
 		private int texw, texh;
@@ -39,12 +40,19 @@ namespace Engine {
 				for(int frameNum = 0; frameNum < cycleLengths[cycleNum]; frameNum++) {
 					IntPtr tex_addr = IntPtr.Add(bmp_data.Scan0, (cycleStartNums[cycleNum]+frameNum) * texw * texh * 4);
 					tex[cycleNum][frameNum] = new byte[texw * texh * 4];
-					for(int i = 0; i < texw * texh*4; i += 4) {
-						tex[cycleNum][frameNum][i + 0] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i), typeof(byte));
-						tex[cycleNum][frameNum][i + 1] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i+1), typeof(byte));
-						tex[cycleNum][frameNum][i + 2] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i+2), typeof(byte));
-						tex[cycleNum][frameNum][i + 3] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i+3), typeof(byte));
+					for(int y = 0; y < texh; y++) {
+						for(int x = 0; x < texw; x++) {
+							for(int i = 0; i < 4; i++) {
+								tex[cycleNum][frameNum][((texh - y - 1) * texw + x) * 4 + i] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, (y * texw + x) * 4 + i), typeof(byte));
+							}
+						}
 					}
+// 						for(int i = 0; i < texw * texh * 4; i += 4) {
+// 							tex[cycleNum][frameNum][i + 0] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i), typeof(byte));
+// 							tex[cycleNum][frameNum][i + 1] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i + 1), typeof(byte));
+// 							tex[cycleNum][frameNum][i + 2] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i + 2), typeof(byte));
+// 							tex[cycleNum][frameNum][i + 3] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i + 3), typeof(byte));
+// 						}
 				}
 			}
 			texbmp.UnlockBits(bmp_data);
@@ -151,9 +159,9 @@ namespace Engine {
 		 */
 		public int draw(int cycleNumber, int frameNumber) {
 			//If possible, move some of these state changes into GameEngine to improve performance
-			GL.EnableClientState(ArrayCap.VertexArray);
-			GL.DisableClientState(ArrayCap.NormalArray);
-			GL.EnableClientState(ArrayCap.TextureCoordArray);
+// 			GL.EnableClientState(ArrayCap.VertexArray);
+// 			GL.DisableClientState(ArrayCap.NormalArray);
+// 			GL.EnableClientState(ArrayCap.TextureCoordArray);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
@@ -166,11 +174,12 @@ namespace Engine {
 			}
 
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[cycleNumber][frameNumber]);
-			GL.VertexPointer(3, VertexPointerType.Float, 0, vertices);
-			GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, texverts);
+// 			GL.VertexPointer(3, VertexPointerType.Float, 0, vertices);
+// 			GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, texverts);
 			//CORasterSaveToBMP(tex[cycleNumber][frameNumber], (uint)texw, (uint)texh, "C:\\Users\\Kendal\\Desktop\\test.bmp");
-			GL.DrawElements(BeginMode.Quads, indices.Length, DrawElementsType.UnsignedByte, indices);
-			GL.PopMatrix(); //this matches to the push in RenderObject.doScaleAndTranslate()
+//			GL.DrawElements(BeginMode.Quads, indices.Length, DrawElementsType.UnsignedByte, indices);
+			quad.Render();
+			//GL.PopMatrix(); //this matches to the push in RenderObject.doScaleAndTranslate()
 
 			return frameNumber;
 		}

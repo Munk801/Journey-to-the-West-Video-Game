@@ -92,6 +92,7 @@ namespace U5Designs
 
 
 			//testing sprite sheet....
+			SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
 			int[] cycleStarts = {0, 4};
 			int[] cycleLengths = {4, 4};
 			SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/test_sprite.png"), cycleStarts, cycleLengths, 512, 512);
