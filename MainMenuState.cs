@@ -8,6 +8,7 @@ using OpenTK.Audio.OpenAL;
 using Engine;
 using Engine.Input;
 using OpenTK.Input;
+using System.Drawing;
 
 
 // XML parser
@@ -28,7 +29,8 @@ namespace U5Designs
         Stack<string> savedGameChoices;
         int saved_level_index = -1;
 
-
+        protected Vector3 eye, lookat;
+        Obstacle background;
    
 
         public MainMenuState(GameEngine engine)
@@ -47,6 +49,28 @@ namespace U5Designs
             // Display available saved game states
             DisplayAvailableSaves();
 
+            // Graphics
+            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.Normalize);
+            GL.Enable(EnableCap.Lighting);
+            GL.Enable(EnableCap.Light0);
+            //test.Play();
+
+            //AudioManager.Manager.StartAudioServices();
+
+            lookat = new Vector3(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 2);
+            eye = new Vector3(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 5);
+            
+            GL.MatrixMode(MatrixMode.Projection);
+            Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width, eng.ClientRectangle.Height, 1.0f, 6400.0f);
+            GL.LoadMatrix(ref projection);
+            SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
+            int[] cycleStarts = { 0 };
+            int[] cycleLengths = { 1 };
+            SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 853, 480);
+            background = new Obstacle(new Vector3(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 1), new Vector3(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 1), true, true, ss);
+
             // TEST //
             LoadSavedState(1);
 
@@ -62,7 +86,11 @@ namespace U5Designs
         public override void Draw(FrameEventArgs e)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            
+
+            GL.PushMatrix();
+            GL.Translate(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 2);
+            GL.Scale(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 1);
+            ((RenderObject)background).sprite.draw(0, 1);
         }
 
         private void DealWithInput()
