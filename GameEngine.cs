@@ -40,8 +40,8 @@ namespace U5Designs
             GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.Normalize);
-            GL.Enable(EnableCap.Lighting);
-            GL.Enable(EnableCap.Light0);
+//             GL.Enable(EnableCap.Lighting);
+//             GL.Enable(EnableCap.Light0);
 			GL.Enable(EnableCap.Texture2D);
 
 

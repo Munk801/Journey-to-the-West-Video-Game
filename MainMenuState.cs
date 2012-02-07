@@ -53,23 +53,22 @@ namespace U5Designs
             GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.Normalize);
-            GL.Enable(EnableCap.Lighting);
-            GL.Enable(EnableCap.Light0);
             //test.Play();
 
             //AudioManager.Manager.StartAudioServices();
 
-            lookat = new Vector3(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 2);
-            eye = new Vector3(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 5);
+            lookat = new Vector3(0, 0, 2);
+            eye = new Vector3(0, 0, 5);
             
             GL.MatrixMode(MatrixMode.Projection);
-            Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width, eng.ClientRectangle.Height, 1.0f, 6400.0f);
+            Matrix4 projection = Matrix4.CreateOrthographic(853, 480, 1.0f, 6400.0f);
             GL.LoadMatrix(ref projection);
+
             SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
             int[] cycleStarts = { 0 };
             int[] cycleLengths = { 1 };
             SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 853, 480);
-            background = new Obstacle(new Vector3(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 1), new Vector3(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 1), true, true, ss);
+            background = new Obstacle(new Vector3(0, 0, 2), new Vector3(426.5f, 240, 1), true, true, ss);
 
             // TEST //
             LoadSavedState(1);
@@ -87,9 +86,13 @@ namespace U5Designs
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+			Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
+			GL.MatrixMode(MatrixMode.Modelview);
+			GL.LoadMatrix(ref modelview);
+
             GL.PushMatrix();
-            GL.Translate(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 2);
-            GL.Scale(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 1);
+            GL.Translate(0, 0, 2);
+            GL.Scale(426.5f, 240, 1);
             ((RenderObject)background).sprite.draw(0, 1);
         }
 
