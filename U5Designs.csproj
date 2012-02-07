@@ -43,8 +43,13 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Tao.DevIl, Version=1.6.8.3, Culture=neutral, PublicKeyToken=7ec4053013524957, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Engine\Engine\Tao DevIL\Tao.DevIl.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Background.cs" />
     <Compile Include="Decoration.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="EntryPoint.cs" />
@@ -58,6 +63,8 @@
     <Compile Include="PlayState.cs" />
     <Compile Include="Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Texture.cs" />
+    <Compile Include="TextureManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Engine\Engine\Engine.csproj">
