@@ -40,8 +40,7 @@ namespace U5Designs
 		protected Vector3 eye, lookat;
 		protected Vector4 lightPos;
 
-        //static string testFile = "Retribution.ogg";
-        //AudioFile test = new AudioFile(testFile);
+       
 
         // Initialize graphics, etc here
         public PlayState(GameEngine engine, int lvl) {
@@ -50,7 +49,9 @@ namespace U5Designs
 			// undo this when done testing ObjList = LoadLevel.Load(current_level);
 			LoadLevel.Load(0, this);
 
-            //AudioManager.Manager.StartAudioServices();
+            //AudioContext ac = new AudioContext();
+            //XRamExtension xram = new XRamExtension();
+
             eng = engine;
             player = new Player();
 

@@ -63,6 +63,7 @@
     <Compile Include="PlayState.cs" />
     <Compile Include="Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SplashScreenState.cs" />
     <Compile Include="Texture.cs" />
     <Compile Include="TextureManager.cs" />
   </ItemGroup>
@@ -84,8 +85,10 @@
     <EmbeddedResource Include="Resources\enemies.dat" />
     <EmbeddedResource Include="Resources\level_0.dat" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Resources\Sound\" />
+    <EmbeddedResource Include="Resources\Sound\jump_sound.ogg" />
+    <EmbeddedResource Include="Resources\Sound\Retribution.ogg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

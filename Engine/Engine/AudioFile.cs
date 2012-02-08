@@ -51,5 +51,13 @@ namespace Engine
                     AudioManager.Manager.PlayFile(sourceAudio.makeInstance());
                 }
             }
+
+            public void Stop()
+            {
+                lock (AudioManager.Manager)
+                {
+                    AudioManager.Manager.StopFile(sourceAudio.makeInstance());
+                }
+            }
         }
 }

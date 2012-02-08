@@ -158,6 +158,23 @@ namespace Engine
             }
         }
 
+        public void StopFile(VorbisFileInstance audioFile)
+        {
+            foreach(AudioSource source in AudioSources)
+            {
+                try
+                {
+                        source.PauseSource(audioFile);
+                        source.Dispose();
+                        return;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Cannot remove source");
+                }
+            }
+        }
+
         // Destructor
         ~AudioManager()
         {

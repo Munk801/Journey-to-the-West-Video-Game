@@ -31,14 +31,18 @@ namespace U5Designs
 
         protected Vector3 eye, lookat;
         Obstacle background;
-   
+
+        static string test = "../../Resources/Sound/Retribution.ogg";
+        AudioFile testFile = new AudioFile(test);
+
 
         public MainMenuState(GameEngine engine)
         {
             eng = engine;
 
-            //AudioManager.Manager.StartAudioServices();
-
+            //Start Audio Services
+            AudioContext ac = new AudioContext();
+            XRamExtension xram = new XRamExtension();
 
             savedGameStates = new Stack<XmlNodeList>();
             savedGameChoices = new Stack<string>();
@@ -53,7 +57,9 @@ namespace U5Designs
             GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.Normalize);
-            //test.Play();
+            
+            // Plays the audio file.  Should be in a data file later
+            testFile.Play();
 
             //AudioManager.Manager.StartAudioServices();
 
@@ -112,13 +118,14 @@ namespace U5Designs
                 if (eng.GameInProgress)
                 {
                     eng.PopState();
+
                 }
                 else
                 {
 
                     // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
                     PlayState ps = new PlayState(eng, 0);
-
+                    testFile.Stop();
                     // Otherwise pass the level index from the saved game
                     //PlayState ps = new PlayState(saved_level_index);
                     eng.ChangeState(ps);
