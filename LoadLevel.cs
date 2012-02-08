@@ -70,7 +70,7 @@ namespace U5Designs
             Vector3 enscale = new Vector3(5, 5, 5);
             Bitmap enmap = new Bitmap("../../Textures/enemy.png");
 
-            Enemy testenemy = new Enemy(enloc, enscale, true, true, 10, 10, 1f, 1, cubemesh, enmap);
+            Enemy testenemy = new Enemy(enloc, enscale, true, true, 10, 10, 80f, 1, cubemesh, enmap);
             ps.objList.Add(testenemy);
             ps.physList.Add(testenemy);
             ps.colisionList.Add(testenemy);

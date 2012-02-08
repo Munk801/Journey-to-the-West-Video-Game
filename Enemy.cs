@@ -130,19 +130,22 @@ namespace U5Designs
 		void PhysicsObject.physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
 			
             //TODO: impliment gravity, colisions etc...
-
-
-
-		}
-
-		void AIObject.aiUpdate(FrameEventArgs e, Vector3 playerposn) {
-            if (AItype == 1) {
-
-
-
-
-
+            if (doesGravity && _location.Y != 0)
+            {
+                accel.Y -= (float)(400 * e.Time); //TODO: turn this into a constant somewhere
             }
+            velocity += accel;
+            accel.X = 0;
+            accel.Y = 0;
+            accel.Z = 0;
+            _location += velocity * (float)e.Time;
+            if (_location.Y - 5 <= 0)
+            {
+                _location.Y = 5;
+                velocity.Y = 0;
+                accel.Y = 0;
+            }
+
 
 		}
 
@@ -176,5 +179,41 @@ namespace U5Designs
             get { return _alive; }
             set { _alive = value; }
         }
+
+
+        void AIObject.aiUpdate(FrameEventArgs e, Vector3 playerposn, bool enable3d) {
+            if (AItype == 1) {
+                //TODO change 2d view to only deal with 2d position vectors, so z movement doesnt happen in 2d
+                if (dist(playerposn, _location) > 30) {
+                    Vector3 dir = getdir(playerposn, _location);
+                    velocity.X = dir.X * _speed;
+                    if (enable3d)
+                        velocity.Z = dir.Z * _speed;
+
+                }
+                else {
+                    velocity.X = 0;
+                    velocity.Z = 0;
+                }
+
+
+
+            }
+        }
+
+        // calculates the literal distance between 2 points
+        double dist(Vector3 v1, Vector3 v2) {
+            Vector3 tmp = new Vector3(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
+            return Math.Sqrt((tmp.X*tmp.X)+(tmp.Y*tmp.Y)+(tmp.Z*tmp.Z));
+        }
+
+        // returns a vector 3 containing the direction from this enemy to the player
+        Vector3 getdir(Vector3 player, Vector3 enemy) {
+            Vector3 tmp = new Vector3(player.X - enemy.X, player.Y - enemy.Y, player.Z - enemy.Z);
+            tmp.Normalize();
+            return tmp;
+        }
+
+
 	}
 }

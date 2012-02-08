@@ -40,10 +40,12 @@ namespace U5Designs
 		protected Vector3 eye, lookat;
 		protected Vector4 lightPos;
 
+        MainMenuState menustate;
+
        
 
         // Initialize graphics, etc here
-        public PlayState(GameEngine engine, int lvl) {
+        public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
 
 			//TODO: pass this the right file to load from
 			// undo this when done testing ObjList = LoadLevel.Load(current_level);
@@ -52,6 +54,7 @@ namespace U5Designs
             //AudioContext ac = new AudioContext();
             //XRamExtension xram = new XRamExtension();
 
+            menustate = prvstate;
             eng = engine;
             player = new Player();
 
@@ -94,11 +97,12 @@ namespace U5Designs
              }
 
              foreach (AIObject aio in aiList) {
-                 aio.aiUpdate(e, player.location);
+                 aio.aiUpdate(e, player.location, enable3d);
              }
 
         }
 
+        double i = 0;
         public override void Draw(FrameEventArgs e)
         {
             //Origin is the left edge of the level, at the ground and the back wall
@@ -137,6 +141,7 @@ namespace U5Designs
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 
+            
 			foreach(RenderObject obj in renderList) {
 				if(obj.is3dGeo) {
  					obj.doScaleTranslateAndTexture();
@@ -156,16 +161,14 @@ namespace U5Designs
 			player.draw();
         }
 
-		double i = 0;
+		
 
-        //if its inconvenient to have key detection outside of the update method, move it back in
         private void DealWithInput()
         {
             //TODO: Change these keys to their final mappings when determined
             if (eng.Keyboard[Key.Escape])
             {
-                MainMenuState ms = new MainMenuState(eng);
-                eng.PushState(ms);
+                eng.PushState(menustate);
             }
 
 			//********************** tab

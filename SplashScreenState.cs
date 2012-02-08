@@ -114,14 +114,15 @@ namespace U5Designs
                 }
                 else
                 {
-
-                    // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
-                    PlayState ps = new PlayState(eng, 0);
+                    //TODO update this to whatever this state does when it ends.
+                    // the only thing that should ever start a new play state is MainMenuState(as thats the state that will be loading saved games)
+                  /*  PlayState ps = new PlayState(this, eng, 0);
 
                     // Otherwise pass the level index from the saved game
                     //PlayState ps = new PlayState(saved_level_index);
                     eng.ChangeState(ps);
                     eng.GameInProgress = true;
+                   */
                 }
             }
         }

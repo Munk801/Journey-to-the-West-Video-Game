@@ -7,6 +7,6 @@ using OpenTK;
 
 namespace Engine {
 	public interface AIObject : PhysicsObject, CombatObject {
-		void aiUpdate(FrameEventArgs e, Vector3 playerposn);
+        void aiUpdate(FrameEventArgs e, Vector3 playerposn, bool enable3d);
 	}
 }

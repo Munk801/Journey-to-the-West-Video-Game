@@ -41,8 +41,8 @@ namespace U5Designs
             eng = engine;
 
             //Start Audio Services
-            //AudioContext ac = new AudioContext();
-            //XRamExtension xram = new XRamExtension();
+            AudioContext ac = new AudioContext();
+            XRamExtension xram = new XRamExtension();
 
             savedGameStates = new Stack<XmlNodeList>();
             savedGameChoices = new Stack<string>();
@@ -61,7 +61,7 @@ namespace U5Designs
             // Plays the audio file.  Should be in a data file later
             //testFile.Play();
 
-            //AudioManager.Manager.StartAudioServices();
+            AudioManager.Manager.StartAudioServices();
 
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
@@ -85,12 +85,13 @@ namespace U5Designs
         public override void Update(FrameEventArgs e)
         {
             DealWithInput();
-            //AudioManager.Manager.Update();
+            AudioManager.Manager.Update();
 
         }
 
         public override void Draw(FrameEventArgs e)
         {
+
             //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
 
@@ -102,7 +103,7 @@ namespace U5Designs
             GL.Translate(-640, -360, -10);
             //GL.Scale(426.5f, 240, 1);
             GL.Scale(1280, 720, 100);    // Weird coincidence that this is really close to the images dimensions???        
-            ((RenderObject)background).sprite.draw(0, 1);  
+            ((RenderObject)background).sprite.draw(0, 1); 
         }
 
         private void DealWithInput()
@@ -127,7 +128,7 @@ namespace U5Designs
                 {
 
                     // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
-                    PlayState ps = new PlayState(eng, 0);
+                    PlayState ps = new PlayState(this, eng, 0);
 
                     //testFile.Stop();
 
