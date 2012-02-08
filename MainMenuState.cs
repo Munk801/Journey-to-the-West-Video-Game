@@ -32,8 +32,8 @@ namespace U5Designs
         protected Vector3 eye, lookat;
         Obstacle background;
 
-        static string test = "../../Resources/Sound/Retribution.ogg";
-        AudioFile testFile = new AudioFile(test);
+        //static string test = "../../Resources/Sound/Retribution.ogg";        
+        //AudioFile testFile = new AudioFile(test);
 
 
         public MainMenuState(GameEngine engine)
@@ -41,8 +41,8 @@ namespace U5Designs
             eng = engine;
 
             //Start Audio Services
-            AudioContext ac = new AudioContext();
-            XRamExtension xram = new XRamExtension();
+            //AudioContext ac = new AudioContext();
+            //XRamExtension xram = new XRamExtension();
 
             savedGameStates = new Stack<XmlNodeList>();
             savedGameChoices = new Stack<string>();
@@ -59,21 +59,22 @@ namespace U5Designs
             GL.Enable(EnableCap.Normalize);
             
             // Plays the audio file.  Should be in a data file later
-            testFile.Play();
+            //testFile.Play();
 
             //AudioManager.Manager.StartAudioServices();
 
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
-            
+
             GL.MatrixMode(MatrixMode.Projection);
-            Matrix4 projection = Matrix4.CreateOrthographic(853, 480, 1.0f, 6400.0f);
+            Matrix4 projection = Matrix4.CreateOrthographic(1280, 720, 1.0f, 6400.0f);
+
             GL.LoadMatrix(ref projection);
 
             SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
             int[] cycleStarts = { 0 };
             int[] cycleLengths = { 1 };
-            SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 853, 480);
+            SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 1280, 720);
             background = new Obstacle(new Vector3(0, 0, 2), new Vector3(426.5f, 240, 1), true, true, ss);
 
             // TEST //
@@ -90,16 +91,18 @@ namespace U5Designs
 
         public override void Draw(FrameEventArgs e)
         {
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
 
-			Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
-			GL.MatrixMode(MatrixMode.Modelview);
-			GL.LoadMatrix(ref modelview);
+            Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadMatrix(ref modelview);
 
             GL.PushMatrix();
-            GL.Translate(0, 0, 2);
-            GL.Scale(426.5f, 240, 1);
-            ((RenderObject)background).sprite.draw(0, 1);
+            GL.Translate(-640, -360, -10);
+            //GL.Scale(426.5f, 240, 1);
+            GL.Scale(1280, 720, 100);    // Weird coincidence that this is really close to the images dimensions???        
+            ((RenderObject)background).sprite.draw(0, 1);  
         }
 
         private void DealWithInput()
@@ -125,7 +128,9 @@ namespace U5Designs
 
                     // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
                     PlayState ps = new PlayState(eng, 0);
-                    testFile.Stop();
+
+                    //testFile.Stop();
+
                     // Otherwise pass the level index from the saved game
                     //PlayState ps = new PlayState(saved_level_index);
                     eng.ChangeState(ps);
