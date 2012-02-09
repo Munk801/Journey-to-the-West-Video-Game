@@ -174,7 +174,7 @@ namespace U5Designs
         private void DealWithInput()
         {
             //TODO: Change these keys to their final mappings when determined
-            if (eng.Keyboard[Key.Tilde])
+            if (eng.Keyboard[Key.Escape])
             {
                 eng.PushState(menustate);
             }
@@ -185,6 +185,7 @@ namespace U5Designs
                 enable3d = !enable3d;
 				switchingPerspective = true;
                 tabDown = true;
+                player.velocity.Z = 0;
             }
             else if (!eng.Keyboard[Key.Tab])
             {
