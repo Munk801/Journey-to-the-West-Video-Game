@@ -41,7 +41,7 @@ namespace U5Designs
 		protected Vector4 lightPos;
 
         MainMenuState menustate;
-
+        PauseMenuState pms;
        
 
         // Initialize graphics, etc here
@@ -58,6 +58,7 @@ namespace U5Designs
             eng = engine;
             player = new Player();
 
+            pms = new PauseMenuState(engine);
             enable3d = false;
 			tabDown = false;
             //test.Play();
@@ -176,7 +177,8 @@ namespace U5Designs
             //TODO: Change these keys to their final mappings when determined
             if (eng.Keyboard[Key.Escape])
             {
-                eng.PushState(menustate);
+                //eng.PushState(menustate);
+                eng.PushState(pms);
             }
 
 			//********************** tab
