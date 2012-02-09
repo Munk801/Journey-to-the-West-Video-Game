@@ -40,8 +40,6 @@ namespace U5Designs
             GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.Normalize);
-//             GL.Enable(EnableCap.Lighting);
-//             GL.Enable(EnableCap.Light0);
 			GL.Enable(EnableCap.Texture2D);
 
 
@@ -62,16 +60,18 @@ namespace U5Designs
             // Cleanup the current state
             if (states.Count != 0)
             {
-                GameState st = states.Pop();
+                /*GameState st =*/ states.Pop();
             }
             // Store new state
             states.Push(state);
+			state.MakeActive();
         }
         // same as changestate but doesnt delete old state(ie pause game, bringup menu)
         public void PushState(GameState state)
         {
             // store and INIT the new state
             states.Push(state);
+			state.MakeActive();
         }
         // pops the current state off and lets the next state have control(menu nukes self, resumes game)
         public void PopState()
@@ -79,8 +79,9 @@ namespace U5Designs
             // cleanup the current state
             if (states.Count != 0)
             {
-                GameState st = states.Peek();
+                //GameState st = states.Peek();
                 states.Pop();
+				states.Peek().MakeActive();
             }
         }
 

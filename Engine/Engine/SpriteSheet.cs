@@ -29,10 +29,10 @@ namespace Engine {
 		private byte[][][] tex; //tex[cycleNumber][frameNumber][y*w + x]
 		private int texw, texh;
 
-		public SpriteSheet(Bitmap texbmp, int[] cycleStartNums, int[] cycleLengths, int _texw, int _texh) {
+		public SpriteSheet(Bitmap texbmp, int[] cycleStartNums, int[] cycleLengths, int _texw, int _texh, bool switchColorOrder) {
 			texw = _texw;
 			texh = _texh;
-
+			
 			BitmapData bmp_data = texbmp.LockBits(new Rectangle(0, 0, texbmp.Width, texbmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 			tex = new byte[cycleStartNums.Length][][];
 			for(int cycleNum = 0; cycleNum < cycleStartNums.Length; cycleNum++) {
@@ -40,10 +40,19 @@ namespace Engine {
 				for(int frameNum = 0; frameNum < cycleLengths[cycleNum]; frameNum++) {
 					IntPtr tex_addr = IntPtr.Add(bmp_data.Scan0, (cycleStartNums[cycleNum]+frameNum) * texw * texh * 4);
 					tex[cycleNum][frameNum] = new byte[texw * texh * 4];
+/*					Marshal.Copy(tex_addr, tex[cycleNum][frameNum], 0, tex[cycleNum][frameNum].Length);*/
 					for(int y = 0; y < texh; y++) {
 						for(int x = 0; x < texw; x++) {
-							for(int i = 0; i < 4; i++) {
-								tex[cycleNum][frameNum][((texh - y - 1) * texw + x) * 4 + i] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, (y * texw + x) * 4 + i), typeof(byte));
+							if(switchColorOrder) {
+								int pixel = ((texh - y - 1) * texw + x) * 4;
+								tex[cycleNum][frameNum][pixel + 2] = (byte)(255 - (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, (y * texw + x) * 4 + 0), typeof(byte)));
+								tex[cycleNum][frameNum][pixel + 1] = (byte)(255 - (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, (y * texw + x) * 4 + 1), typeof(byte)));
+								tex[cycleNum][frameNum][pixel + 0] = (byte)(255 - (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, (y * texw + x) * 4 + 2), typeof(byte)));
+								tex[cycleNum][frameNum][pixel + 3] = (byte)(255 - (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, (y * texw + x) * 4 + 3), typeof(byte))); //+ 3 is alpha
+							} else {
+								for(int i = 0; i < 4; i++) {
+									tex[cycleNum][frameNum][((texh - y - 1) * texw + x) * 4 + i] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, (y * texw + x) * 4 + i), typeof(byte));
+								}
 							}
 						}
 					}

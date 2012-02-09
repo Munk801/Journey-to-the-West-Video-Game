@@ -60,12 +60,6 @@ namespace U5Designs
 
             enable3d = false;
 			tabDown = false;
-
-            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            GL.Enable(EnableCap.DepthTest);
-            GL.Enable(EnableCap.Normalize);
-            GL.Enable(EnableCap.Lighting);
-            GL.Enable(EnableCap.Light0);
             //test.Play();
 
             //AudioManager.Manager.StartAudioServices();
@@ -81,6 +75,22 @@ namespace U5Designs
 			Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width/4, eng.ClientRectangle.Height/4, 1.0f, 6400.0f);
 			GL.LoadMatrix(ref projection);
         }
+
+		public override void MakeActive() {
+			GL.Enable(EnableCap.Lighting);
+			GL.Enable(EnableCap.Light0);
+
+			GL.MatrixMode(MatrixMode.Projection);
+			if(enable3d) {
+				Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 6, eng.ClientRectangle.Width / (float)eng.ClientRectangle.Height, 1.0f, 6400.0f);
+				GL.LoadMatrix(ref projection);
+				GL.Enable(EnableCap.Fog);
+			} else { //2d
+				Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width / 4, eng.ClientRectangle.Height / 4, 1.0f, 6400.0f);
+				GL.LoadMatrix(ref projection);
+				GL.Disable(EnableCap.Fog);
+			}
+		}
 
         public override void Update(FrameEventArgs e)
         {
@@ -161,12 +171,10 @@ namespace U5Designs
 			player.draw();
         }
 
-		
-
         private void DealWithInput()
         {
             //TODO: Change these keys to their final mappings when determined
-            if (eng.Keyboard[Key.Escape])
+            if (eng.Keyboard[Key.Tilde])
             {
                 eng.PushState(menustate);
             }

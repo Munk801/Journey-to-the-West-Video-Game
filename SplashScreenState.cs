@@ -64,7 +64,7 @@ namespace U5Designs
             SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
             int[] cycleStarts = { 0 };
             int[] cycleLengths = { 1 };
-            SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 853, 480);
+            SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 853, 480, true);
             Bitmap test = new Bitmap("../../Geometry/testbg.png");
             background = new Obstacle(new Vector3(0, 0, 2), new Vector3(426.5f, 240, 1), true, true, ss);
 
