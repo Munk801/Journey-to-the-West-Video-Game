@@ -186,7 +186,7 @@ namespace U5Designs
 			accel.Y = 0;
 			accel.Z = 0;
 			_location += velocity*(float)e.Time;
-			if(_location.Y-5 <= 0) {
+			if(_location.Y - 5 <= 0) { //TODO: this should change to a bounding box query instead of a constant
 				_location.Y = 5;
 				velocity.Y = 0;
 				accel.Y = 0;

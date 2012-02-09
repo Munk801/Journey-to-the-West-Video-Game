@@ -97,8 +97,6 @@ namespace U5Designs
         {
             DealWithInput();
 			player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.Space], e);
-			
-			updateView(); 
 
 			//TODO: parallax background based on player movement
 
@@ -109,8 +107,9 @@ namespace U5Designs
 
              foreach (AIObject aio in aiList) {
                  aio.aiUpdate(e, player.location, enable3d);
-             }
+			 }
 
+			 updateView();
         }
 
         double i = 0;
