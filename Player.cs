@@ -26,9 +26,6 @@ namespace U5Designs
 
 		public float deltax; //used for updating position of camera, etc.
 
-        //tmp
-      //  System.Media.SoundPlayer k = new System.Media.SoundPlayer("../../Resources/Sound/jump_sound.wav");
-
 
         // SOUND FILES
         static string jumpSoundFile = "../../Resources/Sound/jump_sound.ogg";
@@ -111,7 +108,6 @@ namespace U5Designs
                 if (velocity.Y < 0.000001f && velocity.Y > -0.0000001f)
                 {
                     accelerate(Vector3.UnitY * 230);
-                   // k.Play();
                 }
                 spaceDown = true;
                 jumpSound.Play();

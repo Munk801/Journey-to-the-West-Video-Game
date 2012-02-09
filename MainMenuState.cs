@@ -32,7 +32,6 @@ namespace U5Designs
         protected Vector3 eye, lookat;
         Obstacle background;
 
-        //System.Media.SoundPlayer k = new System.Media.SoundPlayer("../../Resources/Sound/Retribution.wav");
         static string test = "../../Resources/Sound/Retribution.ogg";        
         AudioFile testFile = new AudioFile(test);
 
@@ -55,11 +54,7 @@ namespace U5Designs
             DisplayAvailableSaves();
             
             // Plays the audio file.  Should be in a data file later
-            //testFile.Play();
-           // k.Play();
-
-            AudioManager.Manager.StartAudioServices();
-            
+            testFile.Play();
 
 			lookat = new Vector3(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 2);
             eye = new Vector3(eng.ClientRectangle.Width/2, eng.ClientRectangle.Height/2, 5);
@@ -87,7 +82,6 @@ namespace U5Designs
         public override void Update(FrameEventArgs e)
         {
             DealWithInput();
-            AudioManager.Manager.Update();
 
         }
 
