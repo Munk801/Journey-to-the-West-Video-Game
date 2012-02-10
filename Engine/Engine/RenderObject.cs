@@ -26,8 +26,7 @@ namespace Engine {
 			get;
 		}
 
-        Vector3 scale
-        {
+        Vector3 scale {
             get;
         }
 

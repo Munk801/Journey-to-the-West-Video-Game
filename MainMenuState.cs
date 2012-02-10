@@ -63,7 +63,7 @@ namespace U5Designs
             int[] cycleStarts = { 0 };
             int[] cycleLengths = { 1 };
             SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 1280, 720, true);
-            background = new Obstacle(new Vector3(0, 0, 2), new Vector3(1280, 720, 1), true, true, ss);
+            background = new Obstacle(new Vector3(0, 0, 2), new Vector3(1280, 720, 1), new Vector3(0,0,0), true, true, ss);
 
             // TEST //
             LoadSavedState(1);

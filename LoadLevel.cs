@@ -37,11 +37,12 @@ namespace U5Designs
 
             //example obstacle load
             //use ps to access object lists!!
-            Vector3 testloc = new Vector3(50, -50, 50);
-			Vector3 testscale = new Vector3(50, 50, 50);
-            Bitmap testmap = new Bitmap("../../Textures/test.png");
+            Vector3 testloc = new Vector3(50, -50, 50); // location is a point 
+			Vector3 testscale = new Vector3(50, 50, 50); // scale is a multiplyer
+            Bitmap testmap = new Bitmap("../../Textures/test.png"); // sprite
+            Vector3 testpbox = new Vector3(50, 50, 50);// the size of the physicsbox extending from the center in x,y,z
 			//Bitmap testmap = new Bitmap("../../Geometry/test_sprite.png");
-            Obstacle testfloor = new Obstacle(testloc, testscale, true, true, cubemesh, testmap);
+            Obstacle testfloor = new Obstacle(testloc, testscale, testpbox, true, true, cubemesh, testmap);
 
             ps.objList.Add(testfloor);
             ps.physList.Add(testfloor);
@@ -53,12 +54,13 @@ namespace U5Designs
             // bool exsistsin3d?
 			// obj file
             // bitmap file
+            // vector3 physics box size
 
 
             //tmp add 5 more floor boxes
             for (int i = 0; i < 5; i++)
             {  
-                testfloor = new Obstacle(testloc+(new Vector3(i*100, 0,0)), testscale, true, true, cubemesh, testmap);
+                testfloor = new Obstacle(testloc+(new Vector3(i*100, 0,0)), testscale, testpbox, true, true, cubemesh, testmap);
                 ps.objList.Add(testfloor);
                 ps.physList.Add(testfloor);
                 ps.renderList.Add(testfloor);
@@ -68,9 +70,11 @@ namespace U5Designs
             //example enemy load
             Vector3 enloc = new Vector3(250, 5, 50);
             Vector3 enscale = new Vector3(5, 5, 5);
+            Vector3 enpbox = new Vector3(5, 5, 5);
+            Vector3 encbox = new Vector3(5, 5, 5);
             Bitmap enmap = new Bitmap("../../Textures/enemy.png");
 
-            Enemy testenemy = new Enemy(enloc, enscale, true, true, 10, 10, 80f, 1, cubemesh, enmap);
+            Enemy testenemy = new Enemy(enloc, enscale, enpbox, encbox, true, true, 10, 10, 80f, 1, cubemesh, enmap);
             ps.objList.Add(testenemy);
             ps.physList.Add(testenemy);
             ps.colisionList.Add(testenemy);
@@ -88,6 +92,8 @@ namespace U5Designs
             // int AItype
             // obj file
             // bitmap file
+            // vector3 physics box size
+            // vector3 combat box size
 
 
 
@@ -96,7 +102,7 @@ namespace U5Designs
 			int[] cycleStarts = {0, 4};
 			int[] cycleLengths = {4, 4};
 			SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/test_sprite.png"), cycleStarts, cycleLengths, 512, 512, false);
-			Obstacle testSprite = new Obstacle(new Vector3(50, 50, 50), testscale, true, true, ss);
+			Obstacle testSprite = new Obstacle(new Vector3(50, 50, 50), testscale,testpbox, true, true, ss);
 			ps.objList.Add(testSprite);
 			ps.physList.Add(testSprite);
 			ps.renderList.Add(testSprite);

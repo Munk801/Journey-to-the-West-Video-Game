@@ -67,6 +67,16 @@ namespace U5Designs {
             get { return _scale; }
         }
 
+        private Vector3 _pbox;
+        Vector3 PhysicsObject.pbox {
+            get { return _pbox; }
+        }
+
+        private Vector3 _cbox;
+        Vector3 CombatObject.cbox {
+            get { return _cbox; }
+        }
+
 		private int _frameNum; //index of the current animation frame
 		int RenderObject.frameNumber {
 			get { return _frameNum; }

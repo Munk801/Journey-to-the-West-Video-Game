@@ -33,6 +33,10 @@ namespace Engine {
 		//this could be AI accelerating itself, or the player accelerating projectiles, etc.
 		void accelerate(Vector3 acceleration);
 
+        // pbox is the size of the physics box
+        Vector3 pbox {
+            get;
+        }
 
 	}
 }

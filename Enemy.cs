@@ -21,9 +21,11 @@ namespace U5Designs
         private Vector3 accel;
         private bool doesGravity; //true if gravity affects this object
 
-		public Enemy(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, Bitmap texture) {
+		public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, Bitmap texture) {
 			_location = location;
             _scale = scale;
+            _pbox = pbox;
+            _cbox = cbox;
 			_existsIn3d = existsIn3d;
 			_existsIn2d = existsIn2d;
             _health = health;
@@ -45,10 +47,12 @@ namespace U5Designs
 		}
 
 
-        public Enemy(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, SpriteSheet sprite)
+        public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, SpriteSheet sprite)
         {
 			_location = location;
 			_scale = scale;
+            _pbox = pbox;
+            _cbox = cbox;
 			_existsIn3d = existsIn3d;
 			_existsIn2d = existsIn2d;
             _health = health;
@@ -100,6 +104,16 @@ namespace U5Designs
         Vector3 RenderObject.scale
         {
             get { return _scale; }
+        }
+
+        private Vector3 _pbox;
+        Vector3 PhysicsObject.pbox {
+            get { return _pbox; }
+        }
+
+        private Vector3 _cbox;
+        Vector3 CombatObject.cbox {
+            get { return _cbox; }
         }
 
 		private int _frameNum; //index of the current animation frame

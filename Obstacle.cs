@@ -12,9 +12,10 @@ using Engine;
 
 namespace U5Designs {
 	class Obstacle : GameObject, RenderObject, PhysicsObject{
-		public Obstacle(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, ObjMesh mesh, Bitmap texture) {
+		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, ObjMesh mesh, Bitmap texture) {
 			_location = location;
             _scale = scale;
+            _pbox = pbox;
 			_existsIn3d = existsIn3d;
 			_existsIn2d = existsIn2d;
 			_mesh = mesh;
@@ -26,9 +27,10 @@ namespace U5Designs {
 		}
 
 
-		public Obstacle(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, SpriteSheet sprite) {
+		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, SpriteSheet sprite) {
 			_location = location;
 			_scale = scale;
+            _pbox = pbox;
 			_existsIn3d = existsIn3d;
 			_existsIn2d = existsIn2d;
 			_mesh = null;
@@ -63,9 +65,13 @@ namespace U5Designs {
 		}
 
         private Vector3 _scale;
-        Vector3 RenderObject.scale
-        {
+        Vector3 RenderObject.scale {
             get { return _scale; }
+        }
+
+        private Vector3 _pbox;
+        Vector3 PhysicsObject.pbox {
+            get { return _pbox; }
         }
 
 		private int _frameNum; //index of the current animation frame
