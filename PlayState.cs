@@ -80,6 +80,8 @@ namespace U5Designs
 		public override void MakeActive() {
 			GL.Enable(EnableCap.Lighting);
 			GL.Enable(EnableCap.Light0);
+			GL.Enable(EnableCap.Blend);
+			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
 			GL.MatrixMode(MatrixMode.Projection);
 			if(enable3d) {

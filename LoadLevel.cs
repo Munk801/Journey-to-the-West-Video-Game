@@ -101,7 +101,7 @@ namespace U5Designs
 			SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
 			int[] cycleStarts = {0, 4};
 			int[] cycleLengths = {4, 4};
-			SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/test_sprite.png"), cycleStarts, cycleLengths, 512, 512, false);
+			SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/test_sprite.png"), cycleStarts, cycleLengths, 512, 512, true);
 			Obstacle testSprite = new Obstacle(new Vector3(50, 50, 50), testscale,testpbox, true, true, ss);
 			ps.objList.Add(testSprite);
 			ps.physList.Add(testSprite);
