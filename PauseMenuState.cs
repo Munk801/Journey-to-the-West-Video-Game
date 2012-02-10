@@ -53,9 +53,11 @@ namespace U5Designs
             if (eng.Keyboard[Key.Q])
             {
                 // Exit Paused Menu state and return to playing
-                Console.WriteLine("Exiting paused menu state");
-                eng.PopState();
-            }
+				Console.WriteLine("Exiting paused menu state");
+				eng.PopState();
+			} else if(eng.Keyboard[Key.Escape]) {
+				eng.Exit();
+			}
         }
 
         /**

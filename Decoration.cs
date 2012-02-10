@@ -17,47 +17,54 @@ namespace U5Designs {
 			_mesh = mesh;
 			_texture = texture;
 			_sprite = sprite;
+			_cycleNum = 0;
 			_frameNum = 0;
 			_is3dGeo = is3dGeo;
 		}
 
 		private bool _is3dGeo;
-		bool RenderObject.is3dGeo {
+		public bool is3dGeo {
 			get { return _is3dGeo; }
 		}
 
 		private ObjMesh _mesh; //null for sprites
-		ObjMesh RenderObject.mesh {
+		public ObjMesh mesh {
 			get { return _mesh; }
 		}
 
 		private Bitmap _texture; //null for sprites
-		Bitmap RenderObject.texture {
+		public Bitmap texture {
 			get { return _texture; }
 		}
 
 		private SpriteSheet _sprite; //null for 3d objects
-		SpriteSheet RenderObject.sprite {
+		public SpriteSheet sprite {
 			get { return _sprite; }
 		}
 
         private Vector3 _scale;
-        Vector3 RenderObject.scale
+		public Vector3 scale
         {
             get { return _scale; }
-        }
+		}
 
-		private int _frameNum; //index of the current animation frame
-		int RenderObject.frameNumber {
+		private int _cycleNum;
+		public int cycleNumber {
+			get { return _cycleNum; }
+			set { _cycleNum = value; }
+		}
+
+		private double _frameNum; //index of the current animation frame
+		public double frameNumber {
 			get { return _frameNum; }
 			set { _frameNum = value; }
 		}
 
-		bool RenderObject.isAnimated() {
+		public bool isAnimated() {
 			throw new Exception("The method or operation is not implemented.");
 		}
 
-		void RenderObject.doScaleTranslateAndTexture() {
+		public void doScaleTranslateAndTexture() {
 			throw new Exception("The method or operation is not implemented.");
 		}
 	}

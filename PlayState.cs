@@ -56,7 +56,6 @@ namespace U5Designs
 
             menustate = prvstate;
             eng = engine;
-            player = new Player();
 
             pms = new PauseMenuState(engine);
             enable3d = false;
@@ -142,9 +141,9 @@ namespace U5Designs
 			}
 
             //Set up for rendering using arrays
-            GL.EnableClientState(ArrayCap.VertexArray);
-			GL.EnableClientState(ArrayCap.NormalArray);
-			GL.EnableClientState(ArrayCap.TextureCoordArray);
+//             GL.EnableClientState(ArrayCap.VertexArray);
+// 			GL.EnableClientState(ArrayCap.NormalArray);
+// 			GL.EnableClientState(ArrayCap.TextureCoordArray);
 
 			//Set up textures
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
@@ -159,18 +158,12 @@ namespace U5Designs
  					obj.doScaleTranslateAndTexture();
  					obj.mesh.Render();
 				} else {
-					GL.PushMatrix();
-					GL.Translate(0, 50, 0);
-					GL.Scale(50, 50, 1);
-					i += e.Time*4;
-					if(obj.sprite.draw(0, (int)i) == 0 && i > 1f) {
-						i = 0;
-					}
+					obj.doScaleTranslateAndTexture();
+					obj.frameNumber = obj.sprite.draw(enable3d, obj.cycleNumber, obj.frameNumber + e.Time);
 				}
 			}
-			//Console.WriteLine(i);
 
-			player.draw();
+			player.draw(enable3d, e.Time);
         }
 
         private void DealWithInput()
@@ -213,9 +206,6 @@ namespace U5Designs
 				if(enable3d) {
 					Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 6, eng.ClientRectangle.Width / (float)eng.ClientRectangle.Height, 1.0f, 6400.0f);
 					GL.LoadMatrix(ref projection);
-					//eye.X = lookat.X - 500;
-					//eye.Y = lookat.Y + 75;
-					//eye.Z = lookat.Z;
 					//TODO: Make these constants into #defines
 					//TODO: Make these constants resolution-independent
 					lookat.X -= 100;
@@ -228,6 +218,8 @@ namespace U5Designs
 					lightPos.Y += eye.Y;
 					lightPos.Z += eye.Z;
 					GL.Enable(EnableCap.Fog);
+					player.cycleNumber = 1;  //TODO: This is a hack!
+					renderList[0].cycleNumber = 1;  //TODO: This is a hack!
 				} else { //2d
 					Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width/4, eng.ClientRectangle.Height/4, 1.0f, 6400.0f);
 					GL.LoadMatrix(ref projection);
@@ -243,6 +235,8 @@ namespace U5Designs
 					lightPos.Y += eye.Y;
 					lightPos.Z += eye.Z;
 					GL.Disable(EnableCap.Fog);
+					player.cycleNumber = 0;  //TODO: This is a hack!
+					renderList[0].cycleNumber = 0;  //TODO: This is a hack!
 				}
 				switchingPerspective = false;
 			}

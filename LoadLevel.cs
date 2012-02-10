@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Linq;
 using System.Text;
-using Engine;
 using System.Drawing;
 using OpenTK;
 using Engine;
@@ -101,13 +100,15 @@ namespace U5Designs
 			SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
 			int[] cycleStarts = {0, 4};
 			int[] cycleLengths = {4, 4};
-			SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/test_sprite.png"), cycleStarts, cycleLengths, 512, 512, true);
-			Obstacle testSprite = new Obstacle(new Vector3(50, 50, 50), testscale,testpbox, true, true, ss);
+			SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/test_sprite.png"), cycleStarts, cycleLengths, 128, 128, 4.0);
+			Obstacle testSprite = new Obstacle(new Vector3(0, 50, 0), new Vector3(25, 25, 25), testpbox, true, true, ss);
 			ps.objList.Add(testSprite);
 			ps.physList.Add(testSprite);
 			ps.renderList.Add(testSprite);
 
 
+			//Load Player
+			ps.player = new Player(ss);
 
 
             //TODO write xml parser to populate this array list with all the objects in a level

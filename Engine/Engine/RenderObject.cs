@@ -30,7 +30,12 @@ namespace Engine {
             get;
         }
 
-		int frameNumber { //index of the current animation frame
+		int cycleNumber { //index of animation for current action
+			get;
+			set;
+		}
+
+		double frameNumber { //index of the current animation frame
 			get;
 			set;
 		}

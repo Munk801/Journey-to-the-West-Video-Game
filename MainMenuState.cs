@@ -56,13 +56,13 @@ namespace U5Designs
             // Plays the audio file.  Should be in a data file later
             testFile.Play();
 
-			lookat = new Vector3(eng.ClientRectangle.Width / 2, eng.ClientRectangle.Height / 2, 2);
-            eye = new Vector3(eng.ClientRectangle.Width/2, eng.ClientRectangle.Height/2, 5);
+			lookat = new Vector3(0, 0, 2);
+            eye = new Vector3(0, 0, 5);
 
             SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
             int[] cycleStarts = { 0 };
             int[] cycleLengths = { 1 };
-            SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 1280, 720, true);
+            SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 1280, 720);
             background = new Obstacle(new Vector3(0, 0, 2), new Vector3(1280, 720, 1), new Vector3(0,0,0), true, true, ss);
 
             // TEST //
@@ -82,7 +82,6 @@ namespace U5Designs
         public override void Update(FrameEventArgs e)
         {
             DealWithInput();
-
         }
 
         public override void Draw(FrameEventArgs e)
@@ -99,7 +98,7 @@ namespace U5Designs
             //GL.Scale(426.5f, 240, 1);
             //GL.Scale(1280, 720, 100);    // Weird coincidence that this is really close to the images dimensions???   
 										 // Actually, not a coincidence at all...
-            ((RenderObject)background).sprite.draw(0, 0);
+            ((RenderObject)background).sprite.draw(false);
         }
 
         private void DealWithInput()
@@ -126,7 +125,7 @@ namespace U5Designs
                     // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
                     PlayState ps = new PlayState(this, eng, 0);
 
-                    //testFile.Stop();
+                    testFile.Stop();
 
                     // Otherwise pass the level index from the saved game
                     //PlayState ps = new PlayState(saved_level_index);

@@ -37,6 +37,7 @@ namespace U5Designs
 			_mesh = mesh;
 			_texture = texture;
 			_sprite = null;
+			_cycleNum = 0;
 			_frameNum = 0;
 			_is3dGeo = true;
             texID = GL.GenTexture();
@@ -81,52 +82,58 @@ namespace U5Designs
 		}
 
 		private bool _is3dGeo;
-		bool RenderObject.is3dGeo {
+		public bool is3dGeo {
 			get { return _is3dGeo; }
 		}
 
 		private ObjMesh _mesh; //null for sprites
-		ObjMesh RenderObject.mesh {
+		public ObjMesh mesh {
 			get { return _mesh; }
 		}
 
 		private Bitmap _texture; //null for sprites
-		Bitmap RenderObject.texture {
+		public Bitmap texture {
 			get { return _texture; }
 		}
 
 		private SpriteSheet _sprite; //null for 3d objects
-		SpriteSheet RenderObject.sprite {
+		public SpriteSheet sprite {
 			get { return _sprite; }
 		}
 
         private Vector3 _scale;
-        Vector3 RenderObject.scale
+		public Vector3 scale
         {
             get { return _scale; }
         }
 
         private Vector3 _pbox;
-        Vector3 PhysicsObject.pbox {
+		public Vector3 pbox {
             get { return _pbox; }
         }
 
         private Vector3 _cbox;
-        Vector3 CombatObject.cbox {
+		public Vector3 cbox {
             get { return _cbox; }
         }
 
-		private int _frameNum; //index of the current animation frame
-		int RenderObject.frameNumber {
+		private int _cycleNum;
+		public int cycleNumber {
+			get { return _cycleNum; }
+			set { _cycleNum = value; }
+		}
+
+		private double _frameNum; //index of the current animation frame
+		public double frameNumber {
 			get { return _frameNum; }
 			set { _frameNum = value; }
 		}
 
-		bool RenderObject.isAnimated() {
+		public bool isAnimated() {
 			throw new Exception("The method or operation is not implemented.");
 		}
 
-		void RenderObject.doScaleTranslateAndTexture() {
+		public void doScaleTranslateAndTexture() {
             GL.PushMatrix();
 
             GL.BindTexture(TextureTarget.Texture2D, texID);
@@ -141,7 +148,7 @@ namespace U5Designs
             GL.Scale(_scale);
 		}
 
-		void PhysicsObject.physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
+		public void physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
 			
             //TODO: impliment gravity, colisions etc...
             if (doesGravity && _location.Y != 0)
@@ -163,7 +170,7 @@ namespace U5Designs
 
 		}
 
-		void CombatObject.reset() {
+		public void reset() {
 			throw new NotImplementedException();
 		}
 
@@ -172,30 +179,30 @@ namespace U5Designs
         }
 
         private float _health;
-        float CombatObject.health {
+		public float health {
             get { return _health; }
             set { _health = value; }
         }
 
         private float _damage;
-        float CombatObject.damage {
+		public float damage {
             get { return _damage; }
         }
 
         private float _speed;
-        float CombatObject.speed {
+		public float speed {
             get { return _speed; }
             set { _speed = value; }
         }
 
         private bool _alive;
-        bool CombatObject.alive {
+		public bool alive {
             get { return _alive; }
             set { _alive = value; }
         }
 
 
-        void AIObject.aiUpdate(FrameEventArgs e, Vector3 playerposn, bool enable3d) {
+		public void aiUpdate(FrameEventArgs e, Vector3 playerposn, bool enable3d) {
             if (AItype == 1) {
                 //TODO change 2d view to only deal with 2d position vectors, so z movement doesnt happen in 2d
                 if (dist(playerposn, _location) > 30) {

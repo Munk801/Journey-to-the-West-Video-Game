@@ -64,7 +64,7 @@ namespace U5Designs
             SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
             int[] cycleStarts = { 0 };
             int[] cycleLengths = { 1 };
-            SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 853, 480, true);
+            SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 853, 480);
             Bitmap test = new Bitmap("../../Geometry/testbg.png");
             background = new Obstacle(new Vector3(0, 0, 2), new Vector3(426.5f, 240, 1), new Vector3(0,0,0), true, true, ss);
 
@@ -92,7 +92,7 @@ namespace U5Designs
             GL.PushMatrix();
             GL.Translate(0, 0, 2);
             GL.Scale(426.5f, 240, 1);
-            ((RenderObject)background).sprite.draw(0, 1);
+            ((RenderObject)background).sprite.draw(false);
         }
 
         private void DealWithInput()

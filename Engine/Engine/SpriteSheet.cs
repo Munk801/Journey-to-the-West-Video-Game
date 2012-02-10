@@ -28,10 +28,12 @@ namespace Engine {
 
 		private byte[][][] tex; //tex[cycleNumber][frameNumber][y*w + x]
 		private int texw, texh;
+		private double framesPerSecond;
 
-		public SpriteSheet(Bitmap texbmp, int[] cycleStartNums, int[] cycleLengths, int _texw, int _texh, bool switchColorOrder) {
+		public SpriteSheet(Bitmap texbmp, int[] cycleStartNums, int[] cycleLengths, int _texw, int _texh, double _framesPerSecond = 1.0) {
 			texw = _texw;
 			texh = _texh;
+			framesPerSecond = _framesPerSecond;
 			
 			BitmapData bmp_data = texbmp.LockBits(new Rectangle(0, 0, texbmp.Width, texbmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 			tex = new byte[cycleStartNums.Length][][];
@@ -40,28 +42,14 @@ namespace Engine {
 				for(int frameNum = 0; frameNum < cycleLengths[cycleNum]; frameNum++) {
 					IntPtr tex_addr = IntPtr.Add(bmp_data.Scan0, (cycleStartNums[cycleNum]+frameNum) * texw * texh * 4);
 					tex[cycleNum][frameNum] = new byte[texw * texh * 4];
-/*					Marshal.Copy(tex_addr, tex[cycleNum][frameNum], 0, tex[cycleNum][frameNum].Length);*/
-					for(int y = 0; y < texh; y++) {
-						for(int x = 0; x < texw; x++) {
-							if(switchColorOrder) {
-								int pixel = ((texh - y - 1) * texw + x) * 4;
-								tex[cycleNum][frameNum][pixel + 2] = (byte)(255 - (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, (y * texw + x) * 4 + 0), typeof(byte)));
-								tex[cycleNum][frameNum][pixel + 1] = (byte)(255 - (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, (y * texw + x) * 4 + 1), typeof(byte)));
-								tex[cycleNum][frameNum][pixel + 0] = (byte)(255 - (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, (y * texw + x) * 4 + 2), typeof(byte)));
-								tex[cycleNum][frameNum][pixel + 3] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, (y * texw + x) * 4 + 3), typeof(byte)); //+ 3 is alpha
-							} else {
-								for(int i = 0; i < 4; i++) {
-									tex[cycleNum][frameNum][((texh - y - 1) * texw + x) * 4 + i] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, (y * texw + x) * 4 + i), typeof(byte));
-								}
-							}
-						}
+					Marshal.Copy(tex_addr, tex[cycleNum][frameNum], 0, tex[cycleNum][frameNum].Length);
+					//Rearrange BGRA -> RGBA and invert colors to proper encoding
+					for(int i = 0; i < tex[cycleNum][frameNum].Length; i += 4) {
+						byte temp = tex[cycleNum][frameNum][i];
+						tex[cycleNum][frameNum][i] = (byte)~(tex[cycleNum][frameNum][i + 2]);
+						tex[cycleNum][frameNum][i + 2] = (byte)~temp;
+						tex[cycleNum][frameNum][i + 1] = (byte)~tex[cycleNum][frameNum][i + 1];
 					}
-// 						for(int i = 0; i < texw * texh * 4; i += 4) {
-// 							tex[cycleNum][frameNum][i + 0] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i), typeof(byte));
-// 							tex[cycleNum][frameNum][i + 1] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i + 1), typeof(byte));
-// 							tex[cycleNum][frameNum][i + 2] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i + 2), typeof(byte));
-// 							tex[cycleNum][frameNum][i + 3] = (byte)Marshal.PtrToStructure(IntPtr.Add(tex_addr, i + 3), typeof(byte));
-// 						}
 				}
 			}
 			texbmp.UnlockBits(bmp_data);
@@ -166,11 +154,8 @@ namespace Engine {
 		 *		  Returns the frameNumber passed, possibly modding it first
 		 *		  to bring it back into the expected range.
 		 */
-		public int draw(int cycleNumber, int frameNumber) {
+		public double draw(bool viewIs3d, int cycleNumber = 0, double frameTime = 0.0) {
 			//If possible, move some of these state changes into GameEngine to improve performance
-// 			GL.EnableClientState(ArrayCap.VertexArray);
-// 			GL.DisableClientState(ArrayCap.NormalArray);
-// 			GL.EnableClientState(ArrayCap.TextureCoordArray);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
@@ -178,19 +163,20 @@ namespace Engine {
 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Blend);
 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvColor, new OpenTK.Graphics.Color4(1, 1, 1, 0)); //transparent
 
-			if(frameNumber >= tex[cycleNumber].Length) {
-				frameNumber %= tex[cycleNumber].Length;
+			int frameNum = (int)(frameTime * framesPerSecond);
+			if(frameNum >= tex[cycleNumber].Length) {
+				frameTime -= tex[cycleNumber].Length / framesPerSecond;
+				frameNum %= tex[cycleNumber].Length;
 			}
 
-			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[cycleNumber][frameNumber]);
-// 			GL.VertexPointer(3, VertexPointerType.Float, 0, vertices);
-// 			GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, texverts);
-			//CORasterSaveToBMP(tex[cycleNumber][frameNumber], (uint)texw, (uint)texh, "C:\\Users\\Kendal\\Desktop\\test.bmp");
-//			GL.DrawElements(BeginMode.Quads, indices.Length, DrawElementsType.UnsignedByte, indices);
+			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[cycleNumber][frameNum]);
+			GL.Scale(1, -1, 1);
+			if(viewIs3d) {
+				GL.Rotate(270, Vector3d.UnitY);
+			}
 			quad.Render();
-			//GL.PopMatrix(); //this matches to the push in RenderObject.doScaleAndTranslate()
 
-			return frameNumber;
+			return frameTime;
 		}
 	}
 }
