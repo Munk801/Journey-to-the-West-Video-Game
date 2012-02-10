@@ -50,12 +50,12 @@ namespace U5Designs
 
         private void DealWithInput()
         {
-            if (eng.Keyboard[Key.Q])
+            if (eng.Keyboard[Key.Enter])
             {
                 // Exit Paused Menu state and return to playing
 				Console.WriteLine("Exiting paused menu state");
 				eng.PopState();
-			} else if(eng.Keyboard[Key.Escape]) {
+			} else if(eng.Keyboard[Key.Q]) {
 				eng.Exit();
 			}
         }

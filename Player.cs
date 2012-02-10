@@ -34,8 +34,10 @@ namespace U5Designs
         {
             p_state = new PlayerState("TEST player");
             p_state.setSpeed(300);
-            _location = new Vector3(50, 12.5f, 50);
+            _location = new Vector3(10, 12.5f, 50);
             _scale = new Vector3(25, 25, 25);
+            _pbox = new Vector3(12.5f, 12.5f, 12.5f);
+            _cbox = new Vector3(12.5f, 12.5f, 12.5f);
             //cubemesh = new ObjMesh("../../Geometry/box.obj");
             //_texture = new Bitmap("../../Textures/player.png");
             _damage = 0;
@@ -56,7 +58,7 @@ namespace U5Designs
 		 * Returns the movement of the player to be used in updating camera, etc.
          * */
         bool spaceDown;
-        public void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool space, FrameEventArgs e) {
+        public void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool c, bool space, FrameEventArgs e) {
             //TODO: add control for other buttons, jump, projectile etc
             if (enable3d)
             {
@@ -105,16 +107,19 @@ namespace U5Designs
                     velocity.X = 0f;
             }
 
+            //TMP PHYSICS TEST BUTTON
+            if (c)
+                velocity.Y = (float)p_state.getSpeed()/3;
+
             //********************** space
             if (space && !spaceDown)
             {
                 if (velocity.Y < 0.000001f && velocity.Y > -0.0000001f)
                 {
                     accelerate(Vector3.UnitY * 230);
+                    jumpSound.Play();
                 }
-                spaceDown = true;
-                jumpSound.Play();
-                
+                spaceDown = true; 
             }
             else if (!space)
             {
@@ -155,12 +160,12 @@ namespace U5Designs
         }
 
         private Vector3 _pbox;
-        Vector3 PhysicsObject.pbox {
+        public Vector3 pbox {
             get { return _pbox; }
         }
 
         private Vector3 _cbox;
-        Vector3 CombatObject.cbox {
+        public Vector3 cbox {
             get { return _cbox; }
 		}
 
@@ -197,7 +202,7 @@ namespace U5Designs
         }
 
 		public void physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
-			if(doesGravity && _location.Y != 0) {
+			if(doesGravity) {
 				accel.Y -= (float)(400*e.Time); //TODO: turn this into a constant somewhere
 			}
 			velocity += accel;
@@ -205,11 +210,35 @@ namespace U5Designs
 			accel.Y = 0;
 			accel.Z = 0;
 			_location += velocity*(float)e.Time;
-			if(_location.Y - 12.5f <= 0) { //TODO: this should change to a bounding box query instead of a constant
-				_location.Y = 12.5f;
-				velocity.Y = 0;
-				accel.Y = 0;
-			}
+
+
+            foreach (PhysicsObject obj in objlist) {
+                // dont do colision physics to yourself
+                if (!(((GameObject)obj).location == _location && obj.pbox == _pbox)) {
+
+                    if (((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y))
+                    && ((Math.Abs(((GameObject)obj).location.Z - _location.Z) < pbox.Z + obj.pbox.Z))
+                    && ((Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X))) {
+                        // at this point obj is in collision with this enemy
+                        if (_location.Y < ((GameObject)obj).location.Y) {
+                            _location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
+                            velocity.Y = 0;
+                            accel.Y = 0;
+                        }
+                        else {
+                            _location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
+                            velocity.Y = 0;
+                            accel.Y = 0;
+                        }
+                    }
+                }
+            }
+
+
+
+
+
+
 			deltax = (velocity * (float)e.Time).X;
 		}
 

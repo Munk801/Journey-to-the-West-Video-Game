@@ -97,7 +97,7 @@ namespace U5Designs
         public override void Update(FrameEventArgs e)
         {
             DealWithInput();
-			player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.Space], e);
+			player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.Space], e);
 
 			//TODO: parallax background based on player movement
 

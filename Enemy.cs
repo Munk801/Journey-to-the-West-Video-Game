@@ -17,8 +17,8 @@ namespace U5Designs
 
         private int texID;
         private int AItype;
-        private Vector3 velocity;
-        private Vector3 accel;
+        internal Vector3 velocity;
+        internal Vector3 accel;
         private bool doesGravity; //true if gravity affects this object
 
 		public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, Bitmap texture) {
@@ -136,14 +136,14 @@ namespace U5Designs
 		public void doScaleTranslateAndTexture() {
             GL.PushMatrix();
 
-            GL.BindTexture(TextureTarget.Texture2D, texID);
+/*            GL.BindTexture(TextureTarget.Texture2D, texID);
             BitmapData bmp_data = _texture.LockBits(new Rectangle(0, 0, _texture.Width, _texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
                 OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
             _texture.UnlockBits(bmp_data);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-
+*/
             GL.Translate(_location);
             GL.Scale(_scale);
 		}
@@ -151,7 +151,7 @@ namespace U5Designs
 		public void physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
 			
             //TODO: impliment gravity, colisions etc...
-            if (doesGravity && _location.Y != 0)
+            if (doesGravity)
             {
                 accel.Y -= (float)(400 * e.Time); //TODO: turn this into a constant somewhere
             }
@@ -160,13 +160,26 @@ namespace U5Designs
             accel.Y = 0;
             accel.Z = 0;
             _location += velocity * (float)e.Time;
-            if (_location.Y - 5 <= 0)
-            {
-                _location.Y = 5;
-                velocity.Y = 0;
-                accel.Y = 0;
-            }
 
+
+            foreach (PhysicsObject obj in objlist) {
+                // dont do colision physics to yourself
+                if (!(((GameObject)obj).location == _location && obj.pbox == _pbox)) {
+                    
+                    if (((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y))
+                    && ((Math.Abs(((GameObject)obj).location.Z - _location.Z) < pbox.Z + obj.pbox.Z))
+                    && ((Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X))){
+                        // at this point obj is in collision with this enemy
+                        if ( _location.Y < ((GameObject)obj).location.Y )
+                            _location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
+                        else
+                            _location.Y = ((GameObject)obj).location.Y  + pbox.Y + obj.pbox.Y;
+                        velocity.Y = 0;
+                        accel.Y = 0;
+                    }
+                }
+            }
+            
 
 		}
 

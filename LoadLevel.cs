@@ -64,16 +64,33 @@ namespace U5Designs
                 ps.physList.Add(testfloor);
                 ps.renderList.Add(testfloor);
             }
+            // test for physics
+            testscale = new Vector3(12.5f, 12.5f, 12.5f);
+            testpbox = new Vector3(12.5f, 12.5f, 12.5f);
+            testfloor = new Obstacle(testloc + (new Vector3(50, 70, 20)), testscale, testpbox, true, true, cubemesh, testmap);
+            ps.objList.Add(testfloor);
+            ps.physList.Add(testfloor);
+            ps.renderList.Add(testfloor);
+
+            testfloor = new Obstacle(testloc + (new Vector3(100, 150, 10)), testscale, testpbox, true, true, cubemesh, testmap);
+            ps.objList.Add(testfloor);
+            ps.physList.Add(testfloor);
+            ps.renderList.Add(testfloor);
 
 
             //example enemy load
-            Vector3 enloc = new Vector3(250, 5, 50);
-            Vector3 enscale = new Vector3(5, 5, 5);
-            Vector3 enpbox = new Vector3(5, 5, 5);
-            Vector3 encbox = new Vector3(5, 5, 5);
-            Bitmap enmap = new Bitmap("../../Textures/enemy.png");
+            Vector3 enloc = new Vector3(250, 50, 50);
+            Vector3 enscale = new Vector3(25, 25, 25);
+            Vector3 enpbox = new Vector3(12.5f, 12.5f, 12.5f);
+            Vector3 encbox = new Vector3(12.5f, 12.5f, 12.5f);
+            //Bitmap enmap = new Bitmap("../../Textures/enemy.png");
+            SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
+            int[] cycleStarts = { 0, 4 };
+            int[] cycleLengths = { 4, 4 };
+            SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/test_sprite.png"), cycleStarts, cycleLengths, 128, 128, 4.0);
 
-            Enemy testenemy = new Enemy(enloc, enscale, enpbox, encbox, true, true, 10, 10, 80f, 1, cubemesh, enmap);
+
+            Enemy testenemy = new Enemy(enloc, enscale, enpbox, encbox, true, true, 10, 10, 80f, 1, ss);
             ps.objList.Add(testenemy);
             ps.physList.Add(testenemy);
             ps.colisionList.Add(testenemy);
@@ -97,14 +114,11 @@ namespace U5Designs
 
 
 			//testing sprite sheet....
-			SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
-			int[] cycleStarts = {0, 4};
-			int[] cycleLengths = {4, 4};
-			SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/test_sprite.png"), cycleStarts, cycleLengths, 128, 128, 4.0);
-			Obstacle testSprite = new Obstacle(new Vector3(0, 50, 0), new Vector3(25, 25, 25), testpbox, true, true, ss);
-			ps.objList.Add(testSprite);
-			ps.physList.Add(testSprite);
-			ps.renderList.Add(testSprite);
+            // moved 4 lines up in enemy.
+//          Obstacle testSprite = new Obstacle(new Vector3(0, 50, 0), new Vector3(25, 25, 25), testpbox, true, true, ss);
+//			ps.objList.Add(testSprite);
+//			ps.physList.Add(testSprite);
+//			ps.renderList.Add(testSprite);
 
 
 			//Load Player
