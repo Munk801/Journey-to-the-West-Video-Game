@@ -41,8 +41,8 @@ namespace U5Designs
             eng = engine;
 
             //Start Audio Services
-            AudioContext ac = new AudioContext();
-            XRamExtension xram = new XRamExtension();
+            // AudioContext ac = new AudioContext();
+            //XRamExtension xram = new XRamExtension();
 
             savedGameStates = new Stack<XmlNodeList>();
             savedGameChoices = new Stack<string>();
@@ -117,6 +117,7 @@ namespace U5Designs
                 if (eng.GameInProgress)
                 {
                     eng.PopState();
+
 
                 }
                 else
