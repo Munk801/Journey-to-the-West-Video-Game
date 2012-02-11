@@ -44,10 +44,10 @@ namespace U5Designs
 
             states = new Stack<GameState>();
 
-            this.ChangeState(ms);
-
-            //MainMenuState ms = new MainMenuState(this);
             //this.ChangeState(ms);
+
+            MainMenuState ms = new MainMenuState(this);
+            this.ChangeState(ms);
 
             // Set the screen resolution (Fullscreen / windowed)
 

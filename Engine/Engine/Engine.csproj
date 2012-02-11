@@ -57,6 +57,7 @@
     <Compile Include="AudioFile.cs" />
     <Compile Include="AudioManager.cs" />
     <Compile Include="AudioSource.cs" />
+    <Compile Include="Camera.cs" />
     <Compile Include="CombatObject.cs" />
     <Compile Include="Audio\csogg\Buffer.cs" />
     <Compile Include="Audio\csogg\Packet.cs" />

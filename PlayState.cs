@@ -36,9 +36,10 @@ namespace U5Designs
         int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
 
 		bool tabDown;
-
 		protected Vector3 eye, lookat;
 		protected Vector4 lightPos;
+
+        Camera camera;
 
         MainMenuState menustate;
         PauseMenuState pms;
@@ -62,18 +63,23 @@ namespace U5Designs
 			tabDown = false;
             //test.Play();
 
-            //AudioManager.Manager.StartAudioServices();
+            
 
 			lookat = new Vector3(100, 75, 50);
 			eye = lookat + new Vector3(0, 0, 100);
-			lightPos = new Vector4(50, 50, 0, 1);
+
+            camera = new Camera(eye, lookat, eng.ClientRectangle.Width, eng.ClientRectangle.Height);
+
+            lightPos = new Vector4(50, 50, 0, 1);
 			lightPos.X += eye.X;
 			lightPos.Y += eye.Y;
 			lightPos.Z += eye.Z;
 
-			GL.MatrixMode(MatrixMode.Projection);
-			Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width/4, eng.ClientRectangle.Height/4, 1.0f, 6400.0f);
-			GL.LoadMatrix(ref projection);
+            camera.SetOrthographic(camera.Width, camera.Height);
+
+            //GL.MatrixMode(MatrixMode.Projection);
+            //Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width/4, eng.ClientRectangle.Height/4, 1.0f, 6400.0f);
+            //GL.LoadMatrix(ref projection);
         }
 
 		public override void MakeActive() {
@@ -84,12 +90,14 @@ namespace U5Designs
 
 			GL.MatrixMode(MatrixMode.Projection);
 			if(enable3d) {
-				Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 6, eng.ClientRectangle.Width / (float)eng.ClientRectangle.Height, 1.0f, 6400.0f);
-				GL.LoadMatrix(ref projection);
+                //Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 6, eng.ClientRectangle.Width / (float)eng.ClientRectangle.Height, 1.0f, 6400.0f);
+                //GL.LoadMatrix(ref projection);
+                camera.SetPerspective(camera.Width, camera.Height);
 				GL.Enable(EnableCap.Fog);
 			} else { //2d
-				Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width / 4, eng.ClientRectangle.Height / 4, 1.0f, 6400.0f);
-				GL.LoadMatrix(ref projection);
+                //Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width / 4, eng.ClientRectangle.Height / 4, 1.0f, 6400.0f);
+                //GL.LoadMatrix(ref projection);
+                camera.SetOrthographic(camera.Width, camera.Height);
 				GL.Disable(EnableCap.Fog);
 			}
 		}
@@ -131,9 +139,7 @@ namespace U5Designs
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadMatrix(ref modelview);
+            camera.SetModelView();
 
             //TODO: Do lights and fog need to happen every frame?
             //Light
@@ -205,23 +211,25 @@ namespace U5Designs
 
         /// <summary>Updates the projection matrix for the current view (2D/3D)</summary>
 		public void updateView() {
-			eye.X += player.deltax;
-			lookat.X += player.deltax;
-			lightPos.X += player.deltax;
+            //eye.X += player.deltax;
+            //lookat.X += player.deltax;
+            lightPos.X += player.deltax;
+            camera.Update(player.deltax);
 
             //TODO: Animate view transition
 			if(switchingPerspective) {
 				GL.MatrixMode(MatrixMode.Projection);
 				if(enable3d) {
-					Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 6, eng.ClientRectangle.Width / (float)eng.ClientRectangle.Height, 1.0f, 6400.0f);
-					GL.LoadMatrix(ref projection);
-					//TODO: Make these constants into #defines
-					//TODO: Make these constants resolution-independent
-					lookat.X -= 100;
-					lookat.Y -= 50;
-					eye.X = lookat.X - 120;
-					eye.Y = lookat.Y + 25;
-					eye.Z = lookat.Z;
+                    camera.Set3DCamera();
+                    //Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 6, eng.ClientRectangle.Width / (float)eng.ClientRectangle.Height, 1.0f, 6400.0f);
+                    //GL.LoadMatrix(ref projection);
+                    ////TODO: Make these constants into #defines
+                    ////TODO: Make these constants resolution-independent
+                    //lookat.X -= 100;
+                    //lookat.Y -= 50;
+                    //eye.X = lookat.X - 120; //Alter this x
+                    //eye.Y = lookat.Y + 25;
+                    //eye.Z = lookat.Z;
 					lightPos = new Vector4(0, 50, 50, 1);
 					lightPos.X += eye.X;
 					lightPos.Y += eye.Y;
@@ -229,23 +237,26 @@ namespace U5Designs
 					GL.Enable(EnableCap.Fog);
 					player.cycleNumber = 1;  //TODO: This is a hack!
 					renderList[0].cycleNumber = 1;  //TODO: This is a hack!
+
 				} else { //2d
-					Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width/4, eng.ClientRectangle.Height/4, 1.0f, 6400.0f);
-					GL.LoadMatrix(ref projection);
-					//TODO: Make these constants into #defines
-					//TODO: Make these constants resolution-independent
-					lookat.X += 100;
-					lookat.Y += 50;
-					eye.X = lookat.X;
-					eye.Y = lookat.Y;
-					eye.Z = lookat.Z + 100;
-					lightPos = new Vector4(50, 50, 0, 1);
+                    camera.Set2DCamera();
+                    //Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width/4, eng.ClientRectangle.Height/4, 1.0f, 6400.0f);
+                    //GL.LoadMatrix(ref projection);
+                    ////TODO: Make these constants into #defines
+                    ////TODO: Make these constants resolution-independent
+                    //lookat.X += 100;
+                    //lookat.Y += 50;
+                    //eye.X = lookat.X;
+                    //eye.Y = lookat.Y;
+                    //eye.Z = lookat.Z + 100; // Alter this z
+                    lightPos = new Vector4(50, 50, 0, 1);
 					lightPos.X += eye.X;
 					lightPos.Y += eye.Y;
 					lightPos.Z += eye.Z;
 					GL.Disable(EnableCap.Fog);
 					player.cycleNumber = 0;  //TODO: This is a hack!
 					renderList[0].cycleNumber = 0;  //TODO: This is a hack!
+
 				}
 				switchingPerspective = false;
 			}

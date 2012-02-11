@@ -117,7 +117,7 @@ namespace U5Designs
                 if (velocity.Y < 0.000001f && velocity.Y > -0.0000001f)
                 {
                     accelerate(Vector3.UnitY * 230);
-                    jumpSound.Play();
+                    //jumpSound.Play();
                 }
                 spaceDown = true; 
             }
