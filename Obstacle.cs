@@ -108,8 +108,14 @@ namespace U5Designs {
             GL.Scale(_scale);
 		}
 
-		public void physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
-			//throw new Exception("The method or operation is not implemented.");
+		public void physUpdate3d(FrameEventArgs e, List<PhysicsObject> objlist) {
+			//obstacles don't move (for now) so they don't need an update
+			return;
+		}
+
+		public void physUpdate2d(FrameEventArgs e, List<PhysicsObject> objlist) {
+			//obstacles don't move (for now) so they don't need an update
+			return;
 		}
 
 		public void accelerate(Vector3 acceleration) {

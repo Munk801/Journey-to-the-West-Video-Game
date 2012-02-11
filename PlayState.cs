@@ -96,21 +96,30 @@ namespace U5Designs
 
         public override void Update(FrameEventArgs e)
         {
+			//First deal with everyone's acceleration
             DealWithInput();
 			player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.Space], e);
+			foreach(AIObject aio in aiList) {
+				aio.aiUpdate(e, player.location, enable3d);
+			}
+
+			//Now that all everyone's had a chance to accelerate, actually
+			//translate that into velocity and position
+			if(enable3d) {
+				player.physUpdate3d(e, physList); //TODO: Should player be first or last?
+				foreach(PhysicsObject po in colisionList) {
+					po.physUpdate3d(e, physList);
+				}
+			} else {
+				player.physUpdate2d(e, physList); //TODO: Should player be first or last?
+				foreach(PhysicsObject po in colisionList) {
+					po.physUpdate2d(e, physList);
+				}
+			}
 
 			//TODO: parallax background based on player movement
-
-			player.physUpdate(e, physList); //TODO: Should player be first or last?
-             foreach (PhysicsObject po in colisionList) {
- 				po.physUpdate(e, physList);
-             }
-
-             foreach (AIObject aio in aiList) {
-                 aio.aiUpdate(e, player.location, enable3d);
-			 }
-
-			 updateView();
+			//Important!  this must be last, or we get the glitchy movement bug from earlier
+			updateView();
         }
 
         double i = 0;
