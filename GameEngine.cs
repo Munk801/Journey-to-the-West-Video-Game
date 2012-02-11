@@ -44,8 +44,7 @@ namespace U5Designs
 
             states = new Stack<GameState>();
 
-            //SplashScreenState sp = new SplashScreenState(this);
-            //this.ChangeState(sp);
+            this.ChangeState(ms);
 
             //MainMenuState ms = new MainMenuState(this);
             //this.ChangeState(ms);
