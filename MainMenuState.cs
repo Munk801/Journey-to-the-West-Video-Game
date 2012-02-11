@@ -32,8 +32,8 @@ namespace U5Designs
         protected Vector3 eye, lookat;
         Obstacle background;
 
-        //static string test = "../../Resources/Sound/Retribution.ogg";        
-        //AudioFile testFile = new AudioFile(test);
+        static string test = "../../Resources/Sound/Retribution.ogg";        
+        AudioFile testFile = new AudioFile(test);
 
 
         public MainMenuState(GameEngine engine)
@@ -41,8 +41,8 @@ namespace U5Designs
             eng = engine;
 
             //Start Audio Services
-            AudioContext ac = new AudioContext();
-            XRamExtension xram = new XRamExtension();
+            // AudioContext ac = new AudioContext();
+            //XRamExtension xram = new XRamExtension();
 
             savedGameStates = new Stack<XmlNodeList>();
             savedGameChoices = new Stack<string>();
@@ -59,9 +59,7 @@ namespace U5Designs
             GL.Enable(EnableCap.Normalize);
             
             // Plays the audio file.  Should be in a data file later
-            //testFile.Play();
-
-            AudioManager.Manager.StartAudioServices();
+            testFile.Play();
 
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
@@ -85,7 +83,6 @@ namespace U5Designs
         public override void Update(FrameEventArgs e)
         {
             DealWithInput();
-            AudioManager.Manager.Update();
 
         }
 
@@ -123,6 +120,7 @@ namespace U5Designs
                 {
                     eng.PopState();
 
+
                 }
                 else
                 {
@@ -130,7 +128,7 @@ namespace U5Designs
                     // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
                     PlayState ps = new PlayState(this, eng, 0);
 
-                    //testFile.Stop();
+                    testFile.Stop();
 
                     // Otherwise pass the level index from the saved game
                     //PlayState ps = new PlayState(saved_level_index);

@@ -85,10 +85,17 @@
     <EmbeddedResource Include="Resources\enemies.dat" />
     <EmbeddedResource Include="Resources\level_0.dat" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\u5_logo.png" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Sound\jump_sound.ogg" />
     <EmbeddedResource Include="Resources\Sound\Retribution.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\u5_logo.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

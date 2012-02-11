@@ -44,10 +44,13 @@ namespace U5Designs
 //             GL.Enable(EnableCap.Light0);
 			GL.Enable(EnableCap.Texture2D);
 
-
             states = new Stack<GameState>();
-            MainMenuState ms = new MainMenuState(this);
-            this.ChangeState(ms);
+
+            SplashScreenState sp = new SplashScreenState(this);
+            this.ChangeState(sp);
+
+            //MainMenuState ms = new MainMenuState(this);
+            //this.ChangeState(ms);
 
             // Set the screen resolution (Fullscreen / windowed)
 
