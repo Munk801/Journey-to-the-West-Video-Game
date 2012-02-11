@@ -58,6 +58,7 @@
     <Compile Include="LoadLevel.cs" />
     <Compile Include="MainMenuState.cs" />
     <Compile Include="Obstacle.cs" />
+    <Compile Include="PauseMenuState.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerState.cs" />
     <Compile Include="PlayState.cs" />

@@ -17,13 +17,15 @@ namespace U5Designs
 
         private int texID;
         private int AItype;
-        private Vector3 velocity;
-        private Vector3 accel;
+        internal Vector3 velocity;
+        internal Vector3 accel;
         private bool doesGravity; //true if gravity affects this object
 
-		public Enemy(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, Bitmap texture) {
+		public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, Bitmap texture) {
 			_location = location;
             _scale = scale;
+            _pbox = pbox;
+            _cbox = cbox;
 			_existsIn3d = existsIn3d;
 			_existsIn2d = existsIn2d;
             _health = health;
@@ -35,6 +37,7 @@ namespace U5Designs
 			_mesh = mesh;
 			_texture = texture;
 			_sprite = null;
+			_cycleNum = 0;
 			_frameNum = 0;
 			_is3dGeo = true;
             texID = GL.GenTexture();
@@ -45,10 +48,12 @@ namespace U5Designs
 		}
 
 
-        public Enemy(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, SpriteSheet sprite)
+        public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, SpriteSheet sprite)
         {
 			_location = location;
 			_scale = scale;
+            _pbox = pbox;
+            _cbox = cbox;
 			_existsIn3d = existsIn3d;
 			_existsIn2d = existsIn2d;
             _health = health;
@@ -77,60 +82,74 @@ namespace U5Designs
 		}
 
 		private bool _is3dGeo;
-		bool RenderObject.is3dGeo {
+		public bool is3dGeo {
 			get { return _is3dGeo; }
 		}
 
 		private ObjMesh _mesh; //null for sprites
-		ObjMesh RenderObject.mesh {
+		public ObjMesh mesh {
 			get { return _mesh; }
 		}
 
 		private Bitmap _texture; //null for sprites
-		Bitmap RenderObject.texture {
+		public Bitmap texture {
 			get { return _texture; }
 		}
 
 		private SpriteSheet _sprite; //null for 3d objects
-		SpriteSheet RenderObject.sprite {
+		public SpriteSheet sprite {
 			get { return _sprite; }
 		}
 
         private Vector3 _scale;
-        Vector3 RenderObject.scale
+		public Vector3 scale
         {
             get { return _scale; }
         }
 
-		private int _frameNum; //index of the current animation frame
-		int RenderObject.frameNumber {
+        private Vector3 _pbox;
+		public Vector3 pbox {
+            get { return _pbox; }
+        }
+
+        private Vector3 _cbox;
+		public Vector3 cbox {
+            get { return _cbox; }
+        }
+
+		private int _cycleNum;
+		public int cycleNumber {
+			get { return _cycleNum; }
+			set { _cycleNum = value; }
+		}
+
+		private double _frameNum; //index of the current animation frame
+		public double frameNumber {
 			get { return _frameNum; }
 			set { _frameNum = value; }
 		}
 
-		bool RenderObject.isAnimated() {
+		public bool isAnimated() {
 			throw new Exception("The method or operation is not implemented.");
 		}
 
-		void RenderObject.doScaleTranslateAndTexture() {
+		public void doScaleTranslateAndTexture() {
             GL.PushMatrix();
 
-            GL.BindTexture(TextureTarget.Texture2D, texID);
+/*            GL.BindTexture(TextureTarget.Texture2D, texID);
             BitmapData bmp_data = _texture.LockBits(new Rectangle(0, 0, _texture.Width, _texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
                 OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
             _texture.UnlockBits(bmp_data);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-
+*/
             GL.Translate(_location);
             GL.Scale(_scale);
 		}
 
-		void PhysicsObject.physUpdate(FrameEventArgs e, List<PhysicsObject> objlist) {
-			
-            //TODO: impliment gravity, colisions etc...
-            if (doesGravity && _location.Y != 0)
+		public void physUpdate3d(FrameEventArgs e, List<PhysicsObject> objlist) {
+			if (doesGravity)
             {
                 accel.Y -= (float)(400 * e.Time); //TODO: turn this into a constant somewhere
             }
@@ -139,17 +158,146 @@ namespace U5Designs
             accel.Y = 0;
             accel.Z = 0;
             _location += velocity * (float)e.Time;
-            if (_location.Y - 5 <= 0)
-            {
-                _location.Y = 5;
-                velocity.Y = 0;
-                accel.Y = 0;
-            }
 
 
+			foreach(PhysicsObject obj in objlist) {
+				// don't do collision physics to yourself
+				if(obj != this) {
+
+					if((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
+					&& (Math.Abs(((GameObject)obj).location.Z - _location.Z) < pbox.Z + obj.pbox.Z)
+					&& (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
+						// at this point obj is in collision with this enemy
+
+						//figure out which direction the collision happened on by looking for point where
+						//only one axis is not colliding
+						Vector3 temploc = _location - velocity * (float)e.Time;
+						Vector3 step = velocity * (float)e.Time * 0.25f;
+						bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+						bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+						bool z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
+						int axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
+						bool lastStepWasForward = true;
+						while(axes != 2) {
+							if(axes < 2) { //not far enough, step forward
+								if(!lastStepWasForward) {
+									step *= 0.5f;
+								}
+								lastStepWasForward = true;
+								temploc += step;
+								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+								z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
+								axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
+							} else { //too far, step backwards
+								if(lastStepWasForward) {
+									step *= 0.5f;
+								}
+								lastStepWasForward = false;
+								temploc -= step;
+								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+								z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
+								axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
+							}
+						}
+
+						//We're now at a point that two axes intersect - the third is the one that collided
+						if(!x) {
+							velocity.X = 0;
+							if(_location.X < ((GameObject)obj).location.X) {
+								_location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
+							} else {
+								_location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
+							}
+						} else if(!y) {
+							velocity.Y = 0;
+							if(_location.Y < ((GameObject)obj).location.Y) {
+								_location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
+							} else {
+								_location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
+							}
+						} else { //z
+							velocity.Z = 0;
+							if(_location.Z < ((GameObject)obj).location.Z) {
+								_location.Z = ((GameObject)obj).location.Z - (pbox.Z + obj.pbox.Z);
+							} else {
+								_location.Z = ((GameObject)obj).location.Z + pbox.Z + obj.pbox.Z;
+							}
+						}
+					}
+				}
+			}
 		}
 
-		void CombatObject.reset() {
+		public void physUpdate2d(FrameEventArgs e, List<PhysicsObject> objlist) {
+			if(doesGravity) {
+				accel.Y -= (float)(400 * e.Time); //TODO: turn this into a constant somewhere
+			}
+			velocity.X += accel.X;
+			velocity.Y += accel.Y;
+			accel.X = 0;
+			accel.Y = 0;
+			accel.Z = 0;
+			_location += velocity * (float)e.Time;
+
+			foreach(PhysicsObject obj in objlist) {
+				// don't do collision physics to yourself
+				if(obj != this) {
+
+					if((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
+					&& (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
+						// at this point obj is in collision with this enemy
+
+						//figure out which direction the collision happened on by looking for point where
+						//only one axis is not colliding
+						Vector3 temploc = _location - velocity * (float)e.Time;
+						Vector3 step = velocity * (float)e.Time * 0.25f;
+						bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+						bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+						bool lastStepWasForward = true;
+						while(x == y) {
+							if(!x) { //both false - not far enough, step forward
+								if(!lastStepWasForward) {
+									step *= 0.5f;
+								}
+								lastStepWasForward = true;
+								temploc += step;
+								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+							} else { //both true - too far, step backwards
+								if(lastStepWasForward) {
+									step *= 0.5f;
+								}
+								lastStepWasForward = false;
+								temploc -= step;
+								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+							}
+						}
+
+						//We're now at a point that two axes intersect - the third is the one that collided
+						if(!x) {
+							velocity.X = 0;
+							if(_location.X < ((GameObject)obj).location.X) {
+								_location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
+							} else {
+								_location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
+							}
+						} else { //y
+							velocity.Y = 0;
+							if(_location.Y < ((GameObject)obj).location.Y) {
+								_location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
+							} else {
+								_location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		public void reset() {
 			throw new NotImplementedException();
 		}
 
@@ -158,30 +306,30 @@ namespace U5Designs
         }
 
         private float _health;
-        float CombatObject.health {
+		public float health {
             get { return _health; }
             set { _health = value; }
         }
 
         private float _damage;
-        float CombatObject.damage {
+		public float damage {
             get { return _damage; }
         }
 
         private float _speed;
-        float CombatObject.speed {
+		public float speed {
             get { return _speed; }
             set { _speed = value; }
         }
 
         private bool _alive;
-        bool CombatObject.alive {
+		public bool alive {
             get { return _alive; }
             set { _alive = value; }
         }
 
 
-        void AIObject.aiUpdate(FrameEventArgs e, Vector3 playerposn, bool enable3d) {
+		public void aiUpdate(FrameEventArgs e, Vector3 playerposn, bool enable3d) {
             if (AItype == 1) {
                 //TODO change 2d view to only deal with 2d position vectors, so z movement doesnt happen in 2d
                 if (dist(playerposn, _location) > 30) {

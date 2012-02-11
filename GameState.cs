@@ -23,8 +23,10 @@ namespace U5Designs
      *  If you use an in game menu STATE then you need to have that state POP itself off the game engines state stack in the 
      *  HandleEvents() method of the in game menu state
      * */
-    public abstract class GameState
-    {
+	public abstract class GameState {
+		//Note!  MakeActive() is called every time the state is activated or re-activated.
+		//One time only things should be in the constructor, not in MakeActive()
+		public virtual void MakeActive() { }
 
         public virtual void Update(FrameEventArgs e)
         {

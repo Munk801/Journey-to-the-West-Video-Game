@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Linq;
 using System.Text;
-using Engine;
 using System.Drawing;
 using OpenTK;
 using Engine;
@@ -37,11 +36,12 @@ namespace U5Designs
 
             //example obstacle load
             //use ps to access object lists!!
-            Vector3 testloc = new Vector3(50, -50, 50);
-			Vector3 testscale = new Vector3(50, 50, 50);
-            Bitmap testmap = new Bitmap("../../Textures/test.png");
+            Vector3 testloc = new Vector3(50, -50, 50); // location is a point 
+			Vector3 testscale = new Vector3(50, 50, 50); // scale is a multiplyer
+            Bitmap testmap = new Bitmap("../../Textures/test.png"); // sprite
+            Vector3 testpbox = new Vector3(50, 50, 50);// the size of the physicsbox extending from the center in x,y,z
 			//Bitmap testmap = new Bitmap("../../Geometry/test_sprite.png");
-            Obstacle testfloor = new Obstacle(testloc, testscale, true, true, cubemesh, testmap);
+            Obstacle testfloor = new Obstacle(testloc, testscale, testpbox, true, true, cubemesh, testmap);
 
             ps.objList.Add(testfloor);
             ps.physList.Add(testfloor);
@@ -53,24 +53,44 @@ namespace U5Designs
             // bool exsistsin3d?
 			// obj file
             // bitmap file
+            // vector3 physics box size
 
 
             //tmp add 5 more floor boxes
             for (int i = 0; i < 5; i++)
             {  
-                testfloor = new Obstacle(testloc+(new Vector3(i*100, 0,0)), testscale, true, true, cubemesh, testmap);
+                testfloor = new Obstacle(testloc+(new Vector3(i*100, 0,0)), testscale, testpbox, true, true, cubemesh, testmap);
                 ps.objList.Add(testfloor);
                 ps.physList.Add(testfloor);
                 ps.renderList.Add(testfloor);
             }
+            // test for physics
+            testscale = new Vector3(12.5f, 12.5f, 12.5f);
+            testpbox = new Vector3(12.5f, 12.5f, 12.5f);
+            testfloor = new Obstacle(testloc + (new Vector3(50, 70, 20)), testscale, testpbox, true, true, cubemesh, testmap);
+            ps.objList.Add(testfloor);
+            ps.physList.Add(testfloor);
+            ps.renderList.Add(testfloor);
+
+            testfloor = new Obstacle(testloc + (new Vector3(100, 150, 10)), testscale, testpbox, true, true, cubemesh, testmap);
+            ps.objList.Add(testfloor);
+            ps.physList.Add(testfloor);
+            ps.renderList.Add(testfloor);
 
 
             //example enemy load
-            Vector3 enloc = new Vector3(250, 5, 50);
-            Vector3 enscale = new Vector3(5, 5, 5);
-            Bitmap enmap = new Bitmap("../../Textures/enemy.png");
+            Vector3 enloc = new Vector3(250, 50, 50);
+            Vector3 enscale = new Vector3(25, 25, 25);
+            Vector3 enpbox = new Vector3(12.5f, 12.5f, 12.5f);
+            Vector3 encbox = new Vector3(12.5f, 12.5f, 12.5f);
+            //Bitmap enmap = new Bitmap("../../Textures/enemy.png");
+            SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
+            int[] cycleStarts = { 0, 4 };
+            int[] cycleLengths = { 4, 4 };
+            SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/test_sprite.png"), cycleStarts, cycleLengths, 128, 128, 4.0);
 
-            Enemy testenemy = new Enemy(enloc, enscale, true, true, 10, 10, 80f, 1, cubemesh, enmap);
+
+            Enemy testenemy = new Enemy(enloc, enscale, enpbox, encbox, true, true, 10, 10, 80f, 1, ss);
             ps.objList.Add(testenemy);
             ps.physList.Add(testenemy);
             ps.colisionList.Add(testenemy);
@@ -88,20 +108,21 @@ namespace U5Designs
             // int AItype
             // obj file
             // bitmap file
+            // vector3 physics box size
+            // vector3 combat box size
 
 
 
 			//testing sprite sheet....
-			SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
-			int[] cycleStarts = {0, 4};
-			int[] cycleLengths = {4, 4};
-			SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/test_sprite.png"), cycleStarts, cycleLengths, 512, 512);
-			Obstacle testSprite = new Obstacle(new Vector3(50, 50, 50), testscale, true, true, ss);
-			ps.objList.Add(testSprite);
-			ps.physList.Add(testSprite);
-			ps.renderList.Add(testSprite);
+            // moved 4 lines up in enemy.
+//          Obstacle testSprite = new Obstacle(new Vector3(0, 50, 0), new Vector3(25, 25, 25), testpbox, true, true, ss);
+//			ps.objList.Add(testSprite);
+//			ps.physList.Add(testSprite);
+//			ps.renderList.Add(testSprite);
 
 
+			//Load Player
+			ps.player = new Player(ss);
 
 
             //TODO write xml parser to populate this array list with all the objects in a level

@@ -41,7 +41,7 @@ namespace U5Designs
 		protected Vector4 lightPos;
 
         MainMenuState menustate;
-
+        PauseMenuState pms;
        
 
         // Initialize graphics, etc here
@@ -56,16 +56,10 @@ namespace U5Designs
 
             menustate = prvstate;
             eng = engine;
-            player = new Player();
 
+            pms = new PauseMenuState(engine);
             enable3d = false;
 			tabDown = false;
-
-            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            GL.Enable(EnableCap.DepthTest);
-            GL.Enable(EnableCap.Normalize);
-            GL.Enable(EnableCap.Lighting);
-            GL.Enable(EnableCap.Light0);
             //test.Play();
 
             //AudioManager.Manager.StartAudioServices();
@@ -82,24 +76,50 @@ namespace U5Designs
 			GL.LoadMatrix(ref projection);
         }
 
+		public override void MakeActive() {
+			GL.Enable(EnableCap.Lighting);
+			GL.Enable(EnableCap.Light0);
+			GL.Enable(EnableCap.Blend);
+			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+
+			GL.MatrixMode(MatrixMode.Projection);
+			if(enable3d) {
+				Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 6, eng.ClientRectangle.Width / (float)eng.ClientRectangle.Height, 1.0f, 6400.0f);
+				GL.LoadMatrix(ref projection);
+				GL.Enable(EnableCap.Fog);
+			} else { //2d
+				Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width / 4, eng.ClientRectangle.Height / 4, 1.0f, 6400.0f);
+				GL.LoadMatrix(ref projection);
+				GL.Disable(EnableCap.Fog);
+			}
+		}
+
         public override void Update(FrameEventArgs e)
         {
+			//First deal with everyone's acceleration
             DealWithInput();
-			player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.Space], e);
-			
-			updateView(); 
+			player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.Space], e);
+			foreach(AIObject aio in aiList) {
+				aio.aiUpdate(e, player.location, enable3d);
+			}
+
+			//Now that all everyone's had a chance to accelerate, actually
+			//translate that into velocity and position
+			if(enable3d) {
+				player.physUpdate3d(e, physList); //TODO: Should player be first or last?
+				foreach(PhysicsObject po in colisionList) {
+					po.physUpdate3d(e, physList);
+				}
+			} else {
+				player.physUpdate2d(e, physList); //TODO: Should player be first or last?
+				foreach(PhysicsObject po in colisionList) {
+					po.physUpdate2d(e, physList);
+				}
+			}
 
 			//TODO: parallax background based on player movement
-
-			player.physUpdate(e, physList); //TODO: Should player be first or last?
-             foreach (PhysicsObject po in colisionList) {
- 				po.physUpdate(e, physList);
-             }
-
-             foreach (AIObject aio in aiList) {
-                 aio.aiUpdate(e, player.location, enable3d);
-             }
-
+			//Important!  this must be last, or we get the glitchy movement bug from earlier
+			updateView();
         }
 
         double i = 0;
@@ -130,9 +150,9 @@ namespace U5Designs
 			}
 
             //Set up for rendering using arrays
-            GL.EnableClientState(ArrayCap.VertexArray);
-			GL.EnableClientState(ArrayCap.NormalArray);
-			GL.EnableClientState(ArrayCap.TextureCoordArray);
+//             GL.EnableClientState(ArrayCap.VertexArray);
+// 			GL.EnableClientState(ArrayCap.NormalArray);
+// 			GL.EnableClientState(ArrayCap.TextureCoordArray);
 
 			//Set up textures
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
@@ -147,28 +167,21 @@ namespace U5Designs
  					obj.doScaleTranslateAndTexture();
  					obj.mesh.Render();
 				} else {
-					GL.PushMatrix();
-					GL.Translate(0, 50, 0);
-					GL.Scale(50, 50, 1);
-					i += e.Time*4;
-					if(obj.sprite.draw(0, (int)i) == 0 && i > 1f) {
-						i = 0;
-					}
+					obj.doScaleTranslateAndTexture();
+					obj.frameNumber = obj.sprite.draw(enable3d, obj.cycleNumber, obj.frameNumber + e.Time);
 				}
 			}
-			//Console.WriteLine(i);
 
-			player.draw();
+			player.draw(enable3d, e.Time);
         }
-
-		
 
         private void DealWithInput()
         {
             //TODO: Change these keys to their final mappings when determined
             if (eng.Keyboard[Key.Escape])
             {
-                eng.PushState(menustate);
+                //eng.PushState(menustate);
+                eng.PushState(pms);
             }
 
 			//********************** tab
@@ -177,6 +190,7 @@ namespace U5Designs
                 enable3d = !enable3d;
 				switchingPerspective = true;
                 tabDown = true;
+                player.velocity.Z = 0;
             }
             else if (!eng.Keyboard[Key.Tab])
             {
@@ -201,9 +215,6 @@ namespace U5Designs
 				if(enable3d) {
 					Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 6, eng.ClientRectangle.Width / (float)eng.ClientRectangle.Height, 1.0f, 6400.0f);
 					GL.LoadMatrix(ref projection);
-					//eye.X = lookat.X - 500;
-					//eye.Y = lookat.Y + 75;
-					//eye.Z = lookat.Z;
 					//TODO: Make these constants into #defines
 					//TODO: Make these constants resolution-independent
 					lookat.X -= 100;
@@ -216,6 +227,8 @@ namespace U5Designs
 					lightPos.Y += eye.Y;
 					lightPos.Z += eye.Z;
 					GL.Enable(EnableCap.Fog);
+					player.cycleNumber = 1;  //TODO: This is a hack!
+					renderList[0].cycleNumber = 1;  //TODO: This is a hack!
 				} else { //2d
 					Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width/4, eng.ClientRectangle.Height/4, 1.0f, 6400.0f);
 					GL.LoadMatrix(ref projection);
@@ -231,6 +244,8 @@ namespace U5Designs
 					lightPos.Y += eye.Y;
 					lightPos.Z += eye.Z;
 					GL.Disable(EnableCap.Fog);
+					player.cycleNumber = 0;  //TODO: This is a hack!
+					renderList[0].cycleNumber = 0;  //TODO: This is a hack!
 				}
 				switchingPerspective = false;
 			}
