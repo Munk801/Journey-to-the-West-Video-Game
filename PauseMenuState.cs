@@ -45,7 +45,8 @@ namespace U5Designs
 
         public override void Draw(FrameEventArgs e)
         {
-            
+            GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+
         }
 
         private void DealWithInput()

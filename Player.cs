@@ -220,7 +220,7 @@ namespace U5Designs
                     if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
                     && (Math.Abs(((GameObject)obj).location.Z - _location.Z) < pbox.Z + obj.pbox.Z)
                     && (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
-                        // at this point obj is in collision with this enemy
+                        // at this point the player is colliding with this obj
 
 						//figure out which direction the collision happened on by looking for point where
 						//only one axis is not colliding
@@ -232,7 +232,7 @@ namespace U5Designs
 						bool z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
 						int axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
 						bool lastStepWasForward = true;
-						while(axes != 2) {
+						while(axes != 2 && step != new Vector3(0,0,0)) {
 							if(axes < 2) { //not far enough, step forward
 								if(!lastStepWasForward) {
 									step *= 0.5f;
