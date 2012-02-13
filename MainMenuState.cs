@@ -35,6 +35,9 @@ namespace U5Designs
         static string test = "../../Resources/Sound/Retribution.ogg";        
         AudioFile testFile = new AudioFile(test);
 
+        // testing buttons
+        Obstacle play_button_npress, play_button_press;
+        int _cur_butn = 0;
 
         public MainMenuState(GameEngine engine)
         {
@@ -62,8 +65,14 @@ namespace U5Designs
             SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
             int[] cycleStarts = { 0 };
             int[] cycleLengths = { 1 };
-            SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 1280, 720);
-            background = new Obstacle(new Vector3(0, 0, 2), new Vector3(1280, 720, 1), new Vector3(0,0,0), true, true, ss);
+            //SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 1280, 720);
+            //background = new Obstacle(new Vector3(0, 0, 2), new Vector3(1280, 720, 1), new Vector3(0,0,0), true, true, ss);
+
+            // testing buttons
+            SpriteSheet pb_np_ss = new SpriteSheet(new Bitmap("../../Geometry/play_button_no_press.png"), cycleStarts, cycleLengths, 320, 200);
+            play_button_npress = new Obstacle(new Vector3(0, 0, 2), new Vector3(320, 200, 1), new Vector3(0, 0, 0), true, true, pb_np_ss);
+            SpriteSheet pb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/play_button_press.png"), cycleStarts, cycleLengths, 320, 200);
+            play_button_press = new Obstacle(new Vector3(0, 0, 2), new Vector3(320, 200, 1), new Vector3(0, 0, 0), true, true, pb_p_ss);
 
             // TEST //
             LoadSavedState(1);
@@ -92,17 +101,46 @@ namespace U5Designs
             Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref modelview);
-			((RenderObject)background).doScaleTranslateAndTexture();
+			//((RenderObject)background).doScaleTranslateAndTexture();
+
+            // testing buttons
+            if (_cur_butn == 0)
+            {
+                ((RenderObject)play_button_press).doScaleTranslateAndTexture();
+                ((RenderObject)play_button_press).sprite.draw(false);
+            }
+            else
+            {
+                ((RenderObject)play_button_npress).doScaleTranslateAndTexture();
+                ((RenderObject)play_button_npress).sprite.draw(false);
+            }
+
             //GL.PushMatrix();
             //GL.Translate(-640, -360, -10);
             //GL.Scale(426.5f, 240, 1);
             //GL.Scale(1280, 720, 100);    // Weird coincidence that this is really close to the images dimensions???   
 										 // Actually, not a coincidence at all...
-            ((RenderObject)background).sprite.draw(false);
+            //((RenderObject)background).sprite.draw(false);                      
         }
 
         private void DealWithInput()
         {
+            // Testing buttons
+            if (eng.Keyboard[Key.Down])
+            {
+                if (_cur_butn < 1)
+                {
+                    // Increment the current button index so you draw the highlighted button of the next button 
+                    _cur_butn += 1;
+                }
+                else
+                {
+                    // Were on the last button in the list so reset to the top of the button list
+                    _cur_butn = 0;
+                }
+
+            }
+            
             //TODO: Change these keys to their final mappings when determined
 
             if (eng.Keyboard[Key.Q])
@@ -111,7 +149,7 @@ namespace U5Designs
             }
 
             //********************** enter
-            if (eng.Keyboard[Key.Enter])
+            if (eng.Keyboard[Key.Enter] && _cur_butn == 0)
             {
                 //transition into PlayState
                 if (eng.GameInProgress)
