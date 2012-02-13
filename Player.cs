@@ -304,7 +304,7 @@ namespace U5Designs
 
 					if((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
 					&& (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
-						// at this point obj is in collision with this enemy
+                        // at this point the player is colliding with this obj
 
 						//figure out which direction the collision happened on by looking for point where
 						//only one axis is not colliding

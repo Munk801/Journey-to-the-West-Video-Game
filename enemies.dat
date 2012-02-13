@@ -1,7 +1,7 @@
 <enemies>
 	<enemy>
 		<e_name>Ninja Wasp</e_name>
-		<e_level>0</e_name>
+		<e_level>0</e_level>
 		<e_sfx>sfx_path01</e_sfx>
 		<e_texture>texture_path01</e_texture>
 		<abilities>

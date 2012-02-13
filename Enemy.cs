@@ -337,7 +337,6 @@ namespace U5Designs
                     velocity.X = dir.X * _speed;
                     if (enable3d)
                         velocity.Z = dir.Z * _speed;
-
                 }
                 else {
                     velocity.X = 0;
