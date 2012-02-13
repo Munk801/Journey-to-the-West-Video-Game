@@ -40,7 +40,7 @@ namespace U5Designs
 		protected Vector4 lightPos;
 
         Camera camera;
-
+        bool isInTransition;
         MainMenuState menustate;
         PauseMenuState pms;
        
@@ -125,9 +125,26 @@ namespace U5Designs
 				}
 			}
 
-			//TODO: parallax background based on player movement
-			//Important!  this must be last, or we get the glitchy movement bug from earlier
-			updateView();
+            // IF they are transitioning cameras, run the transition state
+            if (isInTransition && camera.timer > 0)
+            {
+                lightPos = new Vector4(0, 50, 50, 1);
+                lightPos.X += eye.X;
+                lightPos.Y += eye.Y;
+                lightPos.Z += eye.Z;
+                GL.Enable(EnableCap.Fog);
+
+                camera.timer = camera.TransitionState(enable3d, camera.timer);
+                //transTimer--;
+            }
+
+            //TODO: parallax background based on player movement
+            //Important!  this must be last, or we get the glitchy movement bug from earlier
+            else
+            {
+                isInTransition = false;
+                updateView();
+            }
         }
 
         double i = 0;
@@ -138,6 +155,14 @@ namespace U5Designs
             //Ground is from 0 to 100 along the z-axis
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+
+            // UNCOMMENT THIS AND LINE AFTER DRAW TO ADD MOTION BLUR
+            //if (isInTransition)
+            //{
+            //    GL.Accum(AccumOp.Return, 0.95f);
+            //    GL.Clear(ClearBufferMask.AccumBufferBit);
+            //}
 
             camera.SetModelView();
 
@@ -179,6 +204,13 @@ namespace U5Designs
 			}
 
 			player.draw(enable3d, e.Time);
+
+
+            // UNCOMMENT TO ADD MOTION BLUR
+            //if (isInTransition)
+            //{
+            //    GL.Accum(AccumOp.Accum, 0.9f);
+            //}
         }
 
         private void DealWithInput()
@@ -197,6 +229,9 @@ namespace U5Designs
 				switchingPerspective = true;
                 tabDown = true;
                 player.velocity.Z = 0;
+
+                isInTransition = true;
+                camera.timer = 10;
             }
             else if (!eng.Keyboard[Key.Tab])
             {
