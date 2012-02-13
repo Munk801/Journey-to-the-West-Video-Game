@@ -40,6 +40,7 @@ namespace U5Designs
 		protected Vector4 lightPos;
 
         Camera camera;
+        Vector4 light;
         bool isInTransition;
         MainMenuState menustate;
         PauseMenuState pms;
@@ -70,10 +71,10 @@ namespace U5Designs
 
             camera = new Camera(eye, lookat, eng.ClientRectangle.Width, eng.ClientRectangle.Height);
 
-            lightPos = new Vector4(50, 50, 0, 1);
-			lightPos.X += eye.X;
-			lightPos.Y += eye.Y;
-			lightPos.Z += eye.Z;
+            //lightPos = new Vector4(50, 50, 0, 1);
+            //lightPos.X += eye.X;
+            //lightPos.Y += eye.Y;
+            //lightPos.Z += eye.Z;
 
             camera.SetOrthographic(camera.Width, camera.Height);
 
@@ -93,12 +94,12 @@ namespace U5Designs
                 //Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 6, eng.ClientRectangle.Width / (float)eng.ClientRectangle.Height, 1.0f, 6400.0f);
                 //GL.LoadMatrix(ref projection);
                 camera.SetPerspective(camera.Width, camera.Height);
-				GL.Enable(EnableCap.Fog);
+				//GL.Enable(EnableCap.Fog);
 			} else { //2d
                 //Matrix4 projection = Matrix4.CreateOrthographic(eng.ClientRectangle.Width / 4, eng.ClientRectangle.Height / 4, 1.0f, 6400.0f);
                 //GL.LoadMatrix(ref projection);
                 camera.SetOrthographic(camera.Width, camera.Height);
-				GL.Disable(EnableCap.Fog);
+				//GL.Disable(EnableCap.Fog);
 			}
 		}
 
@@ -128,11 +129,11 @@ namespace U5Designs
             // IF they are transitioning cameras, run the transition state
             if (isInTransition && camera.timer > 0)
             {
-                lightPos = new Vector4(0, 50, 50, 1);
-                lightPos.X += eye.X;
-                lightPos.Y += eye.Y;
-                lightPos.Z += eye.Z;
-                GL.Enable(EnableCap.Fog);
+                //lightPos = new Vector4(0, 50, 50, 1);
+                //lightPos.X += eye.X;
+                //lightPos.Y += eye.Y;
+                //lightPos.Z += eye.Z;
+                //GL.Enable(EnableCap.Fog);
 
                 camera.timer = camera.TransitionState(enable3d, camera.timer);
                 //transTimer--;
@@ -160,21 +161,20 @@ namespace U5Designs
             // UNCOMMENT THIS AND LINE AFTER DRAW TO ADD MOTION BLUR
             //if (isInTransition)
             //{
-            //    GL.Accum(AccumOp.Return, 0.95f);
-            //    GL.Clear(ClearBufferMask.AccumBufferBit);
+            //GL.Accum(AccumOp.Return, 0.95f);
+            //GL.Clear(ClearBufferMask.AccumBufferBit);
             //}
 
             camera.SetModelView();
 
             //TODO: Do lights and fog need to happen every frame?
             //Light
-            GL.ShadeModel(ShadingModel.Smooth);
-            GL.Light(LightName.Light0, LightParameter.Position, lightPos);
-            GL.Light(LightName.Light0, LightParameter.Diffuse, new Vector4(1.0f, 1.0f, 1.0f, 1.0f) );
-			GL.Light(LightName.Light0, LightParameter.Specular, new Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-            GL.Light(LightName.Light0, LightParameter.Ambient, new Vector4(0.4f, 0.4f, 0.4f, 1.0f));
-            GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Emission, noglow);
-
+            //GL.ShadeModel(ShadingModel.Smooth);
+            //GL.Light(LightName.Light0, LightParameter.Position, lightPos);
+            //GL.Light(LightName.Light0, LightParameter.Diffuse, new Vector4(1.0f, 1.0f, 1.0f, 1.0f) );
+            //GL.Light(LightName.Light0, LightParameter.Specular, new Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+            //GL.Light(LightName.Light0, LightParameter.Ambient, new Vector4(0.4f, 0.4f, 0.4f, 1.0f));
+            //GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Emission, noglow);
             //Fog
 			if(enable3d) {
 				GL.Fog(FogParameter.FogDensity, 0.0005f);
@@ -209,7 +209,7 @@ namespace U5Designs
             // UNCOMMENT TO ADD MOTION BLUR
             //if (isInTransition)
             //{
-            //    GL.Accum(AccumOp.Accum, 0.9f);
+            //GL.Accum(AccumOp.Accum, 0.9f);
             //}
         }
 
@@ -265,10 +265,10 @@ namespace U5Designs
                     //eye.X = lookat.X - 120; //Alter this x
                     //eye.Y = lookat.Y + 25;
                     //eye.Z = lookat.Z;
-					lightPos = new Vector4(0, 50, 50, 1);
-					lightPos.X += eye.X;
-					lightPos.Y += eye.Y;
-					lightPos.Z += eye.Z;
+                    //lightPos = new Vector4(0, 50, 50, 1);
+                    //lightPos.X += eye.X;
+                    //lightPos.Y += eye.Y;
+                    //lightPos.Z += eye.Z;
 					GL.Enable(EnableCap.Fog);
 					player.cycleNumber = 1;  //TODO: This is a hack!
 					renderList[0].cycleNumber = 1;  //TODO: This is a hack!
@@ -284,10 +284,10 @@ namespace U5Designs
                     //eye.X = lookat.X;
                     //eye.Y = lookat.Y;
                     //eye.Z = lookat.Z + 100; // Alter this z
-                    lightPos = new Vector4(50, 50, 0, 1);
-					lightPos.X += eye.X;
-					lightPos.Y += eye.Y;
-					lightPos.Z += eye.Z;
+                    //lightPos = new Vector4(50, 50, 0, 1);
+                    //lightPos.X += eye.X;
+                    //lightPos.Y += eye.Y;
+                    //lightPos.Z += eye.Z;
 					GL.Disable(EnableCap.Fog);
 					player.cycleNumber = 0;  //TODO: This is a hack!
 					renderList[0].cycleNumber = 0;  //TODO: This is a hack!

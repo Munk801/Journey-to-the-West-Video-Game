@@ -22,9 +22,6 @@ namespace U5Designs
         protected Vector3 eye, lookat;
         Obstacle background;
 
-        static string test = "../../Resources/Sound/Retribution.ogg";
-        AudioFile testFile = new AudioFile(test);
-
         double timeTilMain = 0.0f;
         
 //        // WILL NEED TO BE MOVED SOMEWHERE ELSE
@@ -38,13 +35,13 @@ namespace U5Designs
             // WILL NEED TO BE PLACED SOMEWHERE ELSE LATER
             TextureManager texturemanager = new TextureManager();
             StateTextureManager = texturemanager;
-            //Il.ilInit();
-            //Ilu.iluInit();
+            Il.ilInit();
+            Ilu.iluInit();
             Ilut.ilutInit();
 
             Ilut.ilutRenderer(Ilut.ILUT_OPENGL);
 
-            texturemanager.LoadTexture("logo", "../../Resources/u5_logo.jpg");
+            texturemanager.LoadTexture("logo", "../../Resources/test.tga");
 
             Texture texture = StateTextureManager.GetTexture("logo");
             logo = texture;
