@@ -143,17 +143,16 @@ namespace U5Designs
             if(_new_state.IsKeyDown(Key.Down) && !_old_state.IsKeyDown(Key.Down))
             {
                 // Down key was just pressed
-                if (_cur_butn < 2)
+                if (_cur_butn < 1)
                 {
                     // Increment the current button index so you draw the highlighted button of the next button 
                     _cur_butn += 1;
                 }
-                else if(_cur_butn >= 2)
+                else if(_cur_butn >= 1)
                 {
                     // Were on the last button in the list so reset to the top of the button list
                     _cur_butn = 0;
-                }
-                _old_state = _new_state;
+                }                
             }
             if (_new_state.IsKeyDown(Key.Up) && !_old_state.IsKeyDown(Key.Up))
             {
@@ -167,9 +166,9 @@ namespace U5Designs
                 {
                     // Were on the last button in the list so reset to the top of the button list
                     _cur_butn = 1;
-                }
-                _old_state = _new_state;
+                }                
             }
+            _old_state = _new_state;
             
             //TODO: Change these keys to their final mappings when determined
 
@@ -179,24 +178,46 @@ namespace U5Designs
             }
 
             //********************** enter
-            if (eng.Keyboard[Key.Enter] && _cur_butn == 0)
+            if (eng.Keyboard[Key.Enter])
             {
-                //transition into PlayState
-                if (eng.GameInProgress)
+                if (_cur_butn == 0)
                 {
-                    eng.PopState();
+                    //transition into PlayState
+                    if (eng.GameInProgress)
+                    {
+                        eng.PopState();
+                    }
+                    else
+                    {
+                        // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
+                        PlayState ps = new PlayState(this, eng, 0);
+
+                        testFile.Stop();
+
+                        // Otherwise pass the level index from the saved game
+                        //PlayState ps = new PlayState(saved_level_index);
+                        eng.ChangeState(ps);
+                        eng.GameInProgress = true;
+                    }
                 }
-                else
+                if (_cur_butn == 1)
                 {
-                    // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
-                    PlayState ps = new PlayState(this, eng, 0);
+                    // load saved game pressed
+                    //transition into PlayState
+                    if (eng.GameInProgress)
+                    {
+                        eng.PopState();
+                    }
+                    else
+                    {
+                        // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
+                        testFile.Stop();
 
-                    testFile.Stop();
-
-                    // Otherwise pass the level index from the saved game
-                    //PlayState ps = new PlayState(saved_level_index);
-                    eng.ChangeState(ps);
-                    eng.GameInProgress = true;
+                        // Otherwise pass the level index from the saved game
+                        PlayState ps = new PlayState(this, eng, saved_level_index);
+                        eng.ChangeState(ps);
+                        eng.GameInProgress = true;
+                    }
                 }
             }
         }
