@@ -36,8 +36,9 @@ namespace U5Designs
         AudioFile testFile = new AudioFile(test);
 
         // testing buttons
-        Obstacle play_button_npress, play_button_press;
+        Obstacle play_button_npress, play_button_press, load_button_npress, load_button_press;
         int _cur_butn = 0;
+        OpenTK.Input.KeyboardState _old_state;
 
         public MainMenuState(GameEngine engine)
         {
@@ -69,10 +70,16 @@ namespace U5Designs
             //background = new Obstacle(new Vector3(0, 0, 2), new Vector3(1280, 720, 1), new Vector3(0,0,0), true, true, ss);
 
             // testing buttons
-            SpriteSheet pb_np_ss = new SpriteSheet(new Bitmap("../../Geometry/play_button_no_press.png"), cycleStarts, cycleLengths, 320, 200);
-            play_button_npress = new Obstacle(new Vector3(0, 0, 2), new Vector3(320, 200, 1), new Vector3(0, 0, 0), true, true, pb_np_ss);
-            SpriteSheet pb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/play_button_press.png"), cycleStarts, cycleLengths, 320, 200);
-            play_button_press = new Obstacle(new Vector3(0, 0, 2), new Vector3(320, 200, 1), new Vector3(0, 0, 0), true, true, pb_p_ss);
+            _old_state = OpenTK.Input.Keyboard.GetState(); // Get the current state of the keyboard           
+            SpriteSheet pb_np_ss = new SpriteSheet(new Bitmap("../../Geometry/play_button_no_press.png"), cycleStarts, cycleLengths, 320, 100);
+            play_button_npress = new Obstacle(new Vector3(0, 100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, pb_np_ss);
+            SpriteSheet pb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/play_button_press.png"), cycleStarts, cycleLengths, 320, 100);
+            play_button_press = new Obstacle(new Vector3(0, 100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, pb_p_ss);
+
+            SpriteSheet lb_np_ss = new SpriteSheet(new Bitmap("../../Geometry/load_button_no_press.png"), cycleStarts, cycleLengths, 320, 100);
+            load_button_npress = new Obstacle(new Vector3(0, 0, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, lb_np_ss);
+            SpriteSheet lb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/load_button_press.png"), cycleStarts, cycleLengths, 320, 100);
+            load_button_press = new Obstacle(new Vector3(0, 0, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, lb_p_ss);
 
             // TEST //
             LoadSavedState(1);
@@ -104,15 +111,20 @@ namespace U5Designs
 			//((RenderObject)background).doScaleTranslateAndTexture();
 
             // testing buttons
-            if (_cur_butn == 0)
+            switch (_cur_butn)
             {
-                ((RenderObject)play_button_press).doScaleTranslateAndTexture();
-                ((RenderObject)play_button_press).sprite.draw(false);
-            }
-            else
-            {
-                ((RenderObject)play_button_npress).doScaleTranslateAndTexture();
-                ((RenderObject)play_button_npress).sprite.draw(false);
+                case 0:
+                    ((RenderObject)play_button_press).doScaleTranslateAndTexture();
+                    ((RenderObject)play_button_press).sprite.draw(false);
+                    ((RenderObject)load_button_npress).doScaleTranslateAndTexture();
+                    ((RenderObject)load_button_npress).sprite.draw(false);
+                    break;
+                case 1:
+                    ((RenderObject)play_button_npress).doScaleTranslateAndTexture();
+                    ((RenderObject)play_button_npress).sprite.draw(false);
+                    ((RenderObject)load_button_press).doScaleTranslateAndTexture();
+                    ((RenderObject)load_button_press).sprite.draw(false);
+                    break;
             }
 
             //GL.PushMatrix();
@@ -126,19 +138,37 @@ namespace U5Designs
         private void DealWithInput()
         {
             // Testing buttons
-            if (eng.Keyboard[Key.Down])
+            //if (eng.Keyboard[Key.Down])
+            OpenTK.Input.KeyboardState _new_state = OpenTK.Input.Keyboard.GetState();
+            if(_new_state.IsKeyDown(Key.Down) && !_old_state.IsKeyDown(Key.Down))
             {
-                if (_cur_butn < 1)
+                // Down key was just pressed
+                if (_cur_butn < 2)
                 {
                     // Increment the current button index so you draw the highlighted button of the next button 
                     _cur_butn += 1;
                 }
-                else
+                else if(_cur_butn >= 2)
                 {
                     // Were on the last button in the list so reset to the top of the button list
                     _cur_butn = 0;
                 }
-
+                _old_state = _new_state;
+            }
+            if (_new_state.IsKeyDown(Key.Up) && !_old_state.IsKeyDown(Key.Up))
+            {
+                // Down key was just pressed
+                if (_cur_butn > 0)
+                {
+                    // Increment the current button index so you draw the highlighted button of the next button 
+                    _cur_butn -= 1;
+                }
+                else if (_cur_butn <= 0)
+                {
+                    // Were on the last button in the list so reset to the top of the button list
+                    _cur_butn = 1;
+                }
+                _old_state = _new_state;
             }
             
             //TODO: Change these keys to their final mappings when determined
@@ -155,12 +185,9 @@ namespace U5Designs
                 if (eng.GameInProgress)
                 {
                     eng.PopState();
-
-
                 }
                 else
                 {
-
                     // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
                     PlayState ps = new PlayState(this, eng, 0);
 
