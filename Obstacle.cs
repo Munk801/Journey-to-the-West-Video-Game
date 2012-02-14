@@ -12,6 +12,8 @@ using Engine;
 
 namespace U5Designs {
 	class Obstacle : GameObject, RenderObject, PhysicsObject{
+		private int texID;
+
 		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, ObjMesh mesh, Bitmap texture) {
 			_location = location;
             _scale = scale;
@@ -41,9 +43,6 @@ namespace U5Designs {
 			_is3dGeo = false;
 			texID = GL.GenTexture();
 		}
-
-
-		private int texID;
 
 		private bool _is3dGeo;
 		public bool is3dGeo {

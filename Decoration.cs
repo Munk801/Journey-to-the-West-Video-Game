@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 using Engine;
 
 namespace U5Designs {
 	class Decoration : GameObject, RenderObject {
+
+		private int texID;
+
 		public Decoration(Vector3 location, bool existsIn2d, bool existsIn3d, bool is3dGeo, ObjMesh mesh = null, Bitmap texture = null, SpriteSheet sprite = null) {
 			_location = location;
 			_existsIn3d = existsIn3d;
@@ -20,6 +25,7 @@ namespace U5Designs {
 			_cycleNum = 0;
 			_frameNum = 0;
 			_is3dGeo = is3dGeo;
+			texID = GL.GenTexture();
 		}
 
 		private bool _is3dGeo;
@@ -65,7 +71,20 @@ namespace U5Designs {
 		}
 
 		public void doScaleTranslateAndTexture() {
-			throw new Exception("The method or operation is not implemented.");
+			GL.PushMatrix();
+			if(_is3dGeo) {
+				GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
+				GL.BindTexture(TextureTarget.Texture2D, texID);
+				BitmapData bmp_data = _texture.LockBits(new Rectangle(0, 0, _texture.Width, _texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+					OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+				_texture.UnlockBits(bmp_data);
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+			}
+
+			GL.Translate(_location);
+			GL.Scale(_scale);
 		}
 	}
 }

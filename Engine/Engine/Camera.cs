@@ -14,18 +14,18 @@ namespace Engine
         public int Width;
         public int Height;
         public bool isInTransition;
-        public int timer;
+        public double timer;
+
+		private Vector4 lightOffset;
 
 
         private int visX = 120;
         private int visY = 30;
         private int visZ = 100;
 
-        private float transZ = 10;
-        private float transY = 3;
-        private float transX = 12;
-
-        // TO DO: ADD CODE TO TRANSITION TO AND FROM 2D AND 3D
+        private float transZ = 100;
+        private float transY = 30;
+        private float transX = 120;
 
         public Camera(Vector3 position, Vector3 end, int width, int height)
         {
@@ -40,50 +40,41 @@ namespace Engine
         /// </summary>
         /// <param name="cam"> Takes account the position of the camera being passed in</param>
         /// <returns></returns>
-        public void CreateLight(Vector4 offset)
+        public void UpdateLight()
         {
-
-            offset.X += Position.X;
-            offset.Y += Position.Y;
-            offset.Z += Position.Z;
-
-            GL.Light(LightName.Light0, LightParameter.Position, offset);
+			GL.Light(LightName.Light0, LightParameter.Position, new Vector4(lightOffset.X + Position.X, lightOffset.Y + Position.Y, lightOffset.Z + Position.Z, 1));
         }
 
-        public void Set2DCamera()
+        public void Set2DCamera(Vector3 playerLoc)
         {
-            //timer = 10;
             SetOrthographic(Width, Height);
-            End.X += 100;
-            End.Y += 50;
-            Position.X = End.X;
-            Position.Y = End.Y;
-            Position.Z = End.Z + visZ;
-            CreateLight(new Vector4(50, 50, 0, 1));
+			End = new Vector3(75f, 75f, 50f);
+			End.X += playerLoc.X;
+			Position = new Vector3(75f, 75f, 150f);
+			Position.X += playerLoc.X;
+			lightOffset = new Vector4(50, 50, 0, 1);
+			UpdateLight();
         }
 
-        public void Set3DCamera()
+        public void Set3DCamera(Vector3 playerLoc)
         {
-            //timer = 10;
             SetPerspective(Width, Height);
-            End.X -= 100;
-            End.Y -= 50;
-            Position.X = End.X - visX;
-            Position.Y = End.Y + visY;
-            Position.Z = End.Z;
-            CreateLight(new Vector4(0, 50, 50, 1));
-
+			End = new Vector3(-25f, 25f, 50f);
+			End.X += playerLoc.X;
+			Position = new Vector3(-100f, 28.5f, 50f);
+			Position.X += playerLoc.X;
+			lightOffset = new Vector4(0, 50, 50, 1);
+			UpdateLight();
         }
 
-        public void SetOrthographic(int width, int height)
+        private void SetOrthographic(int width, int height)
         {
             GL.MatrixMode(MatrixMode.Projection);
             Matrix4 projection = Matrix4.CreateOrthographic(width / 4, height / 4, 1.0f, 6400.0f);
             GL.LoadMatrix(ref projection);
-
         }
 
-        public void SetPerspective(int width, int height)
+        private void SetPerspective(int width, int height)
         {
             GL.MatrixMode(MatrixMode.Projection);
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 6, width / (float)height, 1.0f, 6400.0f);
@@ -99,36 +90,45 @@ namespace Engine
             GL.Disable(EnableCap.Fog);
         }
 
-        public int TransitionState(bool enable3D, int cTimer)
+		public bool TransitionState(bool enable3D, double time, Vector3 playerLoc)
         {
+			timer += time;
             if (enable3D)
             {
                 SetPerspective(Width, Height);
                 //End.X -= 100;
                 //End.Y -= 50;
-                Position.X -= transX;
-                Position.Y += transY;
+                Position.X -= (float)(transX*time);
+                Position.Y += (float)(transY*time);
                 //Position.Y = End.Y + visY;
-                Position.Z -= transZ; 
+				Position.Z -= (float)(transZ*time);
+				if(timer >= 1.0) {
+					Set3DCamera(playerLoc);
+					return false;
+				}
             }
             else
             {
                 SetOrthographic(Width, Height);
                 //End.X += 100;
                 //End.Y += 50;
-                Position.X += transX;
-                Position.Y -= transY;
+                Position.X += (float)(transX*time);
+                Position.Y -= (float)(transY*time);
                 //Position.Y = End.Y;
-                Position.Z += visZ;
+				Position.Z += (float)(visZ * time);
+				if(timer >= 1.0) {
+					Set2DCamera(playerLoc);
+					return false;
+				}
             }
-            cTimer = cTimer - 1;
-            return cTimer;
+			return true;
         }
 
         public void Update(float playerDeltaX)
         {
             Position.X += playerDeltaX;
             End.X += playerDeltaX;
+			UpdateLight();
         }
 
 

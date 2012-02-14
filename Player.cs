@@ -35,7 +35,7 @@ namespace U5Designs
             p_state = new PlayerState("TEST player");
             p_state.setSpeed(300);
             _location = new Vector3(25, 12.5f, 50);
-            _scale = new Vector3(25, 25, 25);
+            _scale = new Vector3(12.5f, 12.5f, 12.5f);
             _pbox = new Vector3(12.5f, 12.5f, 12.5f);
             _cbox = new Vector3(12.5f, 12.5f, 12.5f);
             //cubemesh = new ObjMesh("../../Geometry/box.obj");

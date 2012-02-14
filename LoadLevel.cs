@@ -28,6 +28,7 @@ namespace U5Designs
             ps.combatList = new List<CombatObject>();
             ps.physList = new List<PhysicsObject>();
             ps.colisionList = new List<PhysicsObject>();
+			ps.backgroundList = new List<Background>();
 
 
             //First we need to pull the location of the meshes.(or keep this hardcoded one?..)
@@ -80,7 +81,7 @@ namespace U5Designs
 
             //example enemy load
             Vector3 enloc = new Vector3(250, 50, 50);
-            Vector3 enscale = new Vector3(25, 25, 25);
+            Vector3 enscale = new Vector3(12.5f, 12.5f, 12.5f);
             Vector3 enpbox = new Vector3(12.5f, 12.5f, 12.5f);
             Vector3 encbox = new Vector3(12.5f, 12.5f, 12.5f);
             //Bitmap enmap = new Bitmap("../../Textures/enemy.png");
