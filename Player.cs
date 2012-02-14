@@ -232,7 +232,7 @@ namespace U5Designs
 						bool z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
 						int axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
 						bool lastStepWasForward = true;
-						while(axes != 2 && step != new Vector3(0,0,0)) {
+						while(axes != 2 && step.LengthFast >= 0.1f) {
 							if(axes < 2) { //not far enough, step forward
 								if(!lastStepWasForward) {
 									step *= 0.5f;
@@ -254,6 +254,13 @@ namespace U5Designs
 								z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
 								axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
 							}
+						}
+
+						//If we couldn't find a good match, pick the y axis as a default
+						if(axes != 2) {
+							x = true;
+							y = false;
+							z = true;
 						}
 
 						//We're now at a point that two axes intersect - the third is the one that collided
@@ -314,7 +321,7 @@ namespace U5Designs
 						bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
 						bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
 						bool lastStepWasForward = true;
-						while(x == y && step != new Vector3(0, 0, 0)) {
+						while(x == y && step.LengthFast >= 0.1f) {
 							if(!x) { //both false - not far enough, step forward
 								if(!lastStepWasForward) {
 									step *= 0.5f;
@@ -332,6 +339,12 @@ namespace U5Designs
 								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
 								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
 							}
+						}
+
+						//If we couldn't find a good match, pick the y axis as a default
+						if(x == y) {
+							x = true;
+							y = false;
 						}
 
 						//We're now at a point that two axes intersect - the third is the one that collided
