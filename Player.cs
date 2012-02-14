@@ -314,7 +314,7 @@ namespace U5Designs
 						bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
 						bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
 						bool lastStepWasForward = true;
-						while(x == y) {
+						while(x == y && step != new Vector3(0, 0, 0)) {
 							if(!x) { //both false - not far enough, step forward
 								if(!lastStepWasForward) {
 									step *= 0.5f;
