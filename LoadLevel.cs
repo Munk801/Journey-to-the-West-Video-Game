@@ -82,8 +82,8 @@ namespace U5Designs
             //example enemy load
             Vector3 enloc = new Vector3(250, 50, 50);
             Vector3 enscale = new Vector3(12.5f, 12.5f, 12.5f);
-            Vector3 enpbox = new Vector3(12.5f, 12.5f, 12.5f);
-            Vector3 encbox = new Vector3(12.5f, 12.5f, 12.5f);
+            Vector3 enpbox = new Vector3(6.25f, 6.25f, 6.25f);
+            Vector3 encbox = new Vector3(6.25f, 6.25f, 6.25f);
             //Bitmap enmap = new Bitmap("../../Textures/enemy.png");
             SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
             int[] cycleStarts = { 0, 4 };

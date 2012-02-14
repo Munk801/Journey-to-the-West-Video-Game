@@ -36,8 +36,8 @@ namespace U5Designs
             p_state.setSpeed(300);
             _location = new Vector3(25, 12.5f, 50);
             _scale = new Vector3(12.5f, 12.5f, 12.5f);
-            _pbox = new Vector3(12.5f, 12.5f, 12.5f);
-            _cbox = new Vector3(12.5f, 12.5f, 12.5f);
+            _pbox = new Vector3(6.25f, 6.25f, 6.25f);
+            _cbox = new Vector3(6.25f, 6.25f, 6.25f);
             //cubemesh = new ObjMesh("../../Geometry/box.obj");
             //_texture = new Bitmap("../../Textures/player.png");
             _damage = 0;
