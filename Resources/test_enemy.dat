@@ -1,0 +1,21 @@
+<enemy>
+	<loc>250</loc>
+	<loc>50</loc>
+	<loc>50</loc>
+	<scale>12.5</scale>
+	<scale>12.5</scale>
+	<scale>12.5</scale>
+	<pbox>6.25</pbox>
+	<pbox>6.25</pbox>
+	<pbox>6.25</pbox>
+	<cbox>6.25</cbox>
+	<cbox>6.25</cbox>
+	<cbox>6.25</cbox>
+	<draw2>1</draw2>
+	<draw3>1</draw3>
+	<health>10</health>
+	<damage>10</damage>
+	<speed>100</speed>
+	<AI>1</AI>
+	<sprite>test_sprite.dat</sprite>
+</enemy>

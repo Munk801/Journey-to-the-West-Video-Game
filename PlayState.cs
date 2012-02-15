@@ -89,6 +89,7 @@ namespace U5Designs
 
         public override void Update(FrameEventArgs e)
         {
+            Console.WriteLine(e.Time);
 			//First deal with everyone's acceleration
             DealWithInput();
 

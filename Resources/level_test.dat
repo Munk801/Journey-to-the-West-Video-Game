@@ -1,0 +1,5 @@
+<level>
+	<enemylist>
+		<enemy>test_enemy.dat</enemy>		
+	</enemylist>
+</level>
