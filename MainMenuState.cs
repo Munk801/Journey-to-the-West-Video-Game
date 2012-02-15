@@ -36,7 +36,7 @@ namespace U5Designs
         AudioFile testFile = new AudioFile(test);
 
         // testing buttons
-        Obstacle play_button_npress, play_button_press, load_button_npress, load_button_press;
+        Obstacle play_button_npress, play_button_press, load_button_npress, load_button_press, quit_button_press, quit_button_npress;
         int _cur_butn = 0;
         OpenTK.Input.KeyboardState _old_state;
 
@@ -81,6 +81,11 @@ namespace U5Designs
             SpriteSheet lb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/load_button_press.png"), cycleStarts, cycleLengths, 320, 100);
             load_button_press = new Obstacle(new Vector3(0, 0, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, lb_p_ss);
 
+            SpriteSheet qb_np_ss = new SpriteSheet(new Bitmap("../../Geometry/quit_button_no_press.png"), cycleStarts, cycleLengths, 320, 100);
+            quit_button_npress = new Obstacle(new Vector3(0, -100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, qb_np_ss);
+            SpriteSheet qb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/quit_button_press.png"), cycleStarts, cycleLengths, 320, 100);
+            quit_button_press = new Obstacle(new Vector3(0, -100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, qb_p_ss);
+
             // TEST //
             LoadSavedState(1);
 
@@ -118,12 +123,24 @@ namespace U5Designs
                     ((RenderObject)play_button_press).sprite.draw(false);
                     ((RenderObject)load_button_npress).doScaleTranslateAndTexture();
                     ((RenderObject)load_button_npress).sprite.draw(false);
+                    ((RenderObject)quit_button_npress).doScaleTranslateAndTexture();
+                    ((RenderObject)quit_button_npress).sprite.draw(false);
                     break;
                 case 1:
                     ((RenderObject)play_button_npress).doScaleTranslateAndTexture();
                     ((RenderObject)play_button_npress).sprite.draw(false);
                     ((RenderObject)load_button_press).doScaleTranslateAndTexture();
                     ((RenderObject)load_button_press).sprite.draw(false);
+                    ((RenderObject)quit_button_npress).doScaleTranslateAndTexture();
+                    ((RenderObject)quit_button_npress).sprite.draw(false);
+                    break;
+                case 2:
+                    ((RenderObject)play_button_npress).doScaleTranslateAndTexture();
+                    ((RenderObject)play_button_npress).sprite.draw(false);
+                    ((RenderObject)load_button_npress).doScaleTranslateAndTexture();
+                    ((RenderObject)load_button_npress).sprite.draw(false);
+                    ((RenderObject)quit_button_press).doScaleTranslateAndTexture();
+                    ((RenderObject)quit_button_press).sprite.draw(false);
                     break;
             }
 
@@ -143,12 +160,12 @@ namespace U5Designs
             if(_new_state.IsKeyDown(Key.Down) && !_old_state.IsKeyDown(Key.Down))
             {
                 // Down key was just pressed
-                if (_cur_butn < 1)
+                if (_cur_butn < 2)
                 {
                     // Increment the current button index so you draw the highlighted button of the next button 
                     _cur_butn += 1;
                 }
-                else if(_cur_butn >= 1)
+                else if(_cur_butn >= 2)
                 {
                     // Were on the last button in the list so reset to the top of the button list
                     _cur_butn = 0;
@@ -165,7 +182,7 @@ namespace U5Designs
                 else if (_cur_butn <= 0)
                 {
                     // Were on the last button in the list so reset to the top of the button list
-                    _cur_butn = 1;
+                    _cur_butn = 2;
                 }                
             }
             _old_state = _new_state;
@@ -218,6 +235,10 @@ namespace U5Designs
                         eng.ChangeState(ps);
                         eng.GameInProgress = true;
                     }
+                }
+                if (_cur_butn == 2)
+                {
+                    eng.Exit();
                 }
             }
         }
