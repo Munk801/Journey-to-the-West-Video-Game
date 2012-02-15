@@ -46,10 +46,10 @@ namespace U5Designs
 
             //this.ChangeState(ms);
 
-            MainMenuState ms = new MainMenuState(this);
-            this.ChangeState(ms);
-            //SplashScreenState ss = new SplashScreenState(this);
-            //this.ChangeState(ss);
+            //MainMenuState ms = new MainMenuState(this);
+            //this.ChangeState(ms);
+            SplashScreenState ss = new SplashScreenState(this);
+            this.ChangeState(ss);
 
             // Set the screen resolution (Fullscreen / windowed)
 

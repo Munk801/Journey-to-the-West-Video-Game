@@ -12,11 +12,22 @@ using System.Drawing;
 
 using Tao.DevIl;
 
+// P/Invoke
+using System.Runtime.InteropServices;
+ 
 namespace U5Designs
 {
     /** Main Menu State of the game that will be active while the Main Menu is up **/
     class SplashScreenState : GameState
     {
+        /** DLL P/Invoke **/        
+        [DllImport("../../Resources/lib/DevIL.dll")]
+        public static extern void ilInit();
+        [DllImport("../../Resources/lib/ILU.dll")]
+        public static extern void iluInit();
+        [DllImport("../../Resources/lib/ILUT.dll")]
+        public static extern void ilutInit();
+
         internal GameEngine eng;
 
         protected Vector3 eye, lookat;
@@ -35,13 +46,14 @@ namespace U5Designs
             // WILL NEED TO BE PLACED SOMEWHERE ELSE LATER
             TextureManager texturemanager = new TextureManager();
             StateTextureManager = texturemanager;
-            Il.ilInit();
-            Ilu.iluInit();
-            Ilut.ilutInit();
+            ilInit();
+            iluInit();
+            ilutInit();
 
-            Ilut.ilutRenderer(Ilut.ILUT_OPENGL);
 
-            texturemanager.LoadTexture("logo", "../../Resources/test.tga");
+            Tao.DevIl.Ilut.ilutRenderer(Ilut.ILUT_OPENGL);
+
+            texturemanager.LoadTexture("logo", "../../Resources/u5_logo.jpg");
 
             Texture texture = StateTextureManager.GetTexture("logo");
             logo = texture;

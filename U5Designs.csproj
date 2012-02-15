@@ -98,6 +98,17 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Engine\Engine\Tao DevIL\DevIL.dll" />
+    <Content Include="Engine\Engine\Tao DevIL\DevIL.NET.dll" />
+    <Content Include="Engine\Engine\Tao DevIL\DevIL.NET2.dll" />
+    <Content Include="Engine\Engine\Tao DevIL\ILU.dll" />
+    <Content Include="Engine\Engine\Tao DevIL\ILUT.dll" />
+    <Content Include="Engine\Engine\Tao DevIL\Tao.DevIl.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\lib\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)test.sav" "$(TargetDir)test.sav"</PostBuildEvent>

@@ -60,6 +60,9 @@ namespace U5Designs
             // Plays the audio file.  Should be in a data file later
             testFile.Play();
 
+            // Clear the color to work with the SplashScreen so it doesn't white out
+            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
 			lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
 
