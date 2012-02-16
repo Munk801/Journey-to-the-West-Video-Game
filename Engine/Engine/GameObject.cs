@@ -38,5 +38,11 @@ namespace Engine
 			protected set { _location = value; }
 		}
 
+        protected bool _hascbox;
+        public bool hascbox {
+            get { return _hascbox; }
+            protected set { _hascbox = value; }
+        }
+
 	}
 }

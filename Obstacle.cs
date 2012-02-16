@@ -27,6 +27,7 @@ namespace U5Designs {
 			_frameNum = 0;
 			_is3dGeo = true;
             texID = GL.GenTexture();
+            _hascbox = false;
 		}
 
 
@@ -42,6 +43,7 @@ namespace U5Designs {
 			_frameNum = 0;
 			_is3dGeo = false;
 			texID = GL.GenTexture();
+            _hascbox = false;
 		}
 
 		private bool _is3dGeo;

@@ -26,6 +26,7 @@ namespace U5Designs {
 			_frameNum = 0;
 			_is3dGeo = is3dGeo;
 			texID = GL.GenTexture();
+            _hascbox = false;
 		}
 
 		private bool _is3dGeo;

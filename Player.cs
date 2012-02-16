@@ -40,7 +40,6 @@ namespace U5Designs
             _cbox = new Vector3(6.25f, 6.25f, 6.25f);
             //cubemesh = new ObjMesh("../../Geometry/box.obj");
             //_texture = new Bitmap("../../Textures/player.png");
-            _damage = 0;
             texID = GL.GenTexture();
 			velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);
@@ -49,6 +48,10 @@ namespace U5Designs
 			_frameNum = 0;
 			_is3dGeo = false;
 			_sprite = sprite;
+            _hascbox = true;
+
+            _damage = 0;
+            _health = 1;
         }
 
         /**
@@ -118,6 +121,7 @@ namespace U5Designs
                 {
                     accelerate(Vector3.UnitY * 230);
                     //jumpSound.Play();
+                    _health = _health - 1;
                 }
                 spaceDown = true; 
             }
@@ -373,14 +377,14 @@ namespace U5Designs
 			accel += acceleration;
 		}
 
-		private float _health;
-		public float health {
+		private int _health;
+		public int health {
 			get { return _health; }
 			set { _health = value; }
 		}
 
-		private float _damage;
-		public float damage {
+		private int _damage;
+		public int damage {
 			get { return _damage; }
 		}
 

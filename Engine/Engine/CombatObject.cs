@@ -10,12 +10,12 @@ using OpenTK;
  */
 namespace Engine {
 	public interface CombatObject {
-		float health {
+		int health {
 			get;
 			set;
 		}
 
-		float damage {
+		int damage {
 			get;
 		}
 

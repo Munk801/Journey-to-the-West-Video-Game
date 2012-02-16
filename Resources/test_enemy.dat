@@ -8,13 +8,13 @@
 	<pbox>6.25</pbox>
 	<pbox>6.25</pbox>
 	<pbox>6.25</pbox>
-	<cbox>6.25</cbox>
-	<cbox>6.25</cbox>
-	<cbox>6.25</cbox>
+	<cbox>4</cbox>
+	<cbox>4</cbox>
+	<cbox>4</cbox>
 	<draw2>1</draw2>
 	<draw3>1</draw3>
 	<health>10</health>
-	<damage>10</damage>
+	<damage>1</damage>
 	<speed>100</speed>
 	<AI>1</AI>
 	<sprite>test_sprite.dat</sprite>

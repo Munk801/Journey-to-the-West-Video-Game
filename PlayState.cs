@@ -89,10 +89,19 @@ namespace U5Designs
 
         public override void Update(FrameEventArgs e)
         {
-            Console.WriteLine(e.Time);
-			//First deal with everyone's acceleration
+            //Console.WriteLine(e.Time); // WORST. BUG. EVER.
+
+            //First deal with hardware input
             DealWithInput();
 
+            //Next check if the player is dead. If he is, game over man
+            if (player.health <= 0) {
+                GameOverState GGbro = new GameOverState(menustate, eng);
+                eng.ChangeState(GGbro);
+            }
+
+
+            //Deal with everyone's acceleration
             if (isInTransition)
             {
 				isInTransition = camera.TransitionState(enable3d, e.Time, player.location);

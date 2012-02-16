@@ -40,6 +40,8 @@ namespace U5Designs
         int _cur_butn = 0;
         OpenTK.Input.KeyboardState _old_state;
 
+        public bool enterdown;
+
         public MainMenuState(GameEngine engine)
         {
             eng = engine;
@@ -90,11 +92,13 @@ namespace U5Designs
             quit_button_press = new Obstacle(new Vector3(0, -100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, qb_p_ss);
 
             // TEST //
+            enterdown = false;
             LoadSavedState(1);
 
         }
 
 		public override void MakeActive() {
+
 			GL.Disable(EnableCap.Lighting);
 			GL.Disable(EnableCap.Light0);
 
@@ -154,7 +158,7 @@ namespace U5Designs
 										 // Actually, not a coincidence at all...
             //((RenderObject)background).sprite.draw(false);                      
         }
-
+        
         private void DealWithInput()
         {
             // Testing buttons
@@ -198,17 +202,14 @@ namespace U5Designs
             }
 
             //********************** enter
-            if (eng.Keyboard[Key.Enter])
-            {
-                if (_cur_butn == 0)
-                {
+            if (eng.Keyboard[Key.Enter] && !enterdown) {
+                enterdown = true;
+                if (_cur_butn == 0) {
                     //transition into PlayState
-                    if (eng.GameInProgress)
-                    {
+                    if (eng.GameInProgress) {
                         eng.PopState();
                     }
-                    else
-                    {
+                    else {
                         // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
                         PlayState ps = new PlayState(this, eng, 0);
 
@@ -220,16 +221,13 @@ namespace U5Designs
                         eng.GameInProgress = true;
                     }
                 }
-                if (_cur_butn == 1)
-                {
+                if (_cur_butn == 1) {
                     // load saved game pressed
                     //transition into PlayState
-                    if (eng.GameInProgress)
-                    {
+                    if (eng.GameInProgress) {
                         eng.PopState();
                     }
-                    else
-                    {
+                    else {
                         // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
                         testFile.Stop();
 
@@ -239,11 +237,12 @@ namespace U5Designs
                         eng.GameInProgress = true;
                     }
                 }
-                if (_cur_butn == 2)
-                {
+                if (_cur_butn == 2) {
                     eng.Exit();
                 }
             }
+            else if (!eng.Keyboard[Key.Enter])
+                enterdown = false;
         }
 
         /**

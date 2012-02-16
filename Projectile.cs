@@ -20,6 +20,7 @@ namespace U5Designs {
 			_cycleNum = 0;
 			_frameNum = 0;
 			_is3dGeo = is3dGeo;
+            _hascbox = true;
 		}
 
 		private bool _is3dGeo;
@@ -27,14 +28,14 @@ namespace U5Designs {
 			get { return _is3dGeo; }
 		}
 
-		private float _health;
-		public float health {
+		private int _health;
+		public int health {
 			get { return _health; }
 			set { _health = value; }
 		}
 
-		private float _damage;
-		public float damage {
+		private int _damage;
+		public int damage {
 			get { return _damage; }
 		}
 

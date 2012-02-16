@@ -33,6 +33,7 @@ namespace U5Designs
             _speed = speed;
             _alive = true;
             this.AItype = AItype;
+            _hascbox = true;
 
 			_mesh = mesh;
 			_texture = texture;
@@ -61,6 +62,7 @@ namespace U5Designs
             _speed = speed;
             _alive = true;
             this.AItype = AItype;
+            _hascbox = true;
 
 			_mesh = null;
 			_texture = null;
@@ -318,14 +320,14 @@ namespace U5Designs
             accel += acceleration;
         }
 
-        private float _health;
-		public float health {
+        private int _health;
+		public int health {
             get { return _health; }
             set { _health = value; }
         }
 
-        private float _damage;
-		public float damage {
+        private int _damage;
+		public int damage {
             get { return _damage; }
         }
 

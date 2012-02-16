@@ -54,6 +54,7 @@
     <Compile Include="Enemy.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="GameEngine.cs" />
+    <Compile Include="GameOverState.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="LoadLevel.cs" />
     <Compile Include="MainMenuState.cs" />
