@@ -21,6 +21,7 @@ namespace U5Designs {
 			_frameNum = 0;
 			_is3dGeo = is3dGeo;
             _hascbox = true;
+            _type = 2;
 		}
 
 		private bool _is3dGeo;
@@ -78,6 +79,11 @@ namespace U5Designs {
 		public Vector3 cbox {
             get { return _cbox; }
 		}
+
+        private int _type;
+        public int type {
+            get { return _type; }
+        }
 
 		private int _cycleNum;
 		public int cycleNumber {

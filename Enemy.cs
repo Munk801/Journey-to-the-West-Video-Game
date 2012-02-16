@@ -34,6 +34,8 @@ namespace U5Designs
             _alive = true;
             this.AItype = AItype;
             _hascbox = true;
+            _type = 1;
+            
 
 			_mesh = mesh;
 			_texture = texture;
@@ -63,6 +65,7 @@ namespace U5Designs
             _alive = true;
             this.AItype = AItype;
             _hascbox = true;
+            _type = 1;
 
 			_mesh = null;
 			_texture = null;
@@ -117,6 +120,11 @@ namespace U5Designs
         private Vector3 _cbox;
 		public Vector3 cbox {
             get { return _cbox; }
+        }
+
+        private int _type;
+        public int type {
+            get { return _type; }
         }
 
 		private int _cycleNum;
@@ -347,7 +355,7 @@ namespace U5Designs
 		public void aiUpdate(FrameEventArgs e, Vector3 playerposn, bool enable3d) {
             if (AItype == 1) {
                 //TODO change 2d view to only deal with 2d position vectors, so z movement doesnt happen in 2d
-                if (dist(playerposn, _location) > 30) {
+                if (dist(playerposn, _location) > 0) {
                     Vector3 dir = getdir(playerposn, _location);
                     velocity.X = dir.X * _speed;
                     if (enable3d)

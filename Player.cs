@@ -16,12 +16,16 @@ namespace U5Designs
 {
     class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
+        //Knockback physics constants:
+        private Vector3 kbspeed = new Vector3(160, 160, 160);
+
         public PlayerState p_state;
-        public bool shifter;
         int texID;
 		public Vector3 velocity;
 		private Vector3 accel;
 		private bool doesGravity; //true if gravity affects this object
+        private bool Invincible;
+        private double Invincibletimer;
 
 		public float deltax; //used for updating position of camera, etc.
 
@@ -49,9 +53,12 @@ namespace U5Designs
 			_is3dGeo = false;
 			_sprite = sprite;
             _hascbox = true;
+            _type = 0; // hack, this means nothing, will never matter as player never collides with himself
 
             _damage = 0;
-            _health = 1;
+            _health = 5;
+            Invincible = false;
+            Invincibletimer = 0;
         }
 
         /**
@@ -61,8 +68,15 @@ namespace U5Designs
 		 * Returns the movement of the player to be used in updating camera, etc.
          * */
         bool spaceDown;
-        public void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool c, bool space, FrameEventArgs e) {
-            //TODO: add control for other buttons, jump, projectile etc
+        public void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool c, bool x, bool space, FrameEventArgs e) {
+
+            if (Invincible)
+                Invincibletimer = Invincibletimer + e.Time;
+            if (Invincibletimer >= 1) { // invincible for 1 second
+                Invincibletimer = 0;
+                Invincible = false;
+            }
+
             if (enable3d)
             {
                 if (w) 
@@ -110,9 +124,12 @@ namespace U5Designs
                     velocity.X = 0f;
             }
 
-            //TMP PHYSICS TEST BUTTON
+            //TMP PHYSICS TEST BUTTON and suicide button
             if (c)
                 velocity.Y = (float)p_state.getSpeed()/3;
+            if (x)
+                _health = 0;
+
 
             //********************** space
             if (space && !spaceDown)
@@ -121,7 +138,6 @@ namespace U5Designs
                 {
                     accelerate(Vector3.UnitY * 230);
                     //jumpSound.Play();
-                    _health = _health - 1;
                 }
                 spaceDown = true; 
             }
@@ -173,6 +189,12 @@ namespace U5Designs
             get { return _cbox; }
 		}
 
+        private int _type;
+        public int type {
+            get { return _type; }
+            set { _type = value; }
+        }
+
 		private int _cycleNum;
 		public int cycleNumber {
 			get { return _cycleNum; }
@@ -221,76 +243,95 @@ namespace U5Designs
                 // don't do collision physics to yourself
 				if(obj != this) {
 
-                    if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
-                    && (Math.Abs(((GameObject)obj).location.Z - _location.Z) < pbox.Z + obj.pbox.Z)
-                    && (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
-                        // at this point the player is colliding with this obj
+                    //If the object has a cbox then a special combat collision needs to happen
+                    if (((GameObject)obj).hascbox && !Invincible) {
+                        if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < cbox.Y + ((CombatObject)obj).cbox.Y)
+                        && (Math.Abs(((GameObject)obj).location.Z - _location.Z) < cbox.Z + ((CombatObject)obj).cbox.Z)
+                        && (Math.Abs(((GameObject)obj).location.X - _location.X) < cbox.X + ((CombatObject)obj).cbox.X)) {
+                            // player just colided with a combat object, bad things need to happen
 
-						//figure out which direction the collision happened on by looking for point where
-						//only one axis is not colliding
-						Vector3 temploc = _location - velocity * (float)e.Time;
-						float originalX = temploc.X; //save the original x position for calculating camera offset
-						Vector3 step = velocity * (float)e.Time * 0.25f;
-						bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-						bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-						bool z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
-						int axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
-						bool lastStepWasForward = true;
-						while(axes != 2 && step.LengthFast >= 0.1f) {
-							if(axes < 2) { //not far enough, step forward
-								if(!lastStepWasForward) {
-									step *= 0.5f;
-								}
-								lastStepWasForward = true;
-								temploc += step;
-								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-								z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
-								axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
-							} else { //too far, step backwards
-								if(lastStepWasForward) {
-									step *= 0.5f;
-								}
-								lastStepWasForward = false;
-								temploc -= step;
-								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-								z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
-								axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
-							}
-						}
+                        }
 
-						//If we couldn't find a good match, pick the y axis as a default
-						if(axes != 2) {
-							x = true;
-							y = false;
-							z = true;
-						}
+                    }
+                    else {
 
-						//We're now at a point that two axes intersect - the third is the one that collided
-						if(!x) {
-							velocity.X = 0;
-							if(_location.X < ((GameObject)obj).location.X) {
-								_location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
-							} else {
-								_location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
-							}
-							deltax = _location.X - originalX; //update this value for camera offset
-						} else if(!y) {
-							velocity.Y = 0;
-							if(_location.Y < ((GameObject)obj).location.Y) {
-								_location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
-							} else {
-								_location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
-							}
-						} else { //z
-							velocity.Z = 0;
-							if(_location.Z < ((GameObject)obj).location.Z) {
-								_location.Z = ((GameObject)obj).location.Z - (pbox.Z + obj.pbox.Z);
-							} else {
-								_location.Z = ((GameObject)obj).location.Z + pbox.Z + obj.pbox.Z;
-							}
-						}
+                        if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
+                        && (Math.Abs(((GameObject)obj).location.Z - _location.Z) < pbox.Z + obj.pbox.Z)
+                        && (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
+                            // at this point the player is colliding with this obj
+
+                            //figure out which direction the collision happened on by looking for point where
+                            //only one axis is not colliding
+                            Vector3 temploc = _location - velocity * (float)e.Time;
+                            float originalX = temploc.X; //save the original x position for calculating camera offset
+                            Vector3 step = velocity * (float)e.Time * 0.25f;
+                            bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+                            bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+                            bool z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
+                            int axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
+                            bool lastStepWasForward = true;
+                            while (axes != 2 && step.LengthFast >= 0.1f) {
+                                if (axes < 2) { //not far enough, step forward
+                                    if (!lastStepWasForward) {
+                                        step *= 0.5f;
+                                    }
+                                    lastStepWasForward = true;
+                                    temploc += step;
+                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+                                    z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
+                                    axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
+                                }
+                                else { //too far, step backwards
+                                    if (lastStepWasForward) {
+                                        step *= 0.5f;
+                                    }
+                                    lastStepWasForward = false;
+                                    temploc -= step;
+                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+                                    z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
+                                    axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
+                                }
+                            }
+
+                            //If we couldn't find a good match, pick the y axis as a default
+                            if (axes != 2) {
+                                x = true;
+                                y = false;
+                                z = true;
+                            }
+
+                            //We're now at a point that two axes intersect - the third is the one that collided
+                            if (!x) {
+                                velocity.X = 0;
+                                if (_location.X < ((GameObject)obj).location.X) {
+                                    _location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
+                                }
+                                else {
+                                    _location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
+                                }
+                                deltax = _location.X - originalX; //update this value for camera offset
+                            }
+                            else if (!y) {
+                                velocity.Y = 0;
+                                if (_location.Y < ((GameObject)obj).location.Y) {
+                                    _location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
+                                }
+                                else {
+                                    _location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
+                                }
+                            }
+                            else { //z
+                                velocity.Z = 0;
+                                if (_location.Z < ((GameObject)obj).location.Z) {
+                                    _location.Z = ((GameObject)obj).location.Z - (pbox.Z + obj.pbox.Z);
+                                }
+                                else {
+                                    _location.Z = ((GameObject)obj).location.Z + pbox.Z + obj.pbox.Z;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -311,65 +352,99 @@ namespace U5Designs
 
 			foreach(PhysicsObject obj in objlist) {
 				// don't do collision physics to yourself
-				if(obj != this) {
+                if (obj != this) {
+                    //If the object has a cbox and we are not currently invincible from a previous cbox collision, then special things happen
+                    if (((GameObject)obj).hascbox && !Invincible) {
+                        if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < cbox.Y + ((CombatObject)obj).cbox.Y)
+                        && (Math.Abs(((GameObject)obj).location.X - _location.X) < cbox.X + ((CombatObject)obj).cbox.X)) {
+                            // player just colided with a combat object, bad things need to happen
+                            if (((CombatObject)obj).type == 1) {// obj is an enemy, do damage, knock player back
+                                _health = _health - ((CombatObject)obj).damage;
+                                Invincible = true;
 
-					if((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
-					&& (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
-                        // at this point the player is colliding with this obj
 
-						//figure out which direction the collision happened on by looking for point where
-						//only one axis is not colliding
-						Vector3 temploc = _location - velocity * (float)e.Time;
-						float originalX = temploc.X; //save the original x position for calculating camera offset
-						Vector3 step = velocity * (float)e.Time * 0.25f;
-						bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-						bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-						bool lastStepWasForward = true;
-						while(x == y && step.LengthFast >= 0.1f) {
-							if(!x) { //both false - not far enough, step forward
-								if(!lastStepWasForward) {
-									step *= 0.5f;
-								}
-								lastStepWasForward = true;
-								temploc += step;
-								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-							} else { //both true - too far, step backwards
-								if(lastStepWasForward) {
-									step *= 0.5f;
-								}
-								lastStepWasForward = false;
-								temploc -= step;
-								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-							}
-						}
+                                // direction we need to be knocked back in.
+                                Vector3 direction = new Vector3(location.X - ((GameObject)obj).location.X, location.Y - ((GameObject)obj).location.Y, 0);
+                                direction.Normalize();
 
-						//If we couldn't find a good match, pick the y axis as a default
-						if(x == y) {
-							x = true;
-							y = false;
-						}
+                                velocity = new Vector3(kbspeed.X * direction.X, kbspeed.Y * direction.Y, kbspeed.Z * direction.Z);
 
-						//We're now at a point that two axes intersect - the third is the one that collided
-						if(!x) {
-							velocity.X = 0;
-							if(_location.X < ((GameObject)obj).location.X) {
-								_location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
-							} else {
-								_location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
-							}
-							deltax = _location.X - originalX; //update this value for camera offset
-						} else { //y
-							velocity.Y = 0;
-							if(_location.Y < ((GameObject)obj).location.Y) {
-								_location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
-							} else {
-								_location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
-							}
-						}
-					}
-				}
+
+                            }
+                            if (((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
+                                //TODO: projectile implimentation
+
+
+                            }
+
+
+
+                        }
+
+                    }
+                    else {
+                        if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
+                        && (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
+                            // at this point the player is colliding with this obj
+
+                            //figure out which direction the collision happened on by looking for point where
+                            //only one axis is not colliding
+                            Vector3 temploc = _location - velocity * (float)e.Time;
+                            float originalX = temploc.X; //save the original x position for calculating camera offset
+                            Vector3 step = velocity * (float)e.Time * 0.25f;
+                            bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+                            bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+                            bool lastStepWasForward = true;
+                            while (x == y && step.LengthFast >= 0.1f) {
+                                if (!x) { //both false - not far enough, step forward
+                                    if (!lastStepWasForward) {
+                                        step *= 0.5f;
+                                    }
+                                    lastStepWasForward = true;
+                                    temploc += step;
+                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+                                }
+                                else { //both true - too far, step backwards
+                                    if (lastStepWasForward) {
+                                        step *= 0.5f;
+                                    }
+                                    lastStepWasForward = false;
+                                    temploc -= step;
+                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+                                }
+                            }
+
+                            //If we couldn't find a good match, pick the y axis as a default
+                            if (x == y) {
+                                x = true;
+                                y = false;
+                            }
+
+                            //We're now at a point that two axes intersect - the third is the one that collided
+                            if (!x) {
+                                velocity.X = 0;
+                                if (_location.X < ((GameObject)obj).location.X) {
+                                    _location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
+                                }
+                                else {
+                                    _location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
+                                }
+                                deltax = _location.X - originalX; //update this value for camera offset
+                            }
+                            else { //y
+                                velocity.Y = 0;
+                                if (_location.Y < ((GameObject)obj).location.Y) {
+                                    _location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
+                                }
+                                else {
+                                    _location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
+                                }
+                            }
+                        }
+                    }
+                }
 			}
 		}
 

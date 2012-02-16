@@ -29,6 +29,14 @@ namespace Engine {
 			set;
 		}
 
+        /*
+         * IMPORTANT!!! this variable determins the type of combat object for the sake of handling collision with the player
+         * 1 = enemy
+         * 2 = projectile
+         */
+        int type {
+            get;
+        }
         // cbox is the size of the combat physics box
         Vector3 cbox {
             get;

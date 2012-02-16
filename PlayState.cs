@@ -114,7 +114,7 @@ namespace U5Designs
 					renderList[0].cycleNumber = 0;  //TODO: This is a hack!
 				}
             } else {
-				player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.Space], e);
+				player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.X], eng.Keyboard[Key.Space], e);
 
 				foreach(AIObject aio in aiList) {
 					aio.aiUpdate(e, player.location, enable3d);
