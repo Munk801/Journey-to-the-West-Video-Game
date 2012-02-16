@@ -20,6 +20,8 @@ namespace U5Designs
         internal Vector3 velocity;
         internal Vector3 accel;
         private bool doesGravity; //true if gravity affects this object
+        public bool frozen;
+        private double freezetimer;
 
 		public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, Bitmap texture) {
 			_location = location;
@@ -35,6 +37,8 @@ namespace U5Designs
             this.AItype = AItype;
             _hascbox = true;
             _type = 1;
+            frozen = false;
+            freezetimer = 0;
             
 
 			_mesh = mesh;
@@ -66,6 +70,8 @@ namespace U5Designs
             this.AItype = AItype;
             _hascbox = true;
             _type = 1;
+            frozen = false;
+            freezetimer = 0;
 
 			_mesh = null;
 			_texture = null;
@@ -158,167 +164,192 @@ namespace U5Designs
             GL.Scale(_scale);
 		}
 
-		public void physUpdate3d(FrameEventArgs e, List<PhysicsObject> objlist) {
-			if (doesGravity)
-            {
-                accel.Y -= (float)(400 * e.Time); //TODO: turn this into a constant somewhere
+        public void physUpdate3d(FrameEventArgs e, List<PhysicsObject> objlist) {
+            if (frozen)
+                freezetimer = freezetimer + e.Time;
+            if (freezetimer > 1) {
+                frozen = false;
+                freezetimer = 0;
             }
-            velocity += accel;
-            accel.X = 0;
-            accel.Y = 0;
-            accel.Z = 0;
-            _location += velocity * (float)e.Time;
+            if (!frozen) {
+                if (doesGravity) {
+                    accel.Y -= (float)(400 * e.Time); //TODO: turn this into a constant somewhere
+                }
+                velocity += accel;
+                accel.X = 0;
+                accel.Y = 0;
+                accel.Z = 0;
+                _location += velocity * (float)e.Time;
 
 
-			foreach(PhysicsObject obj in objlist) {
-				// don't do collision physics to yourself
-				if(obj != this) {
+                foreach (PhysicsObject obj in objlist) {
+                    // don't do collision physics to yourself
+                    if (obj != this) {
 
-					if((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
-					&& (Math.Abs(((GameObject)obj).location.Z - _location.Z) < pbox.Z + obj.pbox.Z)
-					&& (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
-						// at this point this enemy is colliding with this obj
+                        if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
+                        && (Math.Abs(((GameObject)obj).location.Z - _location.Z) < pbox.Z + obj.pbox.Z)
+                        && (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
+                            // at this point this enemy is colliding with this obj
 
-						//figure out which direction the collision happened on by looking for point where
-						//only one axis is not colliding
-						Vector3 temploc = _location - velocity * (float)e.Time;
-						Vector3 step = velocity * (float)e.Time * 0.25f;
-						bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-						bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-						bool z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
-						int axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
-						bool lastStepWasForward = true;
-						while(axes != 2 && step.LengthFast >= 0.01f) {
-							if(axes < 2) { //not far enough, step forward
-								if(!lastStepWasForward) {
-									step *= 0.5f;
-								}
-								lastStepWasForward = true;
-								temploc += step;
-								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-								z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
-								axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
-							} else { //too far, step backwards
-								if(lastStepWasForward) {
-									step *= 0.5f;
-								}
-								lastStepWasForward = false;
-								temploc -= step;
-								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-								z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
-								axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
-							}
-						}
+                            //figure out which direction the collision happened on by looking for point where
+                            //only one axis is not colliding
+                            Vector3 temploc = _location - velocity * (float)e.Time;
+                            Vector3 step = velocity * (float)e.Time * 0.25f;
+                            bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+                            bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+                            bool z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
+                            int axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
+                            bool lastStepWasForward = true;
+                            while (axes != 2 && step.LengthFast >= 0.01f) {
+                                if (axes < 2) { //not far enough, step forward
+                                    if (!lastStepWasForward) {
+                                        step *= 0.5f;
+                                    }
+                                    lastStepWasForward = true;
+                                    temploc += step;
+                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+                                    z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
+                                    axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
+                                }
+                                else { //too far, step backwards
+                                    if (lastStepWasForward) {
+                                        step *= 0.5f;
+                                    }
+                                    lastStepWasForward = false;
+                                    temploc -= step;
+                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+                                    z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
+                                    axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
+                                }
+                            }
 
-						//If we couldn't find a good match, pick the y axis as a default
-						if(axes != 2) {
-							x = true;
-							y = false;
-							z = true;
-						}
+                            //If we couldn't find a good match, pick the y axis as a default
+                            if (axes != 2) {
+                                x = true;
+                                y = false;
+                                z = true;
+                            }
 
-						//We're now at a point that two axes intersect - the third is the one that collided
-						if(!x) {
-							velocity.X = 0;
-							if(_location.X < ((GameObject)obj).location.X) {
-								_location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
-							} else {
-								_location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
-							}
-						} else if(!y) {
-							velocity.Y = 0;
-							if(_location.Y < ((GameObject)obj).location.Y) {
-								_location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
-							} else {
-								_location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
-							}
-						} else { //z
-							velocity.Z = 0;
-							if(_location.Z < ((GameObject)obj).location.Z) {
-								_location.Z = ((GameObject)obj).location.Z - (pbox.Z + obj.pbox.Z);
-							} else {
-								_location.Z = ((GameObject)obj).location.Z + pbox.Z + obj.pbox.Z;
-							}
-						}
-					}
-				}
-			}
-		}
+                            //We're now at a point that two axes intersect - the third is the one that collided
+                            if (!x) {
+                                velocity.X = 0;
+                                if (_location.X < ((GameObject)obj).location.X) {
+                                    _location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
+                                }
+                                else {
+                                    _location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
+                                }
+                            }
+                            else if (!y) {
+                                velocity.Y = 0;
+                                if (_location.Y < ((GameObject)obj).location.Y) {
+                                    _location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
+                                }
+                                else {
+                                    _location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
+                                }
+                            }
+                            else { //z
+                                velocity.Z = 0;
+                                if (_location.Z < ((GameObject)obj).location.Z) {
+                                    _location.Z = ((GameObject)obj).location.Z - (pbox.Z + obj.pbox.Z);
+                                }
+                                else {
+                                    _location.Z = ((GameObject)obj).location.Z + pbox.Z + obj.pbox.Z;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-		public void physUpdate2d(FrameEventArgs e, List<PhysicsObject> objlist) {
-			if(doesGravity) {
-				accel.Y -= (float)(400 * e.Time); //TODO: turn this into a constant somewhere
-			}
-			velocity.X += accel.X;
-			velocity.Y += accel.Y;
-			accel.X = 0;
-			accel.Y = 0;
-			accel.Z = 0;
-			_location += velocity * (float)e.Time;
+        public void physUpdate2d(FrameEventArgs e, List<PhysicsObject> objlist) {
+            if (frozen)
+                freezetimer = freezetimer + e.Time;
+            if (freezetimer > 1) {
+                frozen = false;
+                freezetimer = 0;
+            }
+            if (!frozen) {
+                if (doesGravity) {
+                    accel.Y -= (float)(400 * e.Time); //TODO: turn this into a constant somewhere
+                }
+                velocity.X += accel.X;
+                velocity.Y += accel.Y;
+                accel.X = 0;
+                accel.Y = 0;
+                accel.Z = 0;
+                _location += velocity * (float)e.Time;
 
-			foreach(PhysicsObject obj in objlist) {
-				// don't do collision physics to yourself
-				if(obj != this) {
+                foreach (PhysicsObject obj in objlist) {
+                    // don't do collision physics to yourself
+                    if (obj != this) {
 
-					if((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
-					&& (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
-						// at this point obj is in collision with this enemy
+                        if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
+                        && (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
+                            // at this point obj is in collision with this enemy
 
-						//figure out which direction the collision happened on by looking for point where
-						//only one axis is not colliding
-						Vector3 temploc = _location - velocity * (float)e.Time;
-						Vector3 step = velocity * (float)e.Time * 0.25f;
-						bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-						bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-						bool lastStepWasForward = true;
-						while(x == y && step.LengthFast >= 0.01f) {
-							if(!x) { //both false - not far enough, step forward
-								if(!lastStepWasForward) {
-									step *= 0.5f;
-								}
-								lastStepWasForward = true;
-								temploc += step;
-								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-							} else { //both true - too far, step backwards
-								if(lastStepWasForward) {
-									step *= 0.5f;
-								}
-								lastStepWasForward = false;
-								temploc -= step;
-								x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-								y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-							}
-						}
+                            //figure out which direction the collision happened on by looking for point where
+                            //only one axis is not colliding
+                            Vector3 temploc = _location - velocity * (float)e.Time;
+                            Vector3 step = velocity * (float)e.Time * 0.25f;
+                            bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+                            bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+                            bool lastStepWasForward = true;
+                            while (x == y && step.LengthFast >= 0.01f) {
+                                if (!x) { //both false - not far enough, step forward
+                                    if (!lastStepWasForward) {
+                                        step *= 0.5f;
+                                    }
+                                    lastStepWasForward = true;
+                                    temploc += step;
+                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+                                }
+                                else { //both true - too far, step backwards
+                                    if (lastStepWasForward) {
+                                        step *= 0.5f;
+                                    }
+                                    lastStepWasForward = false;
+                                    temploc -= step;
+                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
+                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
+                                }
+                            }
 
-						//If we couldn't find a good match, pick the y axis as a default
-						if(x == y) {
-							x = true;
-							y = false;
-						}
+                            //If we couldn't find a good match, pick the y axis as a default
+                            if (x == y) {
+                                x = true;
+                                y = false;
+                            }
 
-						//We're now at a point that two axes intersect - the third is the one that collided
-						if(!x) {
-							velocity.X = 0;
-							if(_location.X < ((GameObject)obj).location.X) {
-								_location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
-							} else {
-								_location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
-							}
-						} else { //y
-							velocity.Y = 0;
-							if(_location.Y < ((GameObject)obj).location.Y) {
-								_location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
-							} else {
-								_location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
-							}
-						}
-					}
-				}
-			}
-		}
+                            //We're now at a point that two axes intersect - the third is the one that collided
+                            if (!x) {
+                                velocity.X = 0;
+                                if (_location.X < ((GameObject)obj).location.X) {
+                                    _location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
+                                }
+                                else {
+                                    _location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
+                                }
+                            }
+                            else { //y
+                                velocity.Y = 0;
+                                if (_location.Y < ((GameObject)obj).location.Y) {
+                                    _location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
+                                }
+                                else {
+                                    _location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
 		public void reset() {
 			throw new NotImplementedException();

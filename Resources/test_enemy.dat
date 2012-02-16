@@ -8,9 +8,9 @@
 	<pbox>6.25</pbox>
 	<pbox>6.25</pbox>
 	<pbox>6.25</pbox>
-	<cbox>4</cbox>
-	<cbox>4</cbox>
-	<cbox>4</cbox>
+	<cbox>6.25</cbox>
+	<cbox>6.25</cbox>
+	<cbox>6.25</cbox>
 	<draw2>1</draw2>
 	<draw3>1</draw3>
 	<health>10</health>

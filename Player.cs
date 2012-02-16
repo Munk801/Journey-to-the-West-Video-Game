@@ -17,15 +17,15 @@ namespace U5Designs
     class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
         //Knockback physics constants:
-        private Vector3 kbspeed = new Vector3(160, 160, 160);
+        private Vector3 kbspeed = new Vector3(130, 200, 160);
 
         public PlayerState p_state;
         int texID;
 		public Vector3 velocity;
 		private Vector3 accel;
 		private bool doesGravity; //true if gravity affects this object
-        private bool Invincible;
-        private double Invincibletimer;
+        private bool Invincible, HasControl;
+        private double Invincibletimer, NoControlTimer;
 
 		public float deltax; //used for updating position of camera, etc.
 
@@ -58,7 +58,9 @@ namespace U5Designs
             _damage = 0;
             _health = 5;
             Invincible = false;
+            HasControl = false;
             Invincibletimer = 0;
+            NoControlTimer = 0;
         }
 
         /**
@@ -72,78 +74,82 @@ namespace U5Designs
 
             if (Invincible)
                 Invincibletimer = Invincibletimer + e.Time;
-            if (Invincibletimer >= 1) { // invincible for 1 second
+            if (Invincibletimer >= 2) { // invincible for 2 seconds
                 Invincibletimer = 0;
                 Invincible = false;
             }
 
-            if (enable3d)
-            {
-                if (w) 
-                    velocity.X = (float)p_state.getSpeed();                
-                if (s)
-                    velocity.X = -(float)p_state.getSpeed();
-                if ((s && w) || (!s && !w))
-                    velocity.X = 0f;
-
-                if (d)
-                    velocity.Z = (float)p_state.getSpeed();
-                if (a)
-                    velocity.Z = -(float)p_state.getSpeed();
-                if ((d && a) || (!d && !a))
-                    velocity.Z = 0f;
-
-                if (w && d) {
-                    velocity.X = (float)p_state.getSpeed() * 0.707f;
-                    velocity.Z = (float)p_state.getSpeed() * 0.707f;
-                }
-                if (w && a) {
-					velocity.X = (float)p_state.getSpeed() * 0.707f;
-					velocity.Z = -((float)p_state.getSpeed() * 0.707f);
-                }
-                if (a && s) {
-					velocity.X = -((float)p_state.getSpeed() * 0.707f);
-					velocity.Z = -((float)p_state.getSpeed() * 0.707f);
-                }
-                if (d && s) {
-					velocity.X = -((float)p_state.getSpeed() * 0.707f);
-					velocity.Z = ((float)p_state.getSpeed() * 0.707f);
-                }
-                if (a && d)
-                    velocity.Z = 0;
-                if (w && s)
-                    velocity.X = 0;
-            }
-            else
-            {
-                if (d)
-                    velocity.X = (float)p_state.getSpeed();
-                if (a)
-                    velocity.X = -(float)p_state.getSpeed();
-                if ((d && a) || (!d && !a))
-                    velocity.X = 0f;
+            if (!HasControl)
+                NoControlTimer = NoControlTimer + e.Time;
+            if (NoControlTimer >= 0.5) {
+                NoControlTimer = 0;
+                HasControl = true;
             }
 
-            //TMP PHYSICS TEST BUTTON and suicide button
-            if (c)
-                velocity.Y = (float)p_state.getSpeed()/3;
-            if (x)
-                _health = 0;
+            if (HasControl) {
+                if (enable3d) {
+                    if (w)
+                        velocity.X = (float)p_state.getSpeed();
+                    if (s)
+                        velocity.X = -(float)p_state.getSpeed();
+                    if ((s && w) || (!s && !w))
+                        velocity.X = 0f;
 
+                    if (d)
+                        velocity.Z = (float)p_state.getSpeed();
+                    if (a)
+                        velocity.Z = -(float)p_state.getSpeed();
+                    if ((d && a) || (!d && !a))
+                        velocity.Z = 0f;
 
-            //********************** space
-            if (space && !spaceDown)
-            {
-                if (velocity.Y < 0.000001f && velocity.Y > -0.0000001f)
-                {
-                    accelerate(Vector3.UnitY * 230);
-                    //jumpSound.Play();
+                    if (w && d) {
+                        velocity.X = (float)p_state.getSpeed() * 0.707f;
+                        velocity.Z = (float)p_state.getSpeed() * 0.707f;
+                    }
+                    if (w && a) {
+                        velocity.X = (float)p_state.getSpeed() * 0.707f;
+                        velocity.Z = -((float)p_state.getSpeed() * 0.707f);
+                    }
+                    if (a && s) {
+                        velocity.X = -((float)p_state.getSpeed() * 0.707f);
+                        velocity.Z = -((float)p_state.getSpeed() * 0.707f);
+                    }
+                    if (d && s) {
+                        velocity.X = -((float)p_state.getSpeed() * 0.707f);
+                        velocity.Z = ((float)p_state.getSpeed() * 0.707f);
+                    }
+                    if (a && d)
+                        velocity.Z = 0;
+                    if (w && s)
+                        velocity.X = 0;
                 }
-                spaceDown = true; 
-            }
-            else if (!space)
-            {
-                spaceDown = false;
+                else {
+                    if (d)
+                        velocity.X = (float)p_state.getSpeed();
+                    if (a)
+                        velocity.X = -(float)p_state.getSpeed();
+                    if ((d && a) || (!d && !a))
+                        velocity.X = 0f;
+                }
+
+                //TMP PHYSICS TEST BUTTON and suicide button
+                if (c)
+                    velocity.Y = (float)p_state.getSpeed() / 3;
+                if (x)
+                    _health = 0;
+
+
+                //********************** space
+                if (space && !spaceDown) {
+                    if (velocity.Y < 0.000001f && velocity.Y > -0.0000001f) {
+                        accelerate(Vector3.UnitY * 230);
+                        //jumpSound.Play();
+                    }
+                    spaceDown = true;
+                }
+                else if (!space) {
+                    spaceDown = false;
+                }
             }
         }
 
@@ -243,17 +249,6 @@ namespace U5Designs
                 // don't do collision physics to yourself
 				if(obj != this) {
 
-                    //If the object has a cbox then a special combat collision needs to happen
-                    if (((GameObject)obj).hascbox && !Invincible) {
-                        if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < cbox.Y + ((CombatObject)obj).cbox.Y)
-                        && (Math.Abs(((GameObject)obj).location.Z - _location.Z) < cbox.Z + ((CombatObject)obj).cbox.Z)
-                        && (Math.Abs(((GameObject)obj).location.X - _location.X) < cbox.X + ((CombatObject)obj).cbox.X)) {
-                            // player just colided with a combat object, bad things need to happen
-
-                        }
-
-                    }
-                    else {
 
                         if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
                         && (Math.Abs(((GameObject)obj).location.Z - _location.Z) < pbox.Z + obj.pbox.Z)
@@ -332,7 +327,7 @@ namespace U5Designs
                                 }
                             }
                         }
-                    }
+                    
                 }
             }
 		}
@@ -361,13 +356,16 @@ namespace U5Designs
                             if (((CombatObject)obj).type == 1) {// obj is an enemy, do damage, knock player back
                                 _health = _health - ((CombatObject)obj).damage;
                                 Invincible = true;
-
+                                HasControl = false;
+                                ((Enemy)obj).frozen = true;
 
                                 // direction we need to be knocked back in.
-                                Vector3 direction = new Vector3(location.X - ((GameObject)obj).location.X, location.Y - ((GameObject)obj).location.Y, 0);
+                                Vector3 direction = new Vector3(location.X - ((GameObject)obj).location.X, 0, 0);
                                 direction.Normalize();
 
-                                velocity = new Vector3(kbspeed.X * direction.X, kbspeed.Y * direction.Y, kbspeed.Z * direction.Z);
+                                //location = new Vector3(((GameObject)obj).location.X + (obj.pbox.X * direction.X), ((GameObject)obj).location.Y + obj.pbox.Y, location.Z);
+
+                                //accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
 
 
                             }
