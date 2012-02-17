@@ -174,11 +174,11 @@ namespace U5Designs
  					obj.mesh.Render();
 				} else {
 					obj.doScaleTranslateAndTexture();
-					obj.frameNumber = obj.sprite.draw(enable3d, obj.cycleNumber, obj.frameNumber + e.Time);
+					obj.frameNumber = obj.sprite.draw(enable3d ^ isInTransition, obj.cycleNumber, obj.frameNumber + e.Time);
 				}
 			}
 
-			player.draw(enable3d, e.Time);
+			player.draw(enable3d ^ isInTransition, e.Time);
 
 
             // UNCOMMENT TO ADD MOTION BLUR
@@ -204,7 +204,7 @@ namespace U5Designs
 					tabDown = true;
 					player.velocity.Z = 0;
 					isInTransition = true;
-					camera.timer = 0;
+					camera.timer = (enable3d ? 1 : 0);
 				} else if(!eng.Keyboard[Key.Tab]) {
 					tabDown = false;
 				}

@@ -18,14 +18,7 @@ namespace Engine
 
 		private Vector4 lightOffset;
 
-
-        private int visX = 120;
-        private int visY = 30;
-        private int visZ = 100;
-
-        private float transZ = 100;
-        private float transY = 30;
-        private float transX = 120;
+		private float fov;
 
         public Camera(Vector3 position, Vector3 end, int width, int height)
         {
@@ -33,6 +26,7 @@ namespace Engine
             End = end;
             Width = width;
             Height = height;
+			fov = (float)(Math.PI / 6);
         }
 
         /// <summary>
@@ -42,44 +36,46 @@ namespace Engine
         /// <returns></returns>
         public void UpdateLight()
         {
-			GL.Light(LightName.Light0, LightParameter.Position, new Vector4(lightOffset.X + Position.X, lightOffset.Y + Position.Y, lightOffset.Z + Position.Z, 1));
+			//GL.Light(LightName.Light0, LightParameter.Position, new Vector4(lightOffset.X + Position.X, lightOffset.Y + Position.Y, lightOffset.Z + Position.Z, 1));
+			GL.Light(LightName.Light0, LightParameter.Position, new Vector4(-50.0f, 50.0f, 50.0f, 0.0f));
         }
 
         public void Set2DCamera(Vector3 playerLoc)
         {
-            SetOrthographic(Width, Height);
+            SetOrthographic();
 			End = new Vector3(75f, 75f, 50f);
 			End.X += playerLoc.X;
 			Position = new Vector3(75f, 75f, 150f);
 			Position.X += playerLoc.X;
 			lightOffset = new Vector4(50, 50, 0, 1);
 			UpdateLight();
+			GL.Disable(EnableCap.Fog);
         }
 
         public void Set3DCamera(Vector3 playerLoc)
         {
-            SetPerspective(Width, Height);
+            SetPerspective();
 			End = new Vector3(-25f, 25f, 50f);
 			End.X += playerLoc.X;
 			Position = new Vector3(-100f, 28.5f, 50f);
 			Position.X += playerLoc.X;
 			lightOffset = new Vector4(0, 50, 50, 1);
 			UpdateLight();
+			GL.Enable(EnableCap.Fog);
         }
 
-        private void SetOrthographic(int width, int height)
+        private void SetOrthographic()
         {
             GL.MatrixMode(MatrixMode.Projection);
-            Matrix4 projection = Matrix4.CreateOrthographic(width / 4, height / 4, 1.0f, 6400.0f);
-            GL.LoadMatrix(ref projection);
+            Matrix4 projection = Matrix4.CreateOrthographic(Width / 4, Height / 4, 1.0f, 6400.0f);
+			GL.LoadMatrix(ref projection);
         }
 
-        private void SetPerspective(int width, int height)
+        private void SetPerspective()
         {
             GL.MatrixMode(MatrixMode.Projection);
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 6, width / (float)height, 1.0f, 6400.0f);
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(fov, Width / (float)Height, 1.0f, 6400.0f);
             GL.LoadMatrix(ref projection);
-            GL.Enable(EnableCap.Fog);
         }
 
         public void SetModelView()
@@ -87,40 +83,55 @@ namespace Engine
             Matrix4 modelview = Matrix4.LookAt(Position, End, Vector3.UnitY);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref modelview);
-            GL.Disable(EnableCap.Fog);
         }
+
+		public void updateForTransition() {
+			double theta = timer * timer * Math.PI / 2 + Math.PI;
+
+			//End.X = (float)(200.0 * theta / Math.PI - 225.0);
+			End.Y = (float)(100.0 * theta / Math.PI - 75.0);
+			End.X = (float)(100.0 * timer - 25.0);
+			//End.Y = (float)(50.0 * timer + 25.0);
+			//End.Z is always 50.0f
+
+			//Position.X = End.X + (float)(100.0 * Math.Cos(theta));
+			Position.X = (float)(End.X + (1.0 - timer) * -75.0);
+			Position.Z = End.Z + (float)(-3200.0 * Math.Sin(theta));
+			Position.Y = (float)(46.5 * theta / Math.PI - 18.0);
+
+			//fov = 2 * (float)Math.Atan(Math.Tan(Math.PI / 12) * 335 / ((End - Position).Length - 50));
+			//fov = 2 * (float)Math.Atan(Math.Tan(Math.PI / 12) * 75 / (End - Position).Length);
+			//fov = (float)((0.05765 - 0.39347) * theta + 0.39347);
+			//fov = (float)(-0.33582 * timer * timer + 0.39347);
+			//fov = (float)(0.33582 * timer * timer + 0.05765);
+			fov = (float)(-0.710578*timer*timer*timer+1.63705*timer*timer-1.26229*timer+0.39347);
+			//fov = (float)(1.06511-0.21379*theta);
+			SetPerspective();
+			GL.Disable(EnableCap.Fog);
+		}
 
 		public bool TransitionState(bool enable3D, double time, Vector3 playerLoc)
         {
-			timer += time;
-            if (enable3D)
+			if (enable3D)
             {
-                SetPerspective(Width, Height);
-                //End.X -= 100;
-                //End.Y -= 50;
-                Position.X -= (float)(transX*time);
-                Position.Y += (float)(transY*time);
-                //Position.Y = End.Y + visY;
-				Position.Z -= (float)(transZ*time);
-				if(timer >= 1.0) {
+				timer -= time * 1.5;
+				if(timer <= 0) {
+					Console.WriteLine(fov);
+					fov = (float)(Math.PI / 6);
 					Set3DCamera(playerLoc);
 					return false;
 				}
             }
-            else
+            else // 2D
             {
-                SetOrthographic(Width, Height);
-                //End.X += 100;
-                //End.Y += 50;
-                Position.X += (float)(transX*time);
-                Position.Y -= (float)(transY*time);
-                //Position.Y = End.Y;
-				Position.Z += (float)(visZ * time);
+				timer += time * 1.5;
 				if(timer >= 1.0) {
+					Console.WriteLine(fov);
 					Set2DCamera(playerLoc);
 					return false;
 				}
-            }
+			}
+			updateForTransition();
 			return true;
         }
 
