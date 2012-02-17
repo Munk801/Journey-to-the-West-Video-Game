@@ -116,7 +116,6 @@ namespace Engine
             {
 				timer -= time * 1.5;
 				if(timer <= 0) {
-					Console.WriteLine(fov);
 					fov = (float)(Math.PI / 6);
 					Set3DCamera(playerLoc);
 					return false;
@@ -126,7 +125,6 @@ namespace Engine
             {
 				timer += time * 1.5;
 				if(timer >= 1.0) {
-					Console.WriteLine(fov);
 					Set2DCamera(playerLoc);
 					return false;
 				}

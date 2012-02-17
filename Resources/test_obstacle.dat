@@ -1,5 +1,5 @@
 <obstacle>
-	<is2d>1</is2d>
+	<is2d>0</is2d>
 	<loc>50</loc>
 	<loc>-50</loc>
 	<loc>50</loc>

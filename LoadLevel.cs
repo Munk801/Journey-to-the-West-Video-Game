@@ -91,6 +91,8 @@ namespace U5Designs
                 ps.physList.Add(o);
                 ps.renderList.Add(o);
             }
+
+			SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
                         
             //Load Player
             ps.player = new Player(ss);
@@ -109,11 +111,15 @@ namespace U5Designs
             XmlNodeList _bp = doc_new.GetElementsByTagName("bmp");
             string _bmp_path = "../../Textures/" + _bp.Item(0).InnerText;
             XmlNodeList _c_start_list = doc_new.GetElementsByTagName("c_starts");
-            int _c_start1 = Convert.ToInt32(_c_start_list.Item(0).InnerText);
-            int _c_start2 = Convert.ToInt32(_c_start_list.Item(1).InnerText);
-            XmlNodeList _c_length_list = doc_new.GetElementsByTagName("c_lengths");
-            int _c_len1 = Convert.ToInt32(_c_length_list.Item(0).InnerText);
-            int _c_len2 = Convert.ToInt32(_c_length_list.Item(1).InnerText);
+			int[] cycleStarts = new int[_c_start_list.Count];
+			for(int i = 0; i < _c_start_list.Count; i++) {
+				cycleStarts[i] = Convert.ToInt32(_c_start_list.Item(i).InnerText);
+			}
+			XmlNodeList _c_length_list = doc_new.GetElementsByTagName("c_lengths");
+			int[] cycleLengths = new int[_c_length_list.Count];
+			for(int i = 0; i < _c_length_list.Count; i++) {
+				cycleLengths[i] = Convert.ToInt32(_c_length_list.Item(i).InnerText);
+			}
             XmlNodeList _sw = doc_new.GetElementsByTagName("t_width");
             int _width = Convert.ToInt32(_sw.Item(0).InnerText);
             XmlNodeList _sh = doc_new.GetElementsByTagName("t_height");
@@ -123,12 +129,7 @@ namespace U5Designs
             fstream_new.Close();
 
             // Create the SpriteSheet
-            int[] cycleStarts = { _c_start1, _c_start2 };
-            int[] cycleLengths = { _c_len1, _c_len2 };
-            SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
-            s = new SpriteSheet(new Bitmap(_bmp_path), cycleStarts, cycleLengths, _width, _height, _fps);
-
-            return s;
+            return new SpriteSheet(new Bitmap(_bmp_path), cycleStarts, cycleLengths, _width, _height, _fps);
         }
 
         public static List<Obstacle> parse_Obstacle_File(string[] OList)
@@ -168,15 +169,16 @@ namespace U5Designs
                     XmlNodeList _d2 = doc_new.GetElementsByTagName("draw2");
                     bool _draw2 = Convert.ToBoolean(Convert.ToInt32(_d2.Item(0).InnerText));
                     XmlNodeList _d3 = doc_new.GetElementsByTagName("draw3");
-                    bool _draw3 = Convert.ToBoolean(Convert.ToInt32(_d3.Item(0).InnerText));
+					bool _draw3 = Convert.ToBoolean(Convert.ToInt32(_d3.Item(0).InnerText));
 
-                    XmlNodeList _m = doc_new.GetElementsByTagName("mesh");
-                    ObjMesh _mesh = new ObjMesh("../../Geometry/" + _m.Item(0).InnerText);
-                    
-                    XmlNodeList _b = doc_new.GetElementsByTagName("bmp");
-                    Bitmap _bmp = new Bitmap("../../Textures/" + _b.Item(0).InnerText);
+					XmlNodeList _spr = doc_new.GetElementsByTagName("sprite");
+					string _sprite_path = "U5Designs.Resources." + _spr.Item(0).InnerText;
 
-                    Obstacle _obs = new Obstacle(new Vector3(xpos, ypos, zpos), new Vector3(sx, sy, sz), new Vector3(px, py, pz), _draw2, _draw3, _mesh, _bmp);
+					// Create the SpriteSheet 
+					string[] _slist = { _sprite_path };
+					SpriteSheet ss = parse_Sprite_File(_slist);
+
+					Obstacle _obs = new Obstacle(new Vector3(xpos, ypos, zpos), new Vector3(sx, sy, sz), new Vector3(px, py, pz), _draw2, _draw3, ss);
 
                     _o.Add(_obs);
                 }
@@ -202,16 +204,15 @@ namespace U5Designs
                     XmlNodeList _d2 = doc_new.GetElementsByTagName("draw2");
                     bool _draw2 = Convert.ToBoolean(Convert.ToInt32(_d2.Item(0).InnerText));
                     XmlNodeList _d3 = doc_new.GetElementsByTagName("draw3");
-                    bool _draw3 = Convert.ToBoolean(Convert.ToInt32(_d3.Item(0).InnerText));
+					bool _draw3 = Convert.ToBoolean(Convert.ToInt32(_d3.Item(0).InnerText));
 
-                    XmlNodeList _spr = doc_new.GetElementsByTagName("sprite");
-                    string _sprite_path = "U5Designs.Resources." + _spr.Item(0).InnerText;                    
+					XmlNodeList _m = doc_new.GetElementsByTagName("mesh");
+					ObjMesh _mesh = new ObjMesh("../../Geometry/" + _m.Item(0).InnerText);
 
-                    // Create the SpriteSheet 
-                    string[] _slist = { _sprite_path };
-                    SpriteSheet ss = parse_Sprite_File(_slist);
+					XmlNodeList _b = doc_new.GetElementsByTagName("bmp");
+					Bitmap _bmp = new Bitmap("../../Textures/" + _b.Item(0).InnerText);
 
-                    Obstacle _obs = new Obstacle(new Vector3(xpos, ypos, zpos), new Vector3(sx, sy, sz), new Vector3(px, py, pz), _draw2, _draw3, ss);
+					Obstacle _obs = new Obstacle(new Vector3(xpos, ypos, zpos), new Vector3(sx, sy, sz), new Vector3(px, py, pz), _draw2, _draw3, _mesh, _bmp);
 
                     _o.Add(_obs);
                 }
