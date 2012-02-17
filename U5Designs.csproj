@@ -124,6 +124,12 @@
     <EmbeddedResource Include="Resources\test_obstacle4.dat" />
     <EmbeddedResource Include="Resources\test_obstacle5.dat" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\test_obstacle3D1.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\test_floor_sprite.dat" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)test.sav" "$(TargetDir)test.sav"</PostBuildEvent>

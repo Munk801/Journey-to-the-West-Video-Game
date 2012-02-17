@@ -8,7 +8,6 @@
 		<obstacle>test_obstacle3.dat</obstacle>
 		<obstacle>test_obstacle4.dat</obstacle>
 		<obstacle>test_obstacle5.dat</obstacle>
-		<obstacle>test_obstacle3D.dat</obstacle>
-		<obstacle>test_obstacle3D1.dat</obstacle>
+		<obstacle>test_obstacle3D1.dat</obstacle>		
 	</obstaclelist>
 </level>
