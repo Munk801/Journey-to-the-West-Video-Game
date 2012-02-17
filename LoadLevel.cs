@@ -107,7 +107,7 @@ namespace U5Designs
             fstream_new = assembly_new.GetManifestResourceStream(_sprite_path);
             doc_new.Load(fstream_new);
             XmlNodeList _bp = doc_new.GetElementsByTagName("bmp");
-            string _bmp_path = "../../Geometry/" + _bp.Item(0).InnerText;
+            string _bmp_path = "../../Textures/" + _bp.Item(0).InnerText;
             XmlNodeList _c_start_list = doc_new.GetElementsByTagName("c_starts");
             int _c_start1 = Convert.ToInt32(_c_start_list.Item(0).InnerText);
             int _c_start2 = Convert.ToInt32(_c_start_list.Item(1).InnerText);
