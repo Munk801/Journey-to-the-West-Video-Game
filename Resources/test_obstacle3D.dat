@@ -1,0 +1,15 @@
+<obstacle>
+	<is2d>1</is2d>
+	<loc>50</loc>
+	<loc>-50</loc>
+	<loc>50</loc>
+	<scale>50</scale>
+	<scale>50</scale>
+	<scale>50</scale>
+	<pbox>50</pbox>
+	<pbox>50</pbox>
+	<pbox>50</pbox>
+	<draw2>1</draw2>
+	<draw3>1</draw3>
+	<sprite>test_sprite.dat</sprite>
+</obstacle>

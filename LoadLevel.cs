@@ -28,92 +28,54 @@ namespace U5Designs
             ps.combatList = new List<CombatObject>();
             ps.physList = new List<PhysicsObject>();
             ps.colisionList = new List<PhysicsObject>();
-            ps.backgroundList = new List<Background>();
+            ps.backgroundList = new List<Background>();                              
 
-
-            //First we need to pull the location of the meshes.(or keep this hardcoded one?..)
-            ObjMesh cubemesh = new ObjMesh("../../Geometry/box.obj");
-
-
-            //example obstacle load
-            //use ps to access object lists!!
-            Vector3 testloc = new Vector3(50, -50, 50); // location is a point 
-            Vector3 testscale = new Vector3(50, 50, 50); // scale is a multiplyer
-            Bitmap testmap = new Bitmap("../../Textures/test.png"); // sprite
-            Vector3 testpbox = new Vector3(50, 50, 50);// the size of the physicsbox extending from the center in x,y,z
-            //Bitmap testmap = new Bitmap("../../Geometry/test_sprite.png");
-            Obstacle testfloor = new Obstacle(testloc, testscale, testpbox, true, true, cubemesh, testmap);
-
-            ps.objList.Add(testfloor);
-            ps.physList.Add(testfloor);
-            ps.renderList.Add(testfloor);
-            //xml file needs to contain for 3d object:
-            // vector3 location (( x, y, z) cords)
-            // vector3 scale
-            // bool existsin2d?
-            // bool exsistsin3d?
-            // obj file
-            // bitmap file
-            // vector3 physics box size
-
-            /***
-             * New XML enemy testing please don't move.  This code will eventually go in a function which will return a List<Enemy>()
+            /**
+             * This next section of code will read in a level file and create an array of Enemy files to be parsed.
              * */
             Assembly assembly_new = Assembly.GetExecutingAssembly();
             string file_new = "U5Designs.Resources.level_test.dat";
             Stream fstream_new = assembly_new.GetManifestResourceStream(file_new);
-
-            // Start reading
             XmlDocument doc_new = new XmlDocument();
             doc_new.Load(fstream_new);
-
-            // Create a list of enemy.dat files to load
             XmlNodeList _e_list = doc_new.GetElementsByTagName("enemy");
+            XmlNodeList _o_list = doc_new.GetElementsByTagName("obstacle");
             int _e_list_size = _e_list.Count;
             string[] _e_files = new string[_e_list_size];
+            string[] _o_files = new string[_o_list.Count];
             for (int i = 0; i < _e_list_size; i++)
             {
                 XmlNode n = _e_list.Item(i);
                 _e_files[i] = n.InnerText;
             }
+            for (int i = 0; i < _o_files.Length; i++)
+            {
+                XmlNode n = _o_list.Item(i);
+                _o_files[i] = n.InnerText;
+            }
             fstream_new.Close();
+
             // Load enemy.dat files (for now just loading the first one to test)
             List<Enemy> _elist = parse_Enemy_File(_e_files);
 
-            //tmp add 5 more floor boxes
-            for (int i = 0; i < 20; i++)
-            {
-                testfloor = new Obstacle(testloc + (new Vector3(i * 100, 0, 0)), testscale, testpbox, true, true, cubemesh, testmap);
-                ps.objList.Add(testfloor);
-                ps.physList.Add(testfloor);
-                ps.renderList.Add(testfloor);
-            }
-            // test for physics
-            testscale = new Vector3(12.5f, 12.5f, 12.5f);
-            testpbox = new Vector3(12.5f, 12.5f, 12.5f);
-            testfloor = new Obstacle(testloc + (new Vector3(50, 70, 20)), testscale, testpbox, true, true, cubemesh, testmap);
-            ps.objList.Add(testfloor);
-            ps.physList.Add(testfloor);
-            ps.renderList.Add(testfloor);
-
-            testfloor = new Obstacle(testloc + (new Vector3(100, 150, 10)), testscale, testpbox, true, true, cubemesh, testmap);
-            ps.objList.Add(testfloor);
-            ps.physList.Add(testfloor);
-            ps.renderList.Add(testfloor);
-
-
-            //example enemy load
-            //Vector3 enloc = new Vector3(250, 50, 50);
-            //Vector3 enscale = new Vector3(12.5f, 12.5f, 12.5f);
-            //Vector3 enpbox = new Vector3(6.25f, 6.25f, 6.25f);
-            //Vector3 encbox = new Vector3(6.25f, 6.25f, 6.25f);
-            //Bitmap enmap = new Bitmap("../../Textures/enemy.png");
-            SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
+            // Load obstacle.dat files
+            List<Obstacle> _olist = parse_Obstacle_File(_o_files);
+            
+            //for (int i = 1; i < 5; i++)
+            //{
+                //testfloor = new Obstacle(testloc + (new Vector3(i * 100, 0, 0)), testscale, testpbox, true, true, cubemesh, testmap);
+                //Obstacle _to = _olist.ElementAt(0);
+                //_to._move_Location(new Vector3(i * 100, 0, 0));
+                //ps.objList.Add(_to);
+                //ps.physList.Add(_to);
+                //ps.renderList.Add(_to);
+            //}            
+            
+            //SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
             int[] cycleStarts = { 0, 4 };
             int[] cycleLengths = { 4, 4 };
             SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/test_sprite.png"), cycleStarts, cycleLengths, 128, 128, 4.0);
-
-
+            
             //Enemy testenemy = new Enemy(enloc, enscale, enpbox, encbox, true, true, 10, 10, 80f, 1, ss);
             foreach (Enemy e in _elist)
             {
@@ -123,31 +85,13 @@ namespace U5Designs
                 ps.renderList.Add(e);
                 ps.aiList.Add(e);
             }
-
-            //XML for enemy needs to contain:
-            // vector3 location (( x, y, z) cords)
-            // vector3 scale
-            // bool existsin2d?
-            // bool exsistsin3d?
-            //int health
-            // int damage
-            // float speed
-            // int AItype
-            // obj file
-            // bitmap file
-            // vector3 physics box size
-            // vector3 combat box size
-
-
-
-            //testing sprite sheet....
-            // moved 4 lines up in enemy.
-            //          Obstacle testSprite = new Obstacle(new Vector3(0, 50, 0), new Vector3(25, 25, 25), testpbox, true, true, ss);
-            //			ps.objList.Add(testSprite);
-            //			ps.physList.Add(testSprite);
-            //			ps.renderList.Add(testSprite);
-
-
+            foreach (Obstacle o in _olist)
+            {
+                ps.objList.Add(o);
+                ps.physList.Add(o);
+                ps.renderList.Add(o);
+            }
+                        
             //Load Player
             ps.player = new Player(ss);
         }
@@ -187,6 +131,101 @@ namespace U5Designs
             return s;
         }
 
+        public static List<Obstacle> parse_Obstacle_File(string[] OList)
+        {
+            List<Obstacle> _o = new List<Obstacle>();
+            Assembly assembly_new = Assembly.GetExecutingAssembly();
+            Stream fstream_new;
+            XmlDocument doc_new;
+
+            for (int i = 0; i < OList.Length; i++)
+            {
+                doc_new = new XmlDocument();
+                string _o_path = "U5Designs.Resources." + OList[i];
+                fstream_new = assembly_new.GetManifestResourceStream(_o_path);
+                doc_new.Load(fstream_new);
+
+                // Check to see if the current Obstacle is 2D or 3D and handle accordingly
+                XmlNodeList _type = doc_new.GetElementsByTagName("is2d");                
+                if (Convert.ToBoolean(Convert.ToInt32(_type.Item(0).InnerText)))
+                {
+                    /** Type is 2D **/
+                    XmlNodeList _locs = doc_new.GetElementsByTagName("loc");
+                    int xpos = Convert.ToInt32(_locs.Item(0).InnerText);
+                    int ypos = Convert.ToInt32(_locs.Item(1).InnerText);
+                    int zpos = Convert.ToInt32(_locs.Item(2).InnerText);
+
+                    XmlNodeList _scale = doc_new.GetElementsByTagName("scale");
+                    int sx = Convert.ToInt32(_scale.Item(0).InnerText);
+                    int sy = Convert.ToInt32(_scale.Item(1).InnerText);
+                    int sz = Convert.ToInt32(_scale.Item(2).InnerText);
+
+                    XmlNodeList _pbox = doc_new.GetElementsByTagName("pbox");
+                    int px = Convert.ToInt32(_pbox.Item(0).InnerText);
+                    int py = Convert.ToInt32(_pbox.Item(1).InnerText);
+                    int pz = Convert.ToInt32(_pbox.Item(2).InnerText);
+
+                    XmlNodeList _d2 = doc_new.GetElementsByTagName("draw2");
+                    bool _draw2 = Convert.ToBoolean(Convert.ToInt32(_d2.Item(0).InnerText));
+                    XmlNodeList _d3 = doc_new.GetElementsByTagName("draw3");
+                    bool _draw3 = Convert.ToBoolean(Convert.ToInt32(_d3.Item(0).InnerText));
+
+                    XmlNodeList _m = doc_new.GetElementsByTagName("mesh");
+                    ObjMesh _mesh = new ObjMesh("../../Geometry/" + _m.Item(0).InnerText);
+                    
+                    XmlNodeList _b = doc_new.GetElementsByTagName("bmp");
+                    Bitmap _bmp = new Bitmap("../../Textures/" + _b.Item(0).InnerText);
+
+                    Obstacle _obs = new Obstacle(new Vector3(xpos, ypos, zpos), new Vector3(sx, sy, sz), new Vector3(px, py, pz), _draw2, _draw3, _mesh, _bmp);
+
+                    _o.Add(_obs);
+                }
+                else
+                {
+                    /** Type is 3D **/
+                    // obstacle2.dat
+                    XmlNodeList _locs = doc_new.GetElementsByTagName("loc");
+                    int xpos = Convert.ToInt32(_locs.Item(0).InnerText);
+                    int ypos = Convert.ToInt32(_locs.Item(1).InnerText);
+                    int zpos = Convert.ToInt32(_locs.Item(2).InnerText);
+
+                    XmlNodeList _scale = doc_new.GetElementsByTagName("scale");
+                    int sx = Convert.ToInt32(_scale.Item(0).InnerText);
+                    int sy = Convert.ToInt32(_scale.Item(1).InnerText);
+                    int sz = Convert.ToInt32(_scale.Item(2).InnerText);
+
+                    XmlNodeList _pbox = doc_new.GetElementsByTagName("pbox");
+                    int px = Convert.ToInt32(_pbox.Item(0).InnerText);
+                    int py = Convert.ToInt32(_pbox.Item(1).InnerText);
+                    int pz = Convert.ToInt32(_pbox.Item(2).InnerText);
+
+                    XmlNodeList _d2 = doc_new.GetElementsByTagName("draw2");
+                    bool _draw2 = Convert.ToBoolean(Convert.ToInt32(_d2.Item(0).InnerText));
+                    XmlNodeList _d3 = doc_new.GetElementsByTagName("draw3");
+                    bool _draw3 = Convert.ToBoolean(Convert.ToInt32(_d3.Item(0).InnerText));
+
+                    XmlNodeList _spr = doc_new.GetElementsByTagName("sprite");
+                    string _sprite_path = "U5Designs.Resources." + _spr.Item(0).InnerText;                    
+
+                    // Create the SpriteSheet 
+                    string[] _slist = { _sprite_path };
+                    SpriteSheet ss = parse_Sprite_File(_slist);
+
+                    Obstacle _obs = new Obstacle(new Vector3(xpos, ypos, zpos), new Vector3(sx, sy, sz), new Vector3(px, py, pz), _draw2, _draw3, ss);
+
+                    _o.Add(_obs);
+                }
+                fstream_new.Close();
+            }
+
+            return _o;
+        }
+
+        /**
+         * This method will take an array of strings that contains all the Enemy objects that need to be created
+         * for the current level being loaded.  It will parse the XML .dat files, create an Enemy object, and add it
+         * to a List<> which will be returned. 
+         * */
         public static List<Enemy> parse_Enemy_File(string[] EList)
         {
             // Instantiate the list
@@ -249,7 +288,7 @@ namespace U5Designs
                 string _sprite_path = "U5Designs.Resources." + _sp.Item(0).InnerText;
 
                 // Pause now and parse the Sprite.dat to create the necessary Sprite that is associated with the current Enemy object
-                fstream_new.Close();                              
+                fstream_new.Close();
 
                 // Create the SpriteSheet 
                 string[] _slist = { _sprite_path };              
@@ -267,7 +306,7 @@ namespace U5Designs
                 _e.Add(testenemy);
             }
 
-            // Return list of Enemies
+            // Return list of Enemies               
             return _e;
         }
     }    
