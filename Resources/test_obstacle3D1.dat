@@ -6,9 +6,9 @@
 	<scale>50</scale>
 	<scale>50</scale>
 	<scale>50</scale>
-	<pbox>50</pbox>
-	<pbox>50</pbox>
-	<pbox>50</pbox>
+	<pbox>25</pbox>
+	<pbox>25</pbox>
+	<pbox>25</pbox>
 	<draw2>1</draw2>
 	<draw3>1</draw3>
 	<sprite>test_floor_sprite.dat</sprite>

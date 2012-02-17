@@ -96,6 +96,7 @@ namespace U5Designs
                         
             //Load Player
             ps.player = new Player(ss);
+			ps.physList.Add(ps.player);
         }
 
         public static SpriteSheet parse_Sprite_File(string[] SList)

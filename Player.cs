@@ -74,7 +74,7 @@ namespace U5Designs
 
             if (Invincible)
                 Invincibletimer = Invincibletimer + e.Time;
-            if (Invincibletimer >= 2) { // invincible for 2 seconds
+            if (Invincibletimer >= 0.5) { // invincible for 2 seconds
                 Invincibletimer = 0;
                 Invincible = false;
             }
@@ -241,208 +241,210 @@ namespace U5Designs
 			accel.X = 0;
 			accel.Y = 0;
 			accel.Z = 0;
-			_location += velocity*(float)e.Time;
-			
-			deltax = (velocity * (float)e.Time).X;
+
+			PhysicsObject collidingObj = null;
+			float collidingT = 1.0f/0.0f; //pos infinity
+			int collidingAxis = -1;
 
             foreach (PhysicsObject obj in objlist) {
-                // don't do collision physics to yourself
+				// don't do collision physics to yourself
 				if(obj != this) {
+					Vector3 mybox, objbox;
+					if(!Invincible && ((GameObject)obj).hascbox) {
+						mybox = _cbox;
+						objbox = ((CombatObject)obj).cbox;
+					} else {
+						mybox = _pbox;
+						objbox = obj.pbox;
+					}
+					//find possible ranges of values for which a collision may have occured
+					Vector3 maxTvals = VectorUtil.div(((GameObject)obj).location + objbox - _location + mybox, velocity);
+					Vector3 minTvals = VectorUtil.div(((GameObject)obj).location - objbox - _location - mybox, velocity);
+					VectorUtil.sort(ref minTvals, ref maxTvals);
+
+					float minT = VectorUtil.maxVal(minTvals);
+					float maxT = VectorUtil.minVal(maxTvals);
+
+					// all three axes? || forward? || within range?
+					if(minT > maxT || minT < 0.0f || minT > e.Time) {
+						continue; //no intersection
+					}
+
+					//if we're here, there's a collision
+					//see if this collision is the first to occur
+					if(minT < collidingT) {
+						collidingT = minT;
+						collidingObj = obj;
+						collidingAxis = VectorUtil.maxIndex(minTvals);
+					}
+				}
+			}
+
+			//Assume no collision happened; if it did, adjust below
+			_location += velocity * (float)e.Time;
+			deltax = (velocity * (float)e.Time).X;
+			if(collidingAxis != -1) {
+				if(Invincible || !((GameObject)collidingObj).hascbox) { //if this is a normal physics collision
+					switch(collidingAxis) {
+						case 0: //x
+							velocity.X = 0;
+							float endX = _location.X;
+							if(_location.X < ((GameObject)collidingObj).location.X) {
+								_location.X = ((GameObject)collidingObj).location.X - (pbox.X + collidingObj.pbox.X);
+							} else {
+								_location.X = ((GameObject)collidingObj).location.X + pbox.X + collidingObj.pbox.X;
+							}
+							deltax -= endX - _location.X; //update this value for camera offset
+							break;
+						case 1: //y
+							velocity.Y = 0;
+							if(_location.Y < ((GameObject)collidingObj).location.Y) {
+								_location.Y = ((GameObject)collidingObj).location.Y - (pbox.Y + collidingObj.pbox.Y);
+							} else {
+								_location.Y = ((GameObject)collidingObj).location.Y + pbox.Y + collidingObj.pbox.Y;
+							}
+							break;
+						case 2: //z
+							velocity.Z = 0;
+							if(_location.Z < ((GameObject)collidingObj).location.Z) {
+								_location.Z = ((GameObject)collidingObj).location.Z - (pbox.Z + collidingObj.pbox.Z);
+							} else {
+								_location.Z = ((GameObject)collidingObj).location.Z + pbox.Z + collidingObj.pbox.Z;
+							}
+							break;
+					}
+				} else { //this is a combat collision
+					if(((CombatObject)collidingObj).type == 1) {// obj is an enemy, do damage, knock player back
+						_health = _health - ((CombatObject)collidingObj).damage;
+						Invincible = true;
+						HasControl = false;
+						((Enemy)collidingObj).frozen = true;
+
+						// direction we need to be knocked back in.
+						Vector3 direction = new Vector3(location.X - ((GameObject)collidingObj).location.X, 0, location.Z - ((GameObject)collidingObj).location.Z);
+						direction.Normalize();
+
+						location = new Vector3(((GameObject)collidingObj).location.X + (collidingObj.pbox.X * direction.X), ((GameObject)collidingObj).location.Y + collidingObj.pbox.Y, ((GameObject)collidingObj).location.Z + (collidingObj.pbox.Z * direction.Z));
+
+						accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
 
 
-                        if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
-                        && (Math.Abs(((GameObject)obj).location.Z - _location.Z) < pbox.Z + obj.pbox.Z)
-                        && (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
-                            // at this point the player is colliding with this obj
+					}
+					if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
+						//TODO: projectile implementation
 
-                            //figure out which direction the collision happened on by looking for point where
-                            //only one axis is not colliding
-                            Vector3 temploc = _location - velocity * (float)e.Time;
-                            float originalX = temploc.X; //save the original x position for calculating camera offset
-                            Vector3 step = velocity * (float)e.Time * 0.25f;
-                            bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-                            bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-                            bool z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
-                            int axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
-                            bool lastStepWasForward = true;
-                            while (axes != 2 && step.LengthFast >= 0.1f) {
-                                if (axes < 2) { //not far enough, step forward
-                                    if (!lastStepWasForward) {
-                                        step *= 0.5f;
-                                    }
-                                    lastStepWasForward = true;
-                                    temploc += step;
-                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-                                    z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
-                                    axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
-                                }
-                                else { //too far, step backwards
-                                    if (lastStepWasForward) {
-                                        step *= 0.5f;
-                                    }
-                                    lastStepWasForward = false;
-                                    temploc -= step;
-                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-                                    z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
-                                    axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
-                                }
-                            }
 
-                            //If we couldn't find a good match, pick the y axis as a default
-                            if (axes != 2) {
-                                x = true;
-                                y = false;
-                                z = true;
-                            }
-
-                            //We're now at a point that two axes intersect - the third is the one that collided
-                            if (!x) {
-                                velocity.X = 0;
-                                if (_location.X < ((GameObject)obj).location.X) {
-                                    _location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
-                                }
-                                else {
-                                    _location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
-                                }
-                                deltax = _location.X - originalX; //update this value for camera offset
-                            }
-                            else if (!y) {
-                                velocity.Y = 0;
-                                if (_location.Y < ((GameObject)obj).location.Y) {
-                                    _location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
-                                }
-                                else {
-                                    _location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
-                                }
-                            }
-                            else { //z
-                                velocity.Z = 0;
-                                if (_location.Z < ((GameObject)obj).location.Z) {
-                                    _location.Z = ((GameObject)obj).location.Z - (pbox.Z + obj.pbox.Z);
-                                }
-                                else {
-                                    _location.Z = ((GameObject)obj).location.Z + pbox.Z + obj.pbox.Z;
-                                }
-                            }
-                        }
-                    
-                }
-            }
+					}
+				}
+			}
 		}
 
 		public void physUpdate2d(FrameEventArgs e, List<PhysicsObject> objlist) {
 			if(doesGravity) {
 				accel.Y -= (float)(400 * e.Time); //TODO: turn this into a constant somewhere
 			}
-			velocity.X += accel.X;
-			velocity.Y += accel.Y;
+			velocity += accel;
 			accel.X = 0;
 			accel.Y = 0;
 			accel.Z = 0;
-			_location += velocity * (float)e.Time;
 
-			deltax = (velocity * (float)e.Time).X;
+			velocity.Z = 0; //special case for 2d
+
+			PhysicsObject collidingObj = null;
+			float collidingT = 1.0f / 0.0f; //pos infinity
+			int collidingAxis = -1;
 
 			foreach(PhysicsObject obj in objlist) {
 				// don't do collision physics to yourself
-                if (obj != this) {
-                    //If the object has a cbox and we are not currently invincible from a previous cbox collision, then special things happen
-                    if (((GameObject)obj).hascbox && !Invincible) {
-                        if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < cbox.Y + ((CombatObject)obj).cbox.Y)
-                        && (Math.Abs(((GameObject)obj).location.X - _location.X) < cbox.X + ((CombatObject)obj).cbox.X)) {
-                            // player just colided with a combat object, bad things need to happen
-                            if (((CombatObject)obj).type == 1) {// obj is an enemy, do damage, knock player back
-                                _health = _health - ((CombatObject)obj).damage;
-                                Invincible = true;
-                                HasControl = false;
-                                ((Enemy)obj).frozen = true;
+				if(obj != this) {
+					Vector3 mybox, objbox;
+					if(!Invincible && ((GameObject)obj).hascbox) {
+						mybox = _cbox;
+						objbox = ((CombatObject)obj).cbox;
+					} else {
+						mybox = _pbox;
+						objbox = obj.pbox;
+					}
+					//find possible ranges of values for which a collision may have occured
+					Vector3 maxTvals = VectorUtil.div(((GameObject)obj).location + objbox - _location + mybox, velocity);
+					Vector3 minTvals = VectorUtil.div(((GameObject)obj).location - objbox - _location - mybox, velocity);
+					VectorUtil.sort(ref minTvals, ref maxTvals);
 
-                                // direction we need to be knocked back in.
-                                Vector3 direction = new Vector3(location.X - ((GameObject)obj).location.X, 0, 0);
-                                direction.Normalize();
+					float minT = VectorUtil.maxVal(minTvals.Xy);
+					float maxT = VectorUtil.minVal(maxTvals.Xy);
 
-                                //location = new Vector3(((GameObject)obj).location.X + (obj.pbox.X * direction.X), ((GameObject)obj).location.Y + obj.pbox.Y, location.Z);
+					// both axes? || forward? || within range?
+					if(minT > maxT || minT < 0.0f || minT > e.Time) {
+// 						if(((GameObject)obj).hascbox && velocity.X != 0 && velocity.Y != 0 && minT >= 0) {
+// 							Console.WriteLine(minT + ", " + maxT);
+// 						}
+						continue; //no intersection
+					}
 
-                                //accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
+					//if we're here, there's a collision
+					//see if this collision is the first to occur
+					if(minT < collidingT) {
+						collidingT = minT;
+						collidingObj = obj;
+						collidingAxis = VectorUtil.maxIndex(minTvals.Xy);
+					}
+				}
+			}
+
+			if(collidingAxis != -1) {
+				if(Invincible || !((GameObject)collidingObj).hascbox) { //if this is a normal physics collision
+					//Assume no collision happened; if it did, adjust below
+					_location += velocity * (float)e.Time;
+					deltax = (velocity * (float)e.Time).X;
+					switch(collidingAxis) {
+						case 0: //x
+							velocity.X = 0;
+							float endX = _location.X;
+							if(_location.X < ((GameObject)collidingObj).location.X) {
+								_location.X = ((GameObject)collidingObj).location.X - (pbox.X + collidingObj.pbox.X);
+							} else {
+								_location.X = ((GameObject)collidingObj).location.X + pbox.X + collidingObj.pbox.X;
+							}
+							deltax -= endX - _location.X; //update this value for camera offset
+							break;
+						case 1: //y
+							velocity.Y = 0;
+							if(_location.Y < ((GameObject)collidingObj).location.Y) {
+								_location.Y = ((GameObject)collidingObj).location.Y - (pbox.Y + collidingObj.pbox.Y);
+							} else {
+								_location.Y = ((GameObject)collidingObj).location.Y + pbox.Y + collidingObj.pbox.Y;
+							}
+							break;
+					}
+				} else { //this is a combat collision
+					if(((CombatObject)collidingObj).type == 1) {// obj is an enemy, do damage, knock player back
+						_health = _health - ((CombatObject)collidingObj).damage;
+						Invincible = true;
+						HasControl = false;
+						((Enemy)collidingObj).frozen = true;
+
+						// direction we need to be knocked back in.
+						Vector3 direction = new Vector3(location.X - ((GameObject)collidingObj).location.X, 0, 0);
+						direction.Normalize();
+
+						float origX = location.X;
+
+						location = new Vector3(((GameObject)collidingObj).location.X + (collidingObj.pbox.X * direction.X), ((GameObject)collidingObj).location.Y + collidingObj.pbox.Y, location.Z);
+						deltax = location.X - origX;
+
+						accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, 0);
 
 
-                            }
-                            if (((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
-                                //TODO: projectile implimentation
+					}
+					if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
+						//TODO: projectile implementation
 
 
-                            }
-
-
-
-                        }
-
-                    }
-                    else {
-                        if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
-                        && (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
-                            // at this point the player is colliding with this obj
-
-                            //figure out which direction the collision happened on by looking for point where
-                            //only one axis is not colliding
-                            Vector3 temploc = _location - velocity * (float)e.Time;
-                            float originalX = temploc.X; //save the original x position for calculating camera offset
-                            Vector3 step = velocity * (float)e.Time * 0.25f;
-                            bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-                            bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-                            bool lastStepWasForward = true;
-                            while (x == y && step.LengthFast >= 0.1f) {
-                                if (!x) { //both false - not far enough, step forward
-                                    if (!lastStepWasForward) {
-                                        step *= 0.5f;
-                                    }
-                                    lastStepWasForward = true;
-                                    temploc += step;
-                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-                                }
-                                else { //both true - too far, step backwards
-                                    if (lastStepWasForward) {
-                                        step *= 0.5f;
-                                    }
-                                    lastStepWasForward = false;
-                                    temploc -= step;
-                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-                                }
-                            }
-
-                            //If we couldn't find a good match, pick the y axis as a default
-                            if (x == y) {
-                                x = true;
-                                y = false;
-                            }
-
-                            //We're now at a point that two axes intersect - the third is the one that collided
-                            if (!x) {
-                                velocity.X = 0;
-                                if (_location.X < ((GameObject)obj).location.X) {
-                                    _location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
-                                }
-                                else {
-                                    _location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
-                                }
-                                deltax = _location.X - originalX; //update this value for camera offset
-                            }
-                            else { //y
-                                velocity.Y = 0;
-                                if (_location.Y < ((GameObject)obj).location.Y) {
-                                    _location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
-                                }
-                                else {
-                                    _location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
-                                }
-                            }
-                        }
-                    }
-                }
+					}
+				}
+			} else { //no collision, behave normally
+				_location += velocity * (float)e.Time;
+				deltax = (velocity * (float)e.Time).X;
 			}
 		}
 
