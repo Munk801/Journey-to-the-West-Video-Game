@@ -80,9 +80,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Yeti1.dat" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\test.sav" />
     <EmbeddedResource Include="Resources\enemies.dat" />
     <EmbeddedResource Include="Resources\level_0.dat" />
@@ -116,6 +113,22 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\test_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\test_obstacle.dat" />
+    <EmbeddedResource Include="Resources\test_obstacle2.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\test_obstacle3.dat" />
+    <EmbeddedResource Include="Resources\test_obstacle3D.dat" />
+    <EmbeddedResource Include="Resources\test_obstacle4.dat" />
+    <EmbeddedResource Include="Resources\test_obstacle5.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\test_obstacle3D1.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\test_floor_sprite.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -66,6 +66,14 @@ namespace U5Designs {
 			get { return _sprite; }
 		}
 
+        //private Vector3 _location;
+        //public void _move_Location(Vector3 v)
+        //{
+            //_location.X += x;
+            //_location.Y += y;
+            //_location.Z += z;
+        //    _location += v;
+        //}
         private Vector3 _scale;
 		public Vector3 scale {
             get { return _scale; }

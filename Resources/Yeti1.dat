@@ -1,6 +1,0 @@
-<entity>
-	<e_sfx_0>default_sfx</e_sfx_0>
-	<e_texture>default_texture</e_texture>
-	<e_health>33</e_health>
-	<e_ability_0>Boulder Smash</e_ability_0>
-</entity>

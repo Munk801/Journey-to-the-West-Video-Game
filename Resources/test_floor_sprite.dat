@@ -1,0 +1,10 @@
+<sprite>
+	<bmp>test.png</bmp>
+	<c_starts>0</c_starts>
+	<c_starts>1</c_starts>
+	<c_lengths>1</c_lengths>
+	<c_lengths>0</c_lengths>
+	<t_width>128</t_width>
+	<t_height>128</t_height>
+	<fps>4.0</fps>
+</sprite>

@@ -2,4 +2,12 @@
 	<enemylist>
 		<enemy>test_enemy.dat</enemy>		
 	</enemylist>
+	<obstaclelist>
+		<obstacle>test_obstacle.dat</obstacle>
+		<obstacle>test_obstacle2.dat</obstacle>
+		<obstacle>test_obstacle3.dat</obstacle>
+		<obstacle>test_obstacle4.dat</obstacle>
+		<obstacle>test_obstacle5.dat</obstacle>
+		<obstacle>test_obstacle3D1.dat</obstacle>		
+	</obstaclelist>
 </level>
