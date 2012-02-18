@@ -23,7 +23,7 @@ namespace U5Designs
         {
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
+            GL.Clear(ClearBufferMask.ColorBufferBit);
             height = height / 3;
             width = width / 3;
             double halfHeight = height / 2;

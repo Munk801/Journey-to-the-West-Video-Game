@@ -29,10 +29,6 @@ namespace U5Designs
         public static extern void ilutInit();
 
         internal GameEngine eng;
-
-        protected Vector3 eye, lookat;
-        Obstacle background;
-
         double timeTilMain = 0.0f;
         
 //        // WILL NEED TO BE MOVED SOMEWHERE ELSE
