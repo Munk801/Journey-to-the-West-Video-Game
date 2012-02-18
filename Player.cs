@@ -325,7 +325,7 @@ namespace U5Designs
 						direction.Normalize();
 
 						location = new Vector3(((GameObject)collidingObj).location.X + (collidingObj.pbox.X * direction.X), ((GameObject)collidingObj).location.Y + collidingObj.pbox.Y, ((GameObject)collidingObj).location.Z + (collidingObj.pbox.Z * direction.Z));
-
+                        velocity = new Vector3(0, 0, 0);
 						accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
 
 
@@ -431,7 +431,7 @@ namespace U5Designs
 
 						location = new Vector3(((GameObject)collidingObj).location.X + (collidingObj.pbox.X * direction.X), ((GameObject)collidingObj).location.Y + collidingObj.pbox.Y, location.Z);
 						deltax = location.X - origX;
-
+                        velocity = new Vector3(0, 0, 0);
 						accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, 0);
 
 
