@@ -164,7 +164,8 @@ namespace U5Designs
             // Testing buttons
             //if (eng.Keyboard[Key.Down])
             OpenTK.Input.KeyboardState _new_state = OpenTK.Input.Keyboard.GetState();
-            if(_new_state.IsKeyDown(Key.Down) && !_old_state.IsKeyDown(Key.Down))
+            if((_new_state.IsKeyDown(Key.Down) && !_old_state.IsKeyDown(Key.Down)) ||
+                (_new_state.IsKeyDown(Key.S) && !_old_state.IsKeyDown(Key.S)))
             {
                 // Down key was just pressed
                 if (_cur_butn < 2)
@@ -178,7 +179,8 @@ namespace U5Designs
                     _cur_butn = 0;
                 }                
             }
-            if (_new_state.IsKeyDown(Key.Up) && !_old_state.IsKeyDown(Key.Up))
+            if ((_new_state.IsKeyDown(Key.Up) && !_old_state.IsKeyDown(Key.Up)) ||
+                (_new_state.IsKeyDown(Key.W) && !_old_state.IsKeyDown(Key.W)))
             {
                 // Down key was just pressed
                 if (_cur_butn > 0)

@@ -17,7 +17,7 @@ namespace U5Designs
     class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
         //Knockback physics constants:
-        private Vector3 kbspeed = new Vector3(130, 200, 160);
+        private Vector3 kbspeed = new Vector3(70, 100, 70);
 
         public PlayerState p_state;
         int texID;
@@ -37,7 +37,7 @@ namespace U5Designs
         public Player(SpriteSheet sprite)
         {
             p_state = new PlayerState("TEST player");
-            p_state.setSpeed(300);
+            p_state.setSpeed(130);
             _location = new Vector3(25, 12.5f, 50);
             _scale = new Vector3(12.5f, 12.5f, 12.5f);
             _pbox = new Vector3(6.25f, 6.25f, 6.25f);
