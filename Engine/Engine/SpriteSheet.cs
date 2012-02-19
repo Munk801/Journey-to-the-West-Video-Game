@@ -29,18 +29,20 @@ namespace Engine {
 		private byte[][][] tex; //tex[cycleNumber][frameNumber][y*w + x]
 		private int texw, texh;
 		private double framesPerSecond;
+		private int texID;
+		private int prevCycleNum, prevFrameNum;
 
 		public SpriteSheet(Bitmap texbmp, int[] cycleStartNums, int[] cycleLengths, int _texw, int _texh, double _framesPerSecond = 1.0) {
 			texw = _texw;
 			texh = _texh;
 			framesPerSecond = _framesPerSecond;
-			
+
 			BitmapData bmp_data = texbmp.LockBits(new Rectangle(0, 0, texbmp.Width, texbmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 			tex = new byte[cycleStartNums.Length][][];
 			for(int cycleNum = 0; cycleNum < cycleStartNums.Length; cycleNum++) {
 				tex[cycleNum] = new byte[cycleLengths[cycleNum]][];
 				for(int frameNum = 0; frameNum < cycleLengths[cycleNum]; frameNum++) {
-					IntPtr tex_addr = IntPtr.Add(bmp_data.Scan0, (cycleStartNums[cycleNum]+frameNum) * texw * texh * 4);
+					IntPtr tex_addr = IntPtr.Add(bmp_data.Scan0, (cycleStartNums[cycleNum] + frameNum) * texw * texh * 4);
 					tex[cycleNum][frameNum] = new byte[texw * texh * 4];
 					Marshal.Copy(tex_addr, tex[cycleNum][frameNum], 0, tex[cycleNum][frameNum].Length);
 					//Rearrange BGRA -> RGBA and invert colors to proper encoding
@@ -54,7 +56,18 @@ namespace Engine {
 			}
 			texbmp.UnlockBits(bmp_data);
 
-			//CORasterSaveToBMP(tex[0][2], (uint)texw, (uint)texh, "C:\\Users\\Kendal\\Desktop\\test.bmp");
+			texID = GL.GenTexture();
+			GL.BindTexture(TextureTarget.Texture2D, texID);
+			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[0][0]);
+			prevCycleNum = 0;
+			prevFrameNum = 0;
+			
+
+// 			if(_texh == 1080) {
+// 				CORasterSaveToBMP(tex[0][0], (uint)texw, (uint)texh, "C:\\Users\\Kendal\\Desktop\\test.bmp");
+// 			} else if(_texh == 128) {
+// 				CORasterSaveToBMP(tex[0][0], (uint)texw, (uint)texh, "C:\\Users\\Kendal\\Desktop\\test2.bmp");
+// 			}
 		}
 
 
@@ -169,7 +182,13 @@ namespace Engine {
 				frameNum %= tex[cycleNumber].Length;
 			}
 
-			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[cycleNumber][frameNum]);
+			GL.BindTexture(TextureTarget.Texture2D, texID);
+			if(frameNum != prevFrameNum || cycleNumber != prevCycleNum) {
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[cycleNumber][frameNum]);
+				prevFrameNum = frameNum;
+				prevCycleNum = cycleNumber;
+			}
+
 			GL.Scale(1, -1, 1);
 			if(viewIs3d) {
 				GL.Rotate(270, Vector3d.UnitY);

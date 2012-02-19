@@ -15,8 +15,9 @@ namespace U5Designs {
 
 		private int texID;
 
-		public Decoration(Vector3 location, bool existsIn2d, bool existsIn3d, bool is3dGeo, ObjMesh mesh = null, Bitmap texture = null, SpriteSheet sprite = null) {
+		public Decoration(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, bool is3dGeo, ObjMesh mesh = null, Bitmap texture = null, SpriteSheet sprite = null) {
 			_location = location;
+			_scale = scale;
 			_existsIn3d = existsIn3d;
 			_existsIn2d = existsIn2d;
 			_mesh = mesh;

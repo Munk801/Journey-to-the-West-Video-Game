@@ -117,11 +117,6 @@ namespace U5Designs {
             GL.Scale(_scale);
 		}
 
-        public void UpdateLocationX(float xUpdate)
-        {
-            _location.X += xUpdate;
-        }
-
 		public void physUpdate3d(FrameEventArgs e, List<PhysicsObject> objlist) {
 			//obstacles don't move (for now) so they don't need an update
 			return;

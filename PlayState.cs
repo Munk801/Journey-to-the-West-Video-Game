@@ -14,13 +14,11 @@ using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
 
-
 namespace U5Designs
 {
     /** Main State of the game that will be active while the player is Playing **/
     class PlayState : GameState
     {
-        
         internal GameEngine eng;
         internal Player player;
         internal bool enable3d; //true when being viewed in 3d
@@ -41,12 +39,11 @@ namespace U5Designs
 		bool tabDown;
 
         Camera camera;
+        
 
-        Background background;
-        Vector3 location = new Vector3(0.0f, 0.0f, -10.0f);
         MainMenuState menustate;
         PauseMenuState pms;
-
+       
 
         // Initialize graphics, etc here
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
@@ -66,7 +63,6 @@ namespace U5Designs
 			Vector3 lookat = new Vector3(100, 75, 50);
 			Vector3 eye = lookat + new Vector3(0, 0, 100);
             camera = new Camera(eye, lookat, eng.ClientRectangle.Width, eng.ClientRectangle.Height);
-            background = new Background(location, "../../resources/2DBackground1.jpg", -0.1f, enable3d);
         }
 
 		public override void MakeActive() {
@@ -94,7 +90,6 @@ namespace U5Designs
         public override void Update(FrameEventArgs e)
         {
             //Console.WriteLine(e.Time); // WORST. BUG. EVER.
-            background.UpdatePosition(player.deltax);
 
             //First deal with hardware input
             DealWithInput();
@@ -172,14 +167,16 @@ namespace U5Designs
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 
-            background.Draw(enable3d);
+
 			foreach(RenderObject obj in renderList) {
-				if(obj.is3dGeo) {
- 					obj.doScaleTranslateAndTexture();
- 					obj.mesh.Render();
-				} else {
-					obj.doScaleTranslateAndTexture();
-					obj.frameNumber = obj.sprite.draw(enable3d ^ isInTransition, obj.cycleNumber, obj.frameNumber + e.Time);
+				if((enable3d && ((GameObject)obj).existsIn3d) || (!enable3d && ((GameObject)obj).existsIn2d)) {
+					if(obj.is3dGeo) {
+						obj.doScaleTranslateAndTexture();
+						obj.mesh.Render();
+					} else {
+						obj.doScaleTranslateAndTexture();
+						obj.frameNumber = obj.sprite.draw(enable3d ^ isInTransition, obj.cycleNumber, obj.frameNumber + e.Time);
+					}
 				}
 			}
 
