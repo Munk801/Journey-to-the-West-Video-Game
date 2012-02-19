@@ -15,10 +15,14 @@ namespace Engine
         public int Height;
         public bool isInTransition;
         public double timer;
+		private bool in3d;
 
 		private Vector4 lightOffset;
 
 		private float fov;
+
+		private bool movingInY;
+		private float playerYPos; //the player's y position the last time they were not in midair
 
         public Camera(Vector3 position, Vector3 end, int width, int height)
         {
@@ -27,6 +31,7 @@ namespace Engine
             Width = width;
             Height = height;
 			fov = (float)(Math.PI / 6);
+			playerYPos = 12.5f;
         }
 
         /// <summary>
@@ -42,11 +47,14 @@ namespace Engine
 
         public void Set2DCamera(Vector3 playerLoc)
         {
+			in3d = false;
             SetOrthographic();
-			End = new Vector3(75f, 75f, 50f);
+			End = new Vector3(75f, 62.5f, 50f);
 			End.X += playerLoc.X;
-			Position = new Vector3(75f, 75f, 150f);
+			End.Y += playerYPos;
+			Position = new Vector3(75f, 62.5f, 150f);
 			Position.X += playerLoc.X;
+			Position.Y += playerYPos;
 			lightOffset = new Vector4(50, 50, 0, 1);
 			UpdateLight();
 			GL.Disable(EnableCap.Fog);
@@ -54,11 +62,14 @@ namespace Engine
 
         public void Set3DCamera(Vector3 playerLoc)
         {
+			in3d = true;
             SetPerspective();
-			End = new Vector3(-25f, 25f, 50f);
+			End = new Vector3(-25f, 12.5f, 50f);
 			End.X += playerLoc.X;
-			Position = new Vector3(-100f, 28.5f, 50f);
+			End.Y += playerYPos;
+			Position = new Vector3(-100f, 16f, 50f);
 			Position.X += playerLoc.X;
+			Position.Y += playerYPos;
 			lightOffset = new Vector4(0, 50, 50, 1);
 			UpdateLight();
 			GL.Enable(EnableCap.Fog);
@@ -133,13 +144,39 @@ namespace Engine
 			return true;
         }
 
-        public void Update(float playerDeltaX)
+		public void MoveToYPos(float y) {
+			if(y != playerYPos) {
+				movingInY = true;
+				playerYPos = y;
+			}
+		}
+
+        public void Update(float playerDeltaX, double time)
         {
             Position.X += playerDeltaX;
             End.X += playerDeltaX;
 			UpdateLight();
+
+			if(movingInY) {
+				float desiredY = playerYPos + (in3d ? 16.0f : 62.5f);
+				if(desiredY > Position.Y) {
+					Position.Y += (float)(400.0 * time);
+					End.Y += (float)(400.0 * time);
+					if(desiredY <= Position.Y) {
+						Position.Y = desiredY;
+						End.Y = playerYPos + (in3d ? 12.5f : 62.5f);
+						movingInY = false;
+					}
+				} else {
+					Position.Y -= (float)(400.0 * time);
+					End.Y -= (float)(400.0 * time);
+					if(desiredY >= Position.Y) {
+						Position.Y = desiredY;
+						End.Y = playerYPos + (in3d ? 12.5f : 62.5f);
+						movingInY = false;
+					}
+				}
+			}
         }
-
-
     }
 }

@@ -116,19 +116,21 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\test_obstacle.dat" />
-    <EmbeddedResource Include="Resources\test_obstacle2.dat" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\test_obstacle3.dat" />
-    <EmbeddedResource Include="Resources\test_obstacle3D.dat" />
-    <EmbeddedResource Include="Resources\test_obstacle4.dat" />
-    <EmbeddedResource Include="Resources\test_obstacle5.dat" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\test_obstacle3D1.dat" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\test_floor_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\test_obstacle_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\test_background.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\test_background_3d.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\test_background_3d_sprite.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

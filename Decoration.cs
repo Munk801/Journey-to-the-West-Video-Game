@@ -15,7 +15,7 @@ namespace U5Designs {
 
 		private int texID;
 
-		public Decoration(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, bool is3dGeo, ObjMesh mesh = null, Bitmap texture = null, SpriteSheet sprite = null) {
+		public Decoration(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, SpriteSheet sprite) {
 			_location = location;
 			_scale = scale;
 			_existsIn3d = existsIn3d;
@@ -25,7 +25,22 @@ namespace U5Designs {
 			_sprite = sprite;
 			_cycleNum = 0;
 			_frameNum = 0;
-			_is3dGeo = is3dGeo;
+			_is3dGeo = false;
+			texID = GL.GenTexture();
+            _hascbox = false;
+		}
+
+		public Decoration(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, ObjMesh mesh, Bitmap texture) {
+			_location = location;
+			_scale = scale;
+			_existsIn3d = existsIn3d;
+			_existsIn2d = existsIn2d;
+			_mesh = mesh;
+			_texture = texture;
+			_sprite = sprite;
+			_cycleNum = 0;
+			_frameNum = 0;
+			_is3dGeo = true;
 			texID = GL.GenTexture();
             _hascbox = false;
 		}

@@ -27,8 +27,8 @@ namespace Engine {
         //}
         
 		//applies gravity/acceleration, then velocity, then collision detection
-		void physUpdate2d(FrameEventArgs e, List<PhysicsObject> objlist);
-		void physUpdate3d(FrameEventArgs e, List<PhysicsObject> objlist);
+		void physUpdate2d(double time, List<PhysicsObject> objlist);
+		void physUpdate3d(double time, List<PhysicsObject> objlist);
 
 		//allows other objects to cause this one to accelerate
 		//this could be AI accelerating itself, or the player accelerating projectiles, etc.

@@ -1,18 +1,9 @@
 <enemy>
-	<loc>250</loc>
-	<loc>50</loc>
-	<loc>50</loc>
-	<scale>12.5</scale>
-	<scale>12.5</scale>
-	<scale>12.5</scale>
-	<pbox>6.25</pbox>
-	<pbox>6.25</pbox>
-	<pbox>6.25</pbox>
-	<cbox>6.25</cbox>
-	<cbox>6.25</cbox>
-	<cbox>6.25</cbox>
-	<draw2>1</draw2>
-	<draw3>1</draw3>
+	<scale x="12.5" y="12.5" z="12.5"/>
+	<pbox x="6.25" y="6.25" z="6.25"/>
+	<cbox x="6.25" y="6.25" z="6.25"/>
+	<draw2>true</draw2>
+	<draw3>true</draw3>
 	<health>10</health>
 	<damage>1</damage>
 	<speed>100</speed>

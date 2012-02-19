@@ -28,7 +28,7 @@ namespace U5Designs
         private double Invincibletimer, NoControlTimer;
 
 		public float deltax; //used for updating position of camera, etc.
-
+		public Camera cam; //pointer to the camera, used for informing of y position changes
 
         // SOUND FILES
         static string jumpSoundFile = "../../Resources/Sound/jump_sound.ogg";
@@ -74,7 +74,7 @@ namespace U5Designs
 
             if (Invincible)
                 Invincibletimer = Invincibletimer + e.Time;
-            if (Invincibletimer >= 0.5) { // invincible for 2 seconds
+            if (Invincibletimer >= 0.5) { // invincible for 1/2 second
                 Invincibletimer = 0;
                 Invincible = false;
             }
@@ -233,115 +233,146 @@ namespace U5Designs
 			GL.Scale(_scale);
         }
 
-		public void physUpdate3d(FrameEventArgs e, List<PhysicsObject> objlist) {
+		public void physUpdate3d(double time, List<PhysicsObject> objlist) {
 			if(doesGravity) {
-				accel.Y -= (float)(400*e.Time); //TODO: turn this into a constant somewhere
+				accel.Y -= (float)(400*time); //TODO: turn this into a constant somewhere
 			}
 			velocity += accel;
 			accel.X = 0;
 			accel.Y = 0;
 			accel.Z = 0;
 
-			PhysicsObject collidingObj = null;
-			float collidingT = 1.0f/0.0f; //pos infinity
-			int collidingAxis = -1;
+			deltax = 0.0f;
+			List<PhysicsObject> alreadyCollidedList = new List<PhysicsObject>();
 
-            foreach (PhysicsObject obj in objlist) {
-				// don't do collision physics to yourself
-				if(obj != this) {
-					Vector3 mybox, objbox;
-					if(!Invincible && ((GameObject)obj).hascbox) {
-						mybox = _cbox;
-						objbox = ((CombatObject)obj).cbox;
-					} else {
-						mybox = _pbox;
-						objbox = obj.pbox;
-					}
-					//find possible ranges of values for which a collision may have occured
-					Vector3 maxTvals = VectorUtil.div(((GameObject)obj).location + objbox - _location + mybox, velocity);
-					Vector3 minTvals = VectorUtil.div(((GameObject)obj).location - objbox - _location - mybox, velocity);
-					VectorUtil.sort(ref minTvals, ref maxTvals);
+			while(time > 0.0) {
+				PhysicsObject collidingObj = null;
+				float collidingT = 1.0f / 0.0f; //pos infinity
+				int collidingAxis = -1;
 
-					float minT = VectorUtil.maxVal(minTvals);
-					float maxT = VectorUtil.minVal(maxTvals);
+				foreach(PhysicsObject obj in objlist) {
+					// don't do collision physics to yourself, or on things you already hit this frame
+					if(obj != this && !alreadyCollidedList.Contains(obj)) {
+						Vector3 mybox, objbox;
+						if(!Invincible && ((GameObject)obj).hascbox) {
+							mybox = _cbox;
+							objbox = ((CombatObject)obj).cbox;
+						} else {
+							mybox = _pbox;
+							objbox = obj.pbox;
+						}
+						//find possible ranges of values for which a collision may have occurred
+						Vector3 maxTvals = VectorUtil.div(((GameObject)obj).location + objbox - _location + mybox, velocity);
+						Vector3 minTvals = VectorUtil.div(((GameObject)obj).location - objbox - _location - mybox, velocity);
+						VectorUtil.sort(ref minTvals, ref maxTvals);
 
-					// all three axes? || forward? || within range?
-					if(minT > maxT || minT < 0.0f || minT > e.Time) {
-						continue; //no intersection
-					}
+						float minT = VectorUtil.maxVal(minTvals);
+						float maxT = VectorUtil.minVal(maxTvals);
 
-					//if we're here, there's a collision
-					//see if this collision is the first to occur
-					if(minT < collidingT) {
-						collidingT = minT;
-						collidingObj = obj;
-						collidingAxis = VectorUtil.maxIndex(minTvals);
+						// all three axes? || forward? || within range?
+						if(minT > maxT || minT < 0.0f || minT > time) {
+							continue; //no intersection
+						}
+
+						//if we're here, there's a collision
+						//see if this collision is the first to occur
+						if(minT < collidingT) {
+							collidingT = minT;
+							collidingObj = obj;
+							collidingAxis = VectorUtil.maxIndex(minTvals);
+						}
 					}
 				}
-			}
 
-			//Assume no collision happened; if it did, adjust below
-			_location += velocity * (float)e.Time;
-			deltax = (velocity * (float)e.Time).X;
-			if(collidingAxis != -1) {
-				if(Invincible || !((GameObject)collidingObj).hascbox) { //if this is a normal physics collision
-					switch(collidingAxis) {
-						case 0: //x
-							velocity.X = 0;
-							float endX = _location.X;
-							if(_location.X < ((GameObject)collidingObj).location.X) {
-								_location.X = ((GameObject)collidingObj).location.X - (pbox.X + collidingObj.pbox.X);
-							} else {
-								_location.X = ((GameObject)collidingObj).location.X + pbox.X + collidingObj.pbox.X;
-							}
-							deltax -= endX - _location.X; //update this value for camera offset
-							break;
-						case 1: //y
-							velocity.Y = 0;
-							if(_location.Y < ((GameObject)collidingObj).location.Y) {
-								_location.Y = ((GameObject)collidingObj).location.Y - (pbox.Y + collidingObj.pbox.Y);
-							} else {
-								_location.Y = ((GameObject)collidingObj).location.Y + pbox.Y + collidingObj.pbox.Y;
-							}
-							break;
-						case 2: //z
-							velocity.Z = 0;
-							if(_location.Z < ((GameObject)collidingObj).location.Z) {
-								_location.Z = ((GameObject)collidingObj).location.Z - (pbox.Z + collidingObj.pbox.Z);
-							} else {
-								_location.Z = ((GameObject)collidingObj).location.Z + pbox.Z + collidingObj.pbox.Z;
-							}
-							break;
-					}
-				} else { //this is a combat collision
-					if(((CombatObject)collidingObj).type == 1) {// obj is an enemy, do damage, knock player back
-						_health = _health - ((CombatObject)collidingObj).damage;
-						Invincible = true;
-						HasControl = false;
-						((Enemy)collidingObj).frozen = true;
+				Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
+				if(collidingAxis == -1) { //no collision
+					_location += velocity * (float)time;
+					time = 0.0;
+					deltax += _location.X - startLoc.X; //update this value for camera offset
+				} else {
+					alreadyCollidedList.Add(collidingObj);
+					if(Invincible || !((GameObject)collidingObj).hascbox) { //if this is a normal physics collision
+						switch(collidingAxis) {
+							case 0: //x
+								if(_location.X < ((GameObject)collidingObj).location.X) {
+									_location.X = ((GameObject)collidingObj).location.X - (pbox.X + collidingObj.pbox.X) - 0.001f;
+								} else {
+									_location.X = ((GameObject)collidingObj).location.X + pbox.X + collidingObj.pbox.X + 0.001f;
+								}
+								if(velocity.X != 0) {//should always be true, but just in case...
+									double deltaTime = (location.X - startLoc.X) / velocity.X;
+									_location.Y += (float)(velocity.Y * deltaTime);
+									_location.Z += (float)(velocity.Z * deltaTime);
+									time -= deltaTime;
+								}
+								deltax += _location.X - startLoc.X; //update this value for camera offset
+								velocity.X = 0;
+								break;
+							case 1: //y
+								if(_location.Y < ((GameObject)collidingObj).location.Y) {
+									_location.Y = ((GameObject)collidingObj).location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.001f;
+								} else {
+									_location.Y = ((GameObject)collidingObj).location.Y + pbox.Y + collidingObj.pbox.Y + 0.001f;
+									//Special case for landing on platforms
+									cam.MoveToYPos(_location.Y);
+								}
+								if(velocity.Y != 0) {//should always be true, but just in case...
+									double deltaTime = (location.Y - startLoc.Y) / velocity.Y;
+									_location.X += (float)(velocity.X * deltaTime);
+									_location.Z += (float)(velocity.Z * deltaTime);
+									time -= deltaTime;
+								}
+								deltax += _location.X - startLoc.X; //update this value for camera offset
+								velocity.Y = 0;
+								break;
+							case 2: //z
+								if(_location.Z < ((GameObject)collidingObj).location.Z) {
+									_location.Z = ((GameObject)collidingObj).location.Z - (pbox.Z + collidingObj.pbox.Z) - 0.001f;
+								} else {
+									_location.Z = ((GameObject)collidingObj).location.Z + pbox.Z + collidingObj.pbox.Z + 0.001f;
+								}
+								if(velocity.Z != 0) {//should always be true, but just in case...
+									double deltaTime = (location.Z - startLoc.Z) / velocity.Z;
+									_location.X += (float)(velocity.X * deltaTime);
+									_location.Y += (float)(velocity.Y * deltaTime);
+									time -= deltaTime;
+								}
+								deltax += _location.X - startLoc.X; //update this value for camera offset
+								velocity.Z = 0;
+								break;
+						}
+					} else { //this is a combat collision
+						time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
 
-						// direction we need to be knocked back in.
-						Vector3 direction = new Vector3(location.X - ((GameObject)collidingObj).location.X, 0, location.Z - ((GameObject)collidingObj).location.Z);
-						direction.Normalize();
+						if(((CombatObject)collidingObj).type == 1) {// obj is an enemy, do damage, knock player back
+							_health = _health - ((CombatObject)collidingObj).damage;
+							Invincible = true;
+							HasControl = false;
+							((Enemy)collidingObj).frozen = true;
 
-						location = new Vector3(((GameObject)collidingObj).location.X + (collidingObj.pbox.X * direction.X), ((GameObject)collidingObj).location.Y + collidingObj.pbox.Y, ((GameObject)collidingObj).location.Z + (collidingObj.pbox.Z * direction.Z));
-                        velocity = new Vector3(0, 0, 0);
-						accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
+							// direction we need to be knocked back in.
+							Vector3 direction = new Vector3(location.X - ((GameObject)collidingObj).location.X, 0, location.Z - ((GameObject)collidingObj).location.Z);
+							direction.Normalize();
+
+							location = new Vector3(((GameObject)collidingObj).location.X + (collidingObj.pbox.X * direction.X), ((GameObject)collidingObj).location.Y + collidingObj.pbox.Y, ((GameObject)collidingObj).location.Z + (collidingObj.pbox.Z * direction.Z));
+							velocity = new Vector3(0, 0, 0);
+							accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
 
 
-					}
-					if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
-						//TODO: projectile implementation
+						}
+						if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
+							//TODO: projectile implementation
 
 
+						}
 					}
 				}
 			}
 		}
 
-		public void physUpdate2d(FrameEventArgs e, List<PhysicsObject> objlist) {
+		public void physUpdate2d(double time, List<PhysicsObject> objlist) {
 			if(doesGravity) {
-				accel.Y -= (float)(400 * e.Time); //TODO: turn this into a constant somewhere
+				accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
 			}
 			velocity += accel;
 			accel.X = 0;
@@ -350,101 +381,117 @@ namespace U5Designs
 
 			velocity.Z = 0; //special case for 2d
 
-			PhysicsObject collidingObj = null;
-			float collidingT = 1.0f / 0.0f; //pos infinity
-			int collidingAxis = -1;
+			deltax = 0.0f;
+			List<PhysicsObject> alreadyCollidedList = new List<PhysicsObject>();
 
-			foreach(PhysicsObject obj in objlist) {
-				// don't do collision physics to yourself
-				if(obj != this) {
-					Vector3 mybox, objbox;
-					if(!Invincible && ((GameObject)obj).hascbox) {
-						mybox = _cbox;
-						objbox = ((CombatObject)obj).cbox;
-					} else {
-						mybox = _pbox;
-						objbox = obj.pbox;
-					}
-					//find possible ranges of values for which a collision may have occured
-					Vector3 maxTvals = VectorUtil.div(((GameObject)obj).location + objbox - _location + mybox, velocity);
-					Vector3 minTvals = VectorUtil.div(((GameObject)obj).location - objbox - _location - mybox, velocity);
-					VectorUtil.sort(ref minTvals, ref maxTvals);
+			while(time > 0.0) {
+				PhysicsObject collidingObj = null;
+				float collidingT = 1.0f / 0.0f; //pos infinity
+				int collidingAxis = -1;
 
-					float minT = VectorUtil.maxVal(minTvals.Xy);
-					float maxT = VectorUtil.minVal(maxTvals.Xy);
+				foreach(PhysicsObject obj in objlist) {
+					// don't do collision physics to yourself, or on things you already hit this frame
+					if(obj != this && !alreadyCollidedList.Contains(obj)) {
+						Vector3 mybox, objbox;
+						if(!Invincible && ((GameObject)obj).hascbox) {
+							mybox = _cbox;
+							objbox = ((CombatObject)obj).cbox;
+						} else {
+							mybox = _pbox;
+							objbox = obj.pbox;
+						}
+						//find possible ranges of values for which a collision may have occurred
+						Vector3 maxTvals = VectorUtil.div(((GameObject)obj).location + objbox - _location + mybox, velocity);
+						Vector3 minTvals = VectorUtil.div(((GameObject)obj).location - objbox - _location - mybox, velocity);
+						VectorUtil.sort(ref minTvals, ref maxTvals);
 
-					// both axes? || forward? || within range?
-					if(minT > maxT || minT < 0.0f || minT > e.Time) {
-// 						if(((GameObject)obj).hascbox && velocity.X != 0 && velocity.Y != 0 && minT >= 0) {
-// 							Console.WriteLine(minT + ", " + maxT);
-// 						}
-						continue; //no intersection
-					}
+						float minT = VectorUtil.maxVal(minTvals.Xy);
+						float maxT = VectorUtil.minVal(maxTvals.Xy);
 
-					//if we're here, there's a collision
-					//see if this collision is the first to occur
-					if(minT < collidingT) {
-						collidingT = minT;
-						collidingObj = obj;
-						collidingAxis = VectorUtil.maxIndex(minTvals.Xy);
-					}
-				}
-			}
+						// both axes? || forward? || within range?
+						if(minT > maxT || minT < 0.0f || minT > time) {
+							continue; //no intersection
+						}
 
-			if(collidingAxis != -1) {
-				if(Invincible || !((GameObject)collidingObj).hascbox) { //if this is a normal physics collision
-					//Assume no collision happened; if it did, adjust below
-					_location += velocity * (float)e.Time;
-					deltax = (velocity * (float)e.Time).X;
-					switch(collidingAxis) {
-						case 0: //x
-							velocity.X = 0;
-							float endX = _location.X;
-							if(_location.X < ((GameObject)collidingObj).location.X) {
-								_location.X = ((GameObject)collidingObj).location.X - (pbox.X + collidingObj.pbox.X);
-							} else {
-								_location.X = ((GameObject)collidingObj).location.X + pbox.X + collidingObj.pbox.X;
-							}
-							deltax -= endX - _location.X; //update this value for camera offset
-							break;
-						case 1: //y
-							velocity.Y = 0;
-							if(_location.Y < ((GameObject)collidingObj).location.Y) {
-								_location.Y = ((GameObject)collidingObj).location.Y - (pbox.Y + collidingObj.pbox.Y);
-							} else {
-								_location.Y = ((GameObject)collidingObj).location.Y + pbox.Y + collidingObj.pbox.Y;
-							}
-							break;
-					}
-				} else { //this is a combat collision
-					if(((CombatObject)collidingObj).type == 1) {// obj is an enemy, do damage, knock player back
-						_health = _health - ((CombatObject)collidingObj).damage;
-						Invincible = true;
-						HasControl = false;
-						((Enemy)collidingObj).frozen = true;
-
-						// direction we need to be knocked back in.
-						Vector3 direction = new Vector3(location.X - ((GameObject)collidingObj).location.X, 0, 0);
-						direction.Normalize();
-
-						float origX = location.X;
-
-						location = new Vector3(((GameObject)collidingObj).location.X + (collidingObj.pbox.X * direction.X), ((GameObject)collidingObj).location.Y + collidingObj.pbox.Y, location.Z);
-						deltax = location.X - origX;
-                        velocity = new Vector3(0, 0, 0);
-						accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, 0);
-
-
-					}
-					if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
-						//TODO: projectile implementation
-
-
+						//if we're here, there's a collision
+						//see if this collision is the first to occur
+						if(minT < collidingT) {
+							collidingT = minT;
+							collidingObj = obj;
+							collidingAxis = VectorUtil.maxIndex(minTvals.Xy);
+						}
 					}
 				}
-			} else { //no collision, behave normally
-				_location += velocity * (float)e.Time;
-				deltax = (velocity * (float)e.Time).X;
+
+				Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
+				if(collidingAxis == -1) { //no collision
+					_location += velocity * (float)time;
+					time = 0.0;
+					deltax += _location.X - startLoc.X; //update this value for camera offset
+				} else {
+					alreadyCollidedList.Add(collidingObj);
+					if(Invincible || !((GameObject)collidingObj).hascbox) { //if this is a normal physics collision
+						switch(collidingAxis) {
+							case 0: //x
+								if(_location.X < ((GameObject)collidingObj).location.X) {
+									_location.X = ((GameObject)collidingObj).location.X - (pbox.X + collidingObj.pbox.X) - 0.001f;
+								} else {
+									_location.X = ((GameObject)collidingObj).location.X + pbox.X + collidingObj.pbox.X + 0.001f;
+								}
+								if(velocity.X != 0) {//should always be true, but just in case...
+									double deltaTime = (location.X - startLoc.X) / velocity.X;
+									_location.Y += (float)(velocity.Y * deltaTime);
+									time -= deltaTime;
+								}
+								deltax += _location.X - startLoc.X; //update this value for camera offset
+								velocity.X = 0;
+								break;
+							case 1: //y
+								if(_location.Y < ((GameObject)collidingObj).location.Y) {
+									_location.Y = ((GameObject)collidingObj).location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.001f;
+								} else {
+									_location.Y = ((GameObject)collidingObj).location.Y + pbox.Y + collidingObj.pbox.Y + 0.001f;
+									//Special case for landing on platforms
+									cam.MoveToYPos(_location.Y);
+								}
+								if(velocity.Y != 0) {//should always be true, but just in case...
+									double deltaTime = (location.Y - startLoc.Y) / velocity.Y;
+									_location.X += (float)(velocity.X * deltaTime);
+									time -= deltaTime;
+								}
+								deltax += _location.X - startLoc.X; //update this value for camera offset
+								velocity.Y = 0;
+								break;
+						}
+					} else { //this is a combat collision
+						time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+
+						if(((CombatObject)collidingObj).type == 1) {// obj is an enemy, do damage, knock player back
+							_health = _health - ((CombatObject)collidingObj).damage;
+							Invincible = true;
+							HasControl = false;
+							((Enemy)collidingObj).frozen = true;
+
+							// direction we need to be knocked back in.
+							Vector3 direction = new Vector3(location.X - ((GameObject)collidingObj).location.X, 0, 0);
+							direction.Normalize();
+
+							float origX = location.X;
+
+							location = new Vector3(((GameObject)collidingObj).location.X + (collidingObj.pbox.X * direction.X), ((GameObject)collidingObj).location.Y + collidingObj.pbox.Y, location.Z);
+							deltax = location.X - origX;
+							velocity = new Vector3(0, 0, 0);
+							accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, 0);
+
+
+						}
+						if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
+							//TODO: projectile implementation
+
+
+						}
+					}
+				}
 			}
 		}
 

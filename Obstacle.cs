@@ -103,26 +103,29 @@ namespace U5Designs {
 		public void doScaleTranslateAndTexture() {
 			GL.PushMatrix();
 			if(_is3dGeo) {
-				GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 				GL.BindTexture(TextureTarget.Texture2D, texID);
+//				GL.BindTexture(TextureTarget.Texture2D, 0);
 				BitmapData bmp_data = _texture.LockBits(new Rectangle(0, 0, _texture.Width, _texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
-					OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+ 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
+ 					OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
 				_texture.UnlockBits(bmp_data);
 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+ 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+ 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+ 				GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 			}
 
             GL.Translate(_location);
             GL.Scale(_scale);
 		}
 
-		public void physUpdate3d(FrameEventArgs e, List<PhysicsObject> objlist) {
+		public void physUpdate3d(double time, List<PhysicsObject> objlist) {
 			//obstacles don't move (for now) so they don't need an update
 			return;
 		}
 
-		public void physUpdate2d(FrameEventArgs e, List<PhysicsObject> objlist) {
+		public void physUpdate2d(double time, List<PhysicsObject> objlist) {
 			//obstacles don't move (for now) so they don't need an update
 			return;
 		}

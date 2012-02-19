@@ -1,13 +1,36 @@
 <level>
+	<backgroundlist>
+		<background>
+			<loc x="926" y="75" z="-200"/>
+			<scale x="3704" y="200" z="1"/>
+			<sprite>test_background.dat</sprite>
+			<speed>0.75</speed>
+		</background>
+	</backgroundlist>
 	<enemylist>
-		<enemy>test_enemy.dat</enemy>		
+		<enemy>
+			<path>test_enemy.dat</path>
+			<loc x="250" y="12.5" z="50"/>
+		</enemy>
 	</enemylist>
 	<obstaclelist>
-		<obstacle>test_obstacle.dat</obstacle>
-		<obstacle>test_obstacle2.dat</obstacle>
-		<obstacle>test_obstacle3.dat</obstacle>
-		<obstacle>test_obstacle4.dat</obstacle>
-		<obstacle>test_obstacle5.dat</obstacle>
-		<obstacle>test_obstacle3D1.dat</obstacle>		
+		<obstacle>
+			<path>test_obstacle.dat</path>
+			<loc x="50" y="-50" z="50"/>
+			<loc x="150" y="-50" z="50"/>
+			<loc x="250" y="-50" z="50"/>
+			<loc x="450" y="-50" z="50"/>
+			<loc x="550" y="-50" z="50"/>
+		</obstacle>
+		<obstacle>
+			<path>test_obstacle_sprite.dat</path>
+			<loc x="250" y="70" z="50"/>
+		</obstacle>		
 	</obstaclelist>
+	<decorationlist>
+		<decoration>
+			<path>test_background_3d.dat</path>
+			<loc x="800" y="75" z="50"/>
+		</decoration>
+	</decorationlist>
 </level>

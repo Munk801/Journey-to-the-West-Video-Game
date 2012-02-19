@@ -1,9 +1,8 @@
 <obstacle>
-	<is2d>false</is2d>
+	<is2d>true</is2d>
 	<scale x="50" y="50" z="50"/>
-	<pbox x="50" y="50" z="50"/>
+	<pbox x="25" y="25" z="25"/>
 	<draw2>true</draw2>
 	<draw3>true</draw3>
-	<mesh>box.obj</mesh>
-	<bmp>test.png</bmp>	
+	<sprite>test_floor_sprite.dat</sprite>
 </obstacle>

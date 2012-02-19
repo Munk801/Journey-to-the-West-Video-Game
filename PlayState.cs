@@ -63,6 +63,7 @@ namespace U5Designs
 			Vector3 lookat = new Vector3(100, 75, 50);
 			Vector3 eye = lookat + new Vector3(0, 0, 100);
             camera = new Camera(eye, lookat, eng.ClientRectangle.Width, eng.ClientRectangle.Height);
+			player.cam = camera;
         }
 
 		public override void MakeActive() {
@@ -120,22 +121,22 @@ namespace U5Designs
 					aio.aiUpdate(e, player.location, enable3d);
 				}
 
-				//Now that all everyone's had a chance to accelerate, actually
+				//Now that everyone's had a chance to accelerate, actually
 				//translate that into velocity and position
 				if(enable3d) {
-					player.physUpdate3d(e, physList); //TODO: Should player be first or last?
+					player.physUpdate3d(e.Time, physList); //TODO: Should player be first or last?
 					foreach(PhysicsObject po in colisionList) {
-						po.physUpdate3d(e, physList);
+						po.physUpdate3d(e.Time, physList);
 					}
 				} else {
-					player.physUpdate2d(e, physList); //TODO: Should player be first or last?
+					player.physUpdate2d(e.Time, physList); //TODO: Should player be first or last?
 					foreach(PhysicsObject po in colisionList) {
-						po.physUpdate2d(e, physList);
+						po.physUpdate2d(e.Time, physList);
 					}
 				}
 
 				//Stuff that uses deltax must be last
-				camera.Update(player.deltax);
+				camera.Update(player.deltax, e.Time);
 				foreach(Background b in backgroundList) {
 					b.UpdatePosition(player.deltax);
 				}
@@ -161,21 +162,21 @@ namespace U5Designs
             camera.SetModelView();
 
 			//Set up textures
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
+// 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+// 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+// 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+// 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+// 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 
 
 			foreach(RenderObject obj in renderList) {
-				if((enable3d && ((GameObject)obj).existsIn3d) || (!enable3d && ((GameObject)obj).existsIn2d)) {
+				if((enable3d && ((GameObject)obj).existsIn3d) || (!enable3d && ((GameObject)obj).existsIn2d) || isInTransition) {
 					if(obj.is3dGeo) {
 						obj.doScaleTranslateAndTexture();
 						obj.mesh.Render();
 					} else {
 						obj.doScaleTranslateAndTexture();
-						obj.frameNumber = obj.sprite.draw(enable3d ^ isInTransition, obj.cycleNumber, obj.frameNumber + e.Time);
+						obj.frameNumber = obj.sprite.draw(enable3d && !isInTransition, obj.cycleNumber, obj.frameNumber + e.Time);
 					}
 				}
 			}

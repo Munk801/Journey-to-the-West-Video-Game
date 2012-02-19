@@ -105,11 +105,11 @@ namespace U5Designs {
 			throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void physUpdate3d(FrameEventArgs e, List<PhysicsObject> objlist) {
+		public void physUpdate3d(double time, List<PhysicsObject> objlist) {
 			throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void physUpdate2d(FrameEventArgs e, List<PhysicsObject> objlist) {
+		public void physUpdate2d(double time, List<PhysicsObject> objlist) {
 			throw new Exception("The method or operation is not implemented.");
 		}
 

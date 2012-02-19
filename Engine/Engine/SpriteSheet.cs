@@ -168,7 +168,7 @@ namespace Engine {
 		 *		  to bring it back into the expected range.
 		 */
 		public double draw(bool viewIs3d, int cycleNumber = 0, double frameTime = 0.0) {
-			//If possible, move some of these state changes into GameEngine to improve performance
+ 			//If possible, move some of these state changes into GameEngine to improve performance
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);

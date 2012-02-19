@@ -164,22 +164,22 @@ namespace U5Designs
             GL.Scale(_scale);
 		}
 
-        public void physUpdate3d(FrameEventArgs e, List<PhysicsObject> objlist) {
+        public void physUpdate3d(double time, List<PhysicsObject> objlist) {
             if (frozen)
-                freezetimer = freezetimer + e.Time;
+                freezetimer = freezetimer + time;
             if (freezetimer > 1) {
                 frozen = false;
                 freezetimer = 0;
             }
             if (!frozen) {
                 if (doesGravity) {
-                    accel.Y -= (float)(400 * e.Time); //TODO: turn this into a constant somewhere
+                    accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
                 }
                 velocity += accel;
                 accel.X = 0;
                 accel.Y = 0;
                 accel.Z = 0;
-                _location += velocity * (float)e.Time;
+                _location += velocity * (float)time;
 
 
                 foreach (PhysicsObject obj in objlist) {
@@ -193,8 +193,8 @@ namespace U5Designs
 
                             //figure out which direction the collision happened on by looking for point where
                             //only one axis is not colliding
-                            Vector3 temploc = _location - velocity * (float)e.Time;
-                            Vector3 step = velocity * (float)e.Time * 0.25f;
+                            Vector3 temploc = _location - velocity * (float)time;
+                            Vector3 step = velocity * (float)time * 0.25f;
                             bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
                             bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
                             bool z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
@@ -266,23 +266,23 @@ namespace U5Designs
             }
         }
 
-        public void physUpdate2d(FrameEventArgs e, List<PhysicsObject> objlist) {
+        public void physUpdate2d(double time, List<PhysicsObject> objlist) {
             if (frozen)
-                freezetimer = freezetimer + e.Time;
+                freezetimer = freezetimer + time;
             if (freezetimer > 1) {
                 frozen = false;
                 freezetimer = 0;
             }
             if (!frozen) {
                 if (doesGravity) {
-                    accel.Y -= (float)(400 * e.Time); //TODO: turn this into a constant somewhere
+                    accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
                 }
                 velocity.X += accel.X;
                 velocity.Y += accel.Y;
                 accel.X = 0;
                 accel.Y = 0;
                 accel.Z = 0;
-                _location += velocity * (float)e.Time;
+                _location += velocity * (float)time;
 
                 foreach (PhysicsObject obj in objlist) {
                     // don't do collision physics to yourself
@@ -294,8 +294,8 @@ namespace U5Designs
 
                             //figure out which direction the collision happened on by looking for point where
                             //only one axis is not colliding
-                            Vector3 temploc = _location - velocity * (float)e.Time;
-                            Vector3 step = velocity * (float)e.Time * 0.25f;
+                            Vector3 temploc = _location - velocity * (float)time;
+                            Vector3 step = velocity * (float)time * 0.25f;
                             bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
                             bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
                             bool lastStepWasForward = true;

@@ -22,25 +22,6 @@ namespace Engine
 	        if(!ObjMeshLoader.Load(this, fileName))
                 System.Console.WriteLine("FAIL TO LOAD " + fileName);
 		}
-
-
-// 		public Vector3[] JustVertices {
-// 			get { return justvertices; }
-// 			set { justvertices = value; }
-// 		}
-// 		Vector3[] justvertices;
-// 
-// 		public Vector3[] Normals {
-// 			get { return normals; }
-// 			set { normals = value; }
-// 		}
-// 		Vector3[] normals;
-// 
-// 		public Vector2[] TexCoords {
-// 			get { return texcoords; }
-// 			set { texcoords = value; }
-// 		}
-// 		Vector2[] texcoords;
 	
 	    public ObjVertex[] Vertices
 	    {
