@@ -21,10 +21,22 @@
 			<loc x="250" y="-50" z="50"/>
 			<loc x="450" y="-50" z="50"/>
 			<loc x="550" y="-50" z="50"/>
+			<loc x="750" y="0" z="50"/>
+			<loc x="850" y="0" z="50"/>
+			<loc x="1050" y="50" z="50"/>
+			<loc x="1150" y="50" z="50"/>
+			<loc x="1350" y="0" z="50"/>
+			<loc x="1450" y="0" z="50"/>
+			<loc x="1650" y="-50" z="50"/>
+			<loc x="1750" y="-50" z="50"/>
+			<loc x="1850" y="-50" z="50"/>
+			<loc x="2050" y="-25" z="25"/>
+			<loc x="2050" y="-125" z="25"/>
+			<loc x="2050" y="-50" z="0"/>
 		</obstacle>
 		<obstacle>
 			<path>test_obstacle_sprite.dat</path>
-			<loc x="250" y="70" z="50"/>
+			<loc x="250" y="150" z="50"/>
 		</obstacle>		
 	</obstaclelist>
 	<decorationlist>

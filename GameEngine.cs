@@ -81,7 +81,7 @@ namespace U5Designs
         public void PopState()
         {
             // cleanup the current state
-            if (states.Count != 0)
+            if (states.Count > 0)
             {
                 //GameState st = states.Peek();
                 states.Pop();

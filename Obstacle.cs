@@ -120,6 +120,11 @@ namespace U5Designs {
             GL.Scale(_scale);
 		}
 
+        public void DoRotate(float rotate, Vector3d axis)
+        {
+            GL.Rotate(rotate, axis);
+        }
+
 		public void physUpdate3d(double time, List<PhysicsObject> objlist) {
 			//obstacles don't move (for now) so they don't need an update
 			return;

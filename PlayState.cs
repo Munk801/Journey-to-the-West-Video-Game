@@ -193,6 +193,17 @@ namespace U5Designs
 
         private void DealWithInput()
         {
+            // Testing the Level Design feature of re-loading LoadLevel after changing coords for a given game object
+            if (eng.Keyboard[Key.F5])
+            {
+                PlayState pst = new PlayState(this.menustate, eng, 0);
+                
+                //eng.PushState(pst);
+                eng.ChangeState(pst);
+
+                //LoadLevel.Load(0, pst);
+            }
+
             //TODO: Change these keys to their final mappings when determined
             if (eng.Keyboard[Key.Escape])
             {
