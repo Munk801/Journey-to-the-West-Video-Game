@@ -19,7 +19,7 @@
 		<enemy>
 			<path>test_enemy.dat</path>
 			<loc x="800" y="62.5" z="50"/>
-		</enemy
+		</enemy>
 		<enemy>
 			<path>test_enemy.dat</path>
 			<loc x="1100" y="112.5" z="50"/>
