@@ -18,7 +18,7 @@ namespace Engine {
 			get;
 		}
 
-		Bitmap texture { //null for sprites
+		MeshTexture texture { //null for sprites
 			get;
 		}
 
@@ -44,7 +44,6 @@ namespace Engine {
             get;
         }
 
-		bool isAnimated(); //true if more than one frame (probably only applies to sprites)
 		void doScaleTranslateAndTexture(); //pushes matrix, adds scale and translate to model view stack, and sets texture pointer
 	}
 }

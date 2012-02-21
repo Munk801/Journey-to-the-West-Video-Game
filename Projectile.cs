@@ -10,7 +10,7 @@ using OpenTK;
 namespace U5Designs {
 	class Projectile : GameObject, RenderObject, CombatObject, PhysicsObject {
 
-		public Projectile(Vector3 location, bool existsIn2d, bool existsIn3d, bool is3dGeo, ObjMesh mesh = null, Bitmap texture = null, SpriteSheet sprite = null) {
+		public Projectile(Vector3 location, bool existsIn2d, bool existsIn3d, bool is3dGeo, ObjMesh mesh = null, MeshTexture texture = null, SpriteSheet sprite = null) {
 			_location = location;
 			_existsIn3d = existsIn3d;
 			_existsIn2d = existsIn2d;
@@ -56,8 +56,8 @@ namespace U5Designs {
 			get { return _mesh; }
 		}
 
-		private Bitmap _texture; //null for sprites
-		public Bitmap texture {
+		private MeshTexture _texture; //null for sprites
+		public MeshTexture texture {
 			get { return _texture; }
 		}
 
@@ -95,10 +95,6 @@ namespace U5Designs {
 		public double frameNumber {
 			get { return _frameNum; }
 			set { _frameNum = value; }
-		}
-
-		public bool isAnimated() {
-			throw new Exception("The method or operation is not implemented.");
 		}
 
 		public void doScaleTranslateAndTexture() {

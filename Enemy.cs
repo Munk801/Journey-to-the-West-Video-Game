@@ -14,16 +14,14 @@ namespace U5Designs
 {
     class Enemy : GameObject, AIObject, RenderObject, PhysicsObject, CombatObject
     {
-
-        private int texID;
-        private int AItype;
+		private int AItype;
         internal Vector3 velocity;
         internal Vector3 accel;
         private bool doesGravity; //true if gravity affects this object
         public bool frozen;
         private double freezetimer;
 
-		public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, Bitmap texture) {
+		public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, MeshTexture texture) {
 			_location = location;
             _scale = scale;
             _pbox = pbox;
@@ -47,7 +45,6 @@ namespace U5Designs
 			_cycleNum = 0;
 			_frameNum = 0;
 			_is3dGeo = true;
-            texID = GL.GenTexture();
 
             velocity = new Vector3(0, 0, 0);
             accel = new Vector3(0, 0, 0);
@@ -78,7 +75,6 @@ namespace U5Designs
 			_sprite = sprite;
 			_frameNum = 0;
 			_is3dGeo = false;
-			texID = GL.GenTexture();
 
             velocity = new Vector3(0, 0, 0);
             accel = new Vector3(0, 0, 0);
@@ -102,8 +98,8 @@ namespace U5Designs
 			get { return _mesh; }
 		}
 
-		private Bitmap _texture; //null for sprites
-		public Bitmap texture {
+		private MeshTexture _texture; //null for sprites
+		public MeshTexture texture {
 			get { return _texture; }
 		}
 
@@ -145,21 +141,13 @@ namespace U5Designs
 			set { _frameNum = value; }
 		}
 
-		public bool isAnimated() {
-			throw new Exception("The method or operation is not implemented.");
-		}
-
 		public void doScaleTranslateAndTexture() {
             GL.PushMatrix();
 
-/*            GL.BindTexture(TextureTarget.Texture2D, texID);
-            BitmapData bmp_data = _texture.LockBits(new Rectangle(0, 0, _texture.Width, _texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
-                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
-            _texture.UnlockBits(bmp_data);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-*/
+			if(_is3dGeo) {
+				_texture.doTexture();
+			}
+
             GL.Translate(_location);
             GL.Scale(_scale);
 		}

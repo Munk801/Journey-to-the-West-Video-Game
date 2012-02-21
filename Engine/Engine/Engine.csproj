@@ -98,6 +98,7 @@
     <Compile Include="GameObject.cs" />
     <Compile Include="Input\Input.cs" />
     <Compile Include="Input\Keyboard.cs" />
+    <Compile Include="MeshTexture.cs" />
     <Compile Include="ObjMesh.cs" />
     <Compile Include="ObjMeshLoader.cs" />
     <Compile Include="PhysicsObject.cs" />

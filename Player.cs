@@ -20,10 +20,8 @@ namespace U5Designs
         private Vector3 kbspeed = new Vector3(70, 100, 70);
 
         public PlayerState p_state;
-        int texID;
 		public Vector3 velocity;
 		private Vector3 accel;
-		private bool doesGravity; //true if gravity affects this object
         private bool Invincible, HasControl;
         private double Invincibletimer, NoControlTimer;
 
@@ -44,13 +42,10 @@ namespace U5Designs
             _cbox = new Vector3(6.25f, 6.25f, 6.25f);
             //cubemesh = new ObjMesh("../../Geometry/box.obj");
             //_texture = new Bitmap("../../Textures/player.png");
-            texID = GL.GenTexture();
 			velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);
-			doesGravity = true;
 			_cycleNum = 0;
 			_frameNum = 0;
-			_is3dGeo = false;
 			_sprite = sprite;
             _hascbox = true;
             _type = 0; // hack, this means nothing, will never matter as player never collides with himself
@@ -159,22 +154,19 @@ namespace U5Designs
 			frameNumber = sprite.draw(viewIs3d, cycleNumber, frameNumber + time);
 		}
 
-		private bool _is3dGeo;
 		public bool is3dGeo {
-			get { return _is3dGeo; }
+			get { return false; }
 		}
 
-		private ObjMesh _mesh; //null for sprites
 		public ObjMesh mesh {
-			get { return _mesh; }
+			get { return null; }
 		}
 
-		private Bitmap _texture; //null for sprites
-		public Bitmap texture {
-			get { return _texture; }
+		public MeshTexture texture {
+			get { return null; }
 		}
 
-		private SpriteSheet _sprite; //null for 3d objects
+		private SpriteSheet _sprite;
 		public SpriteSheet sprite {
 			get { return _sprite; }
 		}
@@ -213,35 +205,24 @@ namespace U5Designs
 			set { _frameNum = value; }
 		}
 
-		public bool isAnimated() {
-			throw new Exception("The method or operation is not implemented.");
-		}
-
         public void doScaleTranslateAndTexture() {
 			GL.PushMatrix();
-
-// 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
-// 			GL.BindTexture(TextureTarget.Texture2D, texID);
-// 			BitmapData bmp_data = _texture.LockBits(new Rectangle(0, 0, _texture.Width, _texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-// 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
-// 				OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
-// 			_texture.UnlockBits(bmp_data);
-// 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-// 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
 			GL.Translate(_location);
 			GL.Scale(_scale);
         }
 
 		public void physUpdate3d(double time, List<PhysicsObject> objlist) {
-			if(doesGravity) {
-				accel.Y -= (float)(400*time); //TODO: turn this into a constant somewhere
-			}
+			//first deal with gravity
+			accel.Y -= (float)(400*time); //TODO: turn this into a constant somewhere
+
+			//now do acceleration
 			velocity += accel;
 			accel.X = 0;
 			accel.Y = 0;
 			accel.Z = 0;
 
+			//now check for collisions and move
 			deltax = 0.0f;
 			List<PhysicsObject> alreadyCollidedList = new List<PhysicsObject>();
 
@@ -371,9 +352,10 @@ namespace U5Designs
 		}
 
 		public void physUpdate2d(double time, List<PhysicsObject> objlist) {
-			if(doesGravity) {
-				accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
-			}
+			//first do gravity
+			accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
+			
+			//now deal with acceleration
 			velocity += accel;
 			accel.X = 0;
 			accel.Y = 0;
@@ -381,6 +363,7 @@ namespace U5Designs
 
 			velocity.Z = 0; //special case for 2d
 
+			//now check for collisions and move
 			deltax = 0.0f;
 			List<PhysicsObject> alreadyCollidedList = new List<PhysicsObject>();
 

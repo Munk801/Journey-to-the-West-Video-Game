@@ -14,7 +14,7 @@ namespace U5Designs {
 	class Obstacle : GameObject, RenderObject, PhysicsObject{
 		private int texID;
 
-		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, ObjMesh mesh, Bitmap texture) {
+		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, ObjMesh mesh, MeshTexture texture) {
 			_location = location;
             _scale = scale;
             _pbox = pbox;
@@ -26,7 +26,6 @@ namespace U5Designs {
 			_cycleNum = 0;
 			_frameNum = 0;
 			_is3dGeo = true;
-            texID = GL.GenTexture();
             _hascbox = false;
 		}
 
@@ -42,7 +41,6 @@ namespace U5Designs {
 			_sprite = sprite;
 			_frameNum = 0;
 			_is3dGeo = false;
-			texID = GL.GenTexture();
             _hascbox = false;
 		}
 
@@ -56,8 +54,8 @@ namespace U5Designs {
 			get { return _mesh; }
 		}
 
-		private Bitmap _texture; //null for sprites
-		public Bitmap texture {
+		private MeshTexture _texture; //null for sprites
+		public MeshTexture texture {
 			get { return _texture; }
 		}
 
@@ -96,24 +94,10 @@ namespace U5Designs {
 			set { _frameNum = value; }
 		}
 
-		public bool isAnimated() {
-			throw new Exception("The method or operation is not implemented.");
-		}
-
 		public void doScaleTranslateAndTexture() {
 			GL.PushMatrix();
 			if(_is3dGeo) {
-				GL.BindTexture(TextureTarget.Texture2D, texID);
-//				GL.BindTexture(TextureTarget.Texture2D, 0);
-				BitmapData bmp_data = _texture.LockBits(new Rectangle(0, 0, _texture.Width, _texture.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
- 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0,
- 					OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
-				_texture.UnlockBits(bmp_data);
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
- 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
- 				GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
- 				GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
+				_texture.doTexture();
 			}
 
             GL.Translate(_location);
@@ -136,7 +120,7 @@ namespace U5Designs {
 		}
 
 		public void accelerate(Vector3 acceleration) {
-			throw new Exception("The method or operation is not implemented.");
+			//obstacles don't move (for now) so they don't need an accelerate
 		}
 	}
 }

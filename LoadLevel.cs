@@ -182,11 +182,11 @@ namespace U5Designs
 					ObjMesh _mesh = new ObjMesh("../../Geometry/" + _m.Item(0).InnerText);
 
 					XmlNodeList _b = doc_new.GetElementsByTagName("bmp");
-					Bitmap _bmp = new Bitmap("../../Textures/" + _b.Item(0).InnerText);
+					MeshTexture _tex = new MeshTexture(new Bitmap("../../Textures/" + _b.Item(0).InnerText));
 
 					for(int j = 1; j < OList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(OList[i].ChildNodes[j]);
-						_o.Add(new Obstacle(loc, scale, pbox, _draw2, _draw3, _mesh, _bmp));
+						_o.Add(new Obstacle(loc, scale, pbox, _draw2, _draw3, _mesh, _tex));
 					}
 					fstream_new.Close();
 				}
@@ -334,7 +334,7 @@ namespace U5Designs
 					ObjMesh _mesh = new ObjMesh("../../Geometry/" + _m.Item(0).InnerText);
 
 					XmlNodeList _b = doc_new.GetElementsByTagName("bmp");
-					Bitmap _bmp = new Bitmap("../../Textures/" + _b.Item(0).InnerText);
+					MeshTexture _bmp = new MeshTexture(new Bitmap("../../Textures/" + _b.Item(0).InnerText));
 
 					for(int j = 1; j < DList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(DList[i].ChildNodes[j]);
