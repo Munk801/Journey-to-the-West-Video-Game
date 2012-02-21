@@ -10,6 +10,8 @@ namespace U5Designs
         public int Id { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public double XLoc { get; set; }
+        public double YLoc { get; set; }
 
         public Texture(int id, int width, int height)
             : this()
@@ -19,19 +21,35 @@ namespace U5Designs
             Height = height;
         }
 
-        public void Draw2DTexture(int width, int height)
+        public void Draw2DTexture(double xPos = 0, double yPos = 0, float scaleX = 1.0f, float scaleY = 1.0f)
         {
-            GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-            GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-            height = height / 3;
-            width = width / 3;
-            double halfHeight = height / 2;
-            double halfWidth = width / 2;
+
+            //GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+            //GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+            //GL.Clear(ClearBufferMask.ColorBufferBit);
+            //GL.Enable(EnableCap.Texture2D);
+            GL.BindTexture(TextureTarget.Texture2D, Id);
+
+            //width = (int)(width * scaleX);
+            //height = (int)(height * scaleY);
+            //height = height / 3;
+            //width = width / 3;
+            //double halfHeight = height / 2;
+            //double halfWidth = width / 2;
+
+
+            float scaledWidth = (Width * scaleX);
+            float scaledHeight = (Height * scaleY);
+            double halfHeight = scaledHeight / 2;
+            double halfWidth = scaledWidth / 2;
             // Quad positions
-            double x = 0;
-            double y = 0;
+            double x = xPos;
+            double y = yPos;
             double z = 0;
+
+
+            XLoc = x - halfWidth;
+            YLoc = y + halfHeight;
 
             // Quad color
             float red = 1;

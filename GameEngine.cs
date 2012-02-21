@@ -25,6 +25,7 @@ namespace U5Designs
 
         Stack<GameState> states;// This is the "Stack" of states with an LIFO structure mimicing an actual memory Stack
         internal bool GameInProgress;// this bool tracks if a game is in progress, mostly for the menu state to know if its the first menu, or has been brought up ingame
+        internal TextureManager StateTextureManager;
 
         /// <summary>Creates a 1280x720 window.</summary>
         //TODO: Change this to a dynamic screen resolution
@@ -41,7 +42,7 @@ namespace U5Designs
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.Normalize);
 			GL.Enable(EnableCap.Texture2D);
-
+            StateTextureManager = new TextureManager();
             states = new Stack<GameState>();
 
             //this.ChangeState(ms);
