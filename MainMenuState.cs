@@ -68,27 +68,29 @@ namespace U5Designs
 			lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
 
-            SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
+			Assembly assembly = Assembly.GetExecutingAssembly();
+
+			SpriteSheet.quad = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry.quad.obj"));
             int[] cycleStarts = { 0 };
             int[] cycleLengths = { 1 };
-            //SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 1280, 720);
-            //background = new Obstacle(new Vector3(0, 0, 2), new Vector3(1280, 720, 1), new Vector3(0,0,0), true, true, ss);
+            SpriteSheet ss = new SpriteSheet(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures.testbg.png")), cycleStarts, cycleLengths, 1280, 720);
+            background = new Obstacle(new Vector3(0, 0, 1), new Vector3(1280, 720, 1), new Vector3(0,0,0), true, true, ss);
 
             // testing buttons
             _old_state = OpenTK.Input.Keyboard.GetState(); // Get the current state of the keyboard           
-            SpriteSheet pb_np_ss = new SpriteSheet(new Bitmap("../../Geometry/play_button_no_press.png"), cycleStarts, cycleLengths, 320, 100);
+            SpriteSheet pb_np_ss = new SpriteSheet(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures.play_button_no_press.png")), cycleStarts, cycleLengths, 320, 100);
             play_button_npress = new Obstacle(new Vector3(0, 100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, pb_np_ss);
-            SpriteSheet pb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/play_button_press.png"), cycleStarts, cycleLengths, 320, 100);
+			SpriteSheet pb_p_ss = new SpriteSheet(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures.play_button_press.png")), cycleStarts, cycleLengths, 320, 100);
             play_button_press = new Obstacle(new Vector3(0, 100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, pb_p_ss);
 
-            SpriteSheet lb_np_ss = new SpriteSheet(new Bitmap("../../Geometry/load_button_no_press.png"), cycleStarts, cycleLengths, 320, 100);
+			SpriteSheet lb_np_ss = new SpriteSheet(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures.load_button_no_press.png")), cycleStarts, cycleLengths, 320, 100);
             load_button_npress = new Obstacle(new Vector3(0, 0, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, lb_np_ss);
-            SpriteSheet lb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/load_button_press.png"), cycleStarts, cycleLengths, 320, 100);
+			SpriteSheet lb_p_ss = new SpriteSheet(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures.load_button_press.png")), cycleStarts, cycleLengths, 320, 100);
             load_button_press = new Obstacle(new Vector3(0, 0, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, lb_p_ss);
 
-            SpriteSheet qb_np_ss = new SpriteSheet(new Bitmap("../../Geometry/quit_button_no_press.png"), cycleStarts, cycleLengths, 320, 100);
+			SpriteSheet qb_np_ss = new SpriteSheet(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures.quit_button_no_press.png")), cycleStarts, cycleLengths, 320, 100);
             quit_button_npress = new Obstacle(new Vector3(0, -100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, qb_np_ss);
-            SpriteSheet qb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/quit_button_press.png"), cycleStarts, cycleLengths, 320, 100);
+			SpriteSheet qb_p_ss = new SpriteSheet(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures.quit_button_press.png")), cycleStarts, cycleLengths, 320, 100);
             quit_button_press = new Obstacle(new Vector3(0, -100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, qb_p_ss);
 
             // TEST //

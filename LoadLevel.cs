@@ -32,7 +32,7 @@ namespace U5Designs
 			 * This next section of code will read in a level file and create an array of Enemy files to be parsed.
 			 * */
 			Assembly assembly_new = Assembly.GetExecutingAssembly();
-			string file_new = "U5Designs.Resources.level_test.dat";
+			string file_new = "U5Designs.Resources.Data.Levels.level_test.dat";
 			Stream fstream_new = assembly_new.GetManifestResourceStream(file_new);
 			XmlDocument doc_new = new XmlDocument();
 			doc_new.Load(fstream_new);
@@ -82,13 +82,13 @@ namespace U5Designs
 
 
 
-			SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
+			SpriteSheet.quad = new ObjMesh(assembly_new.GetManifestResourceStream("U5Designs.Resources.Geometry.quad.obj"));
 
 			//Load Player
-			int[] cycleStarts = new int[] { 0, 4 };
-			int[] cycleLengths = new int[] { 4, 4 };
-			SpriteSheet ss = new SpriteSheet(new Bitmap("../../Textures/test_sprite.png"), cycleStarts, cycleLengths, 128, 128, 4.0);
-			ps.player = new Player(ss);//(_elist[0].sprite);
+			//int[] cycleStarts = new int[] { 0, 4 };
+			//int[] cycleLengths = new int[] { 4, 4 };
+			//SpriteSheet ss = new SpriteSheet(new Bitmap(assembly_new.GetManifestResourceStream("U5Designs.Resources.Textures.test_sprite.png")), cycleStarts, cycleLengths, 128, 128, 4.0);
+			ps.player = new Player(parse_Sprite_File("test_sprite.dat"));
 			ps.physList.Add(ps.player);
 		}
 
@@ -116,10 +116,10 @@ namespace U5Designs
 			Stream fstream_new;
 			XmlDocument doc_new = new XmlDocument();
 
-			fstream_new = assembly_new.GetManifestResourceStream("U5Designs.Resources." + path);
+			fstream_new = assembly_new.GetManifestResourceStream("U5Designs.Resources.Data.Sprites." + path);
 			doc_new.Load(fstream_new);
 			XmlNodeList _bp = doc_new.GetElementsByTagName("bmp");
-			string _bmp_path = "../../Textures/" + _bp.Item(0).InnerText;
+			string _bmp_path = "U5Designs.Resources.Textures." + _bp.Item(0).InnerText;
 			XmlNodeList _c_start_list = doc_new.GetElementsByTagName("c_starts");
 			int[] cycleStarts = new int[_c_start_list.Count];
 			for(int i = 0; i < _c_start_list.Count; i++) {
@@ -139,7 +139,7 @@ namespace U5Designs
 			fstream_new.Close();
 
 			// Create the SpriteSheet
-			return new SpriteSheet(new Bitmap(_bmp_path), cycleStarts, cycleLengths, _width, _height, _fps);
+			return new SpriteSheet(new Bitmap(assembly_new.GetManifestResourceStream(_bmp_path)), cycleStarts, cycleLengths, _width, _height, _fps);
 		}
 
 		/**
@@ -155,7 +155,7 @@ namespace U5Designs
 
 			for(int i = 0; i < OList.Count; i++) {
 				doc_new = new XmlDocument();
-				string _o_path = "U5Designs.Resources." + OList[i].FirstChild.InnerText;
+				string _o_path = "U5Designs.Resources.Data.Obstacles." + OList[i].FirstChild.InnerText;
 				fstream_new = assembly_new.GetManifestResourceStream(_o_path);
 				doc_new.Load(fstream_new);
 
@@ -179,10 +179,10 @@ namespace U5Designs
 					}
 				} else {
 					XmlNodeList _m = doc_new.GetElementsByTagName("mesh");
-					ObjMesh _mesh = new ObjMesh("../../Geometry/" + _m.Item(0).InnerText);
+					ObjMesh _mesh = new ObjMesh(assembly_new.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
 
 					XmlNodeList _b = doc_new.GetElementsByTagName("bmp");
-					MeshTexture _tex = new MeshTexture(new Bitmap("../../Textures/" + _b.Item(0).InnerText));
+					MeshTexture _tex = new MeshTexture(new Bitmap(assembly_new.GetManifestResourceStream("U5Designs.Resources.Textures." + _b.Item(0).InnerText)));
 
 					for(int j = 1; j < OList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(OList[i].ChildNodes[j]);
@@ -216,7 +216,7 @@ namespace U5Designs
 				int _health, _damage, _AI;
 				float _speed;
 
-				string _e_path = "U5Designs.Resources." + EList[i].FirstChild.InnerText;
+				string _e_path = "U5Designs.Resources.Data.Enemies." + EList[i].FirstChild.InnerText;
 				fstream_new = assembly_new.GetManifestResourceStream(_e_path);
 				doc_new.Load(fstream_new);
 
@@ -310,7 +310,7 @@ namespace U5Designs
 
 			for(int i = 0; i < DList.Count; i++) {
 				doc_new = new XmlDocument();
-				string _d_path = "U5Designs.Resources." + DList[i].FirstChild.InnerText;
+				string _d_path = "U5Designs.Resources.Data.Decorations." + DList[i].FirstChild.InnerText;
 				fstream_new = assembly_new.GetManifestResourceStream(_d_path);
 				doc_new.Load(fstream_new);
 
@@ -331,10 +331,10 @@ namespace U5Designs
 					}
 				} else {
 					XmlNodeList _m = doc_new.GetElementsByTagName("mesh");
-					ObjMesh _mesh = new ObjMesh("../../Geometry/" + _m.Item(0).InnerText);
+					ObjMesh _mesh = new ObjMesh(assembly_new.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
 
 					XmlNodeList _b = doc_new.GetElementsByTagName("bmp");
-					MeshTexture _bmp = new MeshTexture(new Bitmap("../../Textures/" + _b.Item(0).InnerText));
+					MeshTexture _bmp = new MeshTexture(new Bitmap(assembly_new.GetManifestResourceStream("U5Designs.Resources.Textures." + _b.Item(0).InnerText)));
 
 					for(int j = 1; j < DList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(DList[i].ChildNodes[j]);

@@ -5,6 +5,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.IO;
 
 using OpenTK;
 using OpenTK.Graphics;
@@ -20,7 +21,12 @@ namespace Engine
 	    public ObjMesh(string fileName)
 	    {
 	        if(!ObjMeshLoader.Load(this, fileName))
-                System.Console.WriteLine("FAIL TO LOAD " + fileName);
+                System.Console.WriteLine("FAILED TO LOAD " + fileName);
+		}
+
+		public ObjMesh(Stream objStream) {
+			if(!ObjMeshLoader.Load(this, objStream))
+				System.Console.WriteLine("FAILED TO LOAD .OBJ FILE");
 		}
 	
 	    public ObjVertex[] Vertices
@@ -95,16 +101,6 @@ namespace Engine
 
             GL.PopMatrix();
 	    }
-
-
-// 		public void Draw() {
-// 			GL.VertexPointer(3, VertexPointerType.Float, 0, justvertices);
-// 			GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, texcoords);
-// 			GL.NormalPointer(NormalPointerType.Float, 0, normals);
-// 
-// 			GL.DrawElements(BeginMode.Triangles, 3*triangles.Length, DrawElementsType.UnsignedInt, triangles);
-// 			GL.DrawElements(BeginMode.Quads, 4*quads.Length, DrawElementsType.UnsignedInt, quads);
-// 		}
 	
 	    [StructLayout(LayoutKind.Sequential)]
 	    public struct ObjVertex

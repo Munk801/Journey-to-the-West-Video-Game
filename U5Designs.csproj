@@ -80,19 +80,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\test_sprite.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\test_floor_sprite.dat" />
     <EmbeddedResource Include="Resources\test.sav" />
-    <EmbeddedResource Include="Resources\enemies.dat" />
-    <EmbeddedResource Include="Resources\level_0.dat" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\u5_logo.png" />
+    <EmbeddedResource Include="Resources\Textures\u5_logo.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Sound\jump_sound.ogg" />
     <EmbeddedResource Include="Resources\Sound\Retribution.ogg" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\u5_logo.jpg">
+    <EmbeddedResource Include="Resources\Textures\u5_logo.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
@@ -103,38 +101,48 @@
     <Content Include="Engine\Engine\Tao DevIL\ILU.dll" />
     <Content Include="Engine\Engine\Tao DevIL\ILUT.dll" />
     <Content Include="Engine\Engine\Tao DevIL\Tao.DevIl.dll" />
+    <EmbeddedResource Include="Resources\Textures\load_button_no_press.png" />
+    <EmbeddedResource Include="Resources\Textures\load_button_press.png" />
+    <EmbeddedResource Include="Resources\Textures\play_button_no_press.png" />
+    <EmbeddedResource Include="Resources\Textures\play_button_press.png" />
+    <EmbeddedResource Include="Resources\Textures\quit_button_no_press.png" />
+    <EmbeddedResource Include="Resources\Textures\quit_button_press.png" />
+    <EmbeddedResource Include="Resources\Textures\testbg.png" />
+    <EmbeddedResource Include="Resources\Textures\test.png" />
+    <EmbeddedResource Include="Resources\Textures\test_background.png" />
+    <EmbeddedResource Include="Resources\Textures\test_background_3d.png" />
+    <EmbeddedResource Include="Resources\Textures\test_sprite.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\lib\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\level_test.dat" />
-    <EmbeddedResource Include="Resources\test_enemy.dat" />
+    <EmbeddedResource Include="Resources\Data\Levels\level_test.dat" />
+    <EmbeddedResource Include="Resources\Data\Enemies\test_enemy.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\test_sprite.dat" />
+    <EmbeddedResource Include="Resources\Data\Obstacles\test_obstacle.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\test_obstacle.dat" />
+    <EmbeddedResource Include="Resources\Data\Obstacles\test_obstacle_sprite.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\test_floor_sprite.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\test_background.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\test_obstacle_sprite.dat" />
+    <EmbeddedResource Include="Resources\Data\Decorations\test_background_3d.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\test_background.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\test_background_3d_sprite.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\test_background_3d.dat" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\test_background_3d_sprite.dat" />
+    <EmbeddedResource Include="Resources\Geometry\box.obj" />
+    <EmbeddedResource Include="Resources\Geometry\quad.obj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(SolutionDir)test.sav" "$(TargetDir)test.sav"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

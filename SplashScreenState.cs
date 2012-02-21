@@ -49,7 +49,7 @@ namespace U5Designs
 
             Tao.DevIl.Ilut.ilutRenderer(Ilut.ILUT_OPENGL);
 
-            texturemanager.LoadTexture("logo", "../../Resources/u5_logo.jpg");
+            texturemanager.LoadTexture("logo", "../../Resources/Textures/u5_logo.jpg");
 
             Texture texture = StateTextureManager.GetTexture("logo");
             logo = texture;

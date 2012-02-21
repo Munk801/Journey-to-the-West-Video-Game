@@ -26,6 +26,16 @@ namespace Engine
 	        }
 	        catch { return false; }
 	    }
+
+		public static bool Load(ObjMesh mesh, Stream objStream) {
+			try {
+				using(StreamReader streamReader = new StreamReader(objStream)) {
+					Load(mesh, streamReader);
+					streamReader.Close();
+					return true;
+				}
+			} catch { return false; }
+		}
 	
 	    static char[] splitCharacters = new char[] { ' ' };
 	
