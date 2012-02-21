@@ -2,7 +2,7 @@
 	<bmp>test_background.png</bmp>
 	<c_starts>0</c_starts>
 	<c_lengths>1</c_lengths>
-	<t_width>10000</t_width>
+	<t_width>5000</t_width>
 	<t_height>1080</t_height>
 	<fps>1.0</fps>
 </sprite>
