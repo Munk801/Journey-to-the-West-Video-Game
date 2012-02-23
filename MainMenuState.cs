@@ -45,7 +45,7 @@ namespace U5Designs
         Texture play_press, play_nopress, load_nopress, load_press, quit_nopress, quit_press;
         public bool enterdown;
 
-        public bool clickdown;
+        public bool clickdown = false;
 
         public MainMenuState(GameEngine engine)
         {
@@ -201,25 +201,39 @@ namespace U5Designs
 
         private void MouseInput()
         {
-            if (mouse.X - eng.Width/2 > play_press.XLoc && mouse.X - eng.Width/2 < play_press.XLoc + play_press.Width
-                && -(mouse.Y - eng.Height / 2) < play_press.YLoc && -(mouse.Y - eng.Height / 2) > play_press.YLoc - play_press.Height)
+            //if (mouse.X - eng.Width/2 > play_press.XLoc && mouse.X - eng.Width/2 < play_press.XLoc + play_press.Width
+            //    && -(mouse.Y - eng.Height / 2) < play_press.YLoc && -(mouse.Y - eng.Height / 2) > play_press.YLoc - play_press.Height)
+            //{
+            //    _cur_butn = 0;
+            //}
+
+            //if (mouse.X - eng.Width / 2 > load_press.XLoc && mouse.X - eng.Width / 2 < load_press.XLoc + load_press.Width
+            //    && -(mouse.Y - eng.Height / 2) < load_press.YLoc && -(mouse.Y - eng.Height / 2) > load_press.YLoc - load_press.Height)
+            //{
+            //    _cur_butn = 1;
+            //}
+
+            //if (mouse.X - eng.Width / 2 > quit_press.XLoc && mouse.X - eng.Width / 2 < quit_press.XLoc + quit_press.Width
+            //    && -(mouse.Y - eng.Height / 2) < quit_press.YLoc && -(mouse.Y - eng.Height / 2) > quit_press.YLoc - quit_press.Height)
+            //{
+            //    _cur_butn = 2;
+            //}
+
+            if (eng.ThisMouse.inButtonRegion(play_press))
             {
                 _cur_butn = 0;
             }
 
-            if (mouse.X - eng.Width / 2 > load_press.XLoc && mouse.X - eng.Width / 2 < load_press.XLoc + load_press.Width
-                && -(mouse.Y - eng.Height / 2) < load_press.YLoc && -(mouse.Y - eng.Height / 2) > load_press.YLoc - load_press.Height)
+            if (eng.ThisMouse.inButtonRegion(load_press))
             {
                 _cur_butn = 1;
             }
-
-            if (mouse.X - eng.Width / 2 > quit_press.XLoc && mouse.X - eng.Width / 2 < quit_press.XLoc + quit_press.Width
-                && -(mouse.Y - eng.Height / 2) < quit_press.YLoc && -(mouse.Y - eng.Height / 2) > quit_press.YLoc - quit_press.Height)
+            if (eng.ThisMouse.inButtonRegion(quit_press))
             {
                 _cur_butn = 2;
             }
 
-            if (mouse[MouseButton.Left] && !clickdown)
+            if (eng.ThisMouse.LeftPressed() && !clickdown)
             {
                 clickdown = true;
                 if (_cur_butn == 0)
@@ -266,8 +280,7 @@ namespace U5Designs
                     eng.Exit();
                 }
             }
-            else if (!mouse[MouseButton.Left])
-                clickdown = false;
+            else clickdown = false;
         }
 
         private void DealWithInput()

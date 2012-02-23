@@ -43,8 +43,8 @@ namespace U5Designs
 
         MainMenuState menustate;
         PauseMenuState pms;
-       
 
+        public bool clickdown = false;
         // Initialize graphics, etc here
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
 
@@ -94,7 +94,7 @@ namespace U5Designs
 
             //First deal with hardware input
             DealWithInput();
-
+            MouseInput();
             //Next check if the player is dead. If he is, game over man
             if (player.health <= 0) {
                 GameOverState GGbro = new GameOverState(menustate, eng);
@@ -191,6 +191,20 @@ namespace U5Designs
             //}
         }
 
+        private void MouseInput()
+        {
+            if (eng.ThisMouse.LeftPressed() && !clickdown)
+            {
+                clickdown = true;
+                //Console.WriteLine("LEFT MOUSE CLICKED");
+                Console.WriteLine("X Coord: " + eng.ThisMouse.Mouse.X.ToString()+  " Y Coord: " + eng.ThisMouse.Mouse.Y.ToString());
+            }
+            else
+            {
+                clickdown = false;
+            }
+        }
+
         private void DealWithInput()
         {
             // Testing the Level Design feature of re-loading LoadLevel after changing coords for a given game object
@@ -201,7 +215,7 @@ namespace U5Designs
                 //eng.PushState(pst);
                 // test
                 eng.ChangeState(pst);
-
+                
                 //LoadLevel.Load(0, pst);
             }
 
