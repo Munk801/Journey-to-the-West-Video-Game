@@ -146,7 +146,29 @@ namespace U5Designs
 					b.UpdatePosition(player.deltax);
 				}
             }
-        }
+		}
+
+		//sorts RenderObjects by ascending Z coordinate
+		private static int compare2dView(RenderObject lhs, RenderObject rhs) {
+			if(lhs.location.Z < rhs.location.Z) {
+				return -1;
+			} else if(lhs.location.Z > rhs.location.Z) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+
+		//sorts RenderObjects by descending X coordinate
+		private static int compare3dView(RenderObject lhs, RenderObject rhs) {
+			if(lhs.location.X > rhs.location.X) {
+				return -1;
+			} else if(lhs.location.X < rhs.location.X) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
 
         public override void Draw(FrameEventArgs e)
         {
@@ -173,20 +195,40 @@ namespace U5Designs
 // 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
 // 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 
+			//Sort objects by depth for proper alpha rendering
+			if(enable3d) {
+				renderList.Sort(compare3dView);
+			} else {
+				renderList.Sort(compare2dView);
+			}
 
+			//First render all opaque sprites, and all 3d geometry (since they are assumed to be opaque)
 			foreach(RenderObject obj in renderList) {
 				if((enable3d && ((GameObject)obj).existsIn3d) || (!enable3d && ((GameObject)obj).existsIn2d) || isInTransition) {
 					if(obj.is3dGeo) {
 						obj.doScaleTranslateAndTexture();
 						obj.mesh.Render();
 					} else {
+						if(!obj.sprite.hasAlpha) {
+							obj.doScaleTranslateAndTexture();
+							obj.frameNumber = obj.sprite.draw(enable3d && !isInTransition, obj.cycleNumber, obj.frameNumber + e.Time);
+						}
+					}
+				}
+			}
+
+			//Now render transparent sprites in sorted order
+			foreach(RenderObject obj in renderList) {
+				if((enable3d && ((GameObject)obj).existsIn3d) || (!enable3d && ((GameObject)obj).existsIn2d) || isInTransition) {
+					if((!obj.is3dGeo) && obj.sprite.hasAlpha) {
 						obj.doScaleTranslateAndTexture();
 						obj.frameNumber = obj.sprite.draw(enable3d && !isInTransition, obj.cycleNumber, obj.frameNumber + e.Time);
 					}
 				}
 			}
 
-			player.draw(enable3d ^ isInTransition, e.Time);
+			//Finally, draw the player
+			//player.draw(enable3d ^ isInTransition, e.Time);
 
 
             // UNCOMMENT TO ADD MOTION BLUR

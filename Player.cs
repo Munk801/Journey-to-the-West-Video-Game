@@ -49,6 +49,8 @@ namespace U5Designs
 			_sprite = sprite;
             _hascbox = true;
             _type = 0; // hack, this means nothing, will never matter as player never collides with himself
+			_existsIn2d = true;
+			_existsIn3d = true;
 
             _damage = 0;
             _health = 5;

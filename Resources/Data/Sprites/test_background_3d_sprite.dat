@@ -4,5 +4,6 @@
 	<c_lengths>1</c_lengths>
 	<t_width>3000</t_width>
 	<t_height>3000</t_height>
+	<hasAlpha>false</hasAlpha>
 	<fps>1.0</fps>
 </sprite>

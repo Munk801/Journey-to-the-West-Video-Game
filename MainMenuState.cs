@@ -86,9 +86,9 @@ namespace U5Designs
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
 
-            SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
-            int[] cycleStarts = { 0 };
-            int[] cycleLengths = { 1 };
+            //SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
+            //int[] cycleStarts = { 0 };
+            //int[] cycleLengths = { 1 };
             //SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 1280, 720);
             //background = new Obstacle(new Vector3(0, 0, 2), new Vector3(1280, 720, 1), new Vector3(0,0,0), true, true, ss);
 

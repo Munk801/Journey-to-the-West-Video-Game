@@ -90,6 +90,7 @@ namespace U5Designs
 			//SpriteSheet ss = new SpriteSheet(new Bitmap(assembly_new.GetManifestResourceStream("U5Designs.Resources.Textures.test_sprite.png")), cycleStarts, cycleLengths, 128, 128, 4.0);
 			ps.player = new Player(parse_Sprite_File("test_sprite.dat"));
 			ps.physList.Add(ps.player);
+			ps.renderList.Add(ps.player);
 		}
 
 		//Takes an XmlNode with attributes x, y, and z and turns it into a Vector3
@@ -134,12 +135,13 @@ namespace U5Designs
 			int _width = Convert.ToInt32(_sw.Item(0).InnerText);
 			XmlNodeList _sh = doc_new.GetElementsByTagName("t_height");
 			int _height = Convert.ToInt32(_sh.Item(0).InnerText);
+			bool _hasAlpha = Convert.ToBoolean(doc_new.GetElementsByTagName("hasAlpha")[0].InnerText);
 			XmlNodeList _f = doc_new.GetElementsByTagName("fps");
 			float _fps = (float)Convert.ToDouble(_f.Item(0).InnerText);
 			fstream_new.Close();
 
 			// Create the SpriteSheet
-			return new SpriteSheet(new Bitmap(assembly_new.GetManifestResourceStream(_bmp_path)), cycleStarts, cycleLengths, _width, _height, _fps);
+			return new SpriteSheet(new Bitmap(assembly_new.GetManifestResourceStream(_bmp_path)), cycleStarts, cycleLengths, _width, _height, _hasAlpha, _fps);
 		}
 
 		/**
