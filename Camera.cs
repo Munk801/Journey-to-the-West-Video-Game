@@ -5,7 +5,7 @@ using System.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Engine
+namespace U5Designs
 {
     public class Camera
     {
@@ -17,6 +17,7 @@ namespace Engine
         public double timer;
 		private bool in3d;
         private Matrix4 projection;
+		private Player player;
 
 		private Vector4 lightOffset;
 
@@ -25,14 +26,16 @@ namespace Engine
 		private bool movingInY;
 		private float playerYPos; //the player's y position the last time they were not in midair
 
-        public Camera(Vector3 position, Vector3 end, int width, int height)
+        public Camera(int width, int height, Player p)
         {
-            Position = position;
-            End = end;
+            Position = new Vector3();
+            End = new Vector3();
             Width = width;
             Height = height;
-			fov = (float)(Math.PI / 6);
-			playerYPos = 12.5f;
+			fov = (float)(Math.PI / 5);
+			player = p;
+			playerYPos = p.location.Y;
+			Set2DCamera();
         }
 
         /// <summary>
@@ -46,34 +49,38 @@ namespace Engine
 			GL.Light(LightName.Light0, LightParameter.Position, new Vector4(-50.0f, 50.0f, 50.0f, 0.0f));
         }
 
-        public void Set2DCamera(Vector3 playerLoc)
+        public void Set2DCamera()
         {
 			in3d = false;
             SetOrthographic();
-			End = new Vector3(75f, 62.5f, 50f);
-			End.X += playerLoc.X;
+			End = new Vector3(37.5f, 31.25f, 50f);
+			End.X += player.location.X;
 			End.Y += playerYPos;
-			Position = new Vector3(75f, 62.5f, 150f);
-			Position.X += playerLoc.X;
+			Position = new Vector3(37.5f, 31.25f, 150f);
+			Position.X += player.location.X;
 			Position.Y += playerYPos;
 			lightOffset = new Vector4(50, 50, 0, 1);
+			SetModelView();
 			UpdateLight();
 			GL.Disable(EnableCap.Fog);
         }
 
-        public void Set3DCamera(Vector3 playerLoc)
+        public void Set3DCamera()
         {
 			in3d = true;
             SetPerspective();
-			End = new Vector3(-25f, 12.5f, 50f);
-			End.X += playerLoc.X;
+			End = new Vector3(-25f, 20.5f, 0f);
+			End.X += player.location.X;
 			End.Y += playerYPos;
-			Position = new Vector3(-100f, 16f, 50f);
-			Position.X += playerLoc.X;
+			End.Z += player.location.Z;
+			Position = new Vector3(-125f, 24f, 0f);
+			Position.X += player.location.X;
 			Position.Y += playerYPos;
+			Position.Z += player.location.Z;
 			lightOffset = new Vector4(0, 50, 50, 1);
+			SetModelView();
 			UpdateLight();
-			GL.Enable(EnableCap.Fog);
+			//GL.Enable(EnableCap.Fog);
         }
 
         public Matrix4 GetOthoProjectionMatrix()
@@ -84,8 +91,7 @@ namespace Engine
         private void SetOrthographic()
         {
             GL.MatrixMode(MatrixMode.Projection);
-            Matrix4 projection = Matrix4.CreateOrthographic(Width / 4, Height / 4, 1.0f, 6400.0f);
-            this.projection = projection;
+            this.projection = Matrix4.CreateOrthographic(192, 108, 1.0f, 6400.0f);
 			GL.LoadMatrix(ref projection);
         }
 
@@ -128,14 +134,14 @@ namespace Engine
 			GL.Disable(EnableCap.Fog);
 		}
 
-		public bool TransitionState(bool enable3D, double time, Vector3 playerLoc)
+		public bool TransitionState(bool enable3D, double time)
         {
 			if (enable3D)
             {
 				timer -= time * 1.5;
 				if(timer <= 0) {
-					fov = (float)(Math.PI / 6);
-					Set3DCamera(playerLoc);
+					fov = (float)(Math.PI / 5);
+					Set3DCamera();
 					return false;
 				}
             }
@@ -143,7 +149,7 @@ namespace Engine
             {
 				timer += time * 1.5;
 				if(timer >= 1.0) {
-					Set2DCamera(playerLoc);
+					Set2DCamera();
 					return false;
 				}
 			}
@@ -162,16 +168,20 @@ namespace Engine
         {
             Position.X += playerDeltaX;
             End.X += playerDeltaX;
+			if(in3d) {
+				Position.Z = player.location.Z;
+				End.Z = player.location.Z;
+			}
 			UpdateLight();
 
 			if(movingInY) {
-				float desiredY = playerYPos + (in3d ? 16.0f : 62.5f);
+				float desiredY = playerYPos + (in3d ? 24.0f : 31.25f);
 				if(desiredY > Position.Y) {
 					Position.Y += (float)(400.0 * time);
 					End.Y += (float)(400.0 * time);
 					if(desiredY <= Position.Y) {
 						Position.Y = desiredY;
-						End.Y = playerYPos + (in3d ? 12.5f : 62.5f);
+						End.Y = playerYPos + (in3d ? 20.5f : 31.25f);
 						movingInY = false;
 					}
 				} else {
@@ -179,7 +189,7 @@ namespace Engine
 					End.Y -= (float)(400.0 * time);
 					if(desiredY >= Position.Y) {
 						Position.Y = desiredY;
-						End.Y = playerYPos + (in3d ? 12.5f : 62.5f);
+						End.Y = playerYPos + (in3d ? 20.5f : 31.25f);
 						movingInY = false;
 					}
 				}

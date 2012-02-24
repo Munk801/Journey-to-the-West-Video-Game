@@ -10,6 +10,12 @@ using OpenTK;
  */
 namespace Engine {
 	public interface CombatObject {
+		//duplicated from GameObject
+		Vector3 location { get; }
+		bool hascbox { get; }
+		bool existsIn3d { get; }
+		bool existsIn2d { get; }
+
 		int health {
 			get;
 			set;

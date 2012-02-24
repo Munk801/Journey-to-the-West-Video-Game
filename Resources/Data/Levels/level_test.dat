@@ -71,7 +71,7 @@
 	<decorationlist>
 		<decoration>
 			<path>test_background_3d.dat</path>
-			<loc x="800" y="75" z="50"/>
+			<loc x="6000" y="75" z="50"/>
 		</decoration>
 	</decorationlist>
 </level>

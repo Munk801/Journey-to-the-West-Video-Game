@@ -14,7 +14,7 @@ using OpenTK.Input;
 
 namespace U5Designs
 {
-    class Player : GameObject, RenderObject, PhysicsObject, CombatObject
+    public class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
         //Knockback physics constants:
         private Vector3 kbspeed = new Vector3(70, 100, 70);
@@ -37,9 +37,9 @@ namespace U5Designs
             p_state = new PlayerState("TEST player");
             p_state.setSpeed(130);
             _location = new Vector3(25, 12.5f, 50);
-            _scale = new Vector3(12.5f, 12.5f, 12.5f);
-            _pbox = new Vector3(6.25f, 6.25f, 6.25f);
-            _cbox = new Vector3(6.25f, 6.25f, 6.25f);
+            _scale = new Vector3(12.5f, 25f, 12.5f);
+            _pbox = new Vector3(6.25f, 12.5f, 6.25f);
+            _cbox = new Vector3(5f, 12.5f, 5f);
             //cubemesh = new ObjMesh("../../Geometry/box.obj");
             //_texture = new Bitmap("../../Textures/player.png");
 			velocity = new Vector3(0, 0, 0);
@@ -131,7 +131,7 @@ namespace U5Designs
 
                 //TMP PHYSICS TEST BUTTON and suicide button
                 if (c)
-                    velocity.Y = (float)p_state.getSpeed() / 3;
+                    velocity.Y = (float)p_state.getSpeed();
                 if (x)
                     _health = 0;
 
@@ -237,7 +237,7 @@ namespace U5Designs
 					// don't do collision physics to yourself, or on things you already hit this frame
 					if(obj != this && !alreadyCollidedList.Contains(obj)) {
 						Vector3 mybox, objbox;
-						if(!Invincible && ((GameObject)obj).hascbox) {
+						if(!Invincible && obj.hascbox) {
 							mybox = _cbox;
 							objbox = ((CombatObject)obj).cbox;
 						} else {
@@ -245,8 +245,8 @@ namespace U5Designs
 							objbox = obj.pbox;
 						}
 						//find possible ranges of values for which a collision may have occurred
-						Vector3 maxTvals = VectorUtil.div(((GameObject)obj).location + objbox - _location + mybox, velocity);
-						Vector3 minTvals = VectorUtil.div(((GameObject)obj).location - objbox - _location - mybox, velocity);
+						Vector3 maxTvals = VectorUtil.div(obj.location + objbox - _location + mybox, velocity);
+						Vector3 minTvals = VectorUtil.div(obj.location - objbox - _location - mybox, velocity);
 						VectorUtil.sort(ref minTvals, ref maxTvals);
 
 						float minT = VectorUtil.maxVal(minTvals);
@@ -274,13 +274,13 @@ namespace U5Designs
 					deltax += _location.X - startLoc.X; //update this value for camera offset
 				} else {
 					alreadyCollidedList.Add(collidingObj);
-					if(Invincible || !((GameObject)collidingObj).hascbox) { //if this is a normal physics collision
+					if(Invincible || !collidingObj.hascbox) { //if this is a normal physics collision
 						switch(collidingAxis) {
 							case 0: //x
-								if(_location.X < ((GameObject)collidingObj).location.X) {
-									_location.X = ((GameObject)collidingObj).location.X - (pbox.X + collidingObj.pbox.X) - 0.001f;
+								if(_location.X < collidingObj.location.X) {
+									_location.X = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
 								} else {
-									_location.X = ((GameObject)collidingObj).location.X + pbox.X + collidingObj.pbox.X + 0.001f;
+									_location.X = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
 								}
 								if(velocity.X != 0) {//should always be true, but just in case...
 									double deltaTime = (location.X - startLoc.X) / velocity.X;
@@ -292,10 +292,10 @@ namespace U5Designs
 								velocity.X = 0;
 								break;
 							case 1: //y
-								if(_location.Y < ((GameObject)collidingObj).location.Y) {
-									_location.Y = ((GameObject)collidingObj).location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.001f;
+								if(_location.Y < collidingObj.location.Y) {
+									_location.Y = collidingObj.location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.0001f;
 								} else {
-									_location.Y = ((GameObject)collidingObj).location.Y + pbox.Y + collidingObj.pbox.Y + 0.001f;
+									_location.Y = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
 									//Special case for landing on platforms
 									cam.MoveToYPos(_location.Y);
 								}
@@ -309,10 +309,10 @@ namespace U5Designs
 								velocity.Y = 0;
 								break;
 							case 2: //z
-								if(_location.Z < ((GameObject)collidingObj).location.Z) {
-									_location.Z = ((GameObject)collidingObj).location.Z - (pbox.Z + collidingObj.pbox.Z) - 0.001f;
+								if(_location.Z < collidingObj.location.Z) {
+									_location.Z = collidingObj.location.Z - (pbox.Z + collidingObj.pbox.Z) - 0.0001f;
 								} else {
-									_location.Z = ((GameObject)collidingObj).location.Z + pbox.Z + collidingObj.pbox.Z + 0.001f;
+									_location.Z = collidingObj.location.Z + pbox.Z + collidingObj.pbox.Z + 0.0001f;
 								}
 								if(velocity.Z != 0) {//should always be true, but just in case...
 									double deltaTime = (location.Z - startLoc.Z) / velocity.Z;
@@ -334,10 +334,10 @@ namespace U5Designs
 							((Enemy)collidingObj).frozen = true;
 
 							// direction we need to be knocked back in.
-							Vector3 direction = new Vector3(location.X - ((GameObject)collidingObj).location.X, 0, location.Z - ((GameObject)collidingObj).location.Z);
+							Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, location.Z - collidingObj.location.Z);
 							direction.Normalize();
 
-							location = new Vector3(((GameObject)collidingObj).location.X + (collidingObj.pbox.X * direction.X), ((GameObject)collidingObj).location.Y + collidingObj.pbox.Y, ((GameObject)collidingObj).location.Z + (collidingObj.pbox.Z * direction.Z));
+							location = new Vector3(collidingObj.location.X + (collidingObj.pbox.X * direction.X), collidingObj.location.Y + collidingObj.pbox.Y, collidingObj.location.Z + (collidingObj.pbox.Z * direction.Z));
 							velocity = new Vector3(0, 0, 0);
 							accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
 
@@ -378,7 +378,7 @@ namespace U5Designs
 					// don't do collision physics to yourself, or on things you already hit this frame
 					if(obj != this && !alreadyCollidedList.Contains(obj)) {
 						Vector3 mybox, objbox;
-						if(!Invincible && ((GameObject)obj).hascbox) {
+						if(!Invincible && obj.hascbox) {
 							mybox = _cbox;
 							objbox = ((CombatObject)obj).cbox;
 						} else {
@@ -386,8 +386,8 @@ namespace U5Designs
 							objbox = obj.pbox;
 						}
 						//find possible ranges of values for which a collision may have occurred
-						Vector3 maxTvals = VectorUtil.div(((GameObject)obj).location + objbox - _location + mybox, velocity);
-						Vector3 minTvals = VectorUtil.div(((GameObject)obj).location - objbox - _location - mybox, velocity);
+						Vector3 maxTvals = VectorUtil.div(obj.location + objbox - _location + mybox, velocity);
+						Vector3 minTvals = VectorUtil.div(obj.location - objbox - _location - mybox, velocity);
 						VectorUtil.sort(ref minTvals, ref maxTvals);
 
 						float minT = VectorUtil.maxVal(minTvals.Xy);
@@ -415,13 +415,13 @@ namespace U5Designs
 					deltax += _location.X - startLoc.X; //update this value for camera offset
 				} else {
 					alreadyCollidedList.Add(collidingObj);
-					if(Invincible || !((GameObject)collidingObj).hascbox) { //if this is a normal physics collision
+					if(Invincible || !collidingObj.hascbox) { //if this is a normal physics collision
 						switch(collidingAxis) {
 							case 0: //x
-								if(_location.X < ((GameObject)collidingObj).location.X) {
-									_location.X = ((GameObject)collidingObj).location.X - (pbox.X + collidingObj.pbox.X) - 0.001f;
+								if(_location.X < collidingObj.location.X) {
+									_location.X = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
 								} else {
-									_location.X = ((GameObject)collidingObj).location.X + pbox.X + collidingObj.pbox.X + 0.001f;
+									_location.X = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
 								}
 								if(velocity.X != 0) {//should always be true, but just in case...
 									double deltaTime = (location.X - startLoc.X) / velocity.X;
@@ -432,10 +432,10 @@ namespace U5Designs
 								velocity.X = 0;
 								break;
 							case 1: //y
-								if(_location.Y < ((GameObject)collidingObj).location.Y) {
-									_location.Y = ((GameObject)collidingObj).location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.001f;
+								if(_location.Y < collidingObj.location.Y) {
+									_location.Y = collidingObj.location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.0001f;
 								} else {
-									_location.Y = ((GameObject)collidingObj).location.Y + pbox.Y + collidingObj.pbox.Y + 0.001f;
+									_location.Y = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
 									//Special case for landing on platforms
 									cam.MoveToYPos(_location.Y);
 								}
@@ -458,12 +458,12 @@ namespace U5Designs
 							((Enemy)collidingObj).frozen = true;
 
 							// direction we need to be knocked back in.
-							Vector3 direction = new Vector3(location.X - ((GameObject)collidingObj).location.X, 0, 0);
+							Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, 0);
 							direction.Normalize();
 
 							float origX = location.X;
 
-							location = new Vector3(((GameObject)collidingObj).location.X + (collidingObj.pbox.X * direction.X), ((GameObject)collidingObj).location.Y + collidingObj.pbox.Y, location.Z);
+							location = new Vector3(collidingObj.location.X + (collidingObj.pbox.X * direction.X), collidingObj.location.Y + collidingObj.pbox.Y, location.Z);
 							deltax = location.X - origX;
 							velocity = new Vector3(0, 0, 0);
 							accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, 0);

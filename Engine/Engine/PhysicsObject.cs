@@ -7,24 +7,18 @@ using OpenTK;
 
 namespace Engine {
 	public interface PhysicsObject {
+		//duplicated from GameObject
+		Vector3 location { get; }
+		bool hascbox { get; }
+		bool existsIn3d { get; }
+		bool existsIn2d { get; }
+
 		/* The following are variables that should exist in any
 		 * class implementing PhysicsObject
 		private Vector3 velocity;
 		private Vector3 accel;
 		private bool doesGravity; //true if gravity affects this object
-		private Vector3 boundOrigin; //corner of bounding box at min x,y,z corner
-		private Vector3 boundExtent; //width, length, height of bounding box
 		*/
-
-        //Vector3 collidingBBOrigin
-        //{
-        //    get;
-        //}
-
-        //Vector3 collidingBBMax
-        //{
-        //    get;
-        //}
         
 		//applies gravity/acceleration, then velocity, then collision detection
 		void physUpdate2d(double time, List<PhysicsObject> objlist);

@@ -14,9 +14,11 @@ using OpenTK;
 
 namespace Engine {
 	public interface RenderObject {
-		Vector3 location { //duplicated from GameObject
-			get;
-		}
+		//duplicated from GameObject
+		Vector3 location { get; }
+		bool hascbox { get; }
+		bool existsIn3d { get; }
+		bool existsIn2d { get; }
 
 		ObjMesh mesh { //null for sprites
 			get;

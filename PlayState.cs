@@ -61,9 +61,7 @@ namespace U5Designs
             enable3d = false;
 			tabDown = false;
             //test.Play();
-			Vector3 lookat = new Vector3(100, 75, 50);
-			Vector3 eye = lookat + new Vector3(0, 0, 100);
-            camera = new Camera(eye, lookat, eng.ClientRectangle.Width, eng.ClientRectangle.Height);
+            camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player);
 			player.cam = camera;
             Viewport = new Matrix4(new Vector4(eng.Width/2, 0.0f, 0.0f, eng.Width/2.0f + eng.ClientRectangle.X),
                                    new Vector4(0.0f, eng.Height/2, 0.0f, eng.Height/2.0f + eng.ClientRectangle.Y),
@@ -87,9 +85,9 @@ namespace U5Designs
 			GL.ShadeModel(ShadingModel.Smooth);
 
 			if(enable3d) {
-				camera.Set3DCamera(player.location);
+				camera.Set3DCamera();
 			} else {
-				camera.Set2DCamera(player.location);
+				camera.Set2DCamera();
 			}
 		}
 
@@ -110,14 +108,19 @@ namespace U5Designs
             //Deal with everyone's acceleration
             if (isInTransition)
             {
-				isInTransition = camera.TransitionState(enable3d, e.Time, player.location);
+				isInTransition = camera.TransitionState(enable3d, e.Time);
 
+				//TODO: This if/else block is a hack!
 				if(enable3d) {
-					player.cycleNumber = 1;  //TODO: This is a hack!
-					renderList[0].cycleNumber = 1;  //TODO: This is a hack!
+					//player.cycleNumber = 1;
+					foreach(AIObject o in aiList) {
+						((RenderObject)o).cycleNumber = 1;
+					}
 				} else { //2d
-					player.cycleNumber = 0;  //TODO: This is a hack!
-					renderList[0].cycleNumber = 0;  //TODO: This is a hack!
+					//player.cycleNumber = 0;
+					foreach(AIObject o in aiList) {
+						((RenderObject)o).cycleNumber = 0;
+					}
 				}
             } else {
 				player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.X], eng.Keyboard[Key.Space], e);
@@ -189,11 +192,9 @@ namespace U5Designs
             camera.SetModelView();
 
 			//Set up textures
-// 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-// 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-// 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-// 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-// 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
+ 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+ 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+ 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 
 			//Sort objects by depth for proper alpha rendering
 			if(enable3d) {
@@ -204,7 +205,7 @@ namespace U5Designs
 
 			//First render all opaque sprites, and all 3d geometry (since they are assumed to be opaque)
 			foreach(RenderObject obj in renderList) {
-				if((enable3d && ((GameObject)obj).existsIn3d) || (!enable3d && ((GameObject)obj).existsIn2d) || isInTransition) {
+				if((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d) || isInTransition) {
 					if(obj.is3dGeo) {
 						obj.doScaleTranslateAndTexture();
 						obj.mesh.Render();
@@ -219,7 +220,7 @@ namespace U5Designs
 
 			//Now render transparent sprites in sorted order
 			foreach(RenderObject obj in renderList) {
-				if((enable3d && ((GameObject)obj).existsIn3d) || (!enable3d && ((GameObject)obj).existsIn2d) || isInTransition) {
+				if((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d) || isInTransition) {
 					if((!obj.is3dGeo) && obj.sprite.hasAlpha) {
 						obj.doScaleTranslateAndTexture();
 						obj.frameNumber = obj.sprite.draw(enable3d && !isInTransition, obj.cycleNumber, obj.frameNumber + e.Time);
