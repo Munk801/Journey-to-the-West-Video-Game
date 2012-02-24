@@ -342,9 +342,8 @@ namespace U5Designs
 								break;
 						}
 					} else { //this is a combat collision
-						time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
-
 						if(((CombatObject)collidingObj).type == 1) {// obj is an enemy, do damage, knock player back
+							time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
 							_health = _health - ((CombatObject)collidingObj).damage;
 							Invincible = true;
 							HasControl = false;
@@ -362,7 +361,8 @@ namespace U5Designs
 						}
 						if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
 							//if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
-                            if (!((Projectile)collidingObj).playerspawned) {
+							if(!((Projectile)collidingObj).playerspawned) {
+								time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
                                 _health = _health - ((CombatObject)collidingObj).damage;
                                 Invincible = true;
                                 HasControl = false;
@@ -479,8 +479,8 @@ namespace U5Designs
 								break;
 						}
 					} else { //this is a combat collision
-						time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
 						if(((CombatObject)collidingObj).type == 1) {// obj is an enemy, do damage, knock player back
+							time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
 							_health = _health - ((CombatObject)collidingObj).damage;
 							Invincible = true;
 							HasControl = false;
@@ -501,18 +501,18 @@ namespace U5Designs
 						}
 						if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
                             //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
-                            if (!((Projectile)collidingObj).playerspawned) {
-                                _health = _health - ((CombatObject)collidingObj).damage;
-                                Invincible = true;
-                                HasControl = false;
-                                //despawn the projectile
-                                objList.Remove((GameObject)collidingObj);
-                                renderList.Remove((RenderObject)collidingObj);
-                                colisionList.Remove(collidingObj);
-                                physList.Remove(collidingObj);
-                                combatList.Remove((CombatObject)collidingObj);
-                            }
-
+							if(!((Projectile)collidingObj).playerspawned) {
+								time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+								_health = _health - ((CombatObject)collidingObj).damage;
+								Invincible = true;
+								HasControl = false;
+								//despawn the projectile
+								objList.Remove((GameObject)collidingObj);
+								renderList.Remove((RenderObject)collidingObj);
+								colisionList.Remove(collidingObj);
+								physList.Remove(collidingObj);
+								combatList.Remove((CombatObject)collidingObj);
+							}
 						}
 					}
 				}
