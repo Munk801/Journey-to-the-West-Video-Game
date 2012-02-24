@@ -20,6 +20,7 @@ namespace U5Designs
         private bool doesGravity; //true if gravity affects this object
         public bool frozen;
         private double freezetimer;
+        SpriteSheet projectileSprite;
 
 		public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, MeshTexture texture) {
 			_location = location;
@@ -52,7 +53,7 @@ namespace U5Designs
 		}
 
 
-        public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, SpriteSheet sprite)
+        public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, SpriteSheet sprite, SpriteSheet projectileSprite)
         {
 			_location = location;
 			_scale = scale;
@@ -73,6 +74,7 @@ namespace U5Designs
 			_mesh = null;
 			_texture = null;
 			_sprite = sprite;
+            this.projectileSprite = projectileSprite;
 			_frameNum = 0;
 			_is3dGeo = false;
 
@@ -140,6 +142,36 @@ namespace U5Designs
 			get { return _frameNum; }
 			set { _frameNum = value; }
 		}
+        public void reset() {
+            throw new NotImplementedException();
+        }
+
+        public void accelerate(Vector3 acceleration) {
+            accel += acceleration;
+        }
+
+        private int _health;
+        public int health {
+            get { return _health; }
+            set { _health = value; }
+        }
+
+        private int _damage;
+        public int damage {
+            get { return _damage; }
+        }
+
+        private float _speed;
+        public float speed {
+            get { return _speed; }
+            set { _speed = value; }
+        }
+
+        private bool _alive;
+        public bool alive {
+            get { return _alive; }
+            set { _alive = value; }
+        }
 
 		public void doScaleTranslateAndTexture() {
             GL.PushMatrix();
@@ -339,41 +371,8 @@ namespace U5Designs
             }
         }
 
-		public void reset() {
-			throw new NotImplementedException();
-		}
-
-        public void accelerate(Vector3 acceleration) {
-            accel += acceleration;
-        }
-
-        private int _health;
-		public int health {
-            get { return _health; }
-            set { _health = value; }
-        }
-
-        private int _damage;
-		public int damage {
-            get { return _damage; }
-        }
-
-        private float _speed;
-		public float speed {
-            get { return _speed; }
-            set { _speed = value; }
-        }
-
-        private bool _alive;
-		public bool alive {
-            get { return _alive; }
-            set { _alive = value; }
-        }
-
-
 		public void aiUpdate(FrameEventArgs e, Vector3 playerposn, bool enable3d) {
             if (AItype == 1) {
-                //TODO change 2d view to only deal with 2d position vectors, so z movement doesnt happen in 2d
                 if (dist(playerposn, _location) > 0) {
                     Vector3 dir = getdir(playerposn, _location);
                     velocity.X = dir.X * _speed;

@@ -249,7 +249,8 @@ namespace U5Designs
 				// Create the Enemies
 				for(int j = 1; j < EList[i].ChildNodes.Count; j++) {
 					Vector3 loc = parseVector3(EList[i].ChildNodes[j]);
-					_e.Add(new Enemy(loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss));
+                    //TODO: SETH: change the last 'ss' in this enemy declaration to be the projectile sprite!!!!!!!
+					_e.Add(new Enemy(loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, ss));
 				}
 				fstream_new.Close();
 			}
