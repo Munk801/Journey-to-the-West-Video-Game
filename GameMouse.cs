@@ -45,5 +45,30 @@ namespace U5Designs
             return projectileVector;
         }
 
+        public Vector4 UnProject(ref Matrix4 projection, Matrix4 view, int viewportWidth, int viewportHeight, Vector2 Mouse)
+        {
+            Vector4 v;
+
+            v.X = 2.0f * Mouse.X / (float)viewportWidth - 1;
+            v.Y = -(2.0f * Mouse.Y/ (float)viewportHeight -1);
+            v.Z = 0;
+            v.W = 1.0f;
+
+            Matrix4 viewInv = Matrix4.Invert(view);
+            Matrix4 projInv = Matrix4.Invert(projection);
+
+            Vector4.Transform(ref v, ref projInv, out v);
+            Vector4.Transform(ref v, ref viewInv, out v);
+
+            if (v.W > float.Epsilon || v.W < float.Epsilon)
+            {
+                v.X /= v.W;
+                v.Y /= v.W;
+                v.Z /= v.W;
+            }
+
+            return v;
+        }
+
     }
 }

@@ -44,6 +44,8 @@ namespace U5Designs
         MainMenuState menustate;
         PauseMenuState pms;
 
+        Matrix4 Viewport;
+
         public bool clickdown = false;
         // Initialize graphics, etc here
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
@@ -59,11 +61,14 @@ namespace U5Designs
             enable3d = false;
 			tabDown = false;
             //test.Play();
-
 			Vector3 lookat = new Vector3(100, 75, 50);
 			Vector3 eye = lookat + new Vector3(0, 0, 100);
             camera = new Camera(eye, lookat, eng.ClientRectangle.Width, eng.ClientRectangle.Height);
 			player.cam = camera;
+            Viewport = new Matrix4(new Vector4(eng.Width/2, 0.0f, 0.0f, eng.Width/2.0f + eng.ClientRectangle.X),
+                                   new Vector4(0.0f, eng.Height/2, 0.0f, eng.Height/2.0f + eng.ClientRectangle.Y),
+                                   new Vector4(0.0f, 0.0f, 0.0f, 0.0f),
+                                   new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
         }
 
 		public override void MakeActive() {
@@ -196,8 +201,13 @@ namespace U5Designs
             if (eng.ThisMouse.LeftPressed() && !clickdown)
             {
                 clickdown = true;
+                Vector2 mousecoord = new Vector2(eng.ThisMouse.Mouse.X, eng.ThisMouse.Mouse.Y);
+                Matrix4 ortho = camera.GetOthoProjectionMatrix();
+                Vector4 mouseWorld = eng.ThisMouse.UnProject(ref ortho, Viewport, eng.Width, eng.Height, mousecoord);
+                Console.WriteLine(mouseWorld.ToString());
                 //Console.WriteLine("LEFT MOUSE CLICKED");
-                Console.WriteLine("X Coord: " + eng.ThisMouse.Mouse.X.ToString()+  " Y Coord: " + eng.ThisMouse.Mouse.Y.ToString());
+                //Console.WriteLine("X Coord: " + eng.ThisMouse.Mouse.X.ToString()+  " Y Coord: " + eng.ThisMouse.Mouse.Y.ToString());
+                clickdown = false;
             }
             else
             {

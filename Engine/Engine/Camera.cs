@@ -16,6 +16,7 @@ namespace Engine
         public bool isInTransition;
         public double timer;
 		private bool in3d;
+        private Matrix4 projection;
 
 		private Vector4 lightOffset;
 
@@ -75,10 +76,16 @@ namespace Engine
 			GL.Enable(EnableCap.Fog);
         }
 
+        public Matrix4 GetOthoProjectionMatrix()
+        {
+            return this.projection;
+        }
+
         private void SetOrthographic()
         {
             GL.MatrixMode(MatrixMode.Projection);
             Matrix4 projection = Matrix4.CreateOrthographic(Width / 4, Height / 4, 1.0f, 6400.0f);
+            this.projection = projection;
 			GL.LoadMatrix(ref projection);
         }
 
