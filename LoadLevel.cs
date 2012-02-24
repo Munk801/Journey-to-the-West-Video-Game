@@ -88,7 +88,7 @@ namespace U5Designs
 			//int[] cycleStarts = new int[] { 0, 4 };
 			//int[] cycleLengths = new int[] { 4, 4 };
 			//SpriteSheet ss = new SpriteSheet(new Bitmap(assembly_new.GetManifestResourceStream("U5Designs.Resources.Textures.test_sprite.png")), cycleStarts, cycleLengths, 128, 128, 4.0);
-			ps.player = new Player(parse_Sprite_File("test_player.dat"));
+			ps.player = new Player(parse_Sprite_File("test_player_sprite.dat"));
 			ps.physList.Add(ps.player);
 			ps.renderList.Add(ps.player);
 		}
