@@ -140,6 +140,9 @@
     <EmbeddedResource Include="Resources\Geometry\box.obj" />
     <EmbeddedResource Include="Resources\Geometry\quad.obj" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Enemies\test_flying_enemy.dat" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

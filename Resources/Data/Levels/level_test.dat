@@ -14,6 +14,8 @@
 			<loc x="500" y="12.5" z="50"/>
 			<loc x="800" y="62.5" z="50"/>
 			<loc x="1100" y="112.5" z="50"/>
+			<path>test_flying_enemy.dat</path>
+			<loc x="200" y="30" z="50"/>
 		</enemy>
 	</enemylist>
 	<obstaclelist>
