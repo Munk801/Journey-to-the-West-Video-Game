@@ -7,6 +7,6 @@
 	<health>10</health>
 	<damage>1</damage>
 	<speed>100</speed>
-	<AI>1</AI>
-	<sprite>test_sprite.dat</sprite>
+	<AI>2</AI>
+	<sprite>test_flying_sprite.dat</sprite>
 </enemy>
