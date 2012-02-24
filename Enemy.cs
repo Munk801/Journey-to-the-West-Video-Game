@@ -12,15 +12,17 @@ using Engine;
 
 namespace U5Designs
 {
-    class Enemy : GameObject, AIObject, RenderObject, PhysicsObject, CombatObject
+    public class Enemy : GameObject, AIObject, RenderObject, PhysicsObject, CombatObject
     {
-		private int AItype;
+		private int AItype; //NOTE: to see what number corresponds to which AI look at the comments for InitlizeAI() (its below the 2 physics methods)
         internal Vector3 velocity;
         internal Vector3 accel;
         private bool doesGravity; //true if gravity affects this object
         public bool frozen;
         private double freezetimer;
         SpriteSheet projectileSprite;
+
+        Stack<Airoutine> CurrentAI; // This is the stack holding the AI routines, functions identical to the state stack in GameEngine
 
 		public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, MeshTexture texture) {
 			_location = location;
@@ -50,6 +52,9 @@ namespace U5Designs
             velocity = new Vector3(0, 0, 0);
             accel = new Vector3(0, 0, 0);
             doesGravity = true;
+
+            CurrentAI = new Stack<Airoutine>();
+            InitilizeAI();
 		}
 
 
@@ -67,7 +72,7 @@ namespace U5Designs
             _alive = true;
             this.AItype = AItype;
             _hascbox = true;
-            _type = 1;
+            _type = 1; // type one means this is an enemy
             frozen = false;
             freezetimer = 0;
 
@@ -81,6 +86,9 @@ namespace U5Designs
             velocity = new Vector3(0, 0, 0);
             accel = new Vector3(0, 0, 0);
             doesGravity = true;
+
+            CurrentAI = new Stack<Airoutine>();
+            InitilizeAI();
 		}
 
 
@@ -184,7 +192,7 @@ namespace U5Designs
             GL.Scale(_scale);
 		}
 
-        public void physUpdate3d(double time, List<PhysicsObject> objlist) {
+        public void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
             if (frozen)
                 freezetimer = freezetimer + time;
             if (freezetimer > 1) {
@@ -195,98 +203,129 @@ namespace U5Designs
                 if (doesGravity) {
                     accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
                 }
+                //now do acceleration
                 velocity += accel;
                 accel.X = 0;
                 accel.Y = 0;
                 accel.Z = 0;
-                _location += velocity * (float)time;
 
+                //now check for collisions and move
+                List<PhysicsObject> alreadyCollidedList = new List<PhysicsObject>();
 
-                foreach (PhysicsObject obj in objlist) {
-                    // don't do collision physics to yourself
-                    if (obj != this) {
+                while (time > 0.0) {
+                    PhysicsObject collidingObj = null;
+                    float collidingT = 1.0f / 0.0f; //pos infinity
+                    int collidingAxis = -1;
 
-                        if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
-                        && (Math.Abs(((GameObject)obj).location.Z - _location.Z) < pbox.Z + obj.pbox.Z)
-                        && (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
-                            // at this point this enemy is colliding with this obj
+                    foreach (PhysicsObject obj in physList) {
+                        // don't do collision physics to yourself, or on things you already hit this frame
+                        if (obj != this && !alreadyCollidedList.Contains(obj)) {
+                            Vector3 mybox, objbox;
+                            if (obj.hascbox) {
+                                mybox = _cbox;
+                                objbox = ((CombatObject)obj).cbox;
+                            }
+                            else {
+                                mybox = _pbox;
+                                objbox = obj.pbox;
+                            }
+                            //find possible ranges of values for which a collision may have occurred
+                            Vector3 maxTvals = VectorUtil.div(obj.location + objbox - _location + mybox, velocity);
+                            Vector3 minTvals = VectorUtil.div(obj.location - objbox - _location - mybox, velocity);
+                            VectorUtil.sort(ref minTvals, ref maxTvals);
 
-                            //figure out which direction the collision happened on by looking for point where
-                            //only one axis is not colliding
-                            Vector3 temploc = _location - velocity * (float)time;
-                            Vector3 step = velocity * (float)time * 0.25f;
-                            bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-                            bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-                            bool z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
-                            int axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
-                            bool lastStepWasForward = true;
-                            while (axes != 2 && step.LengthFast >= 0.01f) {
-                                if (axes < 2) { //not far enough, step forward
-                                    if (!lastStepWasForward) {
-                                        step *= 0.5f;
+                            float minT = VectorUtil.maxVal(minTvals);
+                            float maxT = VectorUtil.minVal(maxTvals);
+
+                            // all three axes? || forward? || within range?
+                            if (minT > maxT || minT < 0.0f || minT > time) {
+                                continue; //no intersection
+                            }
+
+                            //if we're here, there's a collision
+                            //see if this collision is the first to occur
+                            if (minT < collidingT) {
+                                collidingT = minT;
+                                collidingObj = obj;
+                                collidingAxis = VectorUtil.maxIndex(minTvals);
+                            }
+                        }
+                    }
+
+                    Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
+                    if (collidingAxis == -1) { //no collision
+                        _location += velocity * (float)time;
+                        time = 0.0;
+                    }
+                    else {
+                        alreadyCollidedList.Add(collidingObj);
+                        if (!collidingObj.hascbox) { //if this is a normal physics collision
+                            switch (collidingAxis) {
+                                case 0: //x
+                                    if (_location.X < collidingObj.location.X) {
+                                        _location.X = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
                                     }
-                                    lastStepWasForward = true;
-                                    temploc += step;
-                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-                                    z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
-                                    axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
-                                }
-                                else { //too far, step backwards
-                                    if (lastStepWasForward) {
-                                        step *= 0.5f;
+                                    else {
+                                        _location.X = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
                                     }
-                                    lastStepWasForward = false;
-                                    temploc -= step;
-                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-                                    z = Math.Abs(((GameObject)obj).location.Z - temploc.Z) <= pbox.Z + obj.pbox.Z;
-                                    axes = (x ? 1 : 0) + (y ? 1 : 0) + (z ? 1 : 0);
-                                }
+                                    if (velocity.X != 0) {//should always be true, but just in case...
+                                        double deltaTime = (location.X - startLoc.X) / velocity.X;
+                                        _location.Y += (float)(velocity.Y * deltaTime);
+                                        _location.Z += (float)(velocity.Z * deltaTime);
+                                        time -= deltaTime;
+                                    }
+                                    velocity.X = 0;
+                                    break;
+                                case 1: //y
+                                    if (_location.Y < collidingObj.location.Y) {
+                                        _location.Y = collidingObj.location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.0001f;
+                                    }
+                                    else {
+                                        _location.Y = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
+                                    }
+                                    if (velocity.Y != 0) {//should always be true, but just in case...
+                                        double deltaTime = (location.Y - startLoc.Y) / velocity.Y;
+                                        _location.X += (float)(velocity.X * deltaTime);
+                                        _location.Z += (float)(velocity.Z * deltaTime);
+                                        time -= deltaTime;
+                                    }
+                                    velocity.Y = 0;
+                                    break;
+                                case 2: //z
+                                    if (_location.Z < collidingObj.location.Z) {
+                                        _location.Z = collidingObj.location.Z - (pbox.Z + collidingObj.pbox.Z) - 0.0001f;
+                                    }
+                                    else {
+                                        _location.Z = collidingObj.location.Z + pbox.Z + collidingObj.pbox.Z + 0.0001f;
+                                    }
+                                    if (velocity.Z != 0) {//should always be true, but just in case...
+                                        double deltaTime = (location.Z - startLoc.Z) / velocity.Z;
+                                        _location.X += (float)(velocity.X * deltaTime);
+                                        _location.Y += (float)(velocity.Y * deltaTime);
+                                        time -= deltaTime;
+                                    }
+                                    velocity.Z = 0;
+                                    break;
                             }
+                        }
+                        else { //this is a combat collision
+                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
 
-                            //If we couldn't find a good match, pick the y axis as a default
-                            if (axes != 2) {
-                                x = true;
-                                y = false;
-                                z = true;
-                            }
+                            
+                            if (((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
+                                //TODO: projectile implementation
 
-                            //We're now at a point that two axes intersect - the third is the one that collided
-                            if (!x) {
-                                velocity.X = 0;
-                                if (_location.X < ((GameObject)obj).location.X) {
-                                    _location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
-                                }
-                                else {
-                                    _location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
-                                }
-                            }
-                            else if (!y) {
-                                velocity.Y = 0;
-                                if (_location.Y < ((GameObject)obj).location.Y) {
-                                    _location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
-                                }
-                                else {
-                                    _location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
-                                }
-                            }
-                            else { //z
-                                velocity.Z = 0;
-                                if (_location.Z < ((GameObject)obj).location.Z) {
-                                    _location.Z = ((GameObject)obj).location.Z - (pbox.Z + obj.pbox.Z);
-                                }
-                                else {
-                                    _location.Z = ((GameObject)obj).location.Z + pbox.Z + obj.pbox.Z;
-                                }
+
                             }
                         }
                     }
                 }
+
+                
             }
         }
 
-        public void physUpdate2d(double time, List<PhysicsObject> objlist) {
+        public void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
             if (frozen)
                 freezetimer = freezetimer + time;
             if (freezetimer > 1) {
@@ -294,76 +333,108 @@ namespace U5Designs
                 freezetimer = 0;
             }
             if (!frozen) {
+                //first do gravity
                 if (doesGravity) {
                     accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
                 }
-                velocity.X += accel.X;
-                velocity.Y += accel.Y;
+                //now deal with acceleration
+                velocity += accel;
                 accel.X = 0;
                 accel.Y = 0;
                 accel.Z = 0;
-                _location += velocity * (float)time;
 
-                foreach (PhysicsObject obj in objlist) {
-                    // don't do collision physics to yourself
-                    if (obj != this) {
+                velocity.Z = 0; //special case for 2d
 
-                        if ((Math.Abs(((GameObject)obj).location.Y - _location.Y) < pbox.Y + obj.pbox.Y)
-                        && (Math.Abs(((GameObject)obj).location.X - _location.X) < pbox.X + obj.pbox.X)) {
-                            // at this point obj is in collision with this enemy
+                //now check for collisions and move
+                List<PhysicsObject> alreadyCollidedList = new List<PhysicsObject>();
 
-                            //figure out which direction the collision happened on by looking for point where
-                            //only one axis is not colliding
-                            Vector3 temploc = _location - velocity * (float)time;
-                            Vector3 step = velocity * (float)time * 0.25f;
-                            bool x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-                            bool y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-                            bool lastStepWasForward = true;
-                            while (x == y && step.LengthFast >= 0.01f) {
-                                if (!x) { //both false - not far enough, step forward
-                                    if (!lastStepWasForward) {
-                                        step *= 0.5f;
+                while (time > 0.0) {
+                    PhysicsObject collidingObj = null;
+                    float collidingT = 1.0f / 0.0f; //pos infinity
+                    int collidingAxis = -1;
+
+                    foreach (PhysicsObject obj in physList) {
+                        // don't do collision physics to yourself, or on things you already hit this frame
+                        if (obj != this && !alreadyCollidedList.Contains(obj)) {
+                            Vector3 mybox, objbox;
+                            if (obj.hascbox) {
+                                mybox = _cbox;
+                                objbox = ((CombatObject)obj).cbox;
+                            }
+                            else {
+                                mybox = _pbox;
+                                objbox = obj.pbox;
+                            }
+                            //find possible ranges of values for which a collision may have occurred
+                            Vector3 maxTvals = VectorUtil.div(obj.location + objbox - _location + mybox, velocity);
+                            Vector3 minTvals = VectorUtil.div(obj.location - objbox - _location - mybox, velocity);
+                            VectorUtil.sort(ref minTvals, ref maxTvals);
+
+                            float minT = VectorUtil.maxVal(minTvals.Xy);
+                            float maxT = VectorUtil.minVal(maxTvals.Xy);
+
+                            // both axes? || forward? || within range?
+                            if (minT > maxT || minT < 0.0f || minT > time) {
+                                continue; //no intersection
+                            }
+
+                            //if we're here, there's a collision
+                            //see if this collision is the first to occur
+                            if (minT < collidingT) {
+                                collidingT = minT;
+                                collidingObj = obj;
+                                collidingAxis = VectorUtil.maxIndex(minTvals.Xy);
+                            }
+                        }
+                    }
+
+                    Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
+                    if (collidingAxis == -1) { //no collision
+                        _location += velocity * (float)time;
+                        time = 0.0;
+                    }
+                    else {
+                        alreadyCollidedList.Add(collidingObj);
+                        if (!collidingObj.hascbox) { //if this is a normal physics collision
+                            switch (collidingAxis) {
+                                case 0: //x
+                                    if (_location.X < collidingObj.location.X) {
+                                        _location.X = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
                                     }
-                                    lastStepWasForward = true;
-                                    temploc += step;
-                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-                                }
-                                else { //both true - too far, step backwards
-                                    if (lastStepWasForward) {
-                                        step *= 0.5f;
+                                    else {
+                                        _location.X = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
                                     }
-                                    lastStepWasForward = false;
-                                    temploc -= step;
-                                    x = Math.Abs(((GameObject)obj).location.X - temploc.X) <= pbox.X + obj.pbox.X;
-                                    y = Math.Abs(((GameObject)obj).location.Y - temploc.Y) <= pbox.Y + obj.pbox.Y;
-                                }
+                                    if (velocity.X != 0) {//should always be true, but just in case...
+                                        double deltaTime = (location.X - startLoc.X) / velocity.X;
+                                        _location.Y += (float)(velocity.Y * deltaTime);
+                                        time -= deltaTime;
+                                    }
+                                    velocity.X = 0;
+                                    break;
+                                case 1: //y
+                                    if (_location.Y < collidingObj.location.Y) {
+                                        _location.Y = collidingObj.location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.0001f;
+                                    }
+                                    else {
+                                        _location.Y = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
+                                    }
+                                    if (velocity.Y != 0) {//should always be true, but just in case...
+                                        double deltaTime = (location.Y - startLoc.Y) / velocity.Y;
+                                        _location.X += (float)(velocity.X * deltaTime);
+                                        time -= deltaTime;
+                                    }
+                                    velocity.Y = 0;
+                                    break;
                             }
+                        }
+                        else { //this is a combat collision
+                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
 
-                            //If we couldn't find a good match, pick the y axis as a default
-                            if (x == y) {
-                                x = true;
-                                y = false;
-                            }
+                            
+                            if (((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
+                                //TODO: projectile implementation
 
-                            //We're now at a point that two axes intersect - the third is the one that collided
-                            if (!x) {
-                                velocity.X = 0;
-                                if (_location.X < ((GameObject)obj).location.X) {
-                                    _location.X = ((GameObject)obj).location.X - (pbox.X + obj.pbox.X);
-                                }
-                                else {
-                                    _location.X = ((GameObject)obj).location.X + pbox.X + obj.pbox.X;
-                                }
-                            }
-                            else { //y
-                                velocity.Y = 0;
-                                if (_location.Y < ((GameObject)obj).location.Y) {
-                                    _location.Y = ((GameObject)obj).location.Y - (pbox.Y + obj.pbox.Y);
-                                }
-                                else {
-                                    _location.Y = ((GameObject)obj).location.Y + pbox.Y + obj.pbox.Y;
-                                }
+
                             }
                         }
                     }
@@ -371,22 +442,27 @@ namespace U5Designs
             }
         }
 
-		public void aiUpdate(FrameEventArgs e, Vector3 playerposn, bool enable3d) {
-            if (AItype == 1) {
-                if (dist(playerposn, _location) > 0) {
-                    Vector3 dir = getdir(playerposn, _location);
-                    velocity.X = dir.X * _speed;
-                    if (enable3d)
-                        velocity.Z = dir.Z * _speed;
-                }
-                else {
-                    velocity.X = 0;
-                    velocity.Z = 0;
-                }
-
-
-
+        /* Hardcoded stuff time.
+         * AItype:
+         * 1 = icecream throwing kid. walks to the player up to a set distance
+         *      once close enough, he throws his projectile at the player
+         *      
+         * 2 = flying bird, flyes to the player, when close enough will swoop down on player
+         * 
+         * 
+         */
+        private void InitilizeAI() {
+            if (AItype == 1)
+                CurrentAI.Push(new Kidmoveto());
+            if (AItype == 2) {
+                doesGravity = false;
+                CurrentAI.Push(new Birdmoveto());
             }
+        }
+
+		public void aiUpdate(FrameEventArgs e, Vector3 playerposn, bool enable3d) {
+
+            CurrentAI.Peek().update(e, playerposn, this, enable3d);
         }
 
         // calculates the literal distance between 2 points

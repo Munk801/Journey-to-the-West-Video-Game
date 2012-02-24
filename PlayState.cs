@@ -123,7 +123,7 @@ namespace U5Designs
 					}
 				}
             } else {
-				player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.X], eng.Keyboard[Key.Space], e);
+				player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.X], eng.Keyboard[Key.Space], eng.Keyboard[Key.P], e, this);
 
 				foreach(AIObject aio in aiList) {
 					aio.aiUpdate(e, player.location, enable3d);
@@ -132,14 +132,14 @@ namespace U5Designs
 				//Now that everyone's had a chance to accelerate, actually
 				//translate that into velocity and position
 				if(enable3d) {
-					player.physUpdate3d(e.Time, physList); //TODO: Should player be first or last?
+                    player.physUpdate3d(e.Time, objList, renderList, colisionList, physList, combatList); //TODO: Should player be first or last?
 					foreach(PhysicsObject po in colisionList) {
-						po.physUpdate3d(e.Time, physList);
+                        po.physUpdate3d(e.Time, objList, renderList, colisionList, physList, combatList);
 					}
 				} else {
-					player.physUpdate2d(e.Time, physList); //TODO: Should player be first or last?
+                    player.physUpdate2d(e.Time, objList, renderList, colisionList, physList, combatList); //TODO: Should player be first or last?
 					foreach(PhysicsObject po in colisionList) {
-						po.physUpdate2d(e.Time, physList);
+                        po.physUpdate2d(e.Time, objList, renderList, colisionList, physList, combatList);
 					}
 				}
 

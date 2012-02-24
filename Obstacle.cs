@@ -109,12 +109,12 @@ namespace U5Designs {
             GL.Rotate(rotate, axis);
         }
 
-		public void physUpdate3d(double time, List<PhysicsObject> objlist) {
+        public void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
 			//obstacles don't move (for now) so they don't need an update
 			return;
 		}
 
-		public void physUpdate2d(double time, List<PhysicsObject> objlist) {
+        public void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
 			//obstacles don't move (for now) so they don't need an update
 			return;
 		}

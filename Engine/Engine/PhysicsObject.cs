@@ -19,10 +19,10 @@ namespace Engine {
 		private Vector3 accel;
 		private bool doesGravity; //true if gravity affects this object
 		*/
-        
+
 		//applies gravity/acceleration, then velocity, then collision detection
-		void physUpdate2d(double time, List<PhysicsObject> objlist);
-		void physUpdate3d(double time, List<PhysicsObject> objlist);
+        void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList);
+        void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList);
 
 		//allows other objects to cause this one to accelerate
 		//this could be AI accelerating itself, or the player accelerating projectiles, etc.

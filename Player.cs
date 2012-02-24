@@ -24,6 +24,7 @@ namespace U5Designs
 		private Vector3 accel;
         private bool Invincible, HasControl;
         private double Invincibletimer, NoControlTimer;
+        SpriteSheet banana;
 
 		public float deltax; //used for updating position of camera, etc.
 		public Camera cam; //pointer to the camera, used for informing of y position changes
@@ -32,7 +33,7 @@ namespace U5Designs
         static string jumpSoundFile = "../../Resources/Sound/jump_sound.ogg";
         AudioFile jumpSound = new AudioFile(jumpSoundFile);
 
-        public Player(SpriteSheet sprite)
+        public Player(SpriteSheet sprite, SpriteSheet banana)
         {
             p_state = new PlayerState("TEST player");
             p_state.setSpeed(130);
@@ -47,6 +48,8 @@ namespace U5Designs
 			_cycleNum = 0;
 			_frameNum = 0;
 			_sprite = sprite;
+            this.banana = banana;
+
             _hascbox = true;
             _type = 0; // hack, this means nothing, will never matter as player never collides with himself
 			_existsIn2d = true;
@@ -66,8 +69,8 @@ namespace U5Designs
 		 * 
 		 * Returns the movement of the player to be used in updating camera, etc.
          * */
-        bool spaceDown;
-        public void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool c, bool x, bool space, FrameEventArgs e) {
+        bool spaceDown, pdown;
+        internal void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool c, bool x, bool space, bool p, FrameEventArgs e, PlayState playstate) {
 
             if (Invincible)
                 Invincibletimer = Invincibletimer + e.Time;
@@ -129,11 +132,25 @@ namespace U5Designs
                         velocity.X = 0f;
                 }
 
-                //TMP PHYSICS TEST BUTTON and suicide button
+                //TMP PHYSICS TEST BUTTON and suicide button and projectlie button
                 if (c)
                     velocity.Y = (float)p_state.getSpeed();
                 if (x)
                     _health = 0;
+                if (p && !pdown) {
+                    Console.WriteLine("projectile fired");
+                    // make new projectile
+                    Projectile shot = new Projectile(new Vector3(50,50,50), new Vector3(0,0,1), new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, 20, 100, false, true, banana);
+                    playstate.objList.Add(shot);
+                    playstate.renderList.Add(shot);
+                    playstate.colisionList.Add(shot);
+                    playstate.physList.Add(shot);
+                    playstate.combatList.Add(shot);
+
+                    pdown = true;
+                }
+                else if (!p)
+                    pdown = false;
 
 
                 //********************** space
@@ -214,7 +231,7 @@ namespace U5Designs
 			GL.Scale(_scale);
         }
 
-		public void physUpdate3d(double time, List<PhysicsObject> objlist) {
+        public void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
 			//first deal with gravity
 			accel.Y -= (float)(400*time); //TODO: turn this into a constant somewhere
 
@@ -233,7 +250,7 @@ namespace U5Designs
 				float collidingT = 1.0f / 0.0f; //pos infinity
 				int collidingAxis = -1;
 
-				foreach(PhysicsObject obj in objlist) {
+                foreach (PhysicsObject obj in physList) {
 					// don't do collision physics to yourself, or on things you already hit this frame
 					if(obj != this && !alreadyCollidedList.Contains(obj)) {
 						Vector3 mybox, objbox;
@@ -344,8 +361,21 @@ namespace U5Designs
 
 						}
 						if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
-							//TODO: projectile implementation
+							//if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
+                            if (!((Projectile)collidingObj).playerspawned) {
+                                _health = _health - ((CombatObject)collidingObj).damage;
+                                Invincible = true;
+                                HasControl = false;
+                                //despawn the projectile
+                                objList.Remove((GameObject)collidingObj);
+                                renderList.Remove((RenderObject)collidingObj);
+                                colisionList.Remove(collidingObj);
+                                physList.Remove(collidingObj);
+                                combatList.Remove((CombatObject)collidingObj);
+                            }
 
+                            
+                                
 
 						}
 					}
@@ -353,7 +383,7 @@ namespace U5Designs
 			}
 		}
 
-		public void physUpdate2d(double time, List<PhysicsObject> objlist) {
+        public void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
 			//first do gravity
 			accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
 			
@@ -374,7 +404,7 @@ namespace U5Designs
 				float collidingT = 1.0f / 0.0f; //pos infinity
 				int collidingAxis = -1;
 
-				foreach(PhysicsObject obj in objlist) {
+                foreach (PhysicsObject obj in physList) {
 					// don't do collision physics to yourself, or on things you already hit this frame
 					if(obj != this && !alreadyCollidedList.Contains(obj)) {
 						Vector3 mybox, objbox;
@@ -450,7 +480,6 @@ namespace U5Designs
 						}
 					} else { //this is a combat collision
 						time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
-
 						if(((CombatObject)collidingObj).type == 1) {// obj is an enemy, do damage, knock player back
 							_health = _health - ((CombatObject)collidingObj).damage;
 							Invincible = true;
@@ -471,8 +500,18 @@ namespace U5Designs
 
 						}
 						if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
-							//TODO: projectile implementation
-
+                            //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
+                            if (!((Projectile)collidingObj).playerspawned) {
+                                _health = _health - ((CombatObject)collidingObj).damage;
+                                Invincible = true;
+                                HasControl = false;
+                                //despawn the projectile
+                                objList.Remove((GameObject)collidingObj);
+                                renderList.Remove((RenderObject)collidingObj);
+                                colisionList.Remove(collidingObj);
+                                physList.Remove(collidingObj);
+                                combatList.Remove((CombatObject)collidingObj);
+                            }
 
 						}
 					}

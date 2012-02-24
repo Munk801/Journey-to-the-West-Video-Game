@@ -3,25 +3,55 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Imaging;
+
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 using Engine;
-using OpenTK;
 
 namespace U5Designs {
-	class Projectile : GameObject, RenderObject, CombatObject, PhysicsObject {
+    /*
+     * projectiles belong on the following lists:
+     * objList
+     * renderList
+     * colisionList
+     * physList
+     * combatList
+     * */
+    class Projectile : GameObject, RenderObject, CombatObject, PhysicsObject {
 
-		public Projectile(Vector3 location, bool existsIn2d, bool existsIn3d, bool is3dGeo, ObjMesh mesh = null, MeshTexture texture = null, SpriteSheet sprite = null) {
+        internal Vector3 velocity;
+        internal Vector3 accel;
+        internal Vector3 direction;
+        internal bool doesGravity, playerspawned; //true if gravity affects this object\
+ 
+
+        public Projectile(Vector3 location, Vector3 direction, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int damage, float speed, bool gravity, bool PlayerSpawned, SpriteSheet sprite) {
 			_location = location;
+            this.direction = direction;
+			_scale = scale;
+            _pbox = pbox;
+            _cbox = cbox;
 			_existsIn3d = existsIn3d;
 			_existsIn2d = existsIn2d;
-			_mesh = mesh;
-			_texture = texture;
-			_sprite = sprite;
-			_cycleNum = 0;
-			_frameNum = 0;
-			_is3dGeo = is3dGeo;
+            _health = 1;
+            _damage = damage;
+            _speed = speed;
+            _alive = true;
             _hascbox = true;
-            _type = 2;
+            _type = 2; // type 2 means this is a projectile
+
+			_mesh = null;
+			_texture = null;
+			_sprite = sprite;
+			_frameNum = 0;
+			_is3dGeo = false;
+            playerspawned = PlayerSpawned;
+
+            velocity = new Vector3(0, 0, 0);
+            accel = new Vector3(0, 0, 0);
+            doesGravity = gravity;
 		}
 
 		private bool _is3dGeo;
@@ -97,20 +127,27 @@ namespace U5Designs {
 			set { _frameNum = value; }
 		}
 
+
+        public void accelerate(Vector3 acceleration) {
+            accel += acceleration;
+        }
 		public void doScaleTranslateAndTexture() {
+            GL.PushMatrix();
+
+            if (_is3dGeo) {
+                _texture.doTexture();
+            }
+
+            GL.Translate(_location);
+            GL.Scale(_scale);
+		}
+
+        public void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
 			throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void physUpdate3d(double time, List<PhysicsObject> objlist) {
-			throw new Exception("The method or operation is not implemented.");
-		}
-
-		public void physUpdate2d(double time, List<PhysicsObject> objlist) {
-			throw new Exception("The method or operation is not implemented.");
-		}
-
-		public void accelerate(Vector3 acceleration) {
-			throw new Exception("The method or operation is not implemented.");
+        public void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+			//throw new Exception("The method or operation is not implemented.");
 		}
 
 		public void reset() {

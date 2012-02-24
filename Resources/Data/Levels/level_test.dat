@@ -17,7 +17,7 @@
 		</enemy>
 		<enemy>
 			<path>test_flying_enemy.dat</path>
-			<loc x="200" y="30" z="50"/>
+			<loc x="200" y="60" z="50"/>
 		</enemy>
 	</enemylist>
 	<obstaclelist>
