@@ -103,7 +103,7 @@ namespace U5Designs
                 GameOverState GGbro = new GameOverState(menustate, eng);
                 eng.ChangeState(GGbro);
             }
-
+            //next check if an emeny is dead, purge it if so
 
             //Deal with everyone's acceleration
             if (isInTransition)
@@ -127,6 +127,15 @@ namespace U5Designs
 
 				foreach(AIObject aio in aiList) {
 					aio.aiUpdate(e, player.location, enable3d);
+                    //check if the enemy is dead here, if so purge it
+                    if (aio.health <= 0) {
+                        objList.Remove((GameObject)aio);
+                        physList.Remove((PhysicsObject)aio);
+                        colisionList.Remove((PhysicsObject)aio);
+                        renderList.Remove((RenderObject)aio);
+                        aiList.Remove(aio);
+                    }
+
 				}
 
 				//Now that everyone's had a chance to accelerate, actually

@@ -428,11 +428,18 @@ namespace U5Designs
                             }
                         }
                         else { //this is a combat collision
-                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
-
-                            
+                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead      
                             if (((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
-                                //TODO: projectile implementation
+                                if (((Projectile)collidingObj).playerspawned) {
+                                    time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+                                    _health = _health - ((CombatObject)collidingObj).damage;
+                                    //despawn the projectile
+                                    objList.Remove((GameObject)collidingObj);
+                                    renderList.Remove((RenderObject)collidingObj);
+                                    colisionList.Remove(collidingObj);
+                                    physList.Remove(collidingObj);
+                                    combatList.Remove((CombatObject)collidingObj);
+                                }
 
 
                             }

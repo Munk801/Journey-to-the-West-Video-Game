@@ -140,7 +140,7 @@ namespace U5Designs
                 if (p && !pdown) {
                     Console.WriteLine("projectile fired");
                     // make new projectile
-                    Projectile shot = new Projectile(new Vector3(50,50,50), new Vector3(0,0,1), new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, 20, 100, false, true, banana);
+                    Projectile shot = new Projectile(new Vector3(50,60,50), new Vector3(1,0,1), new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, 20, 100, false, true, banana);
                     playstate.objList.Add(shot);
                     playstate.renderList.Add(shot);
                     playstate.colisionList.Add(shot);
