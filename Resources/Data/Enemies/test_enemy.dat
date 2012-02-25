@@ -9,4 +9,5 @@
 	<speed>100</speed>
 	<AI>1</AI>
 	<sprite>test_sprite.dat</sprite>
+	<proj>test_projectile_sprite.dat</proj>
 </enemy>

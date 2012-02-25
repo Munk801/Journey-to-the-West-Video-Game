@@ -240,6 +240,11 @@ namespace U5Designs
 				XmlNodeList _sp = doc_new.GetElementsByTagName("sprite");
 				string _sprite_path = _sp.Item(0).InnerText;
 
+                // Projectile stuff
+                XmlNodeList _ps = doc_new.GetElementsByTagName("proj");
+                SpriteSheet ps = parse_Sprite_File(_ps.Item(0).InnerText);
+                
+
 				// Pause now and parse the Sprite.dat to create the necessary Sprite that is associated with the current Enemy object
 				fstream_new.Close();
 
@@ -250,7 +255,7 @@ namespace U5Designs
 				for(int j = 1; j < EList[i].ChildNodes.Count; j++) {
 					Vector3 loc = parseVector3(EList[i].ChildNodes[j]);
                     //TODO: SETH: change the last 'ss' in this enemy declaration to be the projectile sprite!!!!!!!
-					_e.Add(new Enemy(loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, ss));
+					_e.Add(new Enemy(loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, ps));
 				}
 				fstream_new.Close();
 			}
