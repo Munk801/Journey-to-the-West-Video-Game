@@ -88,6 +88,9 @@ namespace U5Designs
 			}
 		}
 
+        List<CombatObject> EnemyKillList = new List<CombatObject>();
+        List<CombatObject> ProjectileKillList = new List<CombatObject>(); 
+
         public override void Update(FrameEventArgs e)
         {
             //Console.WriteLine(e.Time); // WORST. BUG. EVER.
@@ -95,12 +98,43 @@ namespace U5Designs
             //First deal with hardware input
             DealWithInput();
             MouseInput();
+
             //Next check if the player is dead. If he is, game over man
             if (player.health <= 0) {
                 GameOverState GGbro = new GameOverState(menustate, eng);
                 eng.ChangeState(GGbro);
             }
-            //next check if an emeny is dead, purge it if so
+            
+            //handle death and despawning for everything else
+            EnemyKillList.Clear();
+            ProjectileKillList.Clear();
+            foreach (CombatObject CO in combatList) {
+                if (CO.type == 1) { //enemy
+                    if (CO.health <= 0) {
+                        EnemyKillList.Add(CO);
+                    }
+                }
+                if (CO.type == 2) {//projectile
+                    if (CO.health <= 0) {
+                        ProjectileKillList.Add(CO);
+                    }
+                }
+            }
+            foreach (CombatObject CO in EnemyKillList) {
+                objList.Remove((GameObject)CO);
+                physList.Remove((PhysicsObject)CO);
+                colisionList.Remove((PhysicsObject)CO);
+                renderList.Remove((RenderObject)CO);
+                aiList.Remove((AIObject)CO);
+                combatList.Remove(CO);
+            }
+            foreach (CombatObject CO in ProjectileKillList) {
+                objList.Remove((GameObject)CO);
+                physList.Remove((PhysicsObject)CO);
+                colisionList.Remove((PhysicsObject)CO);
+                renderList.Remove((RenderObject)CO);
+                combatList.Remove(CO);
+            }
 
             //Deal with everyone's acceleration
             if (isInTransition)
@@ -120,19 +154,10 @@ namespace U5Designs
 					}
 				}
             } else {
-				player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.X], eng.Keyboard[Key.Space], eng.Keyboard[Key.P], e, this);
+				player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.X], eng.Keyboard[Key.Space], eng.Keyboard[Key.E], e, this);
 
 				foreach(AIObject aio in aiList) {
 					aio.aiUpdate(e, player.location, enable3d);
-                    //check if the enemy is dead here, if so purge it
-                    if (aio.health <= 0) {
-                        objList.Remove((GameObject)aio);
-                        physList.Remove((PhysicsObject)aio);
-                        colisionList.Remove((PhysicsObject)aio);
-                        renderList.Remove((RenderObject)aio);
-                        aiList.Remove(aio);
-                    }
-
 				}
 
 				//Now that everyone's had a chance to accelerate, actually

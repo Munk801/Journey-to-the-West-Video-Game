@@ -49,6 +49,7 @@ namespace U5Designs
 				ps.colisionList.Add(e);
 				ps.renderList.Add(e);
 				ps.aiList.Add(e);
+                ps.combatList.Add(e);
 			}
 
 			List<Obstacle> _olist = parse_Obstacle_File(_o_list);

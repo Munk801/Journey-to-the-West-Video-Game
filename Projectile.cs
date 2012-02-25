@@ -35,7 +35,7 @@ namespace U5Designs {
             _cbox = cbox;
 			_existsIn3d = existsIn3d;
 			_existsIn2d = existsIn2d;
-            _health = 1;
+            _health = 1; // health 1 = active, health 0 = despawning, waiting for cleanup in PlayState
             _damage = damage;
             _speed = speed;
             _alive = true;
@@ -50,6 +50,9 @@ namespace U5Designs {
             playerspawned = PlayerSpawned;
 
             velocity = new Vector3(0, 0, 0);
+            velocity.X = (float)(speed * direction.X);
+            velocity.Y = (float)(speed * direction.Y);
+            velocity.Z = (float)(speed * direction.Z);
             accel = new Vector3(0, 0, 0);
             doesGravity = gravity;
 		}
@@ -143,24 +146,101 @@ namespace U5Designs {
 		}
 
         public void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
-			throw new Exception("The method or operation is not implemented.");
-		}
+            if (doesGravity) {
+                accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
+            }
+            //now do acceleration
+            velocity += accel;
+            accel.X = 0;
+            accel.Y = 0;
+            accel.Z = 0;
+
+            //now check for collisions and move
+            List<PhysicsObject> alreadyCollidedList = new List<PhysicsObject>();
+
+            while (time > 0.0) {
+                PhysicsObject collidingObj = null;
+                float collidingT = 1.0f / 0.0f; //pos infinity
+                int collidingAxis = -1;
+
+                foreach (PhysicsObject obj in physList) {
+                    // don't do collision physics to yourself, or on things you already hit this frame
+                    if (obj != this && !alreadyCollidedList.Contains(obj)) {
+                        Vector3 mybox, objbox;
+                        if (obj.hascbox) {
+                            mybox = _cbox;
+                            objbox = ((CombatObject)obj).cbox;
+                        }
+                        else {
+                            mybox = _pbox;
+                            objbox = obj.pbox;
+                        }
+                        //find possible ranges of values for which a collision may have occurred
+                        Vector3 maxTvals = VectorUtil.div(obj.location + objbox - _location + mybox, velocity);
+                        Vector3 minTvals = VectorUtil.div(obj.location - objbox - _location - mybox, velocity);
+                        VectorUtil.sort(ref minTvals, ref maxTvals);
+
+                        float minT = VectorUtil.maxVal(minTvals);
+                        float maxT = VectorUtil.minVal(maxTvals);
+
+                        // all three axes? || forward? || within range?
+                        if (minT > maxT || minT < 0.0f || minT > time) {
+                            continue; //no intersection
+                        }
+
+                        //if we're here, there's a collision
+                        //see if this collision is the first to occur
+                        if (minT < collidingT) {
+                            collidingT = minT;
+                            collidingObj = obj;
+                            collidingAxis = VectorUtil.maxIndex(minTvals);
+                        }
+                    }
+                }
+
+                Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
+                if (collidingAxis == -1) { //no collision
+                    _location += velocity * (float)time;
+                    time = 0.0;
+                }
+                else {
+                    alreadyCollidedList.Add(collidingObj);
+                    if (!collidingObj.hascbox) { //if this is a normal physics collision
+                        health = 0;
+                    }
+                    else { //this is a combat collision
+                        time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+                        if (((CombatObject)collidingObj).type == 0) { //hit the player
+                            if (!playerspawned) {
+                                ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
+                                health = 0;
+                            }
+                        }
+                        if (((CombatObject)collidingObj).type == 1) { //hit an enemy
+                            if (playerspawned) {
+                                ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
+                                health = 0;
+                            }
+                        }
+
+
+                    }
+                }
+            }
+        }
+		
 
         public void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
             //first do gravity
             if (doesGravity) {
                 accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
             }
-            // no z in 2d
+            
             //now deal with acceleration
             velocity += accel;
             accel.X = 0;
             accel.Y = 0;
             accel.Z = 0;
-
-            velocity.X += (float)(speed * direction.X * time);
-            velocity.Y += (float)(speed * direction.Y * time);
-            velocity.Z = 0; //special case for 2d
 
             //now check for collisions and move
             List<PhysicsObject> alreadyCollidedList = new List<PhysicsObject>();
@@ -213,23 +293,22 @@ namespace U5Designs {
                 else {
                     alreadyCollidedList.Add(collidingObj);
                     if (!collidingObj.hascbox) { //if this is a normal physics collision
-                        objList.Remove((GameObject)this);
-                        renderList.Remove((RenderObject)this);
-                        colisionList.Remove(this);
-                        physList.Remove(this);
-                        combatList.Remove((CombatObject)this);
+                        health = 0;
                     }
                     else { //this is a combat collision
                         time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
-                        if (playerspawned) {
-                            ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
-                            objList.Remove((GameObject)collidingObj);
-                            renderList.Remove((RenderObject)collidingObj);
-                            colisionList.Remove(collidingObj);
-                            physList.Remove(collidingObj);
-                            combatList.Remove((CombatObject)collidingObj);
+                        if (((CombatObject)collidingObj).type == 0) { //hit the player
+                            if (!playerspawned) {
+                                ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
+                                health = 0;
+                            }
                         }
-
+                        if (((CombatObject)collidingObj).type == 1) { //hit an enemy
+                            if (playerspawned) {
+                                ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
+                                health = 0;
+                            }
+                        }
                     }
                 }
             }
