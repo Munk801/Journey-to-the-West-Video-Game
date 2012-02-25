@@ -22,7 +22,7 @@ namespace U5Designs
         public PlayerState p_state;
 		public Vector3 velocity;
 		private Vector3 accel;
-        private bool Invincible, HasControl;
+        internal bool Invincible, HasControl;
         private double Invincibletimer, NoControlTimer;
         SpriteSheet banana;
 
@@ -164,6 +164,7 @@ namespace U5Designs
             // make new projectile object
             //TODO: determine if banana or fireball or w/e
             Vector3 projlocation = location;
+            //Vector3 projlocation = new Vector3(50, 70, 50);
             Vector3 projdirection = new Vector3(1, 0, 1); //TODO: get the direction vector based on where the mouse is.
             Projectile shot = new Projectile(projlocation, projdirection , new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, 20, 100, false, true, banana);
 
@@ -357,13 +358,7 @@ namespace U5Designs
 							HasControl = false;
 							((Enemy)collidingObj).frozen = true;
 
-							// direction we need to be knocked back in.
-							Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, location.Z - collidingObj.location.Z);
-							direction.Normalize();
-
-							location = new Vector3(collidingObj.location.X + (collidingObj.pbox.X * direction.X), collidingObj.location.Y + collidingObj.pbox.Y, collidingObj.location.Z + (collidingObj.pbox.Z * direction.Z));
-							velocity = new Vector3(0, 0, 0);
-							accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
+                            knockback(true, collidingObj);
 
 
 						}
@@ -490,16 +485,7 @@ namespace U5Designs
 							HasControl = false;
 							((Enemy)collidingObj).frozen = true;
 
-							// direction we need to be knocked back in.
-							Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, 0);
-							direction.Normalize();
-
-							float origX = location.X;
-
-							location = new Vector3(collidingObj.location.X + (collidingObj.pbox.X * direction.X), collidingObj.location.Y + collidingObj.pbox.Y, location.Z);
-							deltax = location.X - origX;
-							velocity = new Vector3(0, 0, 0);
-							accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, 0);
+                            knockback(false, collidingObj);
 
 
 						}
@@ -518,6 +504,31 @@ namespace U5Designs
 				}
 			}
 		}
+
+        public void knockback(bool is3d, PhysicsObject collidingObj) {
+
+            if (is3d) {
+                // direction we need to be knocked back in.
+                Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, location.Z - collidingObj.location.Z);
+                direction.Normalize();
+
+                location = new Vector3(collidingObj.location.X + (collidingObj.pbox.X * direction.X), collidingObj.location.Y + collidingObj.pbox.Y, collidingObj.location.Z + (collidingObj.pbox.Z * direction.Z));
+                velocity = new Vector3(0, 0, 0);
+                accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
+            }
+            else {
+                Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, 0);
+                direction.Normalize();
+
+                float origX = location.X;
+
+                location = new Vector3(collidingObj.location.X + (collidingObj.pbox.X * direction.X), collidingObj.location.Y + collidingObj.pbox.Y, location.Z);
+                deltax = location.X - origX;
+                velocity = new Vector3(0, 0, 0);
+                accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, 0);
+            }
+
+        }
 
 		public void accelerate(Vector3 acceleration) {
 			accel += acceleration;

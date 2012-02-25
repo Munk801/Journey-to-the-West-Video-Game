@@ -53,6 +53,10 @@ namespace U5Designs
 			//TODO: pass this the right file to load from
 			// undo this when done testing ObjList = LoadLevel.Load(current_level);
 			LoadLevel.Load(0, this);
+            foreach (AIObject aio in aiList) {
+                ((Enemy)aio).player = player;
+            }
+
 
             menustate = prvstate;
             eng = engine;
