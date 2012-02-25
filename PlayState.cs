@@ -38,13 +38,12 @@ namespace U5Designs
 
 		bool tabDown;
 
-        Camera camera;
-        
+        internal Camera camera;
 
         MainMenuState menustate;
         PauseMenuState pms;
 
-        int[] Viewport;
+        internal int[] Viewport;
 
         public bool clickdown = false;
         // Initialize graphics, etc here
@@ -56,7 +55,6 @@ namespace U5Designs
 
             menustate = prvstate;
             eng = engine;
-
             pms = new PauseMenuState(engine);
             enable3d = false;
 			tabDown = false;
@@ -97,7 +95,7 @@ namespace U5Designs
 
             //First deal with hardware input
             DealWithInput();
-            MouseInput();
+            //MouseInput();
 
             //Next check if the player is dead. If he is, game over man
             if (player.health <= 0) {
@@ -270,28 +268,27 @@ namespace U5Designs
             //}
         }
 
-        private void MouseInput()
-        {
-            if (eng.ThisMouse.LeftPressed() && !clickdown)
-            {
-                clickdown = true;
-                Vector3d mousecoord = new Vector3d((double)eng.Mouse.X, (double)(eng.Height - eng.Mouse.Y), 0);
-                Matrix4d ortho = camera.GetOthoProjectionMatrix();
-                Matrix4d model = camera.GetModelViewMatrix();
-                Vector3d mouseWorld = new Vector3d();
-                //Glu.UnProject(mousecoord, model, ortho, Viewport, ref mouseWorld);
-                mouseWorld = eng.ThisMouse.UnProject(mousecoord, model, ortho, Viewport);
-                Vector3d proj = eng.ThisMouse.Get2DVectorFromPlayerToClick(player.location, mouseWorld);
-                //Console.WriteLine(mouseWorld.ToString());
-                Console.WriteLine(proj.ToString());
-                //Console.WriteLine("X Coord: " + eng.ThisMouse.Mouse.X.ToString()+  " Y Coord: " + eng.ThisMouse.Mouse.Y.ToString());
-                clickdown = false;
-            }
-            else
-            {
-                clickdown = false;
-            }
-        }
+        //private void MouseInput()
+        //{
+        //    if (eng.ThisMouse.LeftPressed() && !clickdown)
+        //    {
+                
+        //        Vector3d mousecoord = new Vector3d((double)eng.Mouse.X, (double)(eng.Height - eng.Mouse.Y), 0);
+        //        Matrix4d ortho = camera.GetOthoProjectionMatrix();
+        //        Matrix4d model = camera.GetModelViewMatrix();
+        //        //Glu.UnProject(mousecoord, model, ortho, Viewport, ref mouseWorld);
+        //        mouseWorld = eng.ThisMouse.UnProject(mousecoord, model, ortho, Viewport);
+        //        Vector3d proj = eng.ThisMouse.Get2DVectorFromPlayerToClick(player.location, mouseWorld);
+        //        //Console.WriteLine(mouseWorld.ToString());
+        //        Console.WriteLine(proj.ToString());
+        //        //Console.WriteLine("X Coord: " + eng.ThisMouse.Mouse.X.ToString()+  " Y Coord: " + eng.ThisMouse.Mouse.Y.ToString());
+        //        clickdown = true;
+        //    }
+        //    else if (eng.ThisMouse.LeftPressed() == false)
+        //    {
+        //        clickdown = false;
+        //    }
+        //}
 
         private void DealWithInput()
         {

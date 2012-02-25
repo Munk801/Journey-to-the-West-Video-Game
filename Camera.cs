@@ -84,7 +84,7 @@ namespace U5Designs
 			//GL.Enable(EnableCap.Fog);
         }
 
-        public Matrix4d GetOthoProjectionMatrix()
+        public Matrix4d GetProjectionMatrix()
         {
             return this.projection;
         }
@@ -106,6 +106,7 @@ namespace U5Designs
         {
             GL.MatrixMode(MatrixMode.Projection);
             Matrix4d projection = Matrix4d.CreatePerspectiveFieldOfView(fov, Width / (float)Height, 1.0f, 6400.0f);
+            this.projection = projection;
             GL.LoadMatrix(ref projection);
         }
 

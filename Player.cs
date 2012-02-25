@@ -23,6 +23,7 @@ namespace U5Designs
 		public Vector3 velocity;
 		private Vector3 accel;
         private bool Invincible, HasControl;
+        private bool ClickDown;
         private double Invincibletimer, NoControlTimer;
         SpriteSheet banana;
 
@@ -137,12 +138,16 @@ namespace U5Designs
                     velocity.Y = (float)p_state.getSpeed();
                 if (x)
                     _health = 0;
-                if (ekey && !edown) {
-                    spawnProjectile(playstate);
-                    edown = true;
-                }
-                else if (!ekey)
-                    edown = false;
+
+                MouseInput(playstate);
+
+                //if (ekey && !edown)
+                //{
+                //    spawnProjectile(playstate);
+                //    edown = true;
+                //}
+                //else if (!ekey)
+                //    edown = false;
 
 
                 //********************** space
@@ -159,14 +164,51 @@ namespace U5Designs
             }
         }
 
-        private void spawnProjectile(PlayState playstate) {
+        /// <summary>
+        /// Provides all the mouse input for the player.  Will currently check for a left click and shoot a projectile in the direction
+        /// </summary>
+        /// <param name="playstate"></param>
+        private void MouseInput(PlayState playstate)
+        {
+            if (playstate.eng.ThisMouse.LeftPressed() && !ClickDown)
+            {
+                // Grab Mouse coord.  Since Y goes down, just subtract from height to get correct orientation
+                Vector3d mousecoord = new Vector3d((double)playstate.eng.Mouse.X, (double)(playstate.eng.Height - playstate.eng.Mouse.Y), 1.0);
+
+                // Pull the projection and model view matrix from the camera.   
+                Matrix4d project = playstate.camera.GetProjectionMatrix();
+                Matrix4d model = playstate.camera.GetModelViewMatrix();
+                
+                // Unproject the coordinates to convert from mouse to world coordinates
+                Vector3d mouseWorld = playstate.eng.ThisMouse.UnProject(mousecoord, model, project, playstate.Viewport);
+
+                // Since Z is 150 in 2d, we just change it here if in 2d
+                if (!playstate.enable3d)
+                    mouseWorld.Z = 50.0;
+
+                // Cannot implicitly typecast a vector3d to vector3
+                Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, (float)mouseWorld.Z);
+
+                // Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
+                projDir.NormalizeFast();
+                spawnProjectile(playstate, projDir);
+                ClickDown = true;
+            }
+            else if (playstate.eng.ThisMouse.LeftPressed() == false)
+            {
+                ClickDown = false;
+            }
+        }
+
+        private void spawnProjectile(PlayState playstate, Vector3 direction) {
             Console.WriteLine("projectile fired");
             // make new projectile object
             //TODO: determine if banana or fireball or w/e
             Vector3 projlocation = location;
-            Vector3 projdirection = new Vector3(1, 0, 1); //TODO: get the direction vector based on where the mouse is.
-            Projectile shot = new Projectile(projlocation, projdirection , new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, 20, 100, false, true, banana);
-
+            //Vector3 projdirection = new Vector3(1, 0, 1); //TODO: get the direction vector based on where the mouse is.
+            //Vector3 projdirection = new Vector3((float)playstate.mouseWorld.X, (float)playstate.mouseWorld.Y, (float)1.0f);
+            direction.NormalizeFast();
+            Projectile shot = new Projectile(projlocation, direction , new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, 20, 100, false, true, banana);
             // add projectile to appropriate lists
             playstate.objList.Add(shot);
             playstate.renderList.Add(shot);
