@@ -44,7 +44,7 @@ namespace U5Designs
         MainMenuState menustate;
         PauseMenuState pms;
 
-        Matrix4 Viewport;
+        int[] Viewport;
 
         public bool clickdown = false;
         // Initialize graphics, etc here
@@ -63,10 +63,7 @@ namespace U5Designs
             //test.Play();
             camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player);
 			player.cam = camera;
-            Viewport = new Matrix4(new Vector4(eng.Width/2, 0.0f, 0.0f, eng.Width/2.0f + eng.ClientRectangle.X),
-                                   new Vector4(0.0f, eng.Height/2, 0.0f, eng.Height/2.0f + eng.ClientRectangle.Y),
-                                   new Vector4(0.0f, 0.0f, 0.0f, 0.0f),
-                                   new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+            Viewport = new int[]{eng.ClientRectangle.X, eng.ClientRectangle.Y, eng.ClientRectangle.Width, eng.ClientRectangle.Height};
         }
 
 		public override void MakeActive() {
@@ -253,11 +250,15 @@ namespace U5Designs
             if (eng.ThisMouse.LeftPressed() && !clickdown)
             {
                 clickdown = true;
-                Vector2 mousecoord = new Vector2(eng.ThisMouse.Mouse.X, eng.ThisMouse.Mouse.Y);
-                Matrix4 ortho = camera.GetOthoProjectionMatrix();
-                Vector4 mouseWorld = eng.ThisMouse.UnProject(ref ortho, Viewport, eng.Width, eng.Height, mousecoord);
-                Console.WriteLine(mouseWorld.ToString());
-                //Console.WriteLine("LEFT MOUSE CLICKED");
+                Vector3d mousecoord = new Vector3d((double)eng.Mouse.X, (double)(eng.Height - eng.Mouse.Y), 0);
+                Matrix4d ortho = camera.GetOthoProjectionMatrix();
+                Matrix4d model = camera.GetModelViewMatrix();
+                Vector3d mouseWorld = new Vector3d();
+                //Glu.UnProject(mousecoord, model, ortho, Viewport, ref mouseWorld);
+                mouseWorld = eng.ThisMouse.UnProject(mousecoord, model, ortho, Viewport);
+                Vector3d proj = eng.ThisMouse.Get2DVectorFromPlayerToClick(player.location, mouseWorld);
+                //Console.WriteLine(mouseWorld.ToString());
+                Console.WriteLine(proj.ToString());
                 //Console.WriteLine("X Coord: " + eng.ThisMouse.Mouse.X.ToString()+  " Y Coord: " + eng.ThisMouse.Mouse.Y.ToString());
                 clickdown = false;
             }

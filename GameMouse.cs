@@ -37,36 +37,65 @@ namespace U5Designs
         }
 
 
-        public Vector3 GetVectorFromPlayerToClick(Vector3 PlayerLocation)
+        public Vector3d Get2DVectorFromPlayerToClick(Vector3 PlayerLocation, Vector3d unprojectedMouse)
         {
-            Vector3 projectileVector = new Vector3();
+            Vector3d projectileVector = new Vector3d();
+            Vector3d convPlayer;
+            // Vector3D does not do an internal cast.  
+            unprojectedMouse.Z = 50.0;
+            convPlayer.X = PlayerLocation.X;
+            convPlayer.Y = PlayerLocation.Y;
+            convPlayer.Z = PlayerLocation.Z;
 
+            projectileVector = convPlayer + unprojectedMouse;
 
             return projectileVector;
         }
 
-        public Vector4 UnProject(ref Matrix4 projection, Matrix4 view, int viewportWidth, int viewportHeight, Vector2 Mouse)
+
+        /// <summary>
+        /// Converts mouse coords to screen coordinates
+        /// </summary>
+        /// <param name="mCoord"> Coordinates on the screen that you are looking to convert</param>
+        /// <param name="model"> Model view matrix.</param>
+        /// <param name="projection"> The projection matrix.  Orthographic for 2D and perspective for 3D</param>
+        /// <param name="viewport"> Viewport Array. [0] - X [1] - Y [2] - Width [3] - Height</param>
+        /// <returns></returns>
+        public Vector3d UnProject(Vector3d mCoord, Matrix4d model, Matrix4d projection, int[] viewport)
         {
-            Vector4 v;
+            Vector3d v = new Vector3d(0.0f, 0.0f, 0.0f);
+            Matrix4d modelProj;
+            Vector4d screen;
 
-            v.X = 2.0f * Mouse.X / (float)viewportWidth - 1;
-            v.Y = -(2.0f * Mouse.Y/ (float)viewportHeight -1);
-            v.Z = 0;
-            v.W = 1.0f;
+            // Concatenate the model and projection matrices
+            modelProj = Matrix4d.Mult(model, projection);
+            modelProj.Invert();
 
-            Matrix4 viewInv = Matrix4.Invert(view);
-            Matrix4 projInv = Matrix4.Invert(projection);
+            // Initalize our screen vector
+            screen.X = mCoord.X;
+            screen.Y = mCoord.Y;
+            screen.Z = mCoord.Z;
+            screen.W = 1.0;
 
-            Vector4.Transform(ref v, ref projInv, out v);
-            Vector4.Transform(ref v, ref viewInv, out v);
+            // Map X and Y coordinates from the screen
+            screen.X = (screen.X - viewport[0]) / viewport[2];
+            screen.Y = (screen.Y - viewport[1]) / viewport[3];
 
-            if (v.W > float.Epsilon || v.W < float.Epsilon)
-            {
-                v.X /= v.W;
-                v.Y /= v.W;
-                v.Z /= v.W;
-            }
+            // Convert to canonical coord
+            screen.X = screen.X * 2 - 1;
+            screen.Y = screen.Y * 2 - 1;
+            screen.Z = screen.Z * 2 - 1;
+            
+            // Transform the vector by the concatenated matrix
+            Vector4d newCoord = Vector4d.Transform(screen, modelProj);
 
+            // Perform Homogeneous Divide
+            if (newCoord.W == 0.0) return v;
+            v.X = newCoord.X / newCoord.W;
+            v.Y = newCoord.Y / newCoord.W;
+            v.Z = newCoord.Z / newCoord.W;
+            
+            // Return the vector 
             return v;
         }
 
