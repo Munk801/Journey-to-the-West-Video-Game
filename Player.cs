@@ -51,7 +51,7 @@ namespace U5Designs
             this.banana = banana;
 
             _hascbox = true;
-            _type = 0; // hack, this means nothing, will never matter as player never collides with himself
+            _type = 0; //type 0 is the player and only the player
 			_existsIn2d = true;
 			_existsIn3d = true;
 
@@ -69,8 +69,8 @@ namespace U5Designs
 		 * 
 		 * Returns the movement of the player to be used in updating camera, etc.
          * */
-        bool spaceDown, pdown;
-        internal void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool c, bool x, bool space, bool p, FrameEventArgs e, PlayState playstate) {
+        bool spaceDown, edown;
+        internal void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool c, bool x, bool space, bool ekey, FrameEventArgs e, PlayState playstate) {
 
             if (Invincible)
                 Invincibletimer = Invincibletimer + e.Time;
@@ -137,20 +137,12 @@ namespace U5Designs
                     velocity.Y = (float)p_state.getSpeed();
                 if (x)
                     _health = 0;
-                if (p && !pdown) {
-                    Console.WriteLine("projectile fired");
-                    // make new projectile
-                    Projectile shot = new Projectile(new Vector3(50,60,50), new Vector3(1,0,1), new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, 20, 100, false, true, banana);
-                    playstate.objList.Add(shot);
-                    playstate.renderList.Add(shot);
-                    playstate.colisionList.Add(shot);
-                    playstate.physList.Add(shot);
-                    playstate.combatList.Add(shot);
-
-                    pdown = true;
+                if (ekey && !edown) {
+                    spawnProjectile(playstate);
+                    edown = true;
                 }
-                else if (!p)
-                    pdown = false;
+                else if (!ekey)
+                    edown = false;
 
 
                 //********************** space
@@ -165,6 +157,22 @@ namespace U5Designs
                     spaceDown = false;
                 }
             }
+        }
+
+        private void spawnProjectile(PlayState playstate) {
+            Console.WriteLine("projectile fired");
+            // make new projectile object
+            //TODO: determine if banana or fireball or w/e
+            Vector3 projlocation = location;
+            Vector3 projdirection = new Vector3(1, 0, 1); //TODO: get the direction vector based on where the mouse is.
+            Projectile shot = new Projectile(projlocation, projdirection , new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, 20, 100, false, true, banana);
+
+            // add projectile to appropriate lists
+            playstate.objList.Add(shot);
+            playstate.renderList.Add(shot);
+            playstate.colisionList.Add(shot);
+            playstate.physList.Add(shot);
+            playstate.combatList.Add(shot);
         }
 
         public void draw(bool viewIs3d, double time)
@@ -367,11 +375,7 @@ namespace U5Designs
                                 Invincible = true;
                                 HasControl = false;
                                 //despawn the projectile
-                                objList.Remove((GameObject)collidingObj);
-                                renderList.Remove((RenderObject)collidingObj);
-                                colisionList.Remove(collidingObj);
-                                physList.Remove(collidingObj);
-                                combatList.Remove((CombatObject)collidingObj);
+                                ((CombatObject)collidingObj).health = 0;
                             }
 
                             
@@ -507,11 +511,7 @@ namespace U5Designs
 								Invincible = true;
 								HasControl = false;
 								//despawn the projectile
-								objList.Remove((GameObject)collidingObj);
-								renderList.Remove((RenderObject)collidingObj);
-								colisionList.Remove(collidingObj);
-								physList.Remove(collidingObj);
-								combatList.Remove((CombatObject)collidingObj);
+                                ((CombatObject)collidingObj).health = 0;
 							}
 						}
 					}
