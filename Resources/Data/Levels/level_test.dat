@@ -77,5 +77,11 @@
 			<path>test_background_3d.dat</path>
 			<loc x="6000" y="75" z="50"/>
 		</decoration>
+		<decoration>
+			<path>test_tree.dat</path>
+			<loc x="100" y="35" z="-150"/>
+			<loc x="250" y="35" z="-150"/>
+			<loc x="450" y="35" z="-150"/>
+		</decoration>
 	</decorationlist>
 </level>

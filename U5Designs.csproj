@@ -192,6 +192,9 @@
     <EmbeddedResource Include="Resources\Data\Obstacles\cage_front.dat" />
     <EmbeddedResource Include="Resources\Data\Obstacles\cage_side.dat" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Decorations\test_tree.dat" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
