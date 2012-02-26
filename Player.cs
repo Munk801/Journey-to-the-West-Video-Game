@@ -16,6 +16,8 @@ namespace U5Designs
 {
     public class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
+		private const int fallDamage = 1;
+
         //Knockback physics constants:
         private Vector3 kbspeed = new Vector3(70, 100, 70);
 
@@ -25,11 +27,15 @@ namespace U5Designs
         internal bool Invincible, HasControl;
         private bool ClickDown;
 
+		private Vector3 lastPosOnGround;
+
         private double Invincibletimer, NoControlTimer;
+		public double fallTimer;
         SpriteSheet banana;
 
 		public float deltax; //used for updating position of camera, etc.
 		public Camera cam; //pointer to the camera, used for informing of y position changes
+		private bool enable3d; //track current world state (used in spawning projectiles)
 
         // SOUND FILES
         static string jumpSoundFile = "../../Resources/Sound/jump_sound.ogg";
@@ -43,8 +49,6 @@ namespace U5Designs
             _scale = new Vector3(12.5f, 25f, 12.5f);
             _pbox = new Vector3(6.25f, 12.5f, 6.25f);
             _cbox = new Vector3(5f, 12.5f, 5f);
-            //cubemesh = new ObjMesh("../../Geometry/box.obj");
-            //_texture = new Bitmap("../../Textures/player.png");
 			velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);
 			_cycleNum = 0;
@@ -61,8 +65,10 @@ namespace U5Designs
             _health = 5;
             Invincible = false;
             HasControl = false;
-            Invincibletimer = 0;
-            NoControlTimer = 0;
+            Invincibletimer = 0.0;
+            NoControlTimer = 0.0;
+			fallTimer = 0.0;
+			lastPosOnGround = new Vector3(_location);
         }
 
         /**
@@ -73,10 +79,11 @@ namespace U5Designs
          * */
         bool spaceDown;
         internal void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool c, bool x, bool space, bool ekey, FrameEventArgs e, PlayState playstate) {
+			this.enable3d = enable3d;
 
             if (Invincible)
-                Invincibletimer = Invincibletimer + e.Time;
-            if (Invincibletimer >= 0.5) { // invincible for 1/2 second
+                Invincibletimer = Invincibletimer - e.Time;
+            if (Invincibletimer <= 0) { // invincible is gone
                 Invincibletimer = 0;
                 Invincible = false;
             }
@@ -134,10 +141,12 @@ namespace U5Designs
                         velocity.X = 0f;
                 }
 
-                //TMP PHYSICS TEST BUTTON and suicide button and projectlie button
-                if (c)
-                    velocity.Y = (float)p_state.getSpeed();
-                if (x)
+                //TMP PHYSICS TEST BUTTON and suicide button and projectile button
+				if(c) {
+					velocity.Y = (float)p_state.getSpeed();
+					fallTimer = 0.0;
+				}
+                if(x)
                     _health = 0;
 
                 MouseInput(playstate);
@@ -181,7 +190,7 @@ namespace U5Designs
                 Matrix4d model = playstate.camera.GetModelViewMatrix();
                 
                 // Unproject the coordinates to convert from mouse to world coordinates
-                Vector3d mouseWorld = playstate.eng.ThisMouse.UnProject(mousecoord, model, project, playstate.Viewport);
+                Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
 
                 // Since Z is 150 in 2d, we just change it here if in 2d
                 if (!playstate.enable3d)
@@ -205,11 +214,15 @@ namespace U5Designs
         private void spawnProjectile(PlayState playstate, Vector3 direction) {
             // make new projectile object
             //TODO: determine if banana or fireball or w/e
-            Vector3 projlocation = location;
+            Vector3 projlocation = new Vector3(location);
+
+			if(!enable3d) {
+				projlocation.Z += 0.001f; //break the rendering tie between player and projectile, or else they flicker
+			}
             //Vector3 projdirection = new Vector3(1, 0, 1); //TODO: get the direction vector based on where the mouse is.
             //Vector3 projdirection = new Vector3((float)playstate.mouseWorld.X, (float)playstate.mouseWorld.Y, (float)1.0f);
             direction.NormalizeFast();
-            Projectile shot = new Projectile(projlocation, direction , new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, playstate.enable3d, damage, 250, true, true, banana);
+            Projectile shot = new Projectile(projlocation, direction , new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(4.5f, 4.5f, 4.5f), true, true, playstate.enable3d, damage, 250, true, true, banana);
 
             // add projectile to appropriate lists
             playstate.objList.Add(shot);
@@ -284,6 +297,8 @@ namespace U5Designs
         }
 
         public void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+			double origTime = time;
+
 			//first deal with gravity
 			accel.Y -= (float)(400*time); //TODO: turn this into a constant somewhere
 
@@ -366,7 +381,9 @@ namespace U5Designs
 								} else {
 									_location.Y = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
 									//Special case for landing on platforms
-									cam.MoveToYPos(_location.Y);
+									fallTimer = 0.0;
+									lastPosOnGround = new Vector3(_location);
+									cam.moveToYPos(_location.Y);
 								}
 								if(velocity.Y != 0) {//should always be true, but just in case...
 									double deltaTime = (location.Y - startLoc.Y) / velocity.Y;
@@ -402,8 +419,6 @@ namespace U5Designs
 							((Enemy)collidingObj).frozen = true;
 
                             knockback(true, collidingObj);
-
-
 						}
 						if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
 							//if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
@@ -414,17 +429,28 @@ namespace U5Designs
                                 //despawn the projectile
                                 ((CombatObject)collidingObj).health = 0;
                             }
-
-                            
-                                
-
 						}
 					}
 				}
 			}
+
+			//Now that everything is done, move the camera if we're below the bottom of the screen
+			if(fallTimer > 0.0 || !cam.playerIsAboveScreenBottom()) {
+				fallTimer += origTime;
+				cam.trackPlayer();
+			}
+
+			if(fallTimer > 1.5) {
+				_health -= fallDamage;
+				_location = lastPosOnGround;
+				Invincible = true;
+				Invincibletimer = 2.0;
+			}
 		}
 
         public void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+			double origTime = time;
+			
 			//first do gravity
 			accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
 			
@@ -508,7 +534,9 @@ namespace U5Designs
 								} else {
 									_location.Y = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
 									//Special case for landing on platforms
-									cam.MoveToYPos(_location.Y);
+									fallTimer = 0.0;
+									lastPosOnGround = new Vector3(_location);
+									cam.moveToYPos(_location.Y);
 								}
 								if(velocity.Y != 0) {//should always be true, but just in case...
 									double deltaTime = (location.Y - startLoc.Y) / velocity.Y;
@@ -524,6 +552,7 @@ namespace U5Designs
 							time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
 							_health = _health - ((CombatObject)collidingObj).damage;
 							Invincible = true;
+							Invincibletimer = 0.5;
 							HasControl = false;
 							((Enemy)collidingObj).frozen = true;
 
@@ -536,6 +565,7 @@ namespace U5Designs
 							if(!((Projectile)collidingObj).playerspawned) {
 								_health = _health - ((CombatObject)collidingObj).damage;
 								Invincible = true;
+								Invincibletimer = 0.5;
 								HasControl = false;
 								//despawn the projectile
                                 ((CombatObject)collidingObj).health = 0;
@@ -543,6 +573,19 @@ namespace U5Designs
 						}
 					}
 				}
+			}
+
+			//Now that everything is done, move the camera if we're below the bottom of the screen
+			if(fallTimer > 0.0 || !cam.playerIsAboveScreenBottom()) {
+				fallTimer += origTime;
+				cam.trackPlayer();
+			}
+
+			if(fallTimer > 1.5) {
+				_health -= fallDamage;
+				_location = lastPosOnGround;
+				Invincible = true;
+				Invincibletimer = 2.0;
 			}
 		}
 
@@ -556,8 +599,7 @@ namespace U5Designs
                 location = new Vector3(collidingObj.location.X + (collidingObj.pbox.X * direction.X), collidingObj.location.Y + collidingObj.pbox.Y, collidingObj.location.Z + (collidingObj.pbox.Z * direction.Z));
                 velocity = new Vector3(0, 0, 0);
                 accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
-            }
-            else {
+            } else {
                 Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, 0);
                 direction.Normalize();
 
@@ -568,7 +610,6 @@ namespace U5Designs
                 velocity = new Vector3(0, 0, 0);
                 accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, 0);
             }
-
         }
 
 		public void accelerate(Vector3 acceleration) {

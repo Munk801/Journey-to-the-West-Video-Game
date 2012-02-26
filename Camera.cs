@@ -11,6 +11,7 @@ namespace U5Designs
     {
         public Vector3 Position;
         public Vector3 End;
+		private int[] viewport;
         public int Width;
         public int Height;
         public bool isInTransition;
@@ -24,18 +25,22 @@ namespace U5Designs
 
 		private float fov;
 
-		private bool movingInY;
+		private bool movingInY; //true when slowly shifting to player's y position (when player is on ground)
+		private bool trackingPlayer; //true when tracking player's exact y position (when player is in freefall below screen)
 		private float playerYPos; //the player's y position the last time they were not in midair
 
-        public Camera(int width, int height, Player p)
+        public Camera(int width, int height, Player p, int[] viewport)
         {
             Position = new Vector3();
             End = new Vector3();
             Width = width;
             Height = height;
+			this.viewport = viewport;
 			fov = (float)(Math.PI / 5);
 			player = p;
 			playerYPos = p.location.Y;
+			movingInY = false;
+			trackingPlayer = false;
 			Set2DCamera();
         }
 
@@ -93,6 +98,10 @@ namespace U5Designs
         {
             return this.model;
         }
+
+		public int[] getViewport() {
+			return this.viewport;
+		}
 
         private void SetOrthographic()
         {
@@ -166,11 +175,16 @@ namespace U5Designs
 			return true;
         }
 
-		public void MoveToYPos(float y) {
+		public void moveToYPos(float y) {
+			trackingPlayer = false;
 			if(y != playerYPos) {
 				movingInY = true;
 				playerYPos = y;
 			}
+		}
+
+		public void trackPlayer() {
+			trackingPlayer = true;
 		}
 
         public void Update(float playerDeltaX, double time)
@@ -183,7 +197,15 @@ namespace U5Designs
 			}
 			UpdateLight();
 
-			if(movingInY) {
+			if(trackingPlayer) {
+				if(in3d) {
+					playerYPos = player.location.Y + 8.0f;
+					Set3DCamera();
+				} else {
+					playerYPos = player.location.Y + 7.0f;
+					Set2DCamera();
+				}
+			} else if(movingInY) {
 				float desiredY = playerYPos + (in3d ? 24.0f : 31.25f);
 				if(desiredY > Position.Y) {
 					Position.Y += (float)(400.0 * time);
@@ -204,5 +226,14 @@ namespace U5Designs
 				}
 			}
         }
+
+		//Used in determining if camera needs to move down to follow player
+		public bool playerIsAboveScreenBottom() {
+			if(in3d) {
+			    return player.location.Y - player.pbox.Y - 3.0 >= End.Y - 45;
+			} else {
+				return player.location.Y - player.pbox.Y - 3.0 >= End.Y - 54;
+			}
+		}
     }
 }

@@ -124,8 +124,13 @@ namespace U5Designs
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-
-            GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
+			if(ClientRectangle.Width > 1280 || ClientRectangle.Height > 720) {
+				int xExtra = (ClientRectangle.Width - 1280) / 2;
+				int yExtra = (ClientRectangle.Height - 720) / 2;
+				GL.Viewport(ClientRectangle.X + xExtra, ClientRectangle.Y + yExtra, ClientRectangle.Width - (xExtra * 2), ClientRectangle.Height - (yExtra * 2));
+			} else {
+				GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
+			}
             //TODO: Something should happen here to handle this gracefully
 			
 			//states.Peek().updateView();

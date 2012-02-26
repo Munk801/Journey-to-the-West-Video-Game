@@ -57,7 +57,14 @@ namespace U5Designs
 
 
             //}
-             if (timeTilMain > 2)
+#if DEBUG
+			if(eng.Keyboard[Key.Enter]) {
+				eng.ChangeState(new PlayState(new MainMenuState(eng), eng, 0));
+				eng.GameInProgress = true;
+			}
+#endif
+
+            if (timeTilMain > 2)
             {
                 MainMenuState ms = new MainMenuState(eng);
                 //eng.StateTextureManager.Dispose();
