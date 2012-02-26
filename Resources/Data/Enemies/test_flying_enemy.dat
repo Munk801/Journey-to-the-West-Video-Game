@@ -4,7 +4,7 @@
 	<cbox x="6.25" y="6.25" z="6.25"/>
 	<draw2>true</draw2>
 	<draw3>true</draw3>
-	<health>10</health>
+	<health>2</health>
 	<damage>1</damage>
 	<speed>100</speed>
 	<AI>2</AI>

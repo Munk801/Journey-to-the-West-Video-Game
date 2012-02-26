@@ -104,8 +104,8 @@
     <Content Include="Engine\Engine\Tao DevIL\ILU.dll" />
     <Content Include="Engine\Engine\Tao DevIL\ILUT.dll" />
     <Content Include="Engine\Engine\Tao DevIL\Tao.DevIl.dll" />
+    <EmbeddedResource Include="Resources\Textures\banana.png" />
     <EmbeddedResource Include="Resources\Textures\test_projectile_sprite.png" />
-    <EmbeddedResource Include="Resources\Textures\test_player_banana.png" />
     <EmbeddedResource Include="Resources\Textures\test_player_sprite.png" />
     <EmbeddedResource Include="Resources\Textures\test_monkey.png" />
     <EmbeddedResource Include="Resources\Textures\test_flying_sprite.png" />
@@ -160,10 +160,10 @@
     <EmbeddedResource Include="Resources\Data\Sprites\test_player_sprite.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Sprites\test_player_banana.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\test_projectile_sprite.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Sprites\test_projectile_sprite.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\player_banana.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
