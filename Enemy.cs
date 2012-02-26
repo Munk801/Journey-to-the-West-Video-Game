@@ -24,6 +24,8 @@ namespace U5Designs
 
         Stack<Airoutine> CurrentAI; // This is the stack holding the AI routines, functions identical to the state stack in GameEngine
 
+        public Player player;
+
 		public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, MeshTexture texture) {
 			_location = location;
             _scale = scale;
@@ -317,8 +319,17 @@ namespace U5Designs
                                     //despawn the projectile
                                     ((CombatObject)collidingObj).health = 0;
                                 }
+                            }
 
+                            //if the collidingObj is the player and the player is in some kill enemy state, hurt the enemy else hurt player and kb player
+                            if (((CombatObject)collidingObj).type == 0) {
+                                time = 0.0;
+                                player.health = player.health - _damage;
+                                player.Invincible = true;
+                                player.HasControl = false;
+                                frozen = true;
 
+                                player.knockback(true, this);
                             }
                         }
                     }
@@ -442,8 +453,16 @@ namespace U5Designs
 
                             }
 
-                            //TODO: if the collidingObj is the player and the player is in some kill enemy state, hurt the enemy else hurt player and kb player
+                            //if the collidingObj is the player and the player is in some kill enemy state, hurt the enemy else hurt player and kb player
+                            if (((CombatObject)collidingObj).type == 0) {
+                                time = 0.0;
+                                player.health = player.health - _damage;
+                                player.Invincible = true;
+                                player.HasControl = false;
+                                frozen = true;
 
+                                player.knockback(false, this);
+                            }
                         }
                     }
                 }

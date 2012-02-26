@@ -209,21 +209,29 @@ namespace U5Designs {
                         health = 0;
                     }
                     else { //this is a combat collision
-                        time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+                        //time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
                         if (((CombatObject)collidingObj).type == 0) { //hit the player
                             if (!playerspawned) {
+                                time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
+                            }
+                            else {
+                                _location += velocity * (float)time;
+                                time = 0.0;
                             }
                         }
                         if (((CombatObject)collidingObj).type == 1) { //hit an enemy
                             if (playerspawned) {
+                                time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
                             }
+                            else {
+                                _location += velocity * (float)time;
+                                time = 0.0;
+                            }
                         }
-
-
                     }
                 }
             }
@@ -296,17 +304,27 @@ namespace U5Designs {
                         health = 0;
                     }
                     else { //this is a combat collision
-                        time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+                        //time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
                         if (((CombatObject)collidingObj).type == 0) { //hit the player
                             if (!playerspawned) {
+                                time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
+                            }
+                            else {
+                                _location += velocity * (float)time;
+                                time = 0.0;
                             }
                         }
                         if (((CombatObject)collidingObj).type == 1) { //hit an enemy
                             if (playerspawned) {
+                                time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
+                            }
+                            else {
+                                _location += velocity * (float)time;
+                                time = 0.0;
                             }
                         }
                     }
