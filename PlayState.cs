@@ -260,7 +260,7 @@ namespace U5Designs
 					}
 				}
 			}
-
+            //player.he
 			//Finally, draw the player
 			//player.draw(enable3d ^ isInTransition, e.Time);
 

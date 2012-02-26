@@ -73,15 +73,13 @@ namespace U5Designs
 			}
 
 			//temporary hard-coded background
-// 			int[] cycleStarts = { 0 };
-// 			int[] cycleLengths = { 1 };
+ 			int[] cycleStarts = { 0 };
+ 			int[] cycleLengths = { 1 };
 // 			Background bg = new Background(new Vector3(926.0f, 75.0f, -200.0f), new Vector3(3704.0f, 200.0f, 100.0f),
 // 											new SpriteSheet(new Bitmap("../../Resources/test_background.png"),
 // 											cycleStarts, cycleLengths, 10000, 1080), 0.75f);
 // 			ps.backgroundList.Add(bg);
-// 			ps.renderList.Add(bg);
-
-
+// 			ps.renderList.Add(bg);            
 
 			SpriteSheet.quad = new ObjMesh(assembly_new.GetManifestResourceStream("U5Designs.Resources.Geometry.quad.obj"));
 
@@ -91,7 +89,7 @@ namespace U5Designs
 			//SpriteSheet ss = new SpriteSheet(new Bitmap(assembly_new.GetManifestResourceStream("U5Designs.Resources.Textures.test_sprite.png")), cycleStarts, cycleLengths, 128, 128, 4.0);
             ps.player = new Player(parse_Sprite_File("test_player_sprite.dat"), parse_Sprite_File("player_banana.dat"));
 			ps.physList.Add(ps.player);
-			ps.renderList.Add(ps.player);
+			ps.renderList.Add(ps.player);            
 		}
 
 		//Takes an XmlNode with attributes x, y, and z and turns it into a Vector3
