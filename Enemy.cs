@@ -339,7 +339,6 @@ namespace U5Designs
                             }
                         }
                         else { //this is a combat collision
-                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
                             if (((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
                                 if (((Projectile)collidingObj).playerspawned) {
                                     time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead

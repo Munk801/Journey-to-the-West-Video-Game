@@ -61,7 +61,7 @@ namespace U5Designs
         /// <param name="projection"> The projection matrix.  Orthographic for 2D and perspective for 3D</param>
         /// <param name="viewport"> Viewport Array. [0] - X [1] - Y [2] - Width [3] - Height</param>
         /// <returns></returns>
-        public Vector3d UnProject(Vector3d mCoord, Matrix4d model, Matrix4d projection, int[] viewport)
+        public static Vector3d UnProject(Vector3d mCoord, Matrix4d model, Matrix4d projection, int[] viewport)
         {
             Vector3d v = new Vector3d(0.0f, 0.0f, 0.0f);
             Matrix4d modelProj;

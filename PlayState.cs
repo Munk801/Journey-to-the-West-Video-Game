@@ -41,9 +41,7 @@ namespace U5Designs
         internal Camera camera;
 
         MainMenuState menustate;
-        PauseMenuState pms;
-
-        internal int[] Viewport;
+		PauseMenuState pms;
 
         public bool clickdown = false;
         // Initialize graphics, etc here
@@ -63,9 +61,9 @@ namespace U5Designs
             enable3d = false;
 			tabDown = false;
             //test.Play();
-            camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player);
+			camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player,
+									new int[] { eng.ClientRectangle.X, eng.ClientRectangle.Y, eng.ClientRectangle.Width, eng.ClientRectangle.Height });
 			player.cam = camera;
-            Viewport = new int[]{eng.ClientRectangle.X, eng.ClientRectangle.Y, eng.ClientRectangle.Width, eng.ClientRectangle.Height};
         }
 
 		public override void MakeActive() {
@@ -212,6 +210,7 @@ namespace U5Designs
             //This means that all valid game coordinates will be positive
             //Ground is from 0 to 100 along the z-axis
 
+			GL.ClearColor(Color4.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
 
