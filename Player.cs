@@ -71,7 +71,7 @@ namespace U5Designs
 		 * 
 		 * Returns the movement of the player to be used in updating camera, etc.
          * */
-        bool spaceDown, edown;
+        bool spaceDown;
         internal void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool c, bool x, bool space, bool ekey, FrameEventArgs e, PlayState playstate) {
 
             if (Invincible)
@@ -203,7 +203,7 @@ namespace U5Designs
         }
 
         private void spawnProjectile(PlayState playstate, Vector3 direction) {
-            Console.WriteLine("projectile fired");
+            //Console.WriteLine("projectile fired");
             // make new projectile object
             //TODO: determine if banana or fireball or w/e
             Vector3 projlocation = location;

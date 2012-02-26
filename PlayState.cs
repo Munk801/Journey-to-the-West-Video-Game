@@ -159,7 +159,7 @@ namespace U5Designs
 				player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.X], eng.Keyboard[Key.Space], eng.Keyboard[Key.E], e, this);
 
 				foreach(AIObject aio in aiList) {
-					aio.aiUpdate(e, player.location, enable3d);
+					((Enemy)aio).aiUpdate(e, this, player.location, enable3d);
 				}
 
 				//Now that everyone's had a chance to accelerate, actually

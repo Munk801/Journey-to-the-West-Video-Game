@@ -20,7 +20,12 @@ namespace U5Designs
         private bool doesGravity; //true if gravity affects this object
         public bool frozen;
         private double freezetimer;
-        SpriteSheet projectileSprite;
+        internal SpriteSheet projectileSprite;
+
+        //attack delay stuff
+        internal int attackspeed;
+        internal bool attackdelayed;
+        internal double attacktimer;
 
         Stack<Airoutine> CurrentAI; // This is the stack holding the AI routines, functions identical to the state stack in GameEngine
 
@@ -42,6 +47,8 @@ namespace U5Designs
             _type = 1;
             frozen = false;
             freezetimer = 0;
+            attackspeed = 1;
+            attacktimer = 0;
             
 
 			_mesh = mesh;
@@ -77,6 +84,8 @@ namespace U5Designs
             _type = 1; // type one means this is an enemy
             frozen = false;
             freezetimer = 0;
+            attackspeed = 1;
+            attacktimer = 0;
 
 			_mesh = null;
 			_texture = null;
@@ -99,6 +108,25 @@ namespace U5Designs
         {
             // Add in the other State elements that will need to be maintained here..
 		}
+
+        // Pushes a new state onto the stack, calls the states Init method, deletes old state(ie launch game, nuke menu)
+        internal void ChangeState(Airoutine ai) {
+            if (CurrentAI.Count != 0) {
+                CurrentAI.Pop();
+            }
+
+            CurrentAI.Push(ai);
+        }
+        // same as changestate but doesnt delete old state(ie pause game, bringup menu)
+        internal void PushState(Airoutine ai) {
+            CurrentAI.Push(ai);
+        }
+        // pops the current state off and lets the next state have control(menu nukes self, resumes game)
+        public void PopState() {
+            if (CurrentAI.Count > 0) {
+                CurrentAI.Pop();
+            }
+        }
 
 		private bool _is3dGeo;
 		public bool is3dGeo {
@@ -487,9 +515,9 @@ namespace U5Designs
             }
         }
 
-		public void aiUpdate(FrameEventArgs e, Vector3 playerposn, bool enable3d) {
+		internal void aiUpdate(FrameEventArgs e, PlayState playstate, Vector3 playerposn, bool enable3d) {
 
-            CurrentAI.Peek().update(e, playerposn, this, enable3d);
+            CurrentAI.Peek().update(e, playstate, playerposn, this, enable3d);
         }
 
         // calculates the literal distance between 2 points
