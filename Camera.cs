@@ -16,7 +16,8 @@ namespace U5Designs
         public bool isInTransition;
         public double timer;
 		private bool in3d;
-        private Matrix4 projection;
+        private Matrix4d projection;
+        private Matrix4d model;
 		private Player player;
 
 		private Vector4 lightOffset;
@@ -83,28 +84,36 @@ namespace U5Designs
 			//GL.Enable(EnableCap.Fog);
         }
 
-        public Matrix4 GetOthoProjectionMatrix()
+        public Matrix4d GetProjectionMatrix()
         {
             return this.projection;
+        }
+
+        public Matrix4d GetModelViewMatrix()
+        {
+            return this.model;
         }
 
         private void SetOrthographic()
         {
             GL.MatrixMode(MatrixMode.Projection);
-            this.projection = Matrix4.CreateOrthographic(192, 108, 1.0f, 6400.0f);
+            Matrix4d Projection = Matrix4d.CreateOrthographic(192, 108, 1.0f, 6400.0f);
+            this.projection = Projection;
 			GL.LoadMatrix(ref projection);
         }
 
         private void SetPerspective()
         {
             GL.MatrixMode(MatrixMode.Projection);
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(fov, Width / (float)Height, 1.0f, 6400.0f);
+            Matrix4d projection = Matrix4d.CreatePerspectiveFieldOfView(fov, Width / (float)Height, 1.0f, 6400.0f);
+            this.projection = projection;
             GL.LoadMatrix(ref projection);
         }
 
         public void SetModelView()
         {
-            Matrix4 modelview = Matrix4.LookAt(Position, End, Vector3.UnitY);
+            Matrix4d modelview = Matrix4d.LookAt((Vector3d)Position, (Vector3d)End, Vector3d.UnitY);
+            this.model = modelview;
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref modelview);
         }
