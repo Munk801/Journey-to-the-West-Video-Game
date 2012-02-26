@@ -1,11 +1,9 @@
 <sprite>
-	<bmp>test_proj2.png</bmp>
+	<bmp>ice_cream.png</bmp>
 	<c_starts>0</c_starts>
-	<c_starts>4</c_starts>
-	<c_lengths>4</c_lengths>
-	<c_lengths>4</c_lengths>
+	<c_lengths>8</c_lengths>
 	<t_width>128</t_width>
 	<t_height>128</t_height>
 	<hasAlpha>true</hasAlpha>
-	<fps>4.0</fps>
+	<fps>16.0</fps>
 </sprite>

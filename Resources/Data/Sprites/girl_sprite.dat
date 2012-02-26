@@ -1,5 +1,5 @@
 <sprite>
-	<bmp>test_proj2.png</bmp>
+	<bmp>girl_sprite.png</bmp>
 	<c_starts>0</c_starts>
 	<c_starts>4</c_starts>
 	<c_lengths>4</c_lengths>
