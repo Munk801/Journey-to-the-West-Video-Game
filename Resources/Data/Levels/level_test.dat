@@ -66,12 +66,7 @@
 			<loc x="4800" y="100" z="50"/>
 			<loc x="4900" y="100" z="50"/>
 			<loc x="5000" y="100" z="50"/>
-		</obstacle>
-		<obstacle>
-			<path>test_tree.dat</path>
-			<loc x="50" y="40" z="-150"/>
-			<loc x="250" y="40" z="-150"/>
-		</obstacle>
+		</obstacle>		
 		<obstacle>
 			<path>test_obstacle_sprite.dat</path>
 			<loc x="250" y="150" z="50"/>
