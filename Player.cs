@@ -190,6 +190,7 @@ namespace U5Designs
                 // Cannot implicitly typecast a vector3d to vector3
                 Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, (float)mouseWorld.Z);
                 projDir.X = projDir.X - _location.X;
+                projDir.Y = projDir.Y - _location.Y;
                 // Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
                 projDir.NormalizeFast();
                 spawnProjectile(playstate, projDir);
