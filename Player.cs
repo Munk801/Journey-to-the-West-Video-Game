@@ -203,14 +203,13 @@ namespace U5Designs
         }
 
         private void spawnProjectile(PlayState playstate, Vector3 direction) {
-            Console.WriteLine("projectile fired");
             // make new projectile object
             //TODO: determine if banana or fireball or w/e
             Vector3 projlocation = location;
             //Vector3 projdirection = new Vector3(1, 0, 1); //TODO: get the direction vector based on where the mouse is.
             //Vector3 projdirection = new Vector3((float)playstate.mouseWorld.X, (float)playstate.mouseWorld.Y, (float)1.0f);
             direction.NormalizeFast();
-            Projectile shot = new Projectile(projlocation, direction , new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, damage, 150, false, true, banana);
+            Projectile shot = new Projectile(projlocation, direction , new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, damage, 250, true, true, banana);
 
             // add projectile to appropriate lists
             playstate.objList.Add(shot);

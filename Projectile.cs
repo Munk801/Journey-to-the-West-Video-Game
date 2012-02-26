@@ -134,6 +134,7 @@ namespace U5Designs {
         public void accelerate(Vector3 acceleration) {
             accel += acceleration;
         }
+
 		public void doScaleTranslateAndTexture() {
             GL.PushMatrix();
 
@@ -321,8 +322,6 @@ namespace U5Designs {
                     }
                 }
             }
-
-
         }
 
 		public void reset() {
