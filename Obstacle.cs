@@ -14,7 +14,7 @@ namespace U5Designs {
 	class Obstacle : GameObject, RenderObject, PhysicsObject{
 		private int texID;
 
-		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, ObjMesh mesh, MeshTexture texture) {
+		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, bool collidesIn2d, bool collidesIn3d, ObjMesh mesh, MeshTexture texture) {
 			_location = location;
             _scale = scale;
             _pbox = pbox;
@@ -27,10 +27,12 @@ namespace U5Designs {
 			_frameNum = 0;
 			_is3dGeo = true;
             _hascbox = false;
+			_collidesIn2d = collidesIn2d;
+			_collidesIn3d = collidesIn3d;
 		}
 
 
-		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, SpriteSheet sprite) {
+		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, bool collidesIn2d, bool collidesIn3d, Billboarding bb, SpriteSheet sprite) {
 			_location = location;
 			_scale = scale;
             _pbox = pbox;
@@ -41,7 +43,10 @@ namespace U5Designs {
 			_sprite = sprite;
 			_frameNum = 0;
 			_is3dGeo = false;
-            _hascbox = false;
+			_hascbox = false;
+			_collidesIn2d = collidesIn2d;
+			_collidesIn3d = collidesIn3d;
+			_billboards = bb;
 		}
 
 		private bool _is3dGeo;
@@ -94,6 +99,21 @@ namespace U5Designs {
 			set { _frameNum = value; }
 		}
 
+		private Billboarding _billboards;
+		public Billboarding billboards {
+			get { return _billboards; }
+		}
+
+		private bool _collidesIn3d;
+		public bool collidesIn3d {
+			get { return _collidesIn3d; }
+		}
+
+		private bool _collidesIn2d;
+		public bool collidesIn2d {
+			get { return _collidesIn2d; }
+		}
+
 		public void doScaleTranslateAndTexture() {
 			GL.PushMatrix();
 			if(_is3dGeo) {
@@ -109,12 +129,12 @@ namespace U5Designs {
             GL.Rotate(rotate, axis);
         }
 
-        public void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+        public void physUpdate3d(double time, List<PhysicsObject> physList) {
 			//obstacles don't move (for now) so they don't need an update
 			return;
 		}
 
-        public void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+        public void physUpdate2d(double time, List<PhysicsObject> physList) {
 			//obstacles don't move (for now) so they don't need an update
 			return;
 		}

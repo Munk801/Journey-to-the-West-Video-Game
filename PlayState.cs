@@ -163,14 +163,14 @@ namespace U5Designs
 				//Now that everyone's had a chance to accelerate, actually
 				//translate that into velocity and position
 				if(enable3d) {
-                    player.physUpdate3d(e.Time, objList, renderList, colisionList, physList, combatList); //TODO: Should player be first or last?
+                    player.physUpdate3d(e.Time,physList); //TODO: Should player be first or last?
 					foreach(PhysicsObject po in colisionList) {
-                        po.physUpdate3d(e.Time, objList, renderList, colisionList, physList, combatList);
+                        po.physUpdate3d(e.Time, physList);
 					}
 				} else {
-                    player.physUpdate2d(e.Time, objList, renderList, colisionList, physList, combatList); //TODO: Should player be first or last?
+                    player.physUpdate2d(e.Time, physList); //TODO: Should player be first or last?
 					foreach(PhysicsObject po in colisionList) {
-                        po.physUpdate2d(e.Time, objList, renderList, colisionList, physList, combatList);
+                        po.physUpdate2d(e.Time, physList);
 					}
 				}
 
@@ -244,7 +244,7 @@ namespace U5Designs
 					} else {
 						if(!obj.sprite.hasAlpha) {
 							obj.doScaleTranslateAndTexture();
-							obj.frameNumber = obj.sprite.draw(enable3d && !isInTransition, obj.cycleNumber, obj.frameNumber + e.Time);
+							obj.frameNumber = obj.sprite.draw(enable3d && !isInTransition, obj.billboards, obj.cycleNumber, obj.frameNumber + e.Time);
 						}
 					}
 				}
@@ -255,7 +255,7 @@ namespace U5Designs
 				if((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d) || isInTransition) {
 					if((!obj.is3dGeo) && obj.sprite.hasAlpha) {
 						obj.doScaleTranslateAndTexture();
-						obj.frameNumber = obj.sprite.draw(enable3d && !isInTransition, obj.cycleNumber, obj.frameNumber + e.Time);
+						obj.frameNumber = obj.sprite.draw(enable3d && !isInTransition, obj.billboards, obj.cycleNumber, obj.frameNumber + e.Time);
 					}
 				}
 			}

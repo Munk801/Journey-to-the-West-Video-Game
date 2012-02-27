@@ -167,6 +167,9 @@ namespace U5Designs
 				bool _draw2 = Convert.ToBoolean(doc_new.GetElementsByTagName("draw2")[0].InnerText);
 				bool _draw3 = Convert.ToBoolean(doc_new.GetElementsByTagName("draw3")[0].InnerText);
 
+				bool _collides2d = Convert.ToBoolean(doc_new.GetElementsByTagName("collidesIn2d")[0].InnerText);
+				bool _collides3d = Convert.ToBoolean(doc_new.GetElementsByTagName("collidesIn3d")[0].InnerText);
+
 				// Check to see if the current Obstacle is 2D or 3D and handle accordingly
 				XmlNodeList _type = doc_new.GetElementsByTagName("is2d");
 				if(Convert.ToBoolean(_type.Item(0).InnerText)) {
@@ -174,9 +177,29 @@ namespace U5Designs
 					fstream_new.Close();
 					SpriteSheet ss = parse_Sprite_File(ss_path);
 
+					Billboarding bb = Billboarding.Yes;  //Have to put something here for it to compile
+					switch(doc_new.GetElementsByTagName("billboards")[0].InnerText) {
+						case "yes":
+						case "Yes":
+							bb = Billboarding.Yes;
+							break;
+						case "lock2d":
+						case "Lock2d":
+							bb = Billboarding.Lock2d;
+							break;
+						case "lock3d":
+						case "Lock3d":
+							bb = Billboarding.Lock3d;
+							break;
+						default:
+							Console.WriteLine("Bad obstacle file: " + OList[i].FirstChild.InnerText);
+							Environment.Exit(1);
+							break;
+					}
+
 					for(int j = 1; j < OList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(OList[i].ChildNodes[j]);
-						_o.Add(new Obstacle(loc, scale, pbox, _draw2, _draw3, ss));
+						_o.Add(new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, bb, ss));
 					}
 				} else {
 					XmlNodeList _m = doc_new.GetElementsByTagName("mesh");
@@ -187,7 +210,7 @@ namespace U5Designs
 
 					for(int j = 1; j < OList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(OList[i].ChildNodes[j]);
-						_o.Add(new Obstacle(loc, scale, pbox, _draw2, _draw3, _mesh, _tex));
+						_o.Add(new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, _mesh, _tex));
 					}
 					fstream_new.Close();
 				}
@@ -332,9 +355,29 @@ namespace U5Designs
 					// Create the SpriteSheet 
 					SpriteSheet ss = parse_Sprite_File(doc_new.GetElementsByTagName("sprite")[0].InnerText);
 
+					Billboarding bb = Billboarding.Yes;  //Have to put something here for it to compile
+					switch(doc_new.GetElementsByTagName("billboards")[0].InnerText) {
+						case "yes":
+						case "Yes":
+							bb = Billboarding.Yes;
+							break;
+						case "lock2d":
+						case "Lock2d":
+							bb = Billboarding.Lock2d;
+							break;
+						case "lock3d":
+						case "Lock3d":
+							bb = Billboarding.Lock3d;
+							break;
+						default:
+							Console.WriteLine("Bad obstacle file: " + DList[i].FirstChild.InnerText);
+							Environment.Exit(1);
+							break;
+					}
+
 					for(int j = 1; j < DList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(DList[i].ChildNodes[j]);
-						_d.Add(new Decoration(loc, scale, _draw2, _draw3, ss));
+						_d.Add(new Decoration(loc, scale, _draw2, _draw3, bb, ss));
 					}
 				} else {
 					XmlNodeList _m = doc_new.GetElementsByTagName("mesh");

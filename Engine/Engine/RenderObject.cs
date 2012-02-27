@@ -50,6 +50,10 @@ namespace Engine {
             get;
         }
 
+		Billboarding billboards {
+			get;
+		}
+
 		void doScaleTranslateAndTexture(); //pushes matrix, adds scale and translate to model view stack, and sets texture pointer
 	}
 }

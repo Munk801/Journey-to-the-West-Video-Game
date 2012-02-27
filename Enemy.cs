@@ -180,6 +180,19 @@ namespace U5Designs
 			get { return _frameNum; }
 			set { _frameNum = value; }
 		}
+
+		public Billboarding billboards {
+			get { return Billboarding.Yes; }
+		}
+
+		public bool collidesIn3d {
+			get { return true; }
+		}
+
+		public bool collidesIn2d {
+			get { return true; }
+		}
+
         public void reset() {
             throw new NotImplementedException();
         }
@@ -222,7 +235,7 @@ namespace U5Designs
             GL.Scale(_scale);
 		}
 
-        public void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+        public void physUpdate3d(double time, List<PhysicsObject> physList) {
             if (frozen)
                 freezetimer = freezetimer + time;
             if (freezetimer > 1) {
@@ -249,7 +262,7 @@ namespace U5Designs
 
                     foreach (PhysicsObject obj in physList) {
                         // don't do collision physics to yourself, or on things you already hit this frame
-                        if (obj != this && !alreadyCollidedList.Contains(obj)) {
+						if(obj.collidesIn3d && obj != this && !alreadyCollidedList.Contains(obj)) {
                             Vector3 mybox, objbox;
                             if (obj.hascbox) {
                                 mybox = _cbox;
@@ -366,7 +379,7 @@ namespace U5Designs
             }
         }
 
-        public void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+        public void physUpdate2d(double time, List<PhysicsObject> physList) {
             if (frozen)
                 freezetimer = freezetimer + time;
             if (freezetimer > 1) {
@@ -396,7 +409,7 @@ namespace U5Designs
 
                     foreach (PhysicsObject obj in physList) {
                         // don't do collision physics to yourself, or on things you already hit this frame
-                        if (obj != this && !alreadyCollidedList.Contains(obj)) {
+						if(obj.collidesIn2d && obj != this && !alreadyCollidedList.Contains(obj)) {
                             Vector3 mybox, objbox;
                             if (obj.hascbox) {
                                 mybox = _cbox;

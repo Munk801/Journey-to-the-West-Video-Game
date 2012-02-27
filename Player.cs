@@ -232,11 +232,11 @@ namespace U5Designs
             playstate.combatList.Add(shot);
         }
 
-        public void draw(bool viewIs3d, double time)
-        {
-			doScaleTranslateAndTexture();
-			frameNumber = sprite.draw(viewIs3d, cycleNumber, frameNumber + time);
-		}
+		//public void draw(bool viewIs3d, double time)
+		//{
+		//    doScaleTranslateAndTexture();
+		//    frameNumber = sprite.draw(viewIs3d, cycleNumber, frameNumber + time);
+		//}
 
 		public bool is3dGeo {
 			get { return false; }
@@ -289,6 +289,18 @@ namespace U5Designs
 			set { _frameNum = value; }
 		}
 
+		public Billboarding billboards {
+			get { return Billboarding.Yes; }
+		}
+
+		public bool collidesIn3d {
+			get { return true; }
+		}
+
+		public bool collidesIn2d {
+			get { return true; }
+		}
+
         public void doScaleTranslateAndTexture() {
 			GL.PushMatrix();
 
@@ -296,7 +308,7 @@ namespace U5Designs
 			GL.Scale(_scale);
         }
 
-        public void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+        public void physUpdate3d(double time, List<PhysicsObject> physList) {
 			double origTime = time;
 
 			//first deal with gravity
@@ -319,7 +331,7 @@ namespace U5Designs
 
                 foreach (PhysicsObject obj in physList) {
 					// don't do collision physics to yourself, or on things you already hit this frame
-					if(obj != this && !alreadyCollidedList.Contains(obj)) {
+					if(obj.collidesIn3d && obj != this && !alreadyCollidedList.Contains(obj)) {
 						Vector3 mybox, objbox;
 						if(!Invincible && obj.hascbox) {
 							mybox = _cbox;
@@ -448,7 +460,7 @@ namespace U5Designs
 			}
 		}
 
-        public void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+        public void physUpdate2d(double time, List<PhysicsObject> physList) {
 			double origTime = time;
 			
 			//first do gravity
@@ -473,7 +485,7 @@ namespace U5Designs
 
                 foreach (PhysicsObject obj in physList) {
 					// don't do collision physics to yourself, or on things you already hit this frame
-					if(obj != this && !alreadyCollidedList.Contains(obj)) {
+					if(obj.collidesIn2d && obj != this && !alreadyCollidedList.Contains(obj)) {
 						Vector3 mybox, objbox;
 						if(!Invincible && obj.hascbox) {
 							mybox = _cbox;

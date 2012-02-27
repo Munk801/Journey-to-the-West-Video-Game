@@ -19,6 +19,8 @@ using ImageLockMode = System.Drawing.Imaging.ImageLockMode;
  */
 
 namespace Engine {
+	public enum Billboarding { Yes, Lock2d, Lock3d };
+
 	public class SpriteSheet {
 
 		private static readonly float[] vertices = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f};
@@ -156,6 +158,7 @@ namespace Engine {
 				//Cleanup
 			file.Close();
         }
+
 		/*
 		 * draw - Uses OpenGL to render this sprite.  Requires that
 		 *		  the modelview matrix has been properly set up previously
@@ -169,12 +172,12 @@ namespace Engine {
 		 *		  Returns the frameNumber passed, possibly modding it first
 		 *		  to bring it back into the expected range.
 		 */
-		public double draw(bool viewIs3d, int cycleNumber = 0, double frameTime = 0.0) {
+		public double draw(bool viewIs3d, Billboarding bb, int cycleNumber = 0, double frameTime = 0.0) {
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
+			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Replace);
 
 			int frameNum = (int)(frameTime * framesPerSecond);
 			if(frameNum >= tex[cycleNumber].Length) {
@@ -190,7 +193,7 @@ namespace Engine {
 			}
 
 			GL.Scale(1, -1, 1);
-			if(viewIs3d) {
+			if(bb == Billboarding.Lock3d || (viewIs3d && bb == Billboarding.Yes)) {
 				GL.Rotate(270, Vector3d.UnitY);
 			}
 			quad.Render();

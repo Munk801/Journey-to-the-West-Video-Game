@@ -1,9 +1,11 @@
 <obstacle>
-	<is2d>false</is2d>
-	<scale x="50" y="50" z="50"/>
-	<pbox x="50" y="50" z="0"/>
+	<is2d>true</is2d>
+	<scale x="100" y="100" z="100"/>
+	<pbox x="20" y="50" z="0"/>
 	<draw2>true</draw2>
 	<draw3>true</draw3>
-	<mesh>box.obj</mesh>
-	<bmp>baum2.png</bmp>	
+  <collidesIn2d>false</collidesIn2d>
+  <collidesIn3d>true</collidesIn3d>
+  <sprite>test_tree_sprite.dat</sprite>
+  <billboards>lock2d</billboards>
 </obstacle>

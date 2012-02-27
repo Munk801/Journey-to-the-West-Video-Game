@@ -195,6 +195,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Decorations\test_tree.dat" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\test_tree_sprite.dat" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

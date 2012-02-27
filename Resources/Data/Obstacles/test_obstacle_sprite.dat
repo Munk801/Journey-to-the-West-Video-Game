@@ -4,5 +4,8 @@
 	<pbox x="25" y="25" z="25"/>
 	<draw2>true</draw2>
 	<draw3>true</draw3>
+  <collidesIn2d>true</collidesIn2d>
+  <collidesIn3d>true</collidesIn3d>
 	<sprite>test_floor_sprite.dat</sprite>
+  <billboards>yes</billboards>
 </obstacle>
