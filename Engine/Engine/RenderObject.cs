@@ -20,39 +20,25 @@ namespace Engine {
 		bool existsIn3d { get; }
 		bool existsIn2d { get; }
 
-		ObjMesh mesh { //null for sprites
-			get;
-		}
+		//null for sprites
+		ObjMesh mesh { get; }
 
-		MeshTexture texture { //null for sprites
-			get;
-		}
+		//null for sprites
+		MeshTexture texture { get; }
 
-		SpriteSheet sprite { //null for 3d objects
-			get;
-		}
+		//null for 3d objects
+		SpriteSheet sprite { get; }
 
-        Vector3 scale {
-            get;
-        }
+        Vector3 scale { get; }
 
-		int cycleNumber { //index of animation for current action
-			get;
-			set;
-		}
+		//index of animation for current action
+		int cycleNumber { get; set; }
 
-		double frameNumber { //index of the current animation frame
-			get;
-			set;
-		}
+		//index of the current animation frame
+		double frameNumber { get; set; }
 
-        bool is3dGeo {
-            get;
-        }
-
-		Billboarding billboards {
-			get;
-		}
+        bool is3dGeo { get; }
+		Billboarding billboards { get; }
 
 		void doScaleTranslateAndTexture(); //pushes matrix, adds scale and translate to model view stack, and sets texture pointer
 	}

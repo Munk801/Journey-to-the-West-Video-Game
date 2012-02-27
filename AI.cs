@@ -54,7 +54,10 @@ namespace U5Designs {
                 if (!me.attackdelayed) {
                     Vector3 dir = getdir(playerposn, me.location);
                     //throw icecream
-                    Vector3 projlocation = me.location;
+					Vector3 projlocation = me.location;
+					if(!enable3d) {
+						projlocation.Z += 0.001f; //break the rendering tie between enemy and projectile, or else they flicker
+					}
                     Vector3 direction = getdir(playerposn, me.location);
                     Projectile shot = new Projectile(projlocation, direction, new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, playstate.enable3d, me.damage, 150, false, false, me.projectileSprite);
                     playstate.objList.Add(shot);

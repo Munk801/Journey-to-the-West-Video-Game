@@ -141,16 +141,30 @@ namespace U5Designs
             {
 				isInTransition = camera.TransitionState(enable3d, e.Time);
 
-				//TODO: This if/else block is a hack!
-				if(enable3d) {
-					//player.cycleNumber = 1;
-					foreach(AIObject o in aiList) {
-						((RenderObject)o).cycleNumber = 1;
+				if(!isInTransition) { //transition just finished
+					//Switch pboxes and cboxes for things that billboard
+					foreach(PhysicsObject p in physList) {
+						if(p.billboards == Billboarding.Yes) {
+							p.swapPBox();
+						}
 					}
-				} else { //2d
-					//player.cycleNumber = 0;
-					foreach(AIObject o in aiList) {
-						((RenderObject)o).cycleNumber = 0;
+					foreach(CombatObject c in combatList) {
+						if(c.billboards == Billboarding.Yes) {
+							c.swapCBox();
+						}
+					}
+
+					//TODO: This if/else block is a hack!
+					if(enable3d) {
+						//player.cycleNumber = 1;
+						foreach(AIObject o in aiList) {
+							((RenderObject)o).cycleNumber = 1;
+						}
+					} else { //2d
+						//player.cycleNumber = 0;
+						foreach(AIObject o in aiList) {
+							((RenderObject)o).cycleNumber = 0;
+						}
 					}
 				}
             } else {

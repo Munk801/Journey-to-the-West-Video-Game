@@ -15,38 +15,25 @@ namespace Engine {
 		bool hascbox { get; }
 		bool existsIn3d { get; }
 		bool existsIn2d { get; }
-
-		int health {
-			get;
-			set;
-		}
-
-		int damage {
-			get;
-		}
-
-        float speed {
-            get;
-            set;
-        }
-
-		bool alive {
-			get;
-			set;
-		}
+		int health { get; set; }
+		int damage { get; }
+        float speed { get; set; }
+		bool alive { get; set; }
 
         /*
          * IMPORTANT!!! this variable determins the type of combat object for the sake of handling collision with the player
          * 1 = enemy
          * 2 = projectile
          */
-        int type {
-            get;
-        }
+        int type { get; }
+
         // cbox is the size of the combat physics box
-        Vector3 cbox {
-            get;
-        }
+        Vector3 cbox { get; }
+
+		Billboarding billboards { get; }
+
+		//swaps combat box x and z coordinates (used for sprites that billboard)
+		void swapCBox();
 
 		void reset(); //resets to alive and full health; used for resetting level
 	}

@@ -25,10 +25,11 @@ namespace Engine {
 		void accelerate(Vector3 acceleration);
 
         // pbox is the size of the physics box
-        Vector3 pbox {
-            get;
-        }
+		Vector3 pbox { get; }
 
+		Billboarding billboards { get; }
 
+		//swaps physics box x and z coordinates (used for sprites that billboard)
+		void swapPBox();
 	}
 }

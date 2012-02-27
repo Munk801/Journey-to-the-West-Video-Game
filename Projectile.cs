@@ -336,6 +336,20 @@ namespace U5Designs {
             }
         }
 
+		//swaps physics box x and z coordinates (used for sprites that billboard)
+		public void swapPBox() {
+			float temp = _pbox.X;
+			_pbox.X = _pbox.Z;
+			_pbox.Z = temp;
+		}
+
+		//swaps combat box x and z coordinates (used for sprites that billboard)
+		public void swapCBox() {
+			float temp = _cbox.X;
+			_cbox.X = _cbox.Z;
+			_cbox.Z = temp;
+		}
+
 		public void reset() {
 			throw new NotImplementedException();
 		}

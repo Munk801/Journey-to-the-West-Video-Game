@@ -172,7 +172,9 @@
     <EmbeddedResource Include="Resources\Data\Sprites\player_banana.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Obstacles\test_tree.dat" />
+    <EmbeddedResource Include="Resources\Data\Obstacles\test_tree.dat">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Enemies\Boy.dat" />
@@ -197,6 +199,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Sprites\test_tree_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Obstacles\test_tree_collides.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
