@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.Diagnostics;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -329,13 +330,31 @@ namespace U5Designs
             }
 
 			//********************** tab
-			if(!isInTransition) {
+			if(!isInTransition && player.onGround) {
 				if(eng.Keyboard[Key.Tab] && !tabDown) {
 					enable3d = !enable3d;
 					tabDown = true;
 					player.velocity.Z = 0;
 					isInTransition = true;
 					camera.timer = (enable3d ? 1 : 0);
+
+					//figure out if the player gets a grace jump
+					if(enable3d && player.onGround) {
+						Vector3 tmpLoc = new Vector3(player.location);
+						Vector3 tmpVel = new Vector3(player.velocity);
+						int tmpHealth = player.health;
+						//Try letting gravity drop us, if we fall then we get a jump.  This is a bit hackish, because
+						//if we hit an enemy bad things will happen, but since we were on the ground it should be fairly safe.... hopefully.
+						player.velocity = new Vector3(0, 0, 0);
+						player.physUpdate3d(0.01, physList);
+						Debug.Assert(tmpHealth == player.health, "ERROR: Player touched an enemy while checking for grace jump");
+						if(!player.onGround) { //we're now in midair, so we get a jump
+							player.viewSwitchJumpTimer = 1.0;
+							player.setLocation = tmpLoc;
+							player.onGround = true;
+						}
+						player.velocity = tmpVel;
+					}
 				} else if(!eng.Keyboard[Key.Tab]) {
 					tabDown = false;
 				}
