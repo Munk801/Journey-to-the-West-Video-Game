@@ -26,7 +26,13 @@
 			<loc x="50" y="-50" z="50"/>
 			<loc x="150" y="-50" z="50"/>
 			<loc x="250" y="-50" z="50"/>
+			<loc x="250" y="-50" z="150"/>
+			<loc x="250" y="-50" z="-50"/>
+			<loc x="350" y="-50" z="-50"/>
+			<loc x="350" y="-50" z="150"/>
+			<loc x="450" y="-50" z="-50"/>
 			<loc x="450" y="-50" z="50"/>
+			<loc x="450" y="-50" z="150"/>
 			<loc x="550" y="-50" z="50"/>
 			<loc x="750" y="0" z="50"/>
 			<loc x="850" y="0" z="50"/>
@@ -70,7 +76,11 @@
 		<obstacle>
 			<path>test_obstacle_sprite.dat</path>
 			<loc x="250" y="150" z="50"/>
-		</obstacle>		
+		</obstacle>	
+		<obstacle>
+			<path>test_tree.dat</path>
+			<loc x="350" y="35" z="50"/>
+		</obstacle>
 	</obstaclelist>
 	<decorationlist>
 		<decoration>
