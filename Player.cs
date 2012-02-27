@@ -30,12 +30,13 @@ namespace U5Designs
 		private Vector3 lastPosOnGround;
 
         private double Invincibletimer, NoControlTimer;
-		public double fallTimer;
+		public double fallTimer, viewSwitchJumpTimer;
         SpriteSheet banana;
 
 		public float deltax; //used for updating position of camera, etc.
 		public Camera cam; //pointer to the camera, used for informing of y position changes
 		private bool enable3d; //track current world state (used in spawning projectiles)
+		public bool onGround; //true when on ground, or when we just switched to 3d and were in midair
 
         // SOUND FILES
         static string jumpSoundFile = "../../Resources/Sound/jump_sound.ogg";
@@ -44,8 +45,9 @@ namespace U5Designs
         public Player(SpriteSheet sprite, SpriteSheet banana)
         {
             p_state = new PlayerState("TEST player");
-            p_state.setSpeed(130);
-            _location = new Vector3(25, 12.5f, 50);
+            //p_state.setSpeed(130);
+			_speed = 130;
+			_location = new Vector3(25, 12.5f, 50);
             _scale = new Vector3(12.5f, 25f, 12.5f);
             _pbox = new Vector3(6.25f, 12.5f, 6.25f);
             _cbox = new Vector3(5f, 12.5f, 5f);
@@ -55,12 +57,11 @@ namespace U5Designs
 			_frameNum = 0;
 			_sprite = sprite;
             this.banana = banana;
-
             _hascbox = true;
             _type = 0; //type 0 is the player and only the player
 			_existsIn2d = true;
 			_existsIn3d = true;
-
+			onGround = true;
             _damage = 1;
             _health = 5;
             Invincible = false;
@@ -68,6 +69,7 @@ namespace U5Designs
             Invincibletimer = 0.0;
             NoControlTimer = 0.0;
 			fallTimer = 0.0;
+			viewSwitchJumpTimer = 0.0;
 			lastPosOnGround = new Vector3(_location);
         }
 
@@ -95,55 +97,66 @@ namespace U5Designs
                 HasControl = true;
             }
 
+			if(viewSwitchJumpTimer > 0.0) {
+				viewSwitchJumpTimer -= e.Time;
+			}
+
             if (HasControl) {
-                if (enable3d) {
-                    if (w)
-                        velocity.X = (float)p_state.getSpeed();
-                    if (s)
-                        velocity.X = -(float)p_state.getSpeed();
-                    if ((s && w) || (!s && !w))
-                        velocity.X = 0f;
+				if(enable3d) {
+					Vector2 newVel = new Vector2(0);
+					if(w) { newVel.X++; }
+					if(s) { newVel.X--; }
+					if(a) { newVel.Y--; }
+					if(d) { newVel.Y++; }
 
-                    if (d)
-                        velocity.Z = (float)p_state.getSpeed();
-                    if (a)
-                        velocity.Z = -(float)p_state.getSpeed();
-                    if ((d && a) || (!d && !a))
-                        velocity.Z = 0f;
+					newVel.NormalizeFast();
+					if(newVel.X != 0 || newVel.Y != 0) {
+						viewSwitchJumpTimer = 0.0;
+					}
 
-                    if (w && d) {
-                        velocity.X = (float)p_state.getSpeed() * 0.707f;
-                        velocity.Z = (float)p_state.getSpeed() * 0.707f;
-                    }
-                    if (w && a) {
-                        velocity.X = (float)p_state.getSpeed() * 0.707f;
-                        velocity.Z = -((float)p_state.getSpeed() * 0.707f);
-                    }
-                    if (a && s) {
-                        velocity.X = -((float)p_state.getSpeed() * 0.707f);
-                        velocity.Z = -((float)p_state.getSpeed() * 0.707f);
-                    }
-                    if (d && s) {
-                        velocity.X = -((float)p_state.getSpeed() * 0.707f);
-                        velocity.Z = ((float)p_state.getSpeed() * 0.707f);
-                    }
-                    if (a && d)
-                        velocity.Z = 0;
-                    if (w && s)
-                        velocity.X = 0;
-                }
-                else {
-                    if (d)
-                        velocity.X = (float)p_state.getSpeed();
-                    if (a)
-                        velocity.X = -(float)p_state.getSpeed();
-                    if ((d && a) || (!d && !a))
+					velocity.X = newVel.X*speed;
+					velocity.Z = newVel.Y*speed;
+					//if((s && w) || (!s && !w)) {
+					//    velocity.X = 0f;
+					//}
+					//if((d && a) || (!d && !a)) {
+					//    velocity.Z = 0f;
+					//}
+					
+					//if(w && d) {
+					//    velocity.X = (float)p_state.getSpeed() * 0.707f;
+					//    velocity.Z = (float)p_state.getSpeed() * 0.707f;
+					//} else if(w && a) {
+					//    velocity.X = (float)p_state.getSpeed() * 0.707f;
+					//    velocity.Z = -((float)p_state.getSpeed() * 0.707f);
+					//} else if(a && s) {
+					//    velocity.X = -((float)p_state.getSpeed() * 0.707f);
+					//    velocity.Z = -((float)p_state.getSpeed() * 0.707f);
+					//} else if(d && s) {
+					//    velocity.X = -((float)p_state.getSpeed() * 0.707f);
+					//    velocity.Z = ((float)p_state.getSpeed() * 0.707f);
+					//} else if(w) {
+					//    velocity.X = (float)p_state.getSpeed();
+					//} else if(s) {
+					//    velocity.X = -(float)p_state.getSpeed();
+					//} else if(d) {
+					//    velocity.Z = (float)p_state.getSpeed();
+					//} else if(a) {
+					//    velocity.Z = -(float)p_state.getSpeed();
+					//}
+                } else {
+                    if ((d && a) || (!d && !a)) {
                         velocity.X = 0f;
+                    } else if(d) {
+                        velocity.X = _speed;
+					} else { //a
+						velocity.X = -_speed;
+					}
                 }
 
                 //TMP PHYSICS TEST BUTTON and suicide button and projectile button
 				if(c) {
-					velocity.Y = (float)p_state.getSpeed();
+					velocity.Y = _speed;
 					fallTimer = 0.0;
 				}
                 if(x)
@@ -162,10 +175,12 @@ namespace U5Designs
 
                 //********************** space
                 if (space && !spaceDown) {
-                    if (velocity.Y < 0.000001f && velocity.Y > -0.0000001f) {
-                        accelerate(Vector3.UnitY * 230);
-                        //jumpSound.Play();
-                    }
+					if(onGround) {
+						accelerate(Vector3.UnitY * 230);
+						onGround = false;
+						viewSwitchJumpTimer = 0.0;
+						//jumpSound.Play();
+					}
                     spaceDown = true;
                 }
                 else if (!space) {
@@ -232,10 +247,28 @@ namespace U5Designs
             playstate.combatList.Add(shot);
         }
 
-        public void draw(bool viewIs3d, double time)
-        {
-			doScaleTranslateAndTexture();
-			frameNumber = sprite.draw(viewIs3d, cycleNumber, frameNumber + time);
+		//swaps physics box x and z coordinates (used for sprites that billboard)
+		public void swapPBox() {
+			float temp = _pbox.X;
+			_pbox.X = _pbox.Z;
+			_pbox.Z = temp;
+		}
+
+		//swaps combat box x and z coordinates (used for sprites that billboard)
+		public void swapCBox() {
+			float temp = _cbox.X;
+			_cbox.X = _cbox.Z;
+			_cbox.Z = temp;
+		}
+
+		//public void draw(bool viewIs3d, double time)
+		//{
+		//    doScaleTranslateAndTexture();
+		//    frameNumber = sprite.draw(viewIs3d, cycleNumber, frameNumber + time);
+		//}
+
+		public Vector3 setLocation {
+			set { _location = value; }
 		}
 
 		public bool is3dGeo {
@@ -289,6 +322,18 @@ namespace U5Designs
 			set { _frameNum = value; }
 		}
 
+		public Billboarding billboards {
+			get { return Billboarding.Yes; }
+		}
+
+		public bool collidesIn3d {
+			get { return true; }
+		}
+
+		public bool collidesIn2d {
+			get { return true; }
+		}
+
         public void doScaleTranslateAndTexture() {
 			GL.PushMatrix();
 
@@ -296,11 +341,14 @@ namespace U5Designs
 			GL.Scale(_scale);
         }
 
-        public void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+        public void physUpdate3d(double time, List<PhysicsObject> physList) {
 			double origTime = time;
+			bool collidedWithGround = false;
 
 			//first deal with gravity
-			accel.Y -= (float)(400*time); //TODO: turn this into a constant somewhere
+			if(viewSwitchJumpTimer <= 0.0) {
+				accel.Y -= (float)(400*time); //TODO: turn this into a constant somewhere
+			}
 
 			//now do acceleration
 			velocity += accel;
@@ -319,7 +367,7 @@ namespace U5Designs
 
                 foreach (PhysicsObject obj in physList) {
 					// don't do collision physics to yourself, or on things you already hit this frame
-					if(obj != this && !alreadyCollidedList.Contains(obj)) {
+					if(obj.collidesIn3d && obj != this && !alreadyCollidedList.Contains(obj)) {
 						Vector3 mybox, objbox;
 						if(!Invincible && obj.hascbox) {
 							mybox = _cbox;
@@ -356,6 +404,9 @@ namespace U5Designs
 					_location += velocity * (float)time;
 					time = 0.0;
 					deltax += _location.X - startLoc.X; //update this value for camera offset
+					if(viewSwitchJumpTimer <= 0.0 && !collidedWithGround) {
+						onGround = false;
+					}
 				} else {
 					alreadyCollidedList.Add(collidingObj);
 					if(Invincible || !collidingObj.hascbox) { //if this is a normal physics collision
@@ -382,6 +433,8 @@ namespace U5Designs
 									_location.Y = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
 									//Special case for landing on platforms
 									fallTimer = 0.0;
+									onGround = true;
+									collidedWithGround = true;
 									lastPosOnGround = new Vector3(_location);
 									cam.moveToYPos(_location.Y);
 								}
@@ -448,11 +501,14 @@ namespace U5Designs
 			}
 		}
 
-        public void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+        public void physUpdate2d(double time, List<PhysicsObject> physList) {
 			double origTime = time;
+			bool collidedWithGround = false;
 			
 			//first do gravity
-			accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
+			if(viewSwitchJumpTimer <= 0.0) {
+				accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
+			}
 			
 			//now deal with acceleration
 			velocity += accel;
@@ -473,7 +529,7 @@ namespace U5Designs
 
                 foreach (PhysicsObject obj in physList) {
 					// don't do collision physics to yourself, or on things you already hit this frame
-					if(obj != this && !alreadyCollidedList.Contains(obj)) {
+					if(obj.collidesIn2d && obj != this && !alreadyCollidedList.Contains(obj)) {
 						Vector3 mybox, objbox;
 						if(!Invincible && obj.hascbox) {
 							mybox = _cbox;
@@ -510,6 +566,9 @@ namespace U5Designs
 					_location += velocity * (float)time;
 					time = 0.0;
 					deltax += _location.X - startLoc.X; //update this value for camera offset
+					if(viewSwitchJumpTimer <= 0.0 && !collidedWithGround) {
+						onGround = false;
+					}
 				} else {
 					alreadyCollidedList.Add(collidingObj);
 					if(Invincible || !collidingObj.hascbox) { //if this is a normal physics collision
@@ -535,6 +594,8 @@ namespace U5Designs
 									_location.Y = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
 									//Special case for landing on platforms
 									fallTimer = 0.0;
+									onGround = true;
+									collidedWithGround = true;
 									lastPosOnGround = new Vector3(_location);
 									cam.moveToYPos(_location.Y);
 								}

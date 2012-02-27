@@ -4,6 +4,8 @@
 	<pbox x="50" y="50" z="50"/>
 	<draw2>true</draw2>
 	<draw3>true</draw3>
+	<collidesIn2d>true</collidesIn2d>
+	<collidesIn3d>true</collidesIn3d>
 	<mesh>box.obj</mesh>
 	<bmp>Zoo_Ground_Side.png</bmp>	
 </obstacle>

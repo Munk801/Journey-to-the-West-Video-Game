@@ -13,26 +13,23 @@ namespace Engine {
 		bool existsIn3d { get; }
 		bool existsIn2d { get; }
 
-		/* The following are variables that should exist in any
-		 * class implementing PhysicsObject
-		private Vector3 velocity;
-		private Vector3 accel;
-		private bool doesGravity; //true if gravity affects this object
-		*/
+		bool collidesIn3d { get; }
+		bool collidesIn2d { get; }
 
 		//applies gravity/acceleration, then velocity, then collision detection
-        void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList);
-        void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList);
+        void physUpdate2d(double time, List<PhysicsObject> physList);
+        void physUpdate3d(double time, List<PhysicsObject> physList);
 
 		//allows other objects to cause this one to accelerate
 		//this could be AI accelerating itself, or the player accelerating projectiles, etc.
 		void accelerate(Vector3 acceleration);
 
         // pbox is the size of the physics box
-        Vector3 pbox {
-            get;
-        }
+		Vector3 pbox { get; }
 
+		Billboarding billboards { get; }
 
+		//swaps physics box x and z coordinates (used for sprites that billboard)
+		void swapPBox();
 	}
 }

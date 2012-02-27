@@ -132,6 +132,17 @@ namespace U5Designs {
 			set { _frameNum = value; }
 		}
 
+		public Billboarding billboards {
+			get { return Billboarding.Yes; }
+		}
+
+		public bool collidesIn3d {
+			get { return true; }
+		}
+
+		public bool collidesIn2d {
+			get { return true; }
+		}
 
         public void accelerate(Vector3 acceleration) {
             accel += acceleration;
@@ -148,7 +159,7 @@ namespace U5Designs {
             GL.Scale(_scale);
 		}
 
-        public void physUpdate3d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+        public void physUpdate3d(double time, List<PhysicsObject> physList) {
             if (doesGravity) {
                 accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
             }
@@ -168,7 +179,7 @@ namespace U5Designs {
 
                 foreach (PhysicsObject obj in physList) {
                     // don't do collision physics to yourself, or on things you already hit this frame
-                    if (obj != this && !alreadyCollidedList.Contains(obj)) {
+					if(obj.collidesIn3d && obj != this && !alreadyCollidedList.Contains(obj)) {
                         Vector3 mybox, objbox;
                         if (obj.hascbox) {
                             mybox = _cbox;
@@ -239,9 +250,8 @@ namespace U5Designs {
                 }
             }
         }
-		
 
-        public void physUpdate2d(double time, List<GameObject> objList, List<RenderObject> renderList, List<PhysicsObject> colisionList, List<PhysicsObject> physList, List<CombatObject> combatList) {
+        public void physUpdate2d(double time, List<PhysicsObject> physList) {
             //first do gravity
             if (doesGravity) {
                 accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
@@ -263,7 +273,7 @@ namespace U5Designs {
 
                 foreach (PhysicsObject obj in physList) {
                     // don't do collision physics to yourself, or on things you already hit this frame
-                    if (obj != this && !alreadyCollidedList.Contains(obj)) {
+					if(obj.collidesIn2d && obj != this && !alreadyCollidedList.Contains(obj)) {
                         Vector3 mybox, objbox;
                         if (obj.hascbox) {
                             mybox = _cbox;
@@ -325,6 +335,20 @@ namespace U5Designs {
                 }
             }
         }
+
+		//swaps physics box x and z coordinates (used for sprites that billboard)
+		public void swapPBox() {
+			float temp = _pbox.X;
+			_pbox.X = _pbox.Z;
+			_pbox.Z = temp;
+		}
+
+		//swaps combat box x and z coordinates (used for sprites that billboard)
+		public void swapCBox() {
+			float temp = _cbox.X;
+			_cbox.X = _cbox.Z;
+			_cbox.Z = temp;
+		}
 
 		public void reset() {
 			throw new NotImplementedException();
