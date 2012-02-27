@@ -5,5 +5,5 @@
 	<draw2>true</draw2>
 	<draw3>true</draw3>
 	<mesh>box.obj</mesh>
-	<bmp>test.png</bmp>	
+	<bmp>Zoo_Ground_Side.png</bmp>	
 </obstacle>
