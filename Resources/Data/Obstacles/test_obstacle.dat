@@ -7,5 +7,5 @@
 	<collidesIn2d>true</collidesIn2d>
 	<collidesIn3d>true</collidesIn3d>
 	<mesh>box.obj</mesh>
-	<bmp>Zoo_Ground_Side.png</bmp>	
+	<bmp>city_ground.png</bmp>	
 </obstacle>
