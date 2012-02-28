@@ -9,7 +9,7 @@
 	</backgroundlist>
 	<enemylist>
 		<enemy>
-			<path>test_enemy.dat</path>
+			<path>Boy.dat</path>
 			<loc x="250" y="12.5" z="50"/>	
 			<loc x="500" y="12.5" z="50"/>
 			<loc x="800" y="62.5" z="50"/>
