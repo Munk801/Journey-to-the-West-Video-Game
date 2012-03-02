@@ -15,6 +15,7 @@ using System.Xml;
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
+using System.Timers;
 
 namespace U5Designs
 {
@@ -28,33 +29,91 @@ namespace U5Designs
         static string test = "../../Resources/Sound/Retribution.ogg";        
         AudioFile testFile = new AudioFile(test);
 
+        Texture _p1, _p2, _p3, _p4;
+        int _current_img;
+        System.Timers.Timer _timer;
 
         public PauseMenuState(GameEngine engine)
         {
             eng = engine;
+
+            lookat = new Vector3(0, 0, 2);
+            eye = new Vector3(0, 0, 5);
+
+            // Load up the 4 images that will be displayed in sequence giving the illusion of animation
+            eng.StateTextureManager.RenderSetup();
+            eng.StateTextureManager.LoadTexture("p1", "../../Resources/Textures/PauseTextures/p1.png");
+            _p1 = eng.StateTextureManager.GetTexture("p1");
+            eng.StateTextureManager.LoadTexture("p2", "../../Resources/Textures/PauseTextures/p2.png");
+            _p2 = eng.StateTextureManager.GetTexture("p2");
+            eng.StateTextureManager.LoadTexture("p3", "../../Resources/Textures/PauseTextures/p3.png");
+            _p3 = eng.StateTextureManager.GetTexture("p3");
+            eng.StateTextureManager.LoadTexture("p4", "../../Resources/Textures/PauseTextures/p4.png");
+            _p4 = eng.StateTextureManager.GetTexture("p4");            
+
+            // Create the timer used to switch the current image
+            _timer = new System.Timers.Timer();
+            
+            // Set the timer interval to 1 second
+            _timer.Interval = 500;
+
+            // elapse a timer tick
+            _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+
+            // Enable the timer
+            _timer.Enabled = true;
+
+            // Set the current image to be displayed at 0 which is the first in the sequence
+            _current_img = 0;
         }
 
+        public void OnTimedEvent(object source, ElapsedEventArgs e)
+        {            
+            if (_current_img < 3)
+                _current_img += 1;
+            else
+                _current_img = 0;            
+        }
 		public override void MakeActive() {
-			
+           
 		}
 
         public override void Update(FrameEventArgs e)
         {
+            // Deal with user input from either the keyboard or the mouse
             DealWithInput();
         }
 
         public override void Draw(FrameEventArgs e)
         {
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+            Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadMatrix(ref modelview);            
 
+            if (_current_img == 0)
+            {
+                _p1.Draw2DTexture(0, 0, 0.2f, 0.2f);                
+            }
+            if (_current_img == 1)
+            {
+                _p2.Draw2DTexture(0, 0, 0.2f, 0.2f);               
+            }
+            if (_current_img == 2)
+            {
+                _p3.Draw2DTexture(0, 0, 0.2f, 0.2f);                
+            }
+            if (_current_img == 3)
+            {
+                _p4.Draw2DTexture(0, 0, 0.2f, 0.2f);               
+            }                
         }
 
         private void DealWithInput()
         {
             if (eng.Keyboard[Key.Enter])
             {
-                // Exit Paused Menu state and return to playing
-				Console.WriteLine("Exiting paused menu state");
+                // Exit Paused Menu state and return to playing				
 				eng.PopState();
 			} else if(eng.Keyboard[Key.Q]) {
 				eng.Exit();
