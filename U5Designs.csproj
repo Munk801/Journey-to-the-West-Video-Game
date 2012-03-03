@@ -205,6 +205,19 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Obstacles\test_tree_collides.dat" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\ZooMiddleBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\zoo_side_background_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\ZooBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Decorations\zoo_end_background.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\zoo_end_background_sprite.dat" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

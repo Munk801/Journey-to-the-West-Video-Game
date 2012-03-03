@@ -1,10 +1,13 @@
 <level>
 	<backgroundlist>
 		<background>
-			<loc x="926" y="75" z="-200"/>
-			<scale x="3704" y="200" z="1"/>
-			<sprite>test_background.dat</sprite>
+			<scale x="350" y="135" z="1"/>
+			<sprite>zoo_side_background_sprite.dat</sprite>
 			<speed>0.75</speed>
+      <loc x="120" y="35" z="-100"/>
+      <loc x="470" y="35" z="-100"/>
+      <loc x="820" y="35" z="-100"/>
+      <loc x="1170" y="35" z="-100"/>
 		</background>
 	</backgroundlist>
 	<enemylist>
@@ -49,7 +52,7 @@
 			<loc x="2000" y="-125" z="140"/>
 			<loc x="2100" y="0" z="-130"/>
 			<loc x="2100" y="-200" z="230"/>
-			<loc x="2200" y="25" z="-220"/>
+			<loc x="2200" y="25" z="-130"/>
 			<loc x="2200" y="-275" z="320"/>
 			<loc x="2300" y="25" z="-220"/>
 			<loc x="2300" y="-275" z="320"/>
@@ -86,7 +89,7 @@
 	</obstaclelist>
 	<decorationlist>
 		<decoration>
-			<path>test_background_3d.dat</path>
+			<path>zoo_end_background.dat</path>
 			<loc x="6000" y="75" z="50"/>
 		</decoration>
 	</decorationlist>

@@ -83,6 +83,7 @@ namespace U5Designs
 			GL.Fog(FogParameter.FogDensity, 0.0005f);
 
 			GL.ShadeModel(ShadingModel.Smooth);
+			GL.ClearColor(0.26667f, 0.86667f, 1.0f, 1.0f);
 
 			if(enable3d) {
 				camera.Set3DCamera();
@@ -166,9 +167,15 @@ namespace U5Designs
 				//Stuff that uses deltax must be last
 				camera.Update(player.deltax, e.Time);
 				foreach(Background b in backgroundList) {
-					b.UpdatePosition(player.deltax);
+					b.UpdatePositionX(player.deltax);
 				}
             }
+		}
+
+		public void updateBackgroundsYPos(float deltay) {
+			foreach(Background b in backgroundList) {
+				b.UpdatePositionY(deltay);
+			}
 		}
 
 		//sorts RenderObjects by ascending Z coordinate
@@ -199,8 +206,7 @@ namespace U5Designs
             //This means that all valid game coordinates will be positive
             //Ground is from 0 to 100 along the z-axis
 
-			GL.ClearColor(Color4.Black);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
 
             // UNCOMMENT THIS AND LINE AFTER DRAW TO ADD MOTION BLUR

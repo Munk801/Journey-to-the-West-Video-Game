@@ -71,7 +71,7 @@ namespace U5Designs
 			End.X += player.location.X;
 			End.Y += playerYPos;
 			End.Z = player.location.Z;
-			Position = new Vector3(37.5f, 31.25f, 100f);
+			Position = new Vector3(37.5f, 31.25f, 500f);
 			Position.X += player.location.X;
 			Position.Y += playerYPos;
 			Position.Z += player.location.Z;
@@ -215,6 +215,7 @@ namespace U5Designs
 			UpdateLight();
 
 			if(trackingPlayer) {
+				float tmpY = Position.Y;
 				if(in3d) {
 					playerYPos = player.location.Y + 8.0f;
 					Set3DCamera();
@@ -222,8 +223,10 @@ namespace U5Designs
 					playerYPos = player.location.Y + 7.0f;
 					Set2DCamera();
 				}
+				playstate.updateBackgroundsYPos(Position.Y - tmpY);
 			} else if(movingInY) {
 				float desiredY = playerYPos + (in3d ? 24.0f : 31.25f);
+				float tmpY = Position.Y;
 				if(desiredY > Position.Y) {
 					Position.Y += (float)(400.0 * time);
 					End.Y += (float)(400.0 * time);
@@ -241,6 +244,7 @@ namespace U5Designs
 						movingInY = false;
 					}
 				}
+				playstate.updateBackgroundsYPos(Position.Y - tmpY);
 			}
         }
 
