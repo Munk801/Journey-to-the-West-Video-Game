@@ -59,5 +59,8 @@ namespace Engine
             protected set { _hascbox = value; }
         }
 
+
+		//CONSTANTS
+		public const double gravity = 400.0;
 	}
 }

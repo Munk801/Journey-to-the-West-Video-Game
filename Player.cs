@@ -213,27 +213,48 @@ namespace U5Designs
                 Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
 
                 // Since Z is 50 in 2d, we just change it here if in 2d
-                if (!playstate.enable3d)
-                    mouseWorld.Z = 50.0;
+				if(!playstate.enable3d) {
+				    double vel = 250.0;
 
-                // Cannot implicitly typecast a vector3d to vector3
-                Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, (float)mouseWorld.Z);
-                projDir.X = projDir.X - _location.X;
-                projDir.Y = projDir.Y - _location.Y;
-				projDir.Z = projDir.Z - _location.Z;
-                // Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
-                projDir.Normalize();
-                spawnProjectile(playstate, projDir);
-                //ClickDown = true;
+				    Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
+				    projDir -= _location;
+					projDir.X = Math.Abs(projDir.X);
+
+				    //Following is adapted from http://en.wikipedia.org/wiki/Trajectory_of_a_projectile#Angle_required_to_hit_coordinate_.28x.2Cy.29
+				    double velsquared = vel * vel;
+					double sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
+				    double theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+					if(theta != theta) { //true when theta == NaN
+						theta = Math.Atan((velsquared + sqrtPart) / (gravity * projDir.X)); //aim far part of parabola at point instead of near
+						if(theta != theta) {
+							theta = Math.PI / 4; //can't reach that point, go as far as we can
+						}
+					}
+
+				    projDir.X = (float)Math.Cos(theta);
+				    projDir.Y = (float)Math.Sin(theta);
+				    projDir.Z = 0.0f;
+					if(mouseWorld.X < _location.X) {
+						projDir.X = -projDir.X;
+					}
+
+				    spawnProjectile(playstate, projDir, (float)vel);
+				} else {
+
+					// Cannot implicitly typecast a vector3d to vector3
+					Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, (float)mouseWorld.Z);
+					projDir -= _location;
+
+					// Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
+					projDir.Normalize();
+					spawnProjectile(playstate, projDir, 250);
+				}
+                
 				projectileTimer = 0.25;
             }
-			//else if (playstate.eng.ThisMouse.LeftPressed() == false)
-			//{
-			//    ClickDown = false;
-			//}
         }
 
-        private void spawnProjectile(PlayState playstate, Vector3 direction) {
+        private void spawnProjectile(PlayState playstate, Vector3 direction, float speed) {
             // make new projectile object
             //TODO: determine if banana or fireball or w/e
             Vector3 projlocation = new Vector3(location);
@@ -244,9 +265,9 @@ namespace U5Designs
             //Vector3 projdirection = new Vector3(1, 0, 1); //TODO: get the direction vector based on where the mouse is.
             //Vector3 projdirection = new Vector3((float)playstate.mouseWorld.X, (float)playstate.mouseWorld.Y, (float)1.0f);
             //direction.NormalizeFast();
-            Projectile shot = new Projectile(projlocation, direction, new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(4.5f, 4.5f, 4.5f), true, true, playstate.enable3d, damage, 170, true, true, banana);
+            Projectile shot = new Projectile(projlocation, direction, new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(4.5f, 4.5f, 4.5f), true, true, playstate.enable3d, damage, speed, true, true, banana);
 			
-			shot.accelerate(velocity); //account for player's current velocity
+			shot.accelerate(new Vector3(velocity.X, 0.0f, velocity.Z)); //account for player's current velocity
 
             // add projectile to appropriate lists
             playstate.objList.Add(shot);
