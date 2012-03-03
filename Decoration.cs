@@ -13,7 +13,7 @@ using Engine;
 namespace U5Designs {
 	class Decoration : GameObject, RenderObject {
 
-		public Decoration(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, Billboarding bb, SpriteSheet sprite) {
+		public Decoration(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, Billboarding bb, SpriteSheet sprite) : base() {
 			_location = location;
 			_scale = scale;
 			_existsIn3d = existsIn3d;
@@ -28,7 +28,7 @@ namespace U5Designs {
 			_billboards = bb;
 		}
 
-		public Decoration(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, ObjMesh mesh, MeshTexture texture) {
+		public Decoration(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, ObjMesh mesh, MeshTexture texture) : base() {
 			_location = location;
 			_scale = scale;
 			_existsIn3d = existsIn3d;

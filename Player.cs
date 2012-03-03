@@ -29,7 +29,7 @@ namespace U5Designs
 
 		private Vector3 lastPosOnGround;
 
-        private double Invincibletimer, NoControlTimer;
+        private double Invincibletimer, NoControlTimer, projectileTimer;
 		public double fallTimer, viewSwitchJumpTimer;
         SpriteSheet banana;
 
@@ -42,7 +42,7 @@ namespace U5Designs
         static string jumpSoundFile = "../../Resources/Sound/jump_sound.ogg";
         AudioFile jumpSound = new AudioFile(jumpSoundFile);
 
-        public Player(SpriteSheet sprite, SpriteSheet banana)
+        public Player(SpriteSheet sprite, SpriteSheet banana) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
         {
             p_state = new PlayerState("TEST player");
             //p_state.setSpeed(130);
@@ -70,6 +70,7 @@ namespace U5Designs
             NoControlTimer = 0.0;
 			fallTimer = 0.0;
 			viewSwitchJumpTimer = 0.0;
+			projectileTimer = 0.0;
 			lastPosOnGround = new Vector3(_location);
         }
 
@@ -82,6 +83,10 @@ namespace U5Designs
         bool spaceDown;
         internal void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool c, bool x, bool space, bool ekey, FrameEventArgs e, PlayState playstate) {
 			this.enable3d = enable3d;
+
+			if(projectileTimer > 0.0) {
+				projectileTimer -= e.Time;
+			}
 
             if (Invincible)
                 Invincibletimer = Invincibletimer - e.Time;
@@ -188,14 +193,14 @@ namespace U5Designs
                 }
             }
         }
-
+		
         /// <summary>
         /// Provides all the mouse input for the player.  Will currently check for a left click and shoot a projectile in the direction
         /// </summary>
         /// <param name="playstate"></param>
         private void MouseInput(PlayState playstate)
         {
-            if (playstate.eng.ThisMouse.LeftPressed() && !ClickDown)
+            if (playstate.eng.ThisMouse.LeftPressed() && projectileTimer <= 0.0)
             {
                 // Grab Mouse coord.  Since Y goes down, just subtract from height to get correct orientation
                 Vector3d mousecoord = new Vector3d((double)playstate.eng.Mouse.X, (double)(playstate.eng.Height - playstate.eng.Mouse.Y), 1.0);
@@ -207,7 +212,7 @@ namespace U5Designs
                 // Unproject the coordinates to convert from mouse to world coordinates
                 Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
 
-                // Since Z is 150 in 2d, we just change it here if in 2d
+                // Since Z is 50 in 2d, we just change it here if in 2d
                 if (!playstate.enable3d)
                     mouseWorld.Z = 50.0;
 
@@ -215,15 +220,17 @@ namespace U5Designs
                 Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, (float)mouseWorld.Z);
                 projDir.X = projDir.X - _location.X;
                 projDir.Y = projDir.Y - _location.Y;
+				projDir.Z = projDir.Z - _location.Z;
                 // Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
-                projDir.NormalizeFast();
+                projDir.Normalize();
                 spawnProjectile(playstate, projDir);
-                ClickDown = true;
+                //ClickDown = true;
+				projectileTimer = 0.25;
             }
-            else if (playstate.eng.ThisMouse.LeftPressed() == false)
-            {
-                ClickDown = false;
-            }
+			//else if (playstate.eng.ThisMouse.LeftPressed() == false)
+			//{
+			//    ClickDown = false;
+			//}
         }
 
         private void spawnProjectile(PlayState playstate, Vector3 direction) {
@@ -236,8 +243,10 @@ namespace U5Designs
 			}
             //Vector3 projdirection = new Vector3(1, 0, 1); //TODO: get the direction vector based on where the mouse is.
             //Vector3 projdirection = new Vector3((float)playstate.mouseWorld.X, (float)playstate.mouseWorld.Y, (float)1.0f);
-            direction.NormalizeFast();
-            Projectile shot = new Projectile(projlocation, direction , new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(4.5f, 4.5f, 4.5f), true, true, playstate.enable3d, damage, 250, true, true, banana);
+            //direction.NormalizeFast();
+            Projectile shot = new Projectile(projlocation, direction, new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(4.5f, 4.5f, 4.5f), true, true, playstate.enable3d, damage, 170, true, true, banana);
+			
+			shot.accelerate(velocity); //account for player's current velocity
 
             // add projectile to appropriate lists
             playstate.objList.Add(shot);

@@ -20,7 +20,7 @@ using System.IO;
 namespace U5Designs
 {
     /** Main Menu State of the game that will be active while the Main Menu is up **/
-    class MainMenuState : GameState
+    public class MainMenuState : GameState
     {
         internal GameEngine eng;
 
@@ -33,7 +33,7 @@ namespace U5Designs
         MouseDevice mouse;
 
         static string test = "../../Resources/Sound/Retribution.ogg";
-        AudioFile testFile = new AudioFile(test);
+        public AudioFile testFile = new AudioFile(test);
 
         // testing buttons
         //Obstacle play_button_npress, play_button_press, load_button_npress, load_button_press, quit_button_press, quit_button_npress;

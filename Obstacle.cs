@@ -14,7 +14,8 @@ namespace U5Designs {
 	class Obstacle : GameObject, RenderObject, PhysicsObject{
 		private int texID;
 
-		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, bool collidesIn2d, bool collidesIn3d, ObjMesh mesh, MeshTexture texture) {
+		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, bool collidesIn2d, bool collidesIn3d,
+							ObjMesh mesh, MeshTexture texture) : base() {
 			_location = location;
             _scale = scale;
             _pbox = pbox;
@@ -32,7 +33,8 @@ namespace U5Designs {
 		}
 
 
-		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, bool collidesIn2d, bool collidesIn3d, Billboarding bb, SpriteSheet sprite) {
+		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, bool collidesIn2d, bool collidesIn3d,
+							Billboarding bb, SpriteSheet sprite) : base() {
 			_location = location;
 			_scale = scale;
             _pbox = pbox;

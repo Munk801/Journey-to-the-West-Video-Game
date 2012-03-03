@@ -31,7 +31,8 @@ namespace U5Designs
 
         public Player player;
 
-		public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, ObjMesh mesh, MeshTexture texture) {
+		public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed,
+						int AItype, ObjMesh mesh, MeshTexture texture) : base() {
 			_location = location;
             _scale = scale;
             _pbox = pbox;

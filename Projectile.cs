@@ -27,7 +27,8 @@ namespace U5Designs {
         internal bool doesGravity, playerspawned; //true if gravity affects this object\
  
 
-        public Projectile(Vector3 location, Vector3 direction, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, bool in3d, int damage, float speed, bool gravity, bool PlayerSpawned, SpriteSheet sprite) {
+        public Projectile(Vector3 location, Vector3 direction, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, bool in3d,
+							int damage, float speed, bool gravity, bool PlayerSpawned, SpriteSheet sprite) : base() {
 			_location = location;
             this.direction = direction;
 			_scale = scale;

@@ -132,7 +132,10 @@ namespace U5Designs
 				GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
 			}
             //TODO: Something should happen here to handle this gracefully
-			
+			if(states.Peek() is PlayState) {
+				((PlayState)states.Peek()).camera.setViewport(new int[] { ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height });
+			}
+
 			//states.Peek().updateView();
         }
     }

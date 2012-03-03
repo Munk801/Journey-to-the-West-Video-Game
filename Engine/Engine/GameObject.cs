@@ -17,6 +17,21 @@ namespace Engine
 		//Note: GameObject should only have fields that are applicable
 		//      to ALL types of objects.  If it only applies to some
 		//      objects, it should be in the appropriate subclass.
+		private static int lastID = 0;
+
+		public readonly int ID;
+		
+		public int getID() {
+			return ID;
+		}
+
+		protected GameObject() {
+			ID = ++lastID;
+		}
+
+		protected GameObject(int id) {
+			ID = id;
+		}
 
 		//Does this object exist when viewed in 3d?
 		protected bool _existsIn3d;
