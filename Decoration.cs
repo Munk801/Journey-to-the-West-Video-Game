@@ -26,6 +26,7 @@ namespace U5Designs {
 			_is3dGeo = false;
             _hascbox = false;
 			_billboards = bb;
+			_animDirection = 1;
 		}
 
 		public Decoration(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, ObjMesh mesh, MeshTexture texture) : base() {
@@ -39,7 +40,8 @@ namespace U5Designs {
 			_cycleNum = 0;
 			_frameNum = 0;
 			_is3dGeo = true;
-            _hascbox = false;
+			_hascbox = false;
+			_animDirection = 1;
 		}
 
 		private bool _is3dGeo;
@@ -83,6 +85,11 @@ namespace U5Designs {
 		private Billboarding _billboards;
 		public Billboarding billboards {
 			get { return _billboards; }
+		}
+
+		private int _animDirection;
+		public int animDirection {
+			get { return _animDirection; }
 		}
 
 		public void doScaleTranslateAndTexture() {

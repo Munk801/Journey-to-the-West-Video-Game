@@ -218,6 +218,13 @@
     <EmbeddedResource Include="Resources\Data\Decorations\zoo_end_background.dat" />
     <EmbeddedResource Include="Resources\Data\Sprites\zoo_end_background_sprite.dat" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\player_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\spritetry1_back.png" />
+    <EmbeddedResource Include="Resources\Textures\spritetry1_side.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

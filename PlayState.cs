@@ -95,8 +95,9 @@ namespace U5Designs
         List<CombatObject> EnemyKillList = new List<CombatObject>();
         List<CombatObject> ProjectileKillList = new List<CombatObject>(); 
 
-        public override void Update(FrameEventArgs e)
-        {
+        public override void Update(FrameEventArgs e) {
+			//e = new FrameEventArgs(e.Time * 0.1);
+
             //Console.WriteLine(e.Time); // WORST. BUG. EVER.
 
             //First deal with hardware input
@@ -153,7 +154,7 @@ namespace U5Designs
 				//Now that everyone's had a chance to accelerate, actually
 				//translate that into velocity and position
 				if(enable3d) {
-                    player.physUpdate3d(e.Time,physList); //TODO: Should player be first or last?
+                    player.physUpdate3d(e.Time, physList); //TODO: Should player be first or last?
 					foreach(PhysicsObject po in colisionList) {
                         po.physUpdate3d(e.Time, physList);
 					}
@@ -200,11 +201,12 @@ namespace U5Designs
 			}
 		}
 
-        public override void Draw(FrameEventArgs e)
-        {
+        public override void Draw(FrameEventArgs e) {
             //Origin is the left edge of the level, at the ground and the back wall
             //This means that all valid game coordinates will be positive
             //Ground is from 0 to 100 along the z-axis
+
+			//e = new FrameEventArgs(e.Time * 0.1);
 
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -224,7 +226,7 @@ namespace U5Designs
  			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 
 			//Sort objects by depth for proper alpha rendering
-			if(enable3d) {
+			if(nowBillboarding) {
 				renderList.Sort(compare3dView);
 			} else {
 				renderList.Sort(compare2dView);
@@ -239,7 +241,7 @@ namespace U5Designs
 					} else {
 						if(!obj.sprite.hasAlpha) {
 							obj.doScaleTranslateAndTexture();
-							obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + e.Time);
+							obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
 						}
 					}
 				}
@@ -250,7 +252,7 @@ namespace U5Designs
 				if((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d) || isInTransition) {
 					if((!obj.is3dGeo) && obj.sprite.hasAlpha) {
 						obj.doScaleTranslateAndTexture();
-						obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + e.Time);
+						obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
 					}
 				}
 			}
@@ -271,6 +273,9 @@ namespace U5Designs
 			} else {
 				nowBillboarding = false;
 			}
+
+			//Temporary hack until we get a setting added to everything that does this
+			player.cycleNumber += (enable3d ? +1 : -1);
 
 			//Switch pboxes and cboxes for things that billboard
 			foreach(PhysicsObject p in physList) {

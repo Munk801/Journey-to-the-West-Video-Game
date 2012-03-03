@@ -46,11 +46,11 @@ namespace U5Designs
         {
             p_state = new PlayerState("TEST player");
             //p_state.setSpeed(130);
-			_speed = 130;
+			_speed = 75;
 			_location = new Vector3(25, 12.5f, 50);
-            _scale = new Vector3(12.5f, 25f, 12.5f);
-            _pbox = new Vector3(6.25f, 12.5f, 6.25f);
-            _cbox = new Vector3(5f, 12.5f, 5f);
+            _scale = new Vector3(16.25f, 25f, 16.25f);
+            _pbox = new Vector3(5f, 12.5f, 5f);
+            _cbox = new Vector3(4f, 11.5f, 4f);
 			velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);
 			_cycleNum = 0;
@@ -65,13 +65,14 @@ namespace U5Designs
             _damage = 1;
             _health = 5;
             Invincible = false;
-            HasControl = false;
+            HasControl = true;
             Invincibletimer = 0.0;
             NoControlTimer = 0.0;
 			fallTimer = 0.0;
 			viewSwitchJumpTimer = 0.0;
 			projectileTimer = 0.0;
 			lastPosOnGround = new Vector3(_location);
+			_animDirection = 1;
         }
 
         /**
@@ -121,34 +122,13 @@ namespace U5Designs
 
 					velocity.X = newVel.X*speed;
 					velocity.Z = newVel.Y*speed;
-					//if((s && w) || (!s && !w)) {
-					//    velocity.X = 0f;
-					//}
-					//if((d && a) || (!d && !a)) {
-					//    velocity.Z = 0f;
-					//}
-					
-					//if(w && d) {
-					//    velocity.X = (float)p_state.getSpeed() * 0.707f;
-					//    velocity.Z = (float)p_state.getSpeed() * 0.707f;
-					//} else if(w && a) {
-					//    velocity.X = (float)p_state.getSpeed() * 0.707f;
-					//    velocity.Z = -((float)p_state.getSpeed() * 0.707f);
-					//} else if(a && s) {
-					//    velocity.X = -((float)p_state.getSpeed() * 0.707f);
-					//    velocity.Z = -((float)p_state.getSpeed() * 0.707f);
-					//} else if(d && s) {
-					//    velocity.X = -((float)p_state.getSpeed() * 0.707f);
-					//    velocity.Z = ((float)p_state.getSpeed() * 0.707f);
-					//} else if(w) {
-					//    velocity.X = (float)p_state.getSpeed();
-					//} else if(s) {
-					//    velocity.X = -(float)p_state.getSpeed();
-					//} else if(d) {
-					//    velocity.Z = (float)p_state.getSpeed();
-					//} else if(a) {
-					//    velocity.Z = -(float)p_state.getSpeed();
-					//}
+
+					_animDirection = (velocity.X >= 0 ? 1 : -1);
+					if(velocity.X == 0) {
+						_cycleNum = (enable3d ? 1 : 0);
+					} else {
+						_cycleNum = (enable3d ? 3 : 2);
+					}
                 } else {
                     if ((d && a) || (!d && !a)) {
                         velocity.X = 0f;
@@ -156,6 +136,13 @@ namespace U5Designs
                         velocity.X = _speed;
 					} else { //a
 						velocity.X = -_speed;
+					}
+
+					_animDirection = (velocity.X >= 0 ? 1 : -1);
+					if(velocity.X == 0) {
+						_cycleNum = (enable3d ? 1 : 0);
+					} else {
+						_cycleNum = (enable3d ? 3 : 2);
 					}
                 }
 
@@ -223,12 +210,12 @@ namespace U5Designs
 				    //Following is adapted from http://en.wikipedia.org/wiki/Trajectory_of_a_projectile#Angle_required_to_hit_coordinate_.28x.2Cy.29
 				    double velsquared = vel * vel;
 					double sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
-				    double theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
-					if(theta != theta) { //true when theta == NaN
-						theta = Math.Atan((velsquared + sqrtPart) / (gravity * projDir.X)); //aim far part of parabola at point instead of near
-						if(theta != theta) {
-							theta = Math.PI / 4; //can't reach that point, go as far as we can
-						}
+					double theta;
+					if(sqrtPart == sqrtPart) { //false when sqrtPart == NaN
+						theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+					} else {
+						//TODO: Come up with a better looking solution than this.
+						theta = Math.PI / 4; //can't reach that point, go as far as we can
 					}
 
 				    projDir.X = (float)Math.Cos(theta);
@@ -265,7 +252,7 @@ namespace U5Designs
             //Vector3 projdirection = new Vector3(1, 0, 1); //TODO: get the direction vector based on where the mouse is.
             //Vector3 projdirection = new Vector3((float)playstate.mouseWorld.X, (float)playstate.mouseWorld.Y, (float)1.0f);
             //direction.NormalizeFast();
-            Projectile shot = new Projectile(projlocation, direction, new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(4.5f, 4.5f, 4.5f), true, true, playstate.enable3d, damage, speed, true, true, banana);
+            Projectile shot = new Projectile(projlocation, direction, new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(3.5f, 3.5f, 3.5f), true, true, playstate.enable3d, damage, speed, true, true, banana);
 			
 			shot.accelerate(new Vector3(velocity.X, 0.0f, velocity.Z)); //account for player's current velocity
 
@@ -362,6 +349,11 @@ namespace U5Designs
 
 		public bool collidesIn2d {
 			get { return true; }
+		}
+
+		private int _animDirection;
+		public int animDirection {
+			get { return _animDirection; }
 		}
 
         public void doScaleTranslateAndTexture() {

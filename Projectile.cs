@@ -57,7 +57,8 @@ namespace U5Designs {
             if (!in3d)
                 velocity.Z = 0;
             accel = new Vector3(0, 0, 0);
-            doesGravity = gravity;
+			doesGravity = gravity;
+			_animDirection = 1;
 		}
 
 		private bool _is3dGeo;
@@ -147,7 +148,12 @@ namespace U5Designs {
 
         public void accelerate(Vector3 acceleration) {
             accel += acceleration;
-        }
+		}
+
+		private int _animDirection;
+		public int animDirection {
+			get { return _animDirection; }
+		}
 
 		public void doScaleTranslateAndTexture() {
             GL.PushMatrix();

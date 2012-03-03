@@ -30,6 +30,7 @@ namespace U5Designs {
             _hascbox = false;
 			_collidesIn2d = collidesIn2d;
 			_collidesIn3d = collidesIn3d;
+			_animDirection = 1;
 		}
 
 
@@ -49,6 +50,7 @@ namespace U5Designs {
 			_collidesIn2d = collidesIn2d;
 			_collidesIn3d = collidesIn3d;
 			_billboards = bb;
+			_animDirection = 1;
 		}
 
 		private bool _is3dGeo;
@@ -114,6 +116,11 @@ namespace U5Designs {
 		private bool _collidesIn2d;
 		public bool collidesIn2d {
 			get { return _collidesIn2d; }
+		}
+
+		private int _animDirection;
+		public int animDirection {
+			get { return _animDirection; }
 		}
 
 		public void doScaleTranslateAndTexture() {

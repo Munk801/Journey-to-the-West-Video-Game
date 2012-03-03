@@ -74,9 +74,9 @@ namespace U5Designs
 
 			SpriteSheet.quad = new ObjMesh(assembly_new.GetManifestResourceStream("U5Designs.Resources.Geometry.quad.obj"));
 
-			ps.player = new Player(parse_Sprite_File("test_player_sprite.dat"), parse_Sprite_File("player_banana.dat"));
+			ps.player = new Player(parse_Sprite_File("player_sprite.dat"), parse_Sprite_File("player_banana.dat"));
 			ps.physList.Add(ps.player);
-			ps.renderList.Add(ps.player);            
+			ps.renderList.Add(ps.player);
 		}
 
 		//Takes an XmlNode with attributes x, y, and z and turns it into a Vector3
@@ -105,8 +105,6 @@ namespace U5Designs
 
 			fstream_new = assembly_new.GetManifestResourceStream("U5Designs.Resources.Data.Sprites." + path);
 			doc_new.Load(fstream_new);
-			XmlNodeList _bp = doc_new.GetElementsByTagName("bmp");
-			string _bmp_path = "U5Designs.Resources.Textures." + _bp.Item(0).InnerText;
 			XmlNodeList _c_start_list = doc_new.GetElementsByTagName("c_starts");
 			int[] cycleStarts = new int[_c_start_list.Count];
 			for(int i = 0; i < _c_start_list.Count; i++) {
@@ -124,10 +122,20 @@ namespace U5Designs
 			bool _hasAlpha = Convert.ToBoolean(doc_new.GetElementsByTagName("hasAlpha")[0].InnerText);
 			XmlNodeList _f = doc_new.GetElementsByTagName("fps");
 			float _fps = (float)Convert.ToDouble(_f.Item(0).InnerText);
+
+			XmlNodeList _bp = doc_new.GetElementsByTagName("bmp");
 			fstream_new.Close();
 
-			// Create the SpriteSheet
-			return new SpriteSheet(new Bitmap(assembly_new.GetManifestResourceStream(_bmp_path)), cycleStarts, cycleLengths, _width, _height, _hasAlpha, _fps);
+			if(_bp.Count == 1) {
+				string _bmp_path = "U5Designs.Resources.Textures." + _bp[0].InnerText;
+				return new SpriteSheet(new Bitmap(assembly_new.GetManifestResourceStream(_bmp_path)), cycleStarts, cycleLengths, _width, _height, _hasAlpha, _fps);
+			} else {
+				Bitmap[] bmps = new Bitmap[_bp.Count];
+				for(int i = 0; i < _bp.Count; i++) {
+					bmps[i] = new Bitmap(assembly_new.GetManifestResourceStream("U5Designs.Resources.Textures." + _bp[i].InnerText));
+				}
+				return new SpriteSheet(bmps, cycleStarts, cycleLengths, _width, _height, _hasAlpha, _fps);
+			}
 		}
 
 		/**

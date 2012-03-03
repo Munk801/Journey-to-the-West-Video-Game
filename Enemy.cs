@@ -58,6 +58,7 @@ namespace U5Designs
 			_cycleNum = 0;
 			_frameNum = 0;
 			_is3dGeo = true;
+			_animDirection = 1;
 
             velocity = new Vector3(0, 0, 0);
             accel = new Vector3(0, 0, 0);
@@ -94,6 +95,7 @@ namespace U5Designs
             this.projectileSprite = projectileSprite;
 			_frameNum = 0;
 			_is3dGeo = false;
+			_animDirection = 1;
 
             velocity = new Vector3(0, 0, 0);
             accel = new Vector3(0, 0, 0);
@@ -223,7 +225,12 @@ namespace U5Designs
         public bool alive {
             get { return _alive; }
             set { _alive = value; }
-        }
+		}
+
+		private int _animDirection;
+		public int animDirection {
+			get { return _animDirection; }
+		}
 
 		public void doScaleTranslateAndTexture() {
             GL.PushMatrix();

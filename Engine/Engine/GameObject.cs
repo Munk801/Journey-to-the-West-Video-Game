@@ -50,7 +50,7 @@ namespace Engine
 		protected Vector3 _location;
 		public Vector3 location {
 			get { return _location; }
-			protected set { _location = value; }
+			set { _location = value; }
 		}
 
         protected bool _hascbox;
