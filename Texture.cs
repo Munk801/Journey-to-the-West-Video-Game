@@ -22,7 +22,7 @@ namespace U5Designs
             Height = height;
         }
 
-        public void Draw2DTexture(double xPos = 0, double yPos = 0, float scaleX = 1.0f, float scaleY = 1.0f, float decrementX = 0.0f)
+        public void Draw2DTexture(double xPos = 0, double yPos = 0, float scaleX = 1.0f, float scaleY = 1.0f)
         {
 
             //GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
@@ -52,7 +52,6 @@ namespace U5Designs
 
             XLoc = x - halfWidth;
             YLoc = y + halfHeight;
-            if (decrementX != 0) decrementX = (float)XLoc - decrementX;
             // Quad color
             float red = 1;
             float green = 1;
@@ -71,15 +70,15 @@ namespace U5Designs
                 GL.TexCoord2(leftUV, topUV);
                 GL.Vertex3(x - halfWidth, y + halfHeight, z); // top left
                 GL.TexCoord2(rightUV, topUV);
-                GL.Vertex3(x + halfWidth - decrementX, y + halfHeight, z); // top right
+                GL.Vertex3(x + halfWidth, y + halfHeight, z); // top right
                 GL.TexCoord2(leftUV, bottomUV);
                 GL.Vertex3(x - halfWidth, y - halfHeight, z); // bottom left
 
 
                 GL.TexCoord2(rightUV, topUV);
-                GL.Vertex3(x + halfWidth - decrementX, y + halfHeight, z); // top right
+                GL.Vertex3(x + halfWidth, y + halfHeight, z); // top right
                 GL.TexCoord2(rightUV, bottomUV);
-                GL.Vertex3(x + halfWidth - decrementX, y - halfHeight, z); // bottom right
+                GL.Vertex3(x + halfWidth, y - halfHeight, z); // bottom right
                 GL.TexCoord2(leftUV, bottomUV);
                 GL.Vertex3(x - halfWidth, y - halfHeight, z); // bottom left
 
@@ -89,17 +88,20 @@ namespace U5Designs
 
         public void DrawHUDElement(int width, int height, double xPos = 0, double yPos = 0, float scaleX = 1.0f, float scaleY = 1.0f, float decrementX = 0.0f)
         {
-            //GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-            //GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-            //GL.Clear(ClearBufferMask.ColorBufferBit);
+
             GL.Disable(EnableCap.DepthTest);
             GL.MatrixMode(MatrixMode.Projection);
             
             GL.PushMatrix();
             GL.LoadIdentity();
-            GL.Ortho(0, 1280, 0, 720, -1, 1);
+            GL.Ortho(0, 1280, 0, 720, 0, 1);
             GL.MatrixMode(MatrixMode.Modelview);
+            GL.PushMatrix();
             GL.LoadIdentity();
+
+            GL.Enable(EnableCap.Texture2D);
+            GL.BindTexture(TextureTarget.Texture2D, Id);
+            GL.Clear(ClearBufferMask.DepthBufferBit);
 
             float scaledWidth = (Width * scaleX);
             float scaledHeight = (Height * scaleY);
@@ -113,7 +115,6 @@ namespace U5Designs
 
             XLoc = x - halfWidth;
             YLoc = y + halfHeight;
-            if (decrementX != 0) decrementX = (float)XLoc - decrementX;
             // Quad color
             float red = 1;
             float green = 1;
@@ -125,6 +126,8 @@ namespace U5Designs
             float leftUV = 0;
             float rightUV = 1;
 
+            float decVal = (float)XLoc + scaledWidth * decrementX;
+
             GL.Begin(BeginMode.Triangles);
             {
                 GL.Color4(red, green, blue, alpha);
@@ -132,25 +135,26 @@ namespace U5Designs
                 GL.TexCoord2(leftUV, topUV);
                 GL.Vertex3(x - halfWidth, y + halfHeight, z); // top left
                 GL.TexCoord2(rightUV, topUV);
-                GL.Vertex3(x + halfWidth - decrementX, y + halfHeight, z); // top right
+                GL.Vertex3(decVal, y + halfHeight, z); // top right
                 GL.TexCoord2(leftUV, bottomUV);
                 GL.Vertex3(x - halfWidth, y - halfHeight, z); // bottom left
 
 
                 GL.TexCoord2(rightUV, topUV);
-                GL.Vertex3(x + halfWidth - decrementX, y + halfHeight, z); // top right
+                GL.Vertex3(decVal, y + halfHeight, z); // top right
                 GL.TexCoord2(rightUV, bottomUV);
-                GL.Vertex3(x + halfWidth - decrementX, y - halfHeight, z); // bottom right
+                GL.Vertex3(decVal, y - halfHeight, z); // bottom right
                 GL.TexCoord2(leftUV, bottomUV);
                 GL.Vertex3(x - halfWidth, y - halfHeight, z); // bottom left
 
             }
             GL.End();
 
-            GL.Enable(EnableCap.DepthTest);
+            GL.PopMatrix();
             GL.MatrixMode(MatrixMode.Projection);
             GL.PopMatrix();
             GL.MatrixMode(MatrixMode.Modelview);
+            GL.Enable(EnableCap.DepthTest);
         }
     }
 }

@@ -45,7 +45,7 @@ namespace U5Designs
         MainMenuState menustate;
 		PauseMenuState pms;
 
-        //Texture Healthbar;
+        Texture Healthbar;
         int MaxHealth;
 
         public bool clickdown = false;
@@ -71,9 +71,9 @@ namespace U5Designs
 			player.cam = camera;
 			nowBillboarding = false;
             // Add healthbar texture to texture manager
-            //eng.StateTextureManager.LoadTexture("Healthbar", "../../Resources/Textures/Dummy_Healthbar.png");
-            //Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
-            //MaxHealth = player.health;
+            eng.StateTextureManager.LoadTexture("Healthbar", "../../Resources/Textures/Dummy_Healthbar.png");
+            Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
+            MaxHealth = player.health;
         }
 
 		public override void MakeActive() {
@@ -230,7 +230,8 @@ namespace U5Designs
  			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
  			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 
-            
+            float dec = (float)player.health / MaxHealth;
+            Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 350, 600, decrementX:dec );
 
 			//Sort objects by depth for proper alpha rendering
 			if(nowBillboarding) {

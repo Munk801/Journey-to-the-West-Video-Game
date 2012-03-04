@@ -30,7 +30,7 @@ namespace U5Designs
         {
             eng = engine;
 
-            eng.StateTextureManager.LoadTexture("logo", "../../Resources/Textures/u5_logo.jpg");
+            
             logo = eng.StateTextureManager.GetTexture("logo");
 
             // Graphics

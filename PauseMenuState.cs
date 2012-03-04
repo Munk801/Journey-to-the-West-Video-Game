@@ -40,16 +40,10 @@ namespace U5Designs
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
 
-            // Load up the 4 images that will be displayed in sequence giving the illusion of animation
-            eng.StateTextureManager.RenderSetup();
-            eng.StateTextureManager.LoadTexture("p1", "../../Resources/Textures/PauseTextures/p1.png");
             _p1 = eng.StateTextureManager.GetTexture("p1");
-            eng.StateTextureManager.LoadTexture("p2", "../../Resources/Textures/PauseTextures/p2.png");
             _p2 = eng.StateTextureManager.GetTexture("p2");
-            eng.StateTextureManager.LoadTexture("p3", "../../Resources/Textures/PauseTextures/p3.png");
             _p3 = eng.StateTextureManager.GetTexture("p3");
-            eng.StateTextureManager.LoadTexture("p4", "../../Resources/Textures/PauseTextures/p4.png");
-            _p4 = eng.StateTextureManager.GetTexture("p4");            
+            _p4 = eng.StateTextureManager.GetTexture("p4");  
 
             // Create the timer used to switch the current image
             _timer = new System.Timers.Timer();

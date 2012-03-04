@@ -32,13 +32,11 @@ namespace U5Designs {
             xf = 1.0f;
             yf = 1.0f;            
 
-            eng.StateTextureManager.RenderSetup();
-            eng.StateTextureManager.LoadTexture("game_over", "../../Resources/Textures/game_over_text.png");
-            go_texture = eng.StateTextureManager.GetTexture("game_over");
-            eng.StateTextureManager.LoadTexture("restart", "../../Resources/Textures/restart_button.png");
-            restart_btn = eng.StateTextureManager.GetTexture("restart");
-            eng.StateTextureManager.LoadTexture("quit_button", "../../Resources/Textures/go_quit_button.png");
-            quit_btn = eng.StateTextureManager.GetTexture("quit_button");
+            //go_texture = eng.StateTextureManager.GetTexture("game_over");
+            
+            //restart_btn = eng.StateTextureManager.GetTexture("restart");
+            
+            //quit_btn = eng.StateTextureManager.GetTexture("quit_button");
         }
 
 		public override void MakeActive() {

@@ -44,6 +44,23 @@ namespace U5Designs
             GL.Enable(EnableCap.Normalize);
 			GL.Enable(EnableCap.Texture2D);
             StateTextureManager = new TextureManager();
+
+            // Load up the 4 images that will be displayed in sequence giving the illusion of animation
+            StateTextureManager.RenderSetup();
+            
+            // Splash Screen
+            StateTextureManager.LoadTexture("logo", "../../Resources/Textures/u5_logo.jpg");
+            // Game over State
+            StateTextureManager.LoadTexture("game_over", "../../Resources/Textures/game_over_text.png");
+            //StateTextureManager.LoadTexture("restart", "../../Resources/Textures/restart_button.png");
+            //StateTextureManager.LoadTexture("quit_button", "../../Resources/Textures/go_quit_button.png");
+
+            // Pause State
+            StateTextureManager.LoadTexture("p1", "../../Resources/Textures/PauseTextures/p1.png");
+            StateTextureManager.LoadTexture("p2", "../../Resources/Textures/PauseTextures/p2.png");
+            StateTextureManager.LoadTexture("p3", "../../Resources/Textures/PauseTextures/p3.png");
+            StateTextureManager.LoadTexture("p4", "../../Resources/Textures/PauseTextures/p4.png");
+        
             ThisMouse = new GameMouse(this);
             states = new Stack<GameState>();
 
