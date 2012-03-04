@@ -65,13 +65,39 @@ namespace Engine {
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[0][0]);
 			prevCycleNum = 0;
 			prevFrameNum = 0;
-			
+		}
 
-// 			if(_texh == 1080) {
-// 				CORasterSaveToBMP(tex[0][0], (uint)texw, (uint)texh, "C:\\Users\\Kendal\\Desktop\\test.bmp");
-// 			} else if(_texh == 128) {
-// 				CORasterSaveToBMP(tex[0][0], (uint)texw, (uint)texh, "C:\\Users\\Kendal\\Desktop\\test2.bmp");
-// 			}
+		//For this constructor, each cycle must be in its own Bitmap
+		public SpriteSheet(Bitmap[] texbmps, int[] cycleStartNums, int[] cycleLengths, int _texw, int _texh, bool _hasAlpha, double _framesPerSecond = 1.0) {
+			texw = _texw;
+			texh = _texh;
+			hasAlpha = _hasAlpha;
+			framesPerSecond = _framesPerSecond;
+
+			tex = new byte[cycleStartNums.Length][][];
+			for(int cycleNum = 0; cycleNum < cycleStartNums.Length; cycleNum++) {
+				BitmapData bmp_data = texbmps[cycleNum].LockBits(new Rectangle(0, 0, texbmps[cycleNum].Width, texbmps[cycleNum].Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+				tex[cycleNum] = new byte[cycleLengths[cycleNum]][];
+				for(int frameNum = 0; frameNum < cycleLengths[cycleNum]; frameNum++) {
+					IntPtr tex_addr = IntPtr.Add(bmp_data.Scan0, (cycleStartNums[cycleNum] + frameNum) * texw * texh * 4);
+					tex[cycleNum][frameNum] = new byte[texw * texh * 4];
+					Marshal.Copy(tex_addr, tex[cycleNum][frameNum], 0, tex[cycleNum][frameNum].Length);
+					//Rearrange BGRA -> RGBA and invert colors to proper encoding
+					for(int i = 0; i < tex[cycleNum][frameNum].Length; i += 4) {
+						byte temp = tex[cycleNum][frameNum][i];
+						tex[cycleNum][frameNum][i] = (byte)(tex[cycleNum][frameNum][i + 2]);
+						tex[cycleNum][frameNum][i + 2] = (byte)temp;
+						//tex[cycleNum][frameNum][i + 1] = (byte)~tex[cycleNum][frameNum][i + 1];
+					}
+				}
+				texbmps[cycleNum].UnlockBits(bmp_data);
+			}
+
+			texID = GL.GenTexture();
+			GL.BindTexture(TextureTarget.Texture2D, texID);
+			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[0][0]);
+			prevCycleNum = 0;
+			prevFrameNum = 0;
 		}
 
 
@@ -181,8 +207,11 @@ namespace Engine {
 
 			int frameNum = (int)(frameTime * framesPerSecond);
 			if(frameNum >= tex[cycleNumber].Length) {
-				frameTime -= tex[cycleNumber].Length / framesPerSecond;
+				frameTime %= tex[cycleNumber].Length / framesPerSecond;
 				frameNum %= tex[cycleNumber].Length;
+			} else while(frameNum < 0) {
+				frameTime += tex[cycleNumber].Length / framesPerSecond;
+				frameNum = (int)(frameTime * framesPerSecond);
 			}
 
 			GL.BindTexture(TextureTarget.Texture2D, texID);

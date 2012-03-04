@@ -27,7 +27,8 @@ namespace U5Designs {
         internal bool doesGravity, playerspawned; //true if gravity affects this object\
  
 
-        public Projectile(Vector3 location, Vector3 direction, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, bool in3d, int damage, float speed, bool gravity, bool PlayerSpawned, SpriteSheet sprite) {
+        public Projectile(Vector3 location, Vector3 direction, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, bool in3d,
+							int damage, float speed, bool gravity, bool PlayerSpawned, SpriteSheet sprite) : base() {
 			_location = location;
             this.direction = direction;
 			_scale = scale;
@@ -56,7 +57,8 @@ namespace U5Designs {
             if (!in3d)
                 velocity.Z = 0;
             accel = new Vector3(0, 0, 0);
-            doesGravity = gravity;
+			doesGravity = gravity;
+			_animDirection = 1;
 		}
 
 		private bool _is3dGeo;
@@ -146,7 +148,12 @@ namespace U5Designs {
 
         public void accelerate(Vector3 acceleration) {
             accel += acceleration;
-        }
+		}
+
+		private int _animDirection;
+		public int animDirection {
+			get { return _animDirection; }
+		}
 
 		public void doScaleTranslateAndTexture() {
             GL.PushMatrix();

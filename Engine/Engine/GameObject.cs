@@ -17,6 +17,21 @@ namespace Engine
 		//Note: GameObject should only have fields that are applicable
 		//      to ALL types of objects.  If it only applies to some
 		//      objects, it should be in the appropriate subclass.
+		private static int lastID = 0;
+
+		public readonly int ID;
+		
+		public int getID() {
+			return ID;
+		}
+
+		protected GameObject() {
+			ID = ++lastID;
+		}
+
+		protected GameObject(int id) {
+			ID = id;
+		}
 
 		//Does this object exist when viewed in 3d?
 		protected bool _existsIn3d;
@@ -35,7 +50,7 @@ namespace Engine
 		protected Vector3 _location;
 		public Vector3 location {
 			get { return _location; }
-			protected set { _location = value; }
+			set { _location = value; }
 		}
 
         protected bool _hascbox;
@@ -44,5 +59,8 @@ namespace Engine
             protected set { _hascbox = value; }
         }
 
+
+		//CONSTANTS
+		public const double gravity = 400.0;
 	}
 }

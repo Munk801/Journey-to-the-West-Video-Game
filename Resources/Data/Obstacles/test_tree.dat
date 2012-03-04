@@ -7,5 +7,5 @@
   <collidesIn2d>false</collidesIn2d>
   <collidesIn3d>true</collidesIn3d>
   <sprite>test_tree_sprite.dat</sprite>
-  <billboards>yes</billboards>
+  <billboards>lock2d</billboards>
 </obstacle>

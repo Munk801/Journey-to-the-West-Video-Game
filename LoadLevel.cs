@@ -70,26 +70,13 @@ namespace U5Designs
 			foreach(Decoration d in _dlist) {
 				ps.objList.Add(d);
 				ps.renderList.Add(d);
-			}
-
-			//temporary hard-coded background
- 			int[] cycleStarts = { 0 };
- 			int[] cycleLengths = { 1 };
-// 			Background bg = new Background(new Vector3(926.0f, 75.0f, -200.0f), new Vector3(3704.0f, 200.0f, 100.0f),
-// 											new SpriteSheet(new Bitmap("../../Resources/test_background.png"),
-// 											cycleStarts, cycleLengths, 10000, 1080), 0.75f);
-// 			ps.backgroundList.Add(bg);
-// 			ps.renderList.Add(bg);            
+			}          
 
 			SpriteSheet.quad = new ObjMesh(assembly_new.GetManifestResourceStream("U5Designs.Resources.Geometry.quad.obj"));
 
-			//Load Player
-			//int[] cycleStarts = new int[] { 0, 4 };
-			//int[] cycleLengths = new int[] { 4, 4 };
-			//SpriteSheet ss = new SpriteSheet(new Bitmap(assembly_new.GetManifestResourceStream("U5Designs.Resources.Textures.test_sprite.png")), cycleStarts, cycleLengths, 128, 128, 4.0);
-            ps.player = new Player(parse_Sprite_File("test_player_sprite.dat"), parse_Sprite_File("player_banana.dat"));
+			ps.player = new Player(parse_Sprite_File("player_sprite.dat"), parse_Sprite_File("player_banana.dat"));
 			ps.physList.Add(ps.player);
-			ps.renderList.Add(ps.player);            
+			ps.renderList.Add(ps.player);
 		}
 
 		//Takes an XmlNode with attributes x, y, and z and turns it into a Vector3
@@ -118,8 +105,6 @@ namespace U5Designs
 
 			fstream_new = assembly_new.GetManifestResourceStream("U5Designs.Resources.Data.Sprites." + path);
 			doc_new.Load(fstream_new);
-			XmlNodeList _bp = doc_new.GetElementsByTagName("bmp");
-			string _bmp_path = "U5Designs.Resources.Textures." + _bp.Item(0).InnerText;
 			XmlNodeList _c_start_list = doc_new.GetElementsByTagName("c_starts");
 			int[] cycleStarts = new int[_c_start_list.Count];
 			for(int i = 0; i < _c_start_list.Count; i++) {
@@ -137,10 +122,20 @@ namespace U5Designs
 			bool _hasAlpha = Convert.ToBoolean(doc_new.GetElementsByTagName("hasAlpha")[0].InnerText);
 			XmlNodeList _f = doc_new.GetElementsByTagName("fps");
 			float _fps = (float)Convert.ToDouble(_f.Item(0).InnerText);
+
+			XmlNodeList _bp = doc_new.GetElementsByTagName("bmp");
 			fstream_new.Close();
 
-			// Create the SpriteSheet
-			return new SpriteSheet(new Bitmap(assembly_new.GetManifestResourceStream(_bmp_path)), cycleStarts, cycleLengths, _width, _height, _hasAlpha, _fps);
+			if(_bp.Count == 1) {
+				string _bmp_path = "U5Designs.Resources.Textures." + _bp[0].InnerText;
+				return new SpriteSheet(new Bitmap(assembly_new.GetManifestResourceStream(_bmp_path)), cycleStarts, cycleLengths, _width, _height, _hasAlpha, _fps);
+			} else {
+				Bitmap[] bmps = new Bitmap[_bp.Count];
+				for(int i = 0; i < _bp.Count; i++) {
+					bmps[i] = new Bitmap(assembly_new.GetManifestResourceStream("U5Designs.Resources.Textures." + _bp[i].InnerText));
+				}
+				return new SpriteSheet(bmps, cycleStarts, cycleLengths, _width, _height, _hasAlpha, _fps);
+			}
 		}
 
 		/**
@@ -297,7 +292,7 @@ namespace U5Designs
 			List<Background> _b = new List<Background>();
 
 			for(int i = 0; i < BList.Count; i++) {
-				Vector3 loc = new Vector3();
+				List<Vector3> locs = new List<Vector3>();
 				Vector3 scale = new Vector3();
 				String spritePath = "";
 				float speed = -1;
@@ -305,7 +300,7 @@ namespace U5Designs
 				foreach(XmlNode n in BList[i].ChildNodes) {
 					switch(n.Name) {
 						case "loc":
-							loc = parseVector3(n);
+							locs.Add(parseVector3(n));
 							break;
 						case "scale":
 							scale = parseVector3(n);
@@ -318,8 +313,9 @@ namespace U5Designs
 							break;
 					}
 				}
-
-				_b.Add(new Background(loc, scale, parse_Sprite_File(spritePath), speed));
+				foreach(Vector3 loc in locs) {
+					_b.Add(new Background(loc, scale, parse_Sprite_File(spritePath), speed));
+				}
 			}
 
 			return _b;

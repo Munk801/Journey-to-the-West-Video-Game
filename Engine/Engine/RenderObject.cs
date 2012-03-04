@@ -15,10 +15,11 @@ using OpenTK;
 namespace Engine {
 	public interface RenderObject {
 		//duplicated from GameObject
-		Vector3 location { get; }
+		Vector3 location { get; set;  }
 		bool hascbox { get; }
 		bool existsIn3d { get; }
 		bool existsIn2d { get; }
+		int getID();
 
 		//null for sprites
 		ObjMesh mesh { get; }
@@ -39,6 +40,9 @@ namespace Engine {
 
         bool is3dGeo { get; }
 		Billboarding billboards { get; }
+
+		//+1 when sprite animation should run forward, -1 when backward
+		int animDirection { get; }
 
 		void doScaleTranslateAndTexture(); //pushes matrix, adds scale and translate to model view stack, and sets texture pointer
 	}

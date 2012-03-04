@@ -29,7 +29,7 @@ namespace U5Designs
 
 		private Vector3 lastPosOnGround;
 
-        private double Invincibletimer, NoControlTimer;
+        private double Invincibletimer, NoControlTimer, projectileTimer;
 		public double fallTimer, viewSwitchJumpTimer;
         SpriteSheet banana;
 
@@ -42,15 +42,15 @@ namespace U5Designs
         static string jumpSoundFile = "../../Resources/Sound/jump_sound.ogg";
         AudioFile jumpSound = new AudioFile(jumpSoundFile);
 
-        public Player(SpriteSheet sprite, SpriteSheet banana)
+        public Player(SpriteSheet sprite, SpriteSheet banana) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
         {
             p_state = new PlayerState("TEST player");
             //p_state.setSpeed(130);
-			_speed = 130;
+			_speed = 75;
 			_location = new Vector3(25, 12.5f, 50);
-            _scale = new Vector3(12.5f, 25f, 12.5f);
-            _pbox = new Vector3(6.25f, 12.5f, 6.25f);
-            _cbox = new Vector3(5f, 12.5f, 5f);
+            _scale = new Vector3(16.25f, 25f, 16.25f);
+            _pbox = new Vector3(5f, 12.5f, 5f);
+            _cbox = new Vector3(4f, 11.5f, 4f);
 			velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);
 			_cycleNum = 0;
@@ -65,12 +65,14 @@ namespace U5Designs
             _damage = 1;
             _health = 5;
             Invincible = false;
-            HasControl = false;
+            HasControl = true;
             Invincibletimer = 0.0;
             NoControlTimer = 0.0;
 			fallTimer = 0.0;
 			viewSwitchJumpTimer = 0.0;
+			projectileTimer = 0.0;
 			lastPosOnGround = new Vector3(_location);
+			_animDirection = 1;
         }
 
         /**
@@ -82,6 +84,10 @@ namespace U5Designs
         bool spaceDown;
         internal void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool c, bool x, bool space, bool ekey, FrameEventArgs e, PlayState playstate) {
 			this.enable3d = enable3d;
+
+			if(projectileTimer > 0.0) {
+				projectileTimer -= e.Time;
+			}
 
             if (Invincible)
                 Invincibletimer = Invincibletimer - e.Time;
@@ -116,34 +122,13 @@ namespace U5Designs
 
 					velocity.X = newVel.X*speed;
 					velocity.Z = newVel.Y*speed;
-					//if((s && w) || (!s && !w)) {
-					//    velocity.X = 0f;
-					//}
-					//if((d && a) || (!d && !a)) {
-					//    velocity.Z = 0f;
-					//}
-					
-					//if(w && d) {
-					//    velocity.X = (float)p_state.getSpeed() * 0.707f;
-					//    velocity.Z = (float)p_state.getSpeed() * 0.707f;
-					//} else if(w && a) {
-					//    velocity.X = (float)p_state.getSpeed() * 0.707f;
-					//    velocity.Z = -((float)p_state.getSpeed() * 0.707f);
-					//} else if(a && s) {
-					//    velocity.X = -((float)p_state.getSpeed() * 0.707f);
-					//    velocity.Z = -((float)p_state.getSpeed() * 0.707f);
-					//} else if(d && s) {
-					//    velocity.X = -((float)p_state.getSpeed() * 0.707f);
-					//    velocity.Z = ((float)p_state.getSpeed() * 0.707f);
-					//} else if(w) {
-					//    velocity.X = (float)p_state.getSpeed();
-					//} else if(s) {
-					//    velocity.X = -(float)p_state.getSpeed();
-					//} else if(d) {
-					//    velocity.Z = (float)p_state.getSpeed();
-					//} else if(a) {
-					//    velocity.Z = -(float)p_state.getSpeed();
-					//}
+
+					_animDirection = (velocity.X >= 0 ? 1 : -1);
+					if(velocity.X == 0) {
+						_cycleNum = (enable3d ? 1 : 0);
+					} else {
+						_cycleNum = (enable3d ? 3 : 2);
+					}
                 } else {
                     if ((d && a) || (!d && !a)) {
                         velocity.X = 0f;
@@ -151,6 +136,13 @@ namespace U5Designs
                         velocity.X = _speed;
 					} else { //a
 						velocity.X = -_speed;
+					}
+
+					_animDirection = (velocity.X >= 0 ? 1 : -1);
+					if(velocity.X == 0) {
+						_cycleNum = (enable3d ? 1 : 0);
+					} else {
+						_cycleNum = (enable3d ? 3 : 2);
 					}
                 }
 
@@ -188,14 +180,14 @@ namespace U5Designs
                 }
             }
         }
-
+		
         /// <summary>
         /// Provides all the mouse input for the player.  Will currently check for a left click and shoot a projectile in the direction
         /// </summary>
         /// <param name="playstate"></param>
         private void MouseInput(PlayState playstate)
         {
-            if (playstate.eng.ThisMouse.LeftPressed() && !ClickDown)
+            if (playstate.eng.ThisMouse.LeftPressed() && projectileTimer <= 0.0)
             {
                 // Grab Mouse coord.  Since Y goes down, just subtract from height to get correct orientation
                 Vector3d mousecoord = new Vector3d((double)playstate.eng.Mouse.X, (double)(playstate.eng.Height - playstate.eng.Mouse.Y), 1.0);
@@ -207,26 +199,49 @@ namespace U5Designs
                 // Unproject the coordinates to convert from mouse to world coordinates
                 Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
 
-                // Since Z is 150 in 2d, we just change it here if in 2d
-                if (!playstate.enable3d)
-                    mouseWorld.Z = 50.0;
+                // Since Z is 50 in 2d, we just change it here if in 2d
+				if(!playstate.enable3d) {
+				    double vel = 250.0;
 
-                // Cannot implicitly typecast a vector3d to vector3
-                Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, (float)mouseWorld.Z);
-                projDir.X = projDir.X - _location.X;
-                projDir.Y = projDir.Y - _location.Y;
-                // Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
-                projDir.NormalizeFast();
-                spawnProjectile(playstate, projDir);
-                ClickDown = true;
-            }
-            else if (playstate.eng.ThisMouse.LeftPressed() == false)
-            {
-                ClickDown = false;
+				    Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
+				    projDir -= _location;
+					projDir.X = Math.Abs(projDir.X);
+
+				    //Following is adapted from http://en.wikipedia.org/wiki/Trajectory_of_a_projectile#Angle_required_to_hit_coordinate_.28x.2Cy.29
+				    double velsquared = vel * vel;
+					double sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
+					double theta;
+					if(sqrtPart == sqrtPart) { //false when sqrtPart == NaN
+						theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+					} else {
+						//TODO: Come up with a better looking solution than this.
+						theta = Math.PI / 4; //can't reach that point, go as far as we can
+					}
+
+				    projDir.X = (float)Math.Cos(theta);
+				    projDir.Y = (float)Math.Sin(theta);
+				    projDir.Z = 0.0f;
+					if(mouseWorld.X < _location.X) {
+						projDir.X = -projDir.X;
+					}
+
+				    spawnProjectile(playstate, projDir, (float)vel);
+				} else {
+
+					// Cannot implicitly typecast a vector3d to vector3
+					Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, (float)mouseWorld.Z);
+					projDir -= _location;
+
+					// Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
+					projDir.Normalize();
+					spawnProjectile(playstate, projDir, 250);
+				}
+                
+				projectileTimer = 0.25;
             }
         }
 
-        private void spawnProjectile(PlayState playstate, Vector3 direction) {
+        private void spawnProjectile(PlayState playstate, Vector3 direction, float speed) {
             // make new projectile object
             //TODO: determine if banana or fireball or w/e
             Vector3 projlocation = new Vector3(location);
@@ -236,8 +251,10 @@ namespace U5Designs
 			}
             //Vector3 projdirection = new Vector3(1, 0, 1); //TODO: get the direction vector based on where the mouse is.
             //Vector3 projdirection = new Vector3((float)playstate.mouseWorld.X, (float)playstate.mouseWorld.Y, (float)1.0f);
-            direction.NormalizeFast();
-            Projectile shot = new Projectile(projlocation, direction , new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(4.5f, 4.5f, 4.5f), true, true, playstate.enable3d, damage, 250, true, true, banana);
+            //direction.NormalizeFast();
+            Projectile shot = new Projectile(projlocation, direction, new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(3.5f, 3.5f, 3.5f), true, true, playstate.enable3d, damage, speed, true, true, banana);
+			
+			shot.accelerate(new Vector3(velocity.X, 0.0f, velocity.Z)); //account for player's current velocity
 
             // add projectile to appropriate lists
             playstate.objList.Add(shot);
@@ -332,6 +349,11 @@ namespace U5Designs
 
 		public bool collidesIn2d {
 			get { return true; }
+		}
+
+		private int _animDirection;
+		public int animDirection {
+			get { return _animDirection; }
 		}
 
         public void doScaleTranslateAndTexture() {

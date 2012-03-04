@@ -83,7 +83,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Sprites\test_sprite.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\test_sprite.dat">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Data\Sprites\test_floor_sprite.dat" />
     <EmbeddedResource Include="Resources\test.sav" />
     <EmbeddedResource Include="Resources\Textures\u5_logo.png" />
@@ -98,12 +100,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Engine\Engine\Tao DevIL\DevIL.dll" />
-    <Content Include="Engine\Engine\Tao DevIL\DevIL.NET.dll" />
-    <Content Include="Engine\Engine\Tao DevIL\DevIL.NET2.dll" />
-    <Content Include="Engine\Engine\Tao DevIL\ILU.dll" />
-    <Content Include="Engine\Engine\Tao DevIL\ILUT.dll" />
-    <Content Include="Engine\Engine\Tao DevIL\Tao.DevIl.dll" />
+    <EmbeddedResource Include="Resources\Textures\PauseTextures\p1.png" />
+    <EmbeddedResource Include="Resources\Textures\PauseTextures\p2.png" />
+    <EmbeddedResource Include="Resources\Textures\PauseTextures\p3.png" />
+    <EmbeddedResource Include="Resources\Textures\PauseTextures\p4.png" />
     <EmbeddedResource Include="Resources\Textures\game_over_text.png" />
     <EmbeddedResource Include="Resources\Textures\city_ground.png" />
     <EmbeddedResource Include="Resources\Textures\ice_cream.png" />
@@ -204,6 +204,26 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Obstacles\test_tree_collides.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\ZooMiddleBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\zoo_side_background_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\ZooBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Decorations\zoo_end_background.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\zoo_end_background_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\player_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\spritetry1_back.png" />
+    <EmbeddedResource Include="Resources\Textures\spritetry1_side.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

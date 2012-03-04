@@ -14,7 +14,8 @@ namespace U5Designs {
 	class Obstacle : GameObject, RenderObject, PhysicsObject{
 		private int texID;
 
-		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, bool collidesIn2d, bool collidesIn3d, ObjMesh mesh, MeshTexture texture) {
+		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, bool collidesIn2d, bool collidesIn3d,
+							ObjMesh mesh, MeshTexture texture) : base() {
 			_location = location;
             _scale = scale;
             _pbox = pbox;
@@ -29,10 +30,12 @@ namespace U5Designs {
             _hascbox = false;
 			_collidesIn2d = collidesIn2d;
 			_collidesIn3d = collidesIn3d;
+			_animDirection = 1;
 		}
 
 
-		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, bool collidesIn2d, bool collidesIn3d, Billboarding bb, SpriteSheet sprite) {
+		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, bool collidesIn2d, bool collidesIn3d,
+							Billboarding bb, SpriteSheet sprite) : base() {
 			_location = location;
 			_scale = scale;
             _pbox = pbox;
@@ -47,6 +50,7 @@ namespace U5Designs {
 			_collidesIn2d = collidesIn2d;
 			_collidesIn3d = collidesIn3d;
 			_billboards = bb;
+			_animDirection = 1;
 		}
 
 		private bool _is3dGeo;
@@ -112,6 +116,11 @@ namespace U5Designs {
 		private bool _collidesIn2d;
 		public bool collidesIn2d {
 			get { return _collidesIn2d; }
+		}
+
+		private int _animDirection;
+		public int animDirection {
+			get { return _animDirection; }
 		}
 
 		public void doScaleTranslateAndTexture() {

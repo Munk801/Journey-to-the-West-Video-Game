@@ -26,9 +26,12 @@ namespace U5Designs
 			texID = GL.GenTexture();
 		}
 
-        public void UpdatePosition(float deltax)
-        {
+        public void UpdatePositionX(float deltax) {
             _location.X += deltax*speed;
         }
+
+		public void UpdatePositionY(float deltay) {
+			_location.Y += deltay * speed;
+		}
     }
 }

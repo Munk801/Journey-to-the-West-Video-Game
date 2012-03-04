@@ -20,7 +20,7 @@ namespace U5Designs {
         Obstacle background;
         MainMenuState menu;
         float xf, yf;
-        Texture go_texture;
+        Texture go_texture, restart_btn, quit_btn;
 
         public GameOverState(MainMenuState prvstate, GameEngine engine)
         {
@@ -30,11 +30,15 @@ namespace U5Designs {
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
             xf = 1.0f;
-            yf = 1.0f;
+            yf = 1.0f;            
 
             eng.StateTextureManager.RenderSetup();
             eng.StateTextureManager.LoadTexture("game_over", "../../Resources/Textures/game_over_text.png");
             go_texture = eng.StateTextureManager.GetTexture("game_over");
+            eng.StateTextureManager.LoadTexture("restart", "../../Resources/Textures/restart_button.png");
+            restart_btn = eng.StateTextureManager.GetTexture("restart");
+            eng.StateTextureManager.LoadTexture("quit_button", "../../Resources/Textures/go_quit_button.png");
+            quit_btn = eng.StateTextureManager.GetTexture("quit_button");
         }
 
 		public override void MakeActive() {
@@ -54,16 +58,16 @@ namespace U5Designs {
             GL.LoadMatrix(ref modelview);
             if (xf >= 0.4)
             {
-                xf -= 0.0001f;
-                yf -= 0.0001f;
+                xf -= 0.0005f;
+                yf -= 0.0005f;
                 go_texture.Draw2DTexture(0, 0, xf, yf);
             }
             else
-            {
+            {                
                 go_texture.Draw2DTexture(0, 0, xf, yf);
-            }
-
-            //go_texture.Draw2DTexture(0, 0);
+                //restart_btn.Draw2DTexture(0, -400);
+                //quit_btn.Draw2DTexture(0, -400);
+            }            
         }
 
         private void DealWithInput()
