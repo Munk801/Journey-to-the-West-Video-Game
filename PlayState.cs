@@ -44,6 +44,9 @@ namespace U5Designs
         MainMenuState menustate;
 		PauseMenuState pms;
 
+        //Texture Healthbar;
+        int MaxHealth;
+
         public bool clickdown = false;
         // Initialize graphics, etc here
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
@@ -65,6 +68,11 @@ namespace U5Designs
 			camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player,
 									new int[] { eng.ClientRectangle.X, eng.ClientRectangle.Y, eng.ClientRectangle.Width, eng.ClientRectangle.Height });
 			player.cam = camera;
+
+            // Add healthbar texture to texture manager
+            //eng.StateTextureManager.LoadTexture("Healthbar", "../../Resources/Textures/Dummy_Healthbar.png");
+            //Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
+            //MaxHealth = player.health;
         }
 
 		public override void MakeActive() {
@@ -95,7 +103,6 @@ namespace U5Designs
         public override void Update(FrameEventArgs e)
         {
             //Console.WriteLine(e.Time); // WORST. BUG. EVER.
-
             //First deal with hardware input
             DealWithInput();
             //MouseInput();
@@ -228,7 +235,6 @@ namespace U5Designs
 			GL.ClearColor(Color4.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-
             // UNCOMMENT THIS AND LINE AFTER DRAW TO ADD MOTION BLUR
             //if (isInTransition)
             //{
@@ -242,6 +248,8 @@ namespace U5Designs
  			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
  			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
  			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
+
+            
 
 			//Sort objects by depth for proper alpha rendering
 			if(enable3d) {
