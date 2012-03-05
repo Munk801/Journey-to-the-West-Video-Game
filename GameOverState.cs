@@ -30,9 +30,12 @@ namespace U5Designs {
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
             xf = 1.0f;
-            yf = 1.0f;            
+            yf = 1.0f;
 
-            //go_texture = eng.StateTextureManager.GetTexture("game_over");
+            eng.StateTextureManager.RenderSetup();
+            eng.StateTextureManager.LoadTexture("game_over", "../../Resources/Textures/game_over_text.png");
+           
+            go_texture = eng.StateTextureManager.GetTexture("game_over");
             
             //restart_btn = eng.StateTextureManager.GetTexture("restart");
             
@@ -50,6 +53,7 @@ namespace U5Designs {
 
         public override void Draw(FrameEventArgs e)
         {
+            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
             GL.MatrixMode(MatrixMode.Modelview);
