@@ -43,6 +43,7 @@ namespace U5Designs
         static string jumpSoundFile = "../../Resources/Sound/jump_sound.ogg";
         AudioFile jumpSound = new AudioFile(jumpSoundFile);
         AudioFile bananaSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
+        AudioFile hurtSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
 
         public Player(SpriteSheet sprite, SpriteSheet banana) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
         {
@@ -497,21 +498,26 @@ namespace U5Designs
 					} else { //this is a combat collision
 						if(((CombatObject)collidingObj).type == 1) {// obj is an enemy, do damage, knock player back
 							time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
-							_health = _health - ((CombatObject)collidingObj).damage;
+                            _health = _health - ((CombatObject)collidingObj).damage;
 							Invincible = true;
 							HasControl = false;
 							((Enemy)collidingObj).frozen = true;
 
                             knockback(true, collidingObj);
+
+                            
 						}
 						if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
-							//if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
+                            //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
 							if(!((Projectile)collidingObj).playerspawned) {
+                                
                                 _health = _health - ((CombatObject)collidingObj).damage;
                                 Invincible = true;
                                 HasControl = false;
                                 //despawn the projectile
                                 ((CombatObject)collidingObj).health = 0;
+
+                                
                             }
 						}
 					}

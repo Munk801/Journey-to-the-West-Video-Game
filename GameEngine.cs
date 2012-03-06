@@ -9,6 +9,7 @@ using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
 using Engine;
 using Engine.Input;
+using System.Reflection;
 
 namespace U5Designs
 {
@@ -27,6 +28,8 @@ namespace U5Designs
         internal bool GameInProgress;// this bool tracks if a game is in progress, mostly for the menu state to know if its the first menu, or has been brought up ingame
         internal TextureManager StateTextureManager;
         internal GameMouse ThisMouse;
+        internal AudioFile selectSound;
+        internal Assembly assembly;
 
         /// <summary>Creates a 1280x720 window.</summary>
         //TODO: Change this to a dynamic screen resolution
@@ -47,7 +50,9 @@ namespace U5Designs
 
             // Load up the 4 images that will be displayed in sequence giving the illusion of animation
             StateTextureManager.RenderSetup();
-            
+
+            assembly = Assembly.GetExecutingAssembly();
+
             // Splash Screen
             StateTextureManager.LoadTexture("logo", "../../Resources/Textures/u5_logo.jpg");
             // Game over State
@@ -70,6 +75,8 @@ namespace U5Designs
             //this.ChangeState(ms);
             SplashScreenState ss = new SplashScreenState(this);
             this.ChangeState(ss);
+
+            selectSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.select.ogg"));
 
             // Set the screen resolution (Fullscreen / windowed)
 

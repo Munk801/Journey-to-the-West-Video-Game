@@ -235,6 +235,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Sound\hurt.ogg" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Sound\select.ogg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

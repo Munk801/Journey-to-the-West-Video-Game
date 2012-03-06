@@ -296,11 +296,13 @@ namespace U5Designs
                 {
                     // Increment the current button index so you draw the highlighted button of the next button 
                     _cur_butn += 1;
+                    eng.selectSound.Play();
                 }
                 else if (_cur_butn >= 2)
                 {
                     // Were on the last button in the list so reset to the top of the button list
                     _cur_butn = 0;
+                    eng.selectSound.Play();
                 }
             }
             if ((_new_state.IsKeyDown(Key.Up) && !_old_state.IsKeyDown(Key.Up)) ||
@@ -311,11 +313,13 @@ namespace U5Designs
                 {
                     // Increment the current button index so you draw the highlighted button of the next button 
                     _cur_butn -= 1;
+                    eng.selectSound.Play();
                 }
                 else if (_cur_butn <= 0)
                 {
                     // Were on the last button in the list so reset to the top of the button list
                     _cur_butn = 2;
+                    eng.selectSound.Play();
                 }
             }
             _old_state = _new_state;
