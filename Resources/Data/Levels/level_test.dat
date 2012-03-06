@@ -82,6 +82,10 @@
 	    <loc x="250" y="35" z="0"/>
 	    <loc x="450" y="35" z="0"/>
     </obstacle>
+	<obstacle>
+		<path>zoo_sign.dat</path>
+		<loc x="10" y="7.5" z="0"/>
+	</obstacle>
     <obstacle>
       <path>test_tree_collides.dat</path>
       <loc x="350" y="35" z="49.8"/>
