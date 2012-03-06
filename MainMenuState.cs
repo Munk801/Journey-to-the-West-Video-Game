@@ -146,7 +146,7 @@ namespace U5Designs
         {
             //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-            GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
             Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
             GL.MatrixMode(MatrixMode.Modelview);

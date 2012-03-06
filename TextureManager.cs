@@ -78,7 +78,10 @@ namespace U5Designs
                 //GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Blend);
                 //GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvColor, new OpenTK.Graphics.Color4(1, 1, 1, 0)); //transparent
                 GL.BindTexture(TextureTarget.Texture2D, textureId);
-                Textures.Add(id, new Texture(textureId, bitmap.Width, bitmap.Height));
+                if (!Textures.ContainsKey(id))
+                {
+                    Textures.Add(id, new Texture(textureId, bitmap.Width, bitmap.Height));
+                }
                 bitmap.UnlockBits(bitmapData);
                 bitmap.Dispose();
             //int devID = 0;
