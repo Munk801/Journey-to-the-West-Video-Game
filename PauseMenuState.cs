@@ -59,6 +59,8 @@ namespace U5Designs
 
             // Set the current image to be displayed at 0 which is the first in the sequence
             _current_img = 0;
+
+
         }
 
         public void OnTimedEvent(object source, ElapsedEventArgs e)

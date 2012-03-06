@@ -219,8 +219,8 @@ namespace U5Designs
             // UNCOMMENT THIS AND LINE AFTER DRAW TO ADD MOTION BLUR
             //if (isInTransition)
             //{
-            //GL.Accum(AccumOp.Return, 0.95f);
-            //GL.Clear(ClearBufferMask.AccumBufferBit);
+            //    GL.Accum(AccumOp.Return, 0.95f);
+            //    GL.Clear(ClearBufferMask.AccumBufferBit);
             //}
 
             camera.SetModelView();
@@ -231,7 +231,7 @@ namespace U5Designs
  			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 
             float dec = (float)player.health / MaxHealth;
-            Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 350, 600, decrementX:dec );
+            Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 350, 600, scaleY: 0.5f, decrementX:dec );
 
 			//Sort objects by depth for proper alpha rendering
 			if(nowBillboarding) {
@@ -269,7 +269,7 @@ namespace U5Designs
             // UNCOMMENT TO ADD MOTION BLUR
             //if (isInTransition)
             //{
-            //GL.Accum(AccumOp.Accum, 0.9f);
+            //    GL.Accum(AccumOp.Accum, 0.9f);
             //}
         }
 

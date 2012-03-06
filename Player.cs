@@ -202,7 +202,7 @@ namespace U5Designs
                 // Since Z is 50 in 2d, we just change it here if in 2d
 				if(!playstate.enable3d) {
 				    double vel = 250.0;
-
+                    //Console.WriteLine(mouseWorld.Y.ToString());
 				    Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
 				    projDir -= _location;
 					projDir.X = Math.Abs(projDir.X);
@@ -216,6 +216,7 @@ namespace U5Designs
 					} else {
 						//TODO: Come up with a better looking solution than this.
 						theta = Math.PI / 4; //can't reach that point, go as far as we can
+                        //theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
 					}
 
 				    projDir.X = (float)Math.Cos(theta);
@@ -227,14 +228,15 @@ namespace U5Designs
 
 				    spawnProjectile(playstate, projDir, (float)vel);
 				} else {
-
+                    //Console.WriteLine(mouseWorld.Y.ToString());
 					// Cannot implicitly typecast a vector3d to vector3
-					Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, (float)mouseWorld.Z);
-					projDir -= _location;
+                    Vector3 projDir = new Vector3((float)mouseWorld.X, (float)Math.Abs(mousecoord.Y + mouseWorld.Y), (float)mouseWorld.Z);
+                    projDir -= _location;
 
-					// Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
-					projDir.Normalize();
-					spawnProjectile(playstate, projDir, 250);
+                    // Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
+                    projDir.NormalizeFast();
+                    Console.WriteLine(projDir.ToString());
+                    spawnProjectile(playstate, projDir, 250);
 				}
                 
 				projectileTimer = 0.25;
