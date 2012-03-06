@@ -225,6 +225,16 @@
     <EmbeddedResource Include="Resources\Textures\spritetry1_back.png" />
     <EmbeddedResource Include="Resources\Textures\spritetry1_side.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Sound\banana.ogg" />
+    <EmbeddedResource Include="Resources\Sound\hit.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Sound\banana2.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Sound\hurt.ogg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

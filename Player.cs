@@ -11,6 +11,7 @@ using OpenTK.Audio.OpenAL;
 using Engine;
 using Engine.Input;
 using OpenTK.Input;
+using System.Reflection;
 
 namespace U5Designs
 {
@@ -26,7 +27,7 @@ namespace U5Designs
 		private Vector3 accel;
         internal bool Invincible, HasControl;
         private bool ClickDown;
-
+        static Assembly assembly_new = Assembly.GetExecutingAssembly();
 		private Vector3 lastPosOnGround;
 
         private double Invincibletimer, NoControlTimer, projectileTimer;
@@ -41,6 +42,7 @@ namespace U5Designs
         // SOUND FILES
         static string jumpSoundFile = "../../Resources/Sound/jump_sound.ogg";
         AudioFile jumpSound = new AudioFile(jumpSoundFile);
+        AudioFile bananaSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
 
         public Player(SpriteSheet sprite, SpriteSheet banana) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
         {
@@ -226,16 +228,21 @@ namespace U5Designs
 						projDir.X = -projDir.X;
 					}
 
+                    bananaSound.Play();
 				    spawnProjectile(playstate, projDir, (float)vel);
 				} else {
                     //Console.WriteLine(mouseWorld.Y.ToString());
 					// Cannot implicitly typecast a vector3d to vector3
-                    Vector3 projDir = new Vector3((float)mouseWorld.X, (float)Math.Abs(mousecoord.Y + mouseWorld.Y), (float)mouseWorld.Z);
+                    float force = 25.0f;
+                    Vector3 projDir = new Vector3((float)mouseWorld.X, force, (float)mouseWorld.Z);
                     projDir -= _location;
 
+                    projDir.Y = Math.Abs(projDir.Y * (float)mousecoord.Y);
                     // Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
                     projDir.NormalizeFast();
                     Console.WriteLine(projDir.ToString());
+
+                    bananaSound.Play();
                     spawnProjectile(playstate, projDir, 250);
 				}
                 
