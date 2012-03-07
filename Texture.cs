@@ -91,6 +91,12 @@ namespace U5Designs
 
             GL.Disable(EnableCap.DepthTest);
             GL.MatrixMode(MatrixMode.Projection);
+
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Replace);
             
             GL.PushMatrix();
             GL.LoadIdentity();
@@ -115,11 +121,6 @@ namespace U5Designs
 
             XLoc = x - halfWidth;
             YLoc = y + halfHeight;
-            // Quad color
-            float red = 1;
-            float green = 1;
-            float blue = 1;
-            float alpha = 1;
 
             float topUV = 0;
             float bottomUV = 1;
@@ -130,8 +131,6 @@ namespace U5Designs
 
             GL.Begin(BeginMode.Triangles);
             {
-                GL.Color4(red, green, blue, alpha);
-
                 GL.TexCoord2(leftUV, topUV);
                 GL.Vertex3(x - halfWidth, y + halfHeight, z); // top left
                 GL.TexCoord2(rightUV, topUV);

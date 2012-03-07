@@ -231,14 +231,6 @@ namespace U5Designs
 
             camera.SetModelView();
 
-			//Set up textures
- 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
- 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
- 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
-
-            float dec = (float)player.health / MaxHealth;
-            Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 350, 600, scaleY: 0.5f, decrementX:dec );
-
 			//Sort objects by depth for proper alpha rendering
 			if(nowBillboarding) {
 				renderList.Sort(compare3dView);
@@ -270,6 +262,9 @@ namespace U5Designs
 					}
 				}
 			}
+
+			float dec = (float)player.health / MaxHealth;
+			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 250, 680, scaleY: 0.125f, decrementX: dec);
 
 
             // UNCOMMENT TO ADD MOTION BLUR
