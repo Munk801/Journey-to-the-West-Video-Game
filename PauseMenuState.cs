@@ -30,8 +30,7 @@ namespace U5Designs
         AudioFile testFile = new AudioFile(test);
 
         Texture _p1, _p2, _p3, _p4;
-        int _current_img;
-        System.Timers.Timer _timer;
+		double curFrame;
 
         public PauseMenuState(GameEngine engine)
         {
@@ -43,34 +42,15 @@ namespace U5Designs
             _p1 = eng.StateTextureManager.GetTexture("p1");
             _p2 = eng.StateTextureManager.GetTexture("p2");
             _p3 = eng.StateTextureManager.GetTexture("p3");
-            _p4 = eng.StateTextureManager.GetTexture("p4");  
+            _p4 = eng.StateTextureManager.GetTexture("p4");
 
-            // Create the timer used to switch the current image
-            _timer = new System.Timers.Timer();
-            
-            // Set the timer interval to 1 second
-            _timer.Interval = 500;
-
-            // elapse a timer tick
-            _timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-
-            // Enable the timer
-            _timer.Enabled = true;
-
-            // Set the current image to be displayed at 0 which is the first in the sequence
-            _current_img = 0;
+			// Set the current image to be displayed at 0 which is the first in the sequence
+			curFrame = 0.0;
 
 
         }
 
-        public void OnTimedEvent(object source, ElapsedEventArgs e)
-        {            
-            if (_current_img < 3)
-                _current_img += 1;
-            else
-                _current_img = 0;            
-        }
-		public override void MakeActive() {
+        public override void MakeActive() {
            
 		}
 
@@ -86,24 +66,24 @@ namespace U5Designs
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
             GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadMatrix(ref modelview);            
+            GL.LoadMatrix(ref modelview);
 
-            if (_current_img == 0)
-            {
-                _p1.Draw2DTexture(0, 0, 0.2f, 0.2f);                
-            }
-            if (_current_img == 1)
-            {
-                _p2.Draw2DTexture(0, 0, 0.2f, 0.2f);               
-            }
-            if (_current_img == 2)
-            {
-                _p3.Draw2DTexture(0, 0, 0.2f, 0.2f);                
-            }
-            if (_current_img == 3)
-            {
-                _p4.Draw2DTexture(0, 0, 0.2f, 0.2f);               
-            }                
+			curFrame = (curFrame + e.Time * 2) % 4;
+
+			switch((int)curFrame) {
+				case 0:
+					_p1.Draw2DTexture(0, 0, 0.2f, 0.2f);
+					break;
+				case 1:
+					_p2.Draw2DTexture(0, 0, 0.2f, 0.2f);
+					break;
+				case 2:
+					_p3.Draw2DTexture(0, 0, 0.2f, 0.2f);
+					break;
+				case 3:
+					_p4.Draw2DTexture(0, 0, 0.2f, 0.2f);
+					break;
+			}             
         }
 
         private void DealWithInput()
