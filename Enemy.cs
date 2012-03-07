@@ -20,7 +20,7 @@ namespace U5Designs
         private bool doesGravity; //true if gravity affects this object
         public bool frozen;
         private double freezetimer;
-        internal SpriteSheet projectileSprite;
+		internal ProjectileProperties projectile;
 
         //attack delay stuff
         internal int attackspeed;
@@ -69,7 +69,7 @@ namespace U5Designs
 		}
 
 
-        public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, SpriteSheet sprite, SpriteSheet projectileSprite)
+        public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, SpriteSheet sprite, ProjectileProperties proj)
         {
 			_location = location;
 			_scale = scale;
@@ -92,7 +92,7 @@ namespace U5Designs
 			_mesh = null;
 			_texture = null;
 			_sprite = sprite;
-            this.projectileSprite = projectileSprite;
+			projectile = proj;
 			_frameNum = 0;
 			_is3dGeo = false;
 			_animDirection = 1;

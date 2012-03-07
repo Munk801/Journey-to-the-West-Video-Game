@@ -32,7 +32,9 @@ namespace U5Designs
 
         private double Invincibletimer, NoControlTimer, projectileTimer;
 		public double fallTimer, viewSwitchJumpTimer;
-        SpriteSheet banana;
+		List<ProjectileProperties> projectiles;
+		ProjectileProperties curProjectile;
+        //SpriteSheet banana;
 
 		public float deltax; //used for updating position of camera, etc.
 		public Camera cam; //pointer to the camera, used for informing of y position changes
@@ -45,7 +47,7 @@ namespace U5Designs
         AudioFile bananaSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
         AudioFile hurtSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
 
-        public Player(SpriteSheet sprite, SpriteSheet banana) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
+        public Player(SpriteSheet sprite, List<ProjectileProperties> projectiles) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
         {
             p_state = new PlayerState("TEST player");
             //p_state.setSpeed(130);
@@ -59,7 +61,6 @@ namespace U5Designs
 			_cycleNum = 0;
 			_frameNum = 0;
 			_sprite = sprite;
-            this.banana = banana;
             _hascbox = true;
             _type = 0; //type 0 is the player and only the player
 			_existsIn2d = true;
@@ -76,6 +77,8 @@ namespace U5Designs
 			projectileTimer = 0.0;
 			lastPosOnGround = new Vector3(_location);
 			_animDirection = 1;
+			this.projectiles = projectiles;
+			curProjectile = projectiles[0];
         }
 
         /**
@@ -202,67 +205,70 @@ namespace U5Designs
                 // Unproject the coordinates to convert from mouse to world coordinates
                 Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
 
-                // Since Z is 50 in 2d, we just change it here if in 2d
-				if(!playstate.enable3d) {
-				    double vel = 250.0;
-                    //Console.WriteLine(mouseWorld.Y.ToString());
-				    Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
-				    projDir -= _location;
-					projDir.X = Math.Abs(projDir.X);
+				if(curProjectile.gravity) {
+					if(!playstate.enable3d) {
+						//Console.WriteLine(mouseWorld.Y.ToString());
+						Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
+						projDir -= _location;
+						projDir.X = Math.Abs(projDir.X); //do this to simplify equation - will undo at end
 
-				    //Following is adapted from http://en.wikipedia.org/wiki/Trajectory_of_a_projectile#Angle_required_to_hit_coordinate_.28x.2Cy.29
-				    double velsquared = vel * vel;
-					double sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
-					double theta;
-					if(sqrtPart == sqrtPart) { //false when sqrtPart == NaN
-						theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+						//Following is adapted from http://en.wikipedia.org/wiki/Trajectory_of_a_projectile#Angle_required_to_hit_coordinate_.28x.2Cy.29
+						double velsquared = curProjectile.speed * curProjectile.speed;
+						double sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
+						double theta;
+						if(sqrtPart == sqrtPart) { //false when sqrtPart == NaN
+							theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+						} else {
+							//TODO: Come up with a better looking solution than this.
+							theta = Math.PI / 4; //can't reach that point, go as far as we can
+							//theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+						}
+
+						projDir.X = (float)Math.Cos(theta);
+						projDir.Y = (float)Math.Sin(theta);
+						projDir.Z = 0.0f;
+						if(mouseWorld.X < _location.X) {
+							projDir.X = -projDir.X;
+						}
+
+						bananaSound.Play();
+						spawnProjectile(playstate, projDir);
 					} else {
-						//TODO: Come up with a better looking solution than this.
-						theta = Math.PI / 4; //can't reach that point, go as far as we can
-                        //theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+						//Console.WriteLine(mouseWorld.Y.ToString());
+						// Cannot implicitly typecast a vector3d to vector3
+						float force = 25.0f;
+						Vector3 projDir = new Vector3((float)mouseWorld.X, force, (float)mouseWorld.Z);
+						projDir -= _location;
+
+						projDir.Y = Math.Abs(projDir.Y * (float)mousecoord.Y);
+						// Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
+						projDir.NormalizeFast();
+						Console.WriteLine(projDir.ToString());
+
+						bananaSound.Play();
+						spawnProjectile(playstate, projDir);
 					}
-
-				    projDir.X = (float)Math.Cos(theta);
-				    projDir.Y = (float)Math.Sin(theta);
-				    projDir.Z = 0.0f;
-					if(mouseWorld.X < _location.X) {
-						projDir.X = -projDir.X;
-					}
-
-                    bananaSound.Play();
-				    spawnProjectile(playstate, projDir, (float)vel);
-				} else {
-                    //Console.WriteLine(mouseWorld.Y.ToString());
-					// Cannot implicitly typecast a vector3d to vector3
-                    float force = 25.0f;
-                    Vector3 projDir = new Vector3((float)mouseWorld.X, force, (float)mouseWorld.Z);
-                    projDir -= _location;
-
-                    projDir.Y = Math.Abs(projDir.Y * (float)mousecoord.Y);
-                    // Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
-                    projDir.NormalizeFast();
-                    Console.WriteLine(projDir.ToString());
-
-                    bananaSound.Play();
-                    spawnProjectile(playstate, projDir, 250);
+				} else { //projectile doesn't do gravity
+					Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
+					projDir -= _location;
+					projDir.NormalizeFast();
+					spawnProjectile(playstate, projDir);
 				}
                 
 				projectileTimer = 0.25;
             }
         }
 
-        private void spawnProjectile(PlayState playstate, Vector3 direction, float speed) {
+        private void spawnProjectile(PlayState playstate, Vector3 direction) {
             // make new projectile object
-            //TODO: determine if banana or fireball or w/e
             Vector3 projlocation = new Vector3(location);
 
 			if(!enable3d) {
 				projlocation.Z += 0.001f; //break the rendering tie between player and projectile, or else they flicker
 			}
-            //Vector3 projdirection = new Vector3(1, 0, 1); //TODO: get the direction vector based on where the mouse is.
-            //Vector3 projdirection = new Vector3((float)playstate.mouseWorld.X, (float)playstate.mouseWorld.Y, (float)1.0f);
-            //direction.NormalizeFast();
-            Projectile shot = new Projectile(projlocation, direction, new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(3.5f, 3.5f, 3.5f), true, true, playstate.enable3d, damage, speed, true, true, banana);
+            
+			Projectile shot = new Projectile(projlocation, direction, true, curProjectile);
+            //Projectile shot = new Projectile(projlocation, direction, new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(3.5f, 3.5f, 3.5f), true, true, playstate.enable3d, damage, speed, true, true, banana);
 			
 			shot.accelerate(new Vector3(velocity.X, 0.0f, velocity.Z)); //account for player's current velocity
 

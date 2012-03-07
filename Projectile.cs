@@ -25,6 +25,31 @@ namespace U5Designs {
         internal Vector3 accel;
         internal Vector3 direction;
         internal bool doesGravity, playerspawned; //true if gravity affects this object\
+
+		public Projectile(Vector3 location, Vector3 direction, bool playerSpawned, ProjectileProperties p) {
+			_location = location;
+			this.direction = direction;
+			_scale = new Vector3(p.scale);
+			_pbox = new Vector3(p.pbox);
+			_cbox = new Vector3(p.cbox);
+			_existsIn2d = p.existsIn2d;
+			_existsIn3d = p.existsIn3d;
+			_damage = p.damage;
+			_speed = p.speed;
+			_sprite = p.sprite;
+			doesGravity = p.gravity;
+
+			_alive = true;
+			_health = 1; // health 1 = active, health 0 = despawning, waiting for cleanup in PlayState
+			_hascbox = true;
+			_mesh = null;
+			_texture = null;
+			_frameNum = 0;
+			this.playerspawned = playerSpawned;
+			velocity = direction * speed;
+			accel = new Vector3(0, 0, 0);
+			_animDirection = 1;
+		}
  
 
         public Projectile(Vector3 location, Vector3 direction, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, bool in3d,
@@ -41,29 +66,23 @@ namespace U5Designs {
             _speed = speed;
             _alive = true;
             _hascbox = true;
-            _type = 2; // type 2 means this is a projectile
 
 			_mesh = null;
 			_texture = null;
 			_sprite = sprite;
 			_frameNum = 0;
-			_is3dGeo = false;
             playerspawned = PlayerSpawned;
 
-            velocity = new Vector3(0, 0, 0);
-            velocity.X = (float)(speed * direction.X);
-            velocity.Y = (float)(speed * direction.Y);
-            velocity.Z = (float)(speed * direction.Z);
-            if (!in3d)
-                velocity.Z = 0;
+			velocity = direction * speed;
+			//if (!in3d)
+			//    velocity.Z = 0;
             accel = new Vector3(0, 0, 0);
 			doesGravity = gravity;
 			_animDirection = 1;
 		}
 
-		private bool _is3dGeo;
 		public bool is3dGeo {
-			get { return _is3dGeo; }
+			get { return false; } //currently all projectiles are sprites - change if needed
 		}
 
 		private int _health;
@@ -117,9 +136,8 @@ namespace U5Designs {
             get { return _cbox; }
 		}
 
-        private int _type;
         public int type {
-            get { return _type; }
+            get { return 2; } //2 for projectile
         }
 
 		private int _cycleNum;
@@ -158,7 +176,7 @@ namespace U5Designs {
 		public void doScaleTranslateAndTexture() {
             GL.PushMatrix();
 
-            if (_is3dGeo) {
+            if (is3dGeo) {
                 _texture.doTexture();
             }
 

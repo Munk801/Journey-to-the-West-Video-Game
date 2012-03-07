@@ -59,7 +59,8 @@ namespace U5Designs {
 						projlocation.Z += 0.001f; //break the rendering tie between enemy and projectile, or else they flicker
 					}
                     Vector3 direction = getdir(playerposn, me.location);
-                    Projectile shot = new Projectile(projlocation, direction, new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, playstate.enable3d, me.damage, 150, false, false, me.projectileSprite);
+					Projectile shot = new Projectile(projlocation, direction, false, me.projectile);
+                    //Projectile shot = new Projectile(projlocation, direction, new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, playstate.enable3d, me.damage, 150, false, false, me.projectileSprite);
                     playstate.objList.Add(shot);
                     playstate.renderList.Add(shot);
                     playstate.colisionList.Add(shot);

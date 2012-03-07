@@ -214,11 +214,7 @@ namespace U5Designs
 		}
 
         public override void Draw(FrameEventArgs e) {
-            //Origin is the left edge of the level, at the ground and the back wall
-            //This means that all valid game coordinates will be positive
-            //Ground is from 0 to 100 along the z-axis
-
-			//e = new FrameEventArgs(e.Time * 0.1);
+            //e = new FrameEventArgs(e.Time * 0.1);
 
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
