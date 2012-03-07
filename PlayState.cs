@@ -48,6 +48,8 @@ namespace U5Designs
         Texture Healthbar;
         int MaxHealth;
 
+		bool aiPaused;
+
         public bool clickdown = false;
         // Initialize graphics, etc here
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
@@ -74,6 +76,8 @@ namespace U5Designs
             eng.StateTextureManager.LoadTexture("Healthbar", "../../Resources/Textures/Dummy_Healthbar.png");
             Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
             MaxHealth = player.health;
+
+			aiPaused = true;
         }
 
 		public override void MakeActive() {
@@ -153,8 +157,10 @@ namespace U5Designs
             } else {
 				player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.X], eng.Keyboard[Key.Space], eng.Keyboard[Key.E], e, this);
 
-				foreach(AIObject aio in aiList) {
-					((Enemy)aio).aiUpdate(e, this, player.location, enable3d);
+				if(!aiPaused) {
+					foreach(AIObject aio in aiList) {
+						((Enemy)aio).aiUpdate(e, this, player.location, enable3d);
+					}
 				}
 
 				//Now that everyone's had a chance to accelerate, actually
@@ -331,6 +337,10 @@ namespace U5Designs
                 //eng.PushState(menustate);
                 eng.PushState(pms);
             }
+
+			if(eng.Keyboard[Key.P]) {
+				aiPaused = false;
+			}
 
 			//********************** tab
 			if(!isInTransition && player.onGround) {
