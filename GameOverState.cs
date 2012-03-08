@@ -60,8 +60,8 @@ namespace U5Designs {
             GL.LoadMatrix(ref modelview);
             if (xf >= 0.4)
             {
-                xf -= 0.0005f;
-                yf -= 0.0005f;
+                xf -= (float)(e.Time);
+                yf -= (float)(e.Time);
                 go_texture.Draw2DTexture(0, 0, xf, yf);
             }
             else

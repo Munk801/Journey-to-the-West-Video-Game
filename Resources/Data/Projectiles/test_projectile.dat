@@ -1,0 +1,11 @@
+﻿<projectile>
+	<scale x="9" y="9" z="9" />
+	<pbox x="4" y="4" z="4" />
+	<cbox x="3.5" y="3.5" z="3.5" />
+	<draw2>true</draw2>
+	<draw3>true</draw3>
+	<damage>1</damage>
+	<speed>150.0</speed>
+	<gravity>false</gravity>
+	<sprite>test_projectile_sprite.dat</sprite>
+</projectile>

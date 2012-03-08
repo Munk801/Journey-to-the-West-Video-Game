@@ -9,5 +9,5 @@
 	<speed>50</speed>
 	<AI>1</AI>
 	<sprite>girl_sprite.dat</sprite>
-	<proj>ice_cream.dat</proj>
+	<proj>ice_cream_projectile.dat</proj>
 </enemy>

@@ -48,6 +48,8 @@ namespace U5Designs
         Texture Healthbar;
         int MaxHealth;
 
+		bool aiPaused;
+
         public bool clickdown = false;
         // Initialize graphics, etc here
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
@@ -74,6 +76,8 @@ namespace U5Designs
             eng.StateTextureManager.LoadTexture("Healthbar", "../../Resources/Textures/Dummy_Healthbar.png");
             Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
             MaxHealth = player.health;
+
+			aiPaused = true;
         }
 
 		public override void MakeActive() {
@@ -153,8 +157,10 @@ namespace U5Designs
             } else {
 				player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.X], eng.Keyboard[Key.Space], eng.Keyboard[Key.E], e, this);
 
-				foreach(AIObject aio in aiList) {
-					((Enemy)aio).aiUpdate(e, this, player.location, enable3d);
+				if(!aiPaused) {
+					foreach(AIObject aio in aiList) {
+						((Enemy)aio).aiUpdate(e, this, player.location, enable3d);
+					}
 				}
 
 				//Now that everyone's had a chance to accelerate, actually
@@ -208,11 +214,7 @@ namespace U5Designs
 		}
 
         public override void Draw(FrameEventArgs e) {
-            //Origin is the left edge of the level, at the ground and the back wall
-            //This means that all valid game coordinates will be positive
-            //Ground is from 0 to 100 along the z-axis
-
-			//e = new FrameEventArgs(e.Time * 0.1);
+            //e = new FrameEventArgs(e.Time * 0.1);
 
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -224,13 +226,6 @@ namespace U5Designs
             //}
 
             camera.SetModelView();
-
-			//Set up textures
- 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
- 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
- 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
-
-
 
 			//Sort objects by depth for proper alpha rendering
 			if(nowBillboarding) {
@@ -264,8 +259,9 @@ namespace U5Designs
 				}
 			}
 
-            float dec = (float)player.health / MaxHealth;
-            Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 350, 600, scaleY: 0.5f, decrementX: dec);
+			float dec = (float)player.health / MaxHealth;
+			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 250, 680, scaleY: 0.125f, decrementX: dec);
+
 
             // UNCOMMENT TO ADD MOTION BLUR
             //if (isInTransition)
@@ -332,6 +328,10 @@ namespace U5Designs
                 //eng.PushState(menustate);
                 eng.PushState(pms);
             }
+
+			if(eng.Keyboard[Key.P]) {
+				aiPaused = false;
+			}
 
 			//********************** tab
 			if(!isInTransition && player.onGround) {
