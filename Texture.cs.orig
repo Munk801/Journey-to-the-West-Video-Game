@@ -118,7 +118,7 @@ namespace U5Designs
             double y = yPos;
             double z = 0;
 
-            
+
             XLoc = x - halfWidth;
             YLoc = y + halfHeight;
 
@@ -128,7 +128,6 @@ namespace U5Designs
             float rightUV = 1;
 
             float decVal = (float)XLoc + scaledWidth * decrementX;
-            if (decrementX == 0) decVal = (float)(x + halfWidth);
 
             GL.Begin(BeginMode.Triangles);
             {

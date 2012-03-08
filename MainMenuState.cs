@@ -42,7 +42,8 @@ namespace U5Designs
 
         // New Buttons
         //TextureManager StateTextureManager;
-        Texture play_press, play_nopress, load_nopress, load_press, quit_nopress, quit_press;
+        Texture menu, arrow, play_press, play_nopress, load_nopress, load_press, quit_nopress, quit_press;
+        float arX, b1Y, b2Y, b3Y;
         public bool enterdown;
 
         public bool clickdown = false;
@@ -55,17 +56,21 @@ namespace U5Designs
             mouse = eng.Mouse;
             // Load all the textures
             eng.StateTextureManager.RenderSetup();
-            eng.StateTextureManager.LoadTexture("load", "../../Resources/Textures/load_button_no_press.png");
+            eng.StateTextureManager.LoadTexture("menu", "../../Resources/Textures/menu.png");
+            menu = eng.StateTextureManager.GetTexture("menu");
+            eng.StateTextureManager.LoadTexture("arrow", "../../Resources/Textures/arrow.png");
+            arrow = eng.StateTextureManager.GetTexture("arrow");
+            eng.StateTextureManager.LoadTexture("load", "../../Resources/Textures/btn_loadlevel.png");
             load_nopress = eng.StateTextureManager.GetTexture("load");
-            eng.StateTextureManager.LoadTexture("loadpress", "../../Resources/Textures/load_button_press.png");
+            eng.StateTextureManager.LoadTexture("loadpress", "../../Resources/Textures/btn_loadlevel_hover.png");
             load_press = eng.StateTextureManager.GetTexture("loadpress");
-            eng.StateTextureManager.LoadTexture("quit", "../../Resources/Textures/quit_button_no_press.png");
+            eng.StateTextureManager.LoadTexture("quit", "../../Resources/Textures/btn_exit.png");
             quit_nopress = eng.StateTextureManager.GetTexture("quit");
-            eng.StateTextureManager.LoadTexture("quitpress", "../../Resources/Textures/quit_button_press.png");
+            eng.StateTextureManager.LoadTexture("quitpress", "../../Resources/Textures/btn_exit_hover.png");
             quit_press = eng.StateTextureManager.GetTexture("quitpress");
-            eng.StateTextureManager.LoadTexture("play", "../../Resources/Textures/play_button_no_press.png");
+            eng.StateTextureManager.LoadTexture("play", "../../Resources/Textures/btn_play.png");
             play_nopress = eng.StateTextureManager.GetTexture("play");
-            eng.StateTextureManager.LoadTexture("playpress", "../../Resources/Textures/play_button_press.png");
+            eng.StateTextureManager.LoadTexture("playpress", "../../Resources/Textures/btn_play_hover.png");
             play_press = eng.StateTextureManager.GetTexture("playpress");
 
 
@@ -110,6 +115,11 @@ namespace U5Designs
             //quit_button_npress = new Obstacle(new Vector3(0, -100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, qb_np_ss);
             //SpriteSheet qb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/quit_button_press.png"), cycleStarts, cycleLengths, 320, 100);
             //quit_button_press = new Obstacle(new Vector3(0, -100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, qb_p_ss);
+            
+            arX = -150.0f;
+            b1Y = 0.0f;
+            b2Y = -100.0f;
+            b3Y = -200.0f;
 
             // TEST //
             enterdown = false;
@@ -151,15 +161,17 @@ namespace U5Designs
             Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref modelview);
+            menu.Draw2DTexture();
             //((RenderObject)background).doScaleTranslateAndTexture();
 
             // testing buttons
             switch (_cur_butn)
             {
                 case 0:
-                    play_press.Draw2DTexture(0, 100, 1.0f, 1.0f);
-                    load_nopress.Draw2DTexture(0, 0);
-                    quit_nopress.Draw2DTexture(0, -100);
+                    arrow.Draw2DTexture(arX, b1Y, 1.0f, 1.0f);
+                    play_press.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
+                    load_nopress.Draw2DTexture(0, b2Y);
+                    quit_nopress.Draw2DTexture(0, b3Y);
                     //((RenderObject)play_button_press).doScaleTranslateAndTexture();
                     //((RenderObject)play_button_press).sprite.draw(false);
                     //((RenderObject)load_button_npress).doScaleTranslateAndTexture();
@@ -168,9 +180,10 @@ namespace U5Designs
                     //((RenderObject)quit_button_npress).sprite.draw(false);
                     break;
                 case 1:
-                    play_nopress.Draw2DTexture(0, 100, 1.0f, 1.0f);
-                    load_press.Draw2DTexture(0, 0);
-                    quit_nopress.Draw2DTexture(0, -100);
+                    arrow.Draw2DTexture(arX, b2Y);
+                    play_nopress.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
+                    load_press.Draw2DTexture(0, b2Y);
+                    quit_nopress.Draw2DTexture(0, b3Y);
                     //((RenderObject)play_button_npress).doScaleTranslateAndTexture();
                     //((RenderObject)play_button_npress).sprite.draw(false);
                     //((RenderObject)load_button_press).doScaleTranslateAndTexture();
@@ -179,9 +192,10 @@ namespace U5Designs
                     //((RenderObject)quit_button_npress).sprite.draw(false);
                     break;
                 case 2:
-                    play_nopress.Draw2DTexture(0, 100, 1.0f, 1.0f);
-                    load_nopress.Draw2DTexture(0, 0);
-                    quit_press.Draw2DTexture(0, -100);
+                    arrow.Draw2DTexture(arX, b3Y);
+                    play_nopress.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
+                    load_nopress.Draw2DTexture(0, b2Y);
+                    quit_press.Draw2DTexture(0, b3Y);
                     //((RenderObject)play_button_npress).doScaleTranslateAndTexture();
                     //((RenderObject)play_button_npress).sprite.draw(false);
                     //((RenderObject)load_button_npress).doScaleTranslateAndTexture();

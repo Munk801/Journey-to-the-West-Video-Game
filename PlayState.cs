@@ -45,7 +45,7 @@ namespace U5Designs
         MainMenuState menustate;
 		PauseMenuState pms;
 
-        Texture Healthbar;
+        Texture Healthbar, bHealth;
         int MaxHealth;
 
 		bool aiPaused;
@@ -73,8 +73,10 @@ namespace U5Designs
 			player.cam = camera;
 			nowBillboarding = false;
             // Add healthbar texture to texture manager
-            eng.StateTextureManager.LoadTexture("Healthbar", "../../Resources/Textures/Dummy_Healthbar.png");
+            eng.StateTextureManager.LoadTexture("Healthbar", "../../Resources/Textures/healthbar_top.png");
             Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
+            eng.StateTextureManager.LoadTexture("bHealth", "../../Resources/Textures/healthbar_bottom.png");
+            bHealth = eng.StateTextureManager.GetTexture("bHealth");
             MaxHealth = player.health;
 
 			aiPaused = true;
@@ -260,7 +262,8 @@ namespace U5Designs
 			}
 
 			float dec = (float)player.health / MaxHealth;
-			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 250, 680, scaleY: 0.125f, decrementX: dec);
+            bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 650, scaleX: 0.5f, scaleY: 0.8f);
+			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 300, 650, scaleX: 0.5f, scaleY: 0.8f, decrementX: dec);
 
 
             // UNCOMMENT TO ADD MOTION BLUR

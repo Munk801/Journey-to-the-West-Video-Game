@@ -257,6 +257,22 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Projectiles\test_projectile.dat" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\arrow.png" />
+    <EmbeddedResource Include="Resources\Textures\btn_exit.png" />
+    <EmbeddedResource Include="Resources\Textures\btn_exit_hover.png" />
+    <EmbeddedResource Include="Resources\Textures\btn_loadlevel.png" />
+    <EmbeddedResource Include="Resources\Textures\btn_loadlevel_hover.png" />
+    <EmbeddedResource Include="Resources\Textures\btn_option.png" />
+    <EmbeddedResource Include="Resources\Textures\btn_option_hover.png" />
+    <EmbeddedResource Include="Resources\Textures\btn_play.png" />
+    <EmbeddedResource Include="Resources\Textures\btn_play_hover.png" />
+    <EmbeddedResource Include="Resources\Textures\healthbar_bottom.png" />
+    <EmbeddedResource Include="Resources\Textures\healthbar_top.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\menu.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
