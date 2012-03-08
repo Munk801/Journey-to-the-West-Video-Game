@@ -101,7 +101,7 @@ namespace U5Designs
 
             GL.Enable(EnableCap.Texture2D);
             GL.BindTexture(TextureTarget.Texture2D, Id);
-            GL.Clear(ClearBufferMask.DepthBufferBit);
+            //GL.Clear(ClearBufferMask.DepthBufferBit);
 
             float scaledWidth = (Width * scaleX);
             float scaledHeight = (Height * scaleY);
