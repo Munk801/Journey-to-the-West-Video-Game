@@ -52,7 +52,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AIObject.cs" />
     <Compile Include="Analyze.cs" />
     <Compile Include="AudioFile.cs" />
     <Compile Include="AudioManager.cs" />

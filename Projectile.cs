@@ -173,6 +173,10 @@ namespace U5Designs {
 			get { return _animDirection; }
 		}
 
+		public int ScreenRegion {
+			get { return screenRegion; }
+		}
+
 		public void doScaleTranslateAndTexture() {
             GL.PushMatrix();
 

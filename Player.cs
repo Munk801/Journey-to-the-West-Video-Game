@@ -40,7 +40,8 @@ namespace U5Designs
 		public Camera cam; //pointer to the camera, used for informing of y position changes
 		private bool enable3d; //track current world state (used in spawning projectiles)
 		public bool onGround; //true when on ground, or when we just switched to 3d and were in midair
-
+		private bool spaceDown;
+        
         // SOUND FILES
         static string jumpSoundFile = "../../Resources/Sound/jump_sound.ogg";
         AudioFile jumpSound = new AudioFile(jumpSoundFile);
@@ -82,48 +83,46 @@ namespace U5Designs
         }
 
         /**
-         * Sets the PlayerState elements to the current Player values.  Call this method every update or simply when the state changes.  This will be used to store
-         * the Players State when saving the game.
-		 * 
-		 * Returns the movement of the player to be used in updating camera, etc.
+         * Handles all player input and timers
          * */
-        bool spaceDown;
-        internal void updateState(bool enable3d, bool a, bool s, bool d, bool w, bool c, bool x, bool space, bool ekey, FrameEventArgs e, PlayState playstate) {
+        internal void updateState(bool enable3d, KeyboardDevice keyboard, double time, PlayState playstate) {
 			this.enable3d = enable3d;
 
+			//Update timers
 			if(projectileTimer > 0.0) {
-				projectileTimer -= e.Time;
+				projectileTimer -= time;
 			}
 
             if (Invincible)
-                Invincibletimer = Invincibletimer - e.Time;
+                Invincibletimer = Invincibletimer - time;
             if (Invincibletimer <= 0) { // invincible is gone
                 Invincibletimer = 0;
                 Invincible = false;
             }
 
             if (!HasControl)
-                NoControlTimer = NoControlTimer + e.Time;
+                NoControlTimer = NoControlTimer + time;
             if (NoControlTimer >= 0.5) {
                 NoControlTimer = 0;
                 HasControl = true;
             }
 
 			if(viewSwitchJumpTimer > 0.0) {
-				viewSwitchJumpTimer -= e.Time;
+				viewSwitchJumpTimer -= time;
 			}
 
             if (HasControl) {
+				//Keyboard
 				if(enable3d) {
 					Vector2 newVel = new Vector2(0);
-					if(w) { newVel.X++; }
-					if(s) { newVel.X--; }
-					if(a) { newVel.Y--; }
-					if(d) { newVel.Y++; }
+					if(keyboard[Key.W]) { newVel.X++; }
+					if(keyboard[Key.S]) { newVel.X--; }
+					if(keyboard[Key.A]) { newVel.Y--; }
+					if(keyboard[Key.D]) { newVel.Y++; }
 
 					newVel.NormalizeFast();
-					if(newVel.X != 0 || newVel.Y != 0) {
-						viewSwitchJumpTimer = 0.0;
+					if(viewSwitchJumpTimer > 0.0 && (newVel.X != 0 || newVel.Y != 0)) {
+						viewSwitchJumpTimer = Math.Min(viewSwitchJumpTimer, 0.3);
 					}
 
 					velocity.X = newVel.X*speed;
@@ -136,9 +135,9 @@ namespace U5Designs
 						_cycleNum = (enable3d ? 3 : 2);
 					}
                 } else {
-                    if ((d && a) || (!d && !a)) {
+                    if (keyboard[Key.A] == keyboard[Key.D]) {
                         velocity.X = 0f;
-                    } else if(d) {
+                    } else if(keyboard[Key.D]) {
                         velocity.X = _speed;
 					} else { //a
 						velocity.X = -_speed;
@@ -152,27 +151,18 @@ namespace U5Designs
 					}
                 }
 
-                //TMP PHYSICS TEST BUTTON and suicide button and projectile button
-				if(c) {
+                //TMP PHYSICS TEST BUTTON float button
+				if(keyboard[Key.C]) {
 					velocity.Y = _speed;
 					fallTimer = 0.0;
 				}
-                if(x)
-                    _health = 0;
 
-                MouseInput(playstate);
+				//TMP PHYSICS TEST BUTTON suicide button
+				if(keyboard[Key.X]) {
+					_health = 0;
+				}
 
-                //if (ekey && !edown)
-                //{
-                //    spawnProjectile(playstate);
-                //    edown = true;
-                //}
-                //else if (!ekey)
-                //    edown = false;
-
-
-                //********************** space
-                if (space && !spaceDown) {
+                if (keyboard[Key.Space] && !spaceDown) {
 					if(onGround) {
 						accelerate(Vector3.UnitY * 230);
 						onGround = false;
@@ -181,9 +171,12 @@ namespace U5Designs
 					}
                     spaceDown = true;
                 }
-                else if (!space) {
+                else if (!keyboard[Key.Space]) {
                     spaceDown = false;
                 }
+
+				//Keep this last
+				handleMouseInput(playstate);
             }
         }
 		
@@ -191,10 +184,9 @@ namespace U5Designs
         /// Provides all the mouse input for the player.  Will currently check for a left click and shoot a projectile in the direction
         /// </summary>
         /// <param name="playstate"></param>
-        private void MouseInput(PlayState playstate)
+        private void handleMouseInput(PlayState playstate)
         {
-            if (playstate.eng.ThisMouse.LeftPressed() && projectileTimer <= 0.0)
-            {
+            if (playstate.eng.ThisMouse.LeftPressed() && projectileTimer <= 0.0) {
                 // Grab Mouse coord.  Since Y goes down, just subtract from height to get correct orientation
                 Vector3d mousecoord = new Vector3d((double)playstate.eng.Mouse.X, (double)(playstate.eng.Height - playstate.eng.Mouse.Y), 1.0);
 
@@ -204,7 +196,7 @@ namespace U5Designs
                 
                 // Unproject the coordinates to convert from mouse to world coordinates
                 Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
-
+				
 				if(curProjectile.gravity) {
 					if(!playstate.enable3d) {
 						//Console.WriteLine(mouseWorld.Y.ToString());
@@ -370,6 +362,10 @@ namespace U5Designs
 		private int _animDirection;
 		public int animDirection {
 			get { return _animDirection; }
+		}
+
+		public int ScreenRegion {
+			get { return screenRegion; }
 		}
 
         public void doScaleTranslateAndTexture() {

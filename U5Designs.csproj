@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AI.cs" />
+    <Compile Include="AIObject.cs" />
     <Compile Include="Background.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Decoration.cs" />

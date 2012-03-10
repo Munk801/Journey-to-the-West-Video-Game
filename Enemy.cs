@@ -232,6 +232,10 @@ namespace U5Designs
 			get { return _animDirection; }
 		}
 
+		public int ScreenRegion {
+			get { return screenRegion; }
+		}
+
 		public void doScaleTranslateAndTexture() {
             GL.PushMatrix();
 
@@ -535,9 +539,9 @@ namespace U5Designs
             }
         }
 
-		internal void aiUpdate(FrameEventArgs e, PlayState playstate, Vector3 playerposn, bool enable3d) {
+		public void aiUpdate(double time, PlayState playstate, Vector3 playerposn, bool enable3d) {
 
-            CurrentAI.Peek().update(e, playstate, playerposn, this, enable3d);
+            CurrentAI.Peek().update(time, playstate, playerposn, this, enable3d);
         }
 
         // calculates the literal distance between 2 points

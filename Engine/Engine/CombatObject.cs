@@ -19,6 +19,7 @@ namespace Engine {
 		int damage { get; }
         float speed { get; set; }
 		bool alive { get; set; }
+		int ScreenRegion { get; }
 
         /*
          * IMPORTANT!!! this variable determins the type of combat object for the sake of handling collision with the player

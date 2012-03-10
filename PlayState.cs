@@ -33,7 +33,6 @@ namespace U5Designs
 		internal List<AIObject> aiList;// aka list of enemies
 		internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
 		internal List<Background> backgroundList;
-        //TODO: projectile list
 
         int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
 
@@ -48,9 +47,7 @@ namespace U5Designs
         Texture Healthbar, bHealth;
         int MaxHealth;
 
-		bool aiPaused;
-
-        public bool clickdown = false;
+		public bool clickdown = false;
         // Initialize graphics, etc here
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
 
@@ -78,8 +75,6 @@ namespace U5Designs
             eng.StateTextureManager.LoadTexture("bHealth", "../../Resources/Textures/healthbar_bottom.png");
             bHealth = eng.StateTextureManager.GetTexture("bHealth");
             MaxHealth = player.health;
-
-			aiPaused = true;
         }
 
 		public override void MakeActive() {
@@ -105,9 +100,6 @@ namespace U5Designs
 			}
 		}
 
-        List<CombatObject> EnemyKillList = new List<CombatObject>();
-        List<CombatObject> ProjectileKillList = new List<CombatObject>(); 
-
         public override void Update(FrameEventArgs e) {
 			//e = new FrameEventArgs(e.Time * 0.1);
 
@@ -121,47 +113,51 @@ namespace U5Designs
                 GameOverState GGbro = new GameOverState(menustate, eng);
                 eng.ChangeState(GGbro);
             }
+
+			//Determine which screen region everything is in
+			foreach(GameObject go in objList) {
+				float dist = VectorUtil.dist(go.location, player.location);
+				if(dist < 400.0) {
+					go.screenRegion = GameObject.ON_SCREEN;
+				} else if(dist > 500.0) {
+					go.screenRegion = GameObject.OFF_SCREEN;
+				}
+				//If between the two distances, then leave as is
+			}
             
             //handle death and despawning for everything else
-            EnemyKillList.Clear();
-            ProjectileKillList.Clear();
-            foreach (CombatObject CO in combatList) {
-                if (CO.type == 1) { //enemy
-                    if (CO.health <= 0) {
-                        EnemyKillList.Add(CO);
+			for(int i=combatList.Count-1; i>=0; i--) {
+				CombatObject co = combatList[i];
+                if (co.type == 1) { //enemy
+					if(co.health <= 0) {
+						objList.Remove((GameObject)co);
+						physList.Remove((PhysicsObject)co);
+						colisionList.Remove((PhysicsObject)co);
+						renderList.Remove((RenderObject)co);
+						aiList.Remove((AIObject)co);
+						combatList.Remove(co);
                     }
                 }
-                if (CO.type == 2) {//projectile
-                    if (CO.health <= 0) {
-                        ProjectileKillList.Add(CO);
+                if (co.type == 2) {//projectile
+					if(co.health <= 0 || co.ScreenRegion == GameObject.OFF_SCREEN) {
+						objList.Remove((GameObject)co);
+						physList.Remove((PhysicsObject)co);
+						colisionList.Remove((PhysicsObject)co);
+						renderList.Remove((RenderObject)co);
+						combatList.Remove(co);
                     }
                 }
-            }
-            foreach (CombatObject CO in EnemyKillList) {
-                objList.Remove((GameObject)CO);
-                physList.Remove((PhysicsObject)CO);
-                colisionList.Remove((PhysicsObject)CO);
-                renderList.Remove((RenderObject)CO);
-                aiList.Remove((AIObject)CO);
-                combatList.Remove(CO);
-            }
-            foreach (CombatObject CO in ProjectileKillList) {
-                objList.Remove((GameObject)CO);
-                physList.Remove((PhysicsObject)CO);
-                colisionList.Remove((PhysicsObject)CO);
-                renderList.Remove((RenderObject)CO);
-                combatList.Remove(CO);
             }
 
-            //Deal with everyone's acceleration
+			//If the camera is transitioning, everything else is paused
             if (isInTransition) {
 				isInTransition = camera.TransitionState(enable3d, e.Time);
-            } else {
-				player.updateState(enable3d, eng.Keyboard[Key.A], eng.Keyboard[Key.S], eng.Keyboard[Key.D], eng.Keyboard[Key.W], eng.Keyboard[Key.C], eng.Keyboard[Key.X], eng.Keyboard[Key.Space], eng.Keyboard[Key.E], e, this);
-
-				if(!aiPaused) {
-					foreach(AIObject aio in aiList) {
-						((Enemy)aio).aiUpdate(e, this, player.location, enable3d);
+			} else {
+				//Deal with everyone's acceleration
+				player.updateState(enable3d, eng.Keyboard, e.Time, this);
+				foreach(AIObject aio in aiList) {
+					if(aio.ScreenRegion == GameObject.ON_SCREEN) {
+						aio.aiUpdate(e.Time, this, player.location, enable3d);
 					}
 				}
 
@@ -187,6 +183,7 @@ namespace U5Designs
             }
 		}
 
+		//Called by camera for parallaxing
 		public void updateBackgroundsYPos(float deltay) {
 			foreach(Background b in backgroundList) {
 				b.UpdatePositionY(deltay);
@@ -265,7 +262,6 @@ namespace U5Designs
             bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 650, scaleX: 0.5f, scaleY: 0.8f);
 			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 300, 650, scaleX: 0.5f, scaleY: 0.8f, decrementX: dec);
 
-
             // UNCOMMENT TO ADD MOTION BLUR
             //if (isInTransition)
             //{
@@ -331,10 +327,6 @@ namespace U5Designs
                 //eng.PushState(menustate);
                 eng.PushState(pms);
             }
-
-			if(eng.Keyboard[Key.P]) {
-				aiPaused = false;
-			}
 
 			//********************** tab
 			if(!isInTransition && player.onGround) {

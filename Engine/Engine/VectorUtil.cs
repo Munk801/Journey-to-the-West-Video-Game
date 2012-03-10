@@ -73,5 +73,16 @@ namespace Engine {
 				mins.Z = tmp;
 			}
 		}
+
+		public static float dist(Vector3 v1, Vector3 v2) {
+			Vector3 tmp = new Vector3(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
+			return tmp.LengthFast;
+		}
+
+		public static Vector3 getdir(Vector3 player, Vector3 enemy) {
+			Vector3 tmp = new Vector3(player.X - enemy.X, player.Y - enemy.Y, player.Z - enemy.Z);
+			tmp.Normalize();
+			return tmp;
+		}
 	}
 }

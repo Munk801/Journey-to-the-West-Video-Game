@@ -27,10 +27,12 @@ namespace Engine
 
 		protected GameObject() {
 			ID = ++lastID;
+			screenRegion = ON_SCREEN; //safest assumption for now
 		}
 
 		protected GameObject(int id) {
 			ID = id;
+			screenRegion = ON_SCREEN; //safest assumption for now
 		}
 
 		//Does this object exist when viewed in 3d?
@@ -59,8 +61,11 @@ namespace Engine
             protected set { _hascbox = value; }
         }
 
+		public int screenRegion; //0, 1, or 2 - see constants below
 
 		//CONSTANTS
 		public const double gravity = 400.0;
+		public const int ON_SCREEN = 1;
+		public const int OFF_SCREEN = 0;
 	}
 }
