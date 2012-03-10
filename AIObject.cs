@@ -7,7 +7,6 @@ using OpenTK;
 
 namespace U5Designs {
 	public interface AIObject : PhysicsObject, CombatObject {
-		int ScreenRegion { get; }
-		void aiUpdate(double time, PlayState playstate, Vector3 playerposn, bool enable3d);
+		void aiUpdate(double time, PlayState playstate, Vector3 playerposn, bool enable3d, List<PhysicsObject> physList);
 	}
 }

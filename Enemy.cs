@@ -539,9 +539,9 @@ namespace U5Designs
             }
         }
 
-		public void aiUpdate(double time, PlayState playstate, Vector3 playerposn, bool enable3d) {
+		public void aiUpdate(double time, PlayState playstate, Vector3 playerposn, bool enable3d, List<PhysicsObject> physList) {
 
-            CurrentAI.Peek().update(time, playstate, playerposn, this, enable3d);
+			CurrentAI.Peek().update(time, playstate, playerposn, this, enable3d, physList);
         }
 
         // calculates the literal distance between 2 points

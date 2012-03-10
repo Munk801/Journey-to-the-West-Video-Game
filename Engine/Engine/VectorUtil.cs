@@ -84,5 +84,72 @@ namespace Engine {
 			tmp.Normalize();
 			return tmp;
 		}
+		
+		//Test if an object is entirely over the ground
+		//Used for saving safe player locations to respawn, and keeping enemies from jumping to death
+		public static bool overGround2d(PhysicsObject obj, List<PhysicsObject> physList) {
+			bool left = false, right = false;
+			float leftEdge = obj.location.X - obj.pbox.X;
+			float rightEdge = obj.location.X + obj.pbox.X;
+
+			foreach(PhysicsObject po in physList) {
+				if(po.hascbox) {
+					//Anything with a cbox is not a valid ground object
+					continue;
+				}
+				if(obj.location.Y - obj.pbox.Y >= po.location.Y + po.pbox.Y) {
+					if(leftEdge >= po.location.X - po.pbox.X && leftEdge <= po.location.X + po.pbox.X) {
+						left = true;
+					}
+					if(rightEdge >= po.location.X - po.pbox.X && rightEdge <= po.location.X + po.pbox.X) {
+						right = true;
+					}
+					//Note: Edges have to be separate like this to correctly handle seams between ground planes
+					if(left && right) {
+						return true;
+					}
+				}
+			}
+			//No match
+			return false;
+		}
+
+		//Helper method for overGround3d
+		private static bool inBox(Vector2 point, PhysicsObject po) {
+			return point.X < po.location.X + po.pbox.X && point.X > po.location.X - po.pbox.X
+					&& point.Y < po.location.Z + po.pbox.Z && point.Y > po.location.Z - po.pbox.Z;
+		}
+
+		//Test if an object is entirely over the ground
+		//Used for saving safe player locations to respawn, and keeping enemies from jumping to death
+		public static bool overGround3d(PhysicsObject obj, List<PhysicsObject> physList) {
+			Vector2 loc = new Vector2(obj.location.X, obj.location.Z);
+			Vector2 box = new Vector2(obj.pbox.X, obj.pbox.Z);
+			Vector2 frontRight = new Vector2(obj.location.X + obj.pbox.X, obj.location.Z + obj.pbox.Z);
+			Vector2 backLeft = new Vector2(obj.location.X - obj.pbox.X, obj.location.Z - obj.pbox.Z);
+			Vector2 frontLeft = new Vector2(backLeft.X, frontRight.Y);
+			Vector2 backRight = new Vector2(frontRight.X, backLeft.Y);
+			bool fl = false, fr = false, bl = false, br = false;
+
+			foreach(PhysicsObject po in physList) {
+				if(po.hascbox) {
+					//Anything with a cbox is not a valid ground object
+					continue;
+				}
+				if(obj.location.Y - obj.pbox.Y >= po.location.Y + po.pbox.Y) {
+					if(inBox(frontLeft, po)) { fl = true; }
+					if(inBox(frontRight, po)) { fr = true; }
+					if(inBox(backLeft, po)) { bl = true; }
+					if(inBox(backRight, po)) { br = true; }
+
+					//Note: Edges have to be separate like this to correctly handle seams between ground planes
+					if(fl && fr && bl && br) {
+						return true;
+					}
+				}
+			}
+			//No match
+			return false;
+		}
 	}
 }

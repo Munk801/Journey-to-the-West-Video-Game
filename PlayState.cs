@@ -157,7 +157,7 @@ namespace U5Designs
 				player.updateState(enable3d, eng.Keyboard, e.Time, this);
 				foreach(AIObject aio in aiList) {
 					if(aio.ScreenRegion == GameObject.ON_SCREEN) {
-						aio.aiUpdate(e.Time, this, player.location, enable3d);
+						aio.aiUpdate(e.Time, this, player.location, enable3d, physList);
 					}
 				}
 

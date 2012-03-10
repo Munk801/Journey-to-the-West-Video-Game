@@ -110,7 +110,7 @@ namespace U5Designs
 			if(viewSwitchJumpTimer > 0.0) {
 				viewSwitchJumpTimer -= time;
 			}
-
+			
             if (HasControl) {
 				//Keyboard
 				if(enable3d) {
@@ -122,7 +122,7 @@ namespace U5Designs
 
 					newVel.NormalizeFast();
 					if(viewSwitchJumpTimer > 0.0 && (newVel.X != 0 || newVel.Y != 0)) {
-						viewSwitchJumpTimer = Math.Min(viewSwitchJumpTimer, 0.3);
+						viewSwitchJumpTimer = Math.Min(viewSwitchJumpTimer, 0.025);
 					}
 
 					velocity.X = newVel.X*speed;
@@ -469,7 +469,9 @@ namespace U5Designs
 									fallTimer = 0.0;
 									onGround = true;
 									collidedWithGround = true;
-									lastPosOnGround = new Vector3(_location);
+									if(VectorUtil.overGround3d(this, physList)) {
+										lastPosOnGround = new Vector3(_location);
+									}
 									cam.moveToYPos(_location.Y);
 								}
 								if(velocity.Y != 0) {//should always be true, but just in case...
@@ -535,6 +537,7 @@ namespace U5Designs
 			if(fallTimer > 1.5) {
 				_health -= fallDamage;
 				_location = lastPosOnGround;
+				velocity = Vector3.Zero;
 				Invincible = true;
 				Invincibletimer = 2.0;
 			}
@@ -635,7 +638,11 @@ namespace U5Designs
 									fallTimer = 0.0;
 									onGround = true;
 									collidedWithGround = true;
-									lastPosOnGround = new Vector3(_location);
+
+									//Using 2D instead of 3D is intentional here - don't save position if switching views could make you fall
+									if(VectorUtil.overGround3d(this, physList)) {
+										lastPosOnGround = new Vector3(_location);
+									}
 									cam.moveToYPos(_location.Y);
 								}
 								if(velocity.Y != 0) {//should always be true, but just in case...
@@ -684,6 +691,7 @@ namespace U5Designs
 			if(fallTimer > 1.5) {
 				_health -= fallDamage;
 				_location = lastPosOnGround;
+				velocity = Vector3.Zero;
 				Invincible = true;
 				Invincibletimer = 2.0;
 			}

@@ -12,18 +12,53 @@ using Engine;
 
 namespace U5Designs {
     internal interface Airoutine {
-        void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d);
+		void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList);
     }
 
     internal class Kidmoveto : Airoutine{
 
-        public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d) {
+		public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
             me.attackspeed = 1; //hack initilization
 			if(VectorUtil.dist(playerposn, me.location) > 90) {
 				Vector3 dir = VectorUtil.getdir(playerposn, me.location);
+				dir.Y = 0.0f;
+				if(!enable3d) {
+					dir.Z = 0.0f;
+				}
+				dir.NormalizeFast();
                 me.velocity.X = dir.X * me.speed;
-                if (enable3d)
-                    me.velocity.Z = dir.Z * me.speed;
+				me.velocity.Z = dir.Z * me.speed;
+				//Don't change y - out of our control
+
+				//Look ahead to see if we are at an edge
+				Vector3 origLoc = me.location;
+				me.location += me.velocity * 0.1f; //move a little bit in this direction (will undo later)
+				if(!(enable3d ? VectorUtil.overGround3d(me, physList) : VectorUtil.overGround2d(me, physList))) {
+					if(enable3d) {
+						//If we're on edge, move along one axis to corner
+						Vector3 origVel = new Vector3(me.velocity);
+
+						//Check X first
+						me.velocity.X = 0.0f;
+						me.location = origLoc + me.velocity * 0.1f;
+						if(!VectorUtil.overGround3d(me, physList)) {
+							me.velocity.X = origVel.X;
+							me.velocity.Z = 0.0f;
+							me.location = origLoc + me.velocity * 0.1f;
+							if(!VectorUtil.overGround3d(me, physList)) {
+								//Now we're at corner
+								me.velocity.X = 0.0f;
+								me.velocity.Z = 0.0f;
+							}
+						}
+						//Velocity now resulted in something over ground or is zero
+					} else {
+						//Only one option, so just stop
+						me.velocity.X = 0.0f;
+						me.velocity.Z = 0.0f;
+					}
+				}
+				me.location = origLoc; //undo above
             }
             else {
                 me.velocity.X = 0;
@@ -34,7 +69,7 @@ namespace U5Designs {
     }
 
     internal class KidThrowTime : Airoutine {
-        public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d) {
+		public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
 			if(VectorUtil.dist(playerposn, me.location) <= 90) {
                 if (me.attackdelayed)
                     me.attacktimer = me.attacktimer + time;
@@ -46,10 +81,13 @@ namespace U5Designs {
 					Vector3 dir = VectorUtil.getdir(playerposn, me.location);
                     //throw icecream
 					Vector3 projlocation = me.location;
+					Vector3 direction = VectorUtil.getdir(playerposn, me.location);
 					if(!enable3d) {
 						projlocation.Z += 0.001f; //break the rendering tie between enemy and projectile, or else they flicker
+					} else {
+						direction.Z = 0.0f;
+						direction.NormalizeFast();
 					}
-                    Vector3 direction = VectorUtil.getdir(playerposn, me.location);
 					Projectile shot = new Projectile(projlocation, direction, false, me.projectile);
                     //Projectile shot = new Projectile(projlocation, direction, new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, playstate.enable3d, me.damage, 150, false, false, me.projectileSprite);
                     playstate.objList.Add(shot);
@@ -67,7 +105,7 @@ namespace U5Designs {
 
 
     internal class Birdmoveto : Airoutine {
-        public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d) {
+		public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
         }
     }
 
