@@ -212,8 +212,17 @@ namespace U5Designs
 							theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
 						} else {
 							//TODO: Come up with a better looking solution than this.
-							theta = Math.PI / 4; //can't reach that point, go as far as we can
-							//theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+							//theta = Math.PI / 4; //can't reach that point, go as far as we can
+
+							//Calculate how far in that direction we can get
+							double phi = Math.Atan(projDir.Y / projDir.X); //TODO: What if we shoot straight up?
+							double cosphi = Math.Cos(phi);
+							double r = (gravity * velsquared * (1 - Math.Sin(phi))) / (gravity * gravity * cosphi * cosphi);
+							r -= 0.01f;
+							projDir.X = (float)(r * cosphi);
+							projDir.Y = (float)(r * Math.Sin(phi));
+							sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
+							theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
 						}
 
 						projDir.X = (float)Math.Cos(theta);
@@ -285,12 +294,6 @@ namespace U5Designs
 			_cbox.X = _cbox.Z;
 			_cbox.Z = temp;
 		}
-
-		//public void draw(bool viewIs3d, double time)
-		//{
-		//    doScaleTranslateAndTexture();
-		//    frameNumber = sprite.draw(viewIs3d, cycleNumber, frameNumber + time);
-		//}
 
 		public Vector3 setLocation {
 			set { _location = value; }
