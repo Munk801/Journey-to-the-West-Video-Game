@@ -250,7 +250,7 @@ namespace U5Designs
         public void physUpdate3d(double time, List<PhysicsObject> physList) {
             if (frozen)
                 freezetimer = freezetimer + time;
-            if (freezetimer > 1) {
+            if (freezetimer > 0.7) {
                 frozen = false;
                 freezetimer = 0;
             }
@@ -394,7 +394,7 @@ namespace U5Designs
         public void physUpdate2d(double time, List<PhysicsObject> physList) {
             if (frozen)
                 freezetimer = freezetimer + time;
-            if (freezetimer > 1) {
+            if (freezetimer > 0.7) {
                 frozen = false;
                 freezetimer = 0;
             }

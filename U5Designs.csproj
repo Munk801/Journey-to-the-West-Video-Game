@@ -161,9 +161,6 @@
     <EmbeddedResource Include="Resources\Data\Sprites\test_player.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Enemies\test_flying_enemy.dat" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Sprites\test_flying_sprite.dat" />
   </ItemGroup>
   <ItemGroup>
@@ -273,6 +270,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Textures\menu.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Enemies\Bird.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

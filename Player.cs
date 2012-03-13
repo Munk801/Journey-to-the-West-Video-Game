@@ -259,7 +259,7 @@ namespace U5Designs
 				projlocation.Z += 0.001f; //break the rendering tie between player and projectile, or else they flicker
 			}
             
-			Projectile shot = new Projectile(projlocation, direction, true, curProjectile);
+			Projectile shot = new Projectile(projlocation, direction, true, curProjectile, playstate.player);
             //Projectile shot = new Projectile(projlocation, direction, new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(3.5f, 3.5f, 3.5f), true, true, playstate.enable3d, damage, speed, true, true, banana);
 			
 			shot.accelerate(new Vector3(velocity.X, 0.0f, velocity.Z)); //account for player's current velocity
@@ -521,7 +521,7 @@ namespace U5Designs
                                 //despawn the projectile
                                 ((CombatObject)collidingObj).health = 0;
 
-                                
+                                knockback(true, collidingObj);
                             }
 						}
 					}
@@ -676,6 +676,7 @@ namespace U5Designs
 								HasControl = false;
 								//despawn the projectile
                                 ((CombatObject)collidingObj).health = 0;
+                                knockback(false, collidingObj);
 							}
 						}
 					}

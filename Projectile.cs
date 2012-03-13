@@ -26,7 +26,9 @@ namespace U5Designs {
         internal Vector3 direction;
         internal bool doesGravity, playerspawned; //true if gravity affects this object\
 
-		public Projectile(Vector3 location, Vector3 direction, bool playerSpawned, ProjectileProperties p) {
+        public Player player;
+
+		public Projectile(Vector3 location, Vector3 direction, bool playerSpawned, ProjectileProperties p, Player player) {
 			_location = location;
 			this.direction = direction;
 			_scale = new Vector3(p.scale);
@@ -38,6 +40,7 @@ namespace U5Designs {
 			_speed = p.speed;
 			_sprite = p.sprite;
 			doesGravity = p.gravity;
+            this.player = player;
 
 			_alive = true;
 			_health = 1; // health 1 = active, health 0 = despawning, waiting for cleanup in PlayState
@@ -258,6 +261,7 @@ namespace U5Designs {
                                 time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
+                                player.knockback(true, this);
                             }
 							//else {
 							//    _location += velocity * (float)time;
@@ -351,6 +355,7 @@ namespace U5Designs {
                                 time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
+                                player.knockback(false, this);
                             }
                         }
                         if (((CombatObject)collidingObj).type == 1) { //hit an enemy
