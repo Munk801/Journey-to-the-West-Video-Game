@@ -36,11 +36,14 @@ namespace U5Designs
 			Stream fstream = assembly.GetManifestResourceStream(file);
 			XmlDocument doc = new XmlDocument();
 			doc.Load(fstream);
+			XmlNode endRegion = doc.GetElementsByTagName("endRegion")[0];
 			XmlNodeList _b_list = doc.GetElementsByTagName("background");
 			XmlNodeList _e_list = doc.GetElementsByTagName("enemy");
 			XmlNodeList _o_list = doc.GetElementsByTagName("obstacle");
 			XmlNodeList _d_list = doc.GetElementsByTagName("decoration");
 			fstream.Close();
+
+			ps.endRegion = parseRegion(endRegion);
 
 			List<Enemy> _elist = parse_Enemy_File(_e_list);
 			foreach(Enemy e in _elist) {
@@ -100,6 +103,29 @@ namespace U5Designs
 				}
 			}
 			return v;
+		}
+
+		//Takes an XmlNode with attributes x, y, z, and r and turns it into a SphereRegion
+		public static SphereRegion parseRegion(XmlNode n) {
+			Vector3 v = new Vector3();
+			float r = 0.0f;
+			foreach(XmlNode a in n.Attributes) {
+				switch(a.Name) {
+					case "x":
+						v.X = Convert.ToSingle(a.InnerText);
+						break;
+					case "y":
+						v.Y = Convert.ToSingle(a.InnerText);
+						break;
+					case "z":
+						v.Z = Convert.ToSingle(a.InnerText);
+						break;
+					case "r":
+						r = Convert.ToSingle(a.InnerText);
+						break;
+				}
+			}
+			return new SphereRegion(v, r);
 		}
 
 		public static ProjectileProperties parseProjectileFile(String path) {

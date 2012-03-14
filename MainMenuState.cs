@@ -352,22 +352,16 @@ namespace U5Designs
                 if (_cur_butn == 0)
                 {
                     //transition into PlayState
-                    if (eng.GameInProgress)
-                    {
-                        eng.PopState();
-                    }
-                    else
-                    {
-                        // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
-                        PlayState ps = new PlayState(this, eng, 0);
 
-                        testFile.Stop();
+                    // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
+                    PlayState ps = new PlayState(this, eng, 0);
 
-                        // Otherwise pass the level index from the saved game
-                        //PlayState ps = new PlayState(saved_level_index);
-                        eng.ChangeState(ps);
-                        eng.GameInProgress = true;
-                    }
+                    testFile.Stop();
+
+                    // Otherwise pass the level index from the saved game
+                    //PlayState ps = new PlayState(saved_level_index);
+                    eng.ChangeState(ps);
+                    eng.GameInProgress = true;
                 }
                 if (_cur_butn == 1)
                 {

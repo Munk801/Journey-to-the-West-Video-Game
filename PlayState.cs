@@ -20,10 +20,11 @@ namespace U5Designs
     /** Main State of the game that will be active while the player is Playing **/
     public class PlayState : GameState
     {
-        internal GameEngine eng;
-        internal Player player;
-        internal bool enable3d; //true when being viewed in 3d
-		internal bool isInTransition; //true when perspective is in process of switching
+		internal GameEngine eng;
+		MainMenuState menustate;
+		PauseMenuState pms;
+		internal Player player;
+		internal Camera camera;
 
 		//everything is in objList, and then also pointed to from the appropriate interface lists
         internal List<GameObject> objList;
@@ -34,20 +35,20 @@ namespace U5Designs
 		internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
 		internal List<Background> backgroundList;
 
+		public SphereRegion bossRegion;
+		public SphereRegion endRegion;
+
+		internal bool enable3d; //true when being viewed in 3d
+		internal bool isInTransition; //true when perspective is in process of switching
         int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
+		private bool nowBillboarding; //true when billboarding objects should rotate into 3d view
+        Texture Healthbar, bHealth;
+		int MaxHealth;
 
 		bool tabDown;
-		private bool nowBillboarding; //true when billboarding objects should rotate into 3d view
-
-        internal Camera camera;
-
-        MainMenuState menustate;
-		PauseMenuState pms;
-
-        Texture Healthbar, bHealth;
-        int MaxHealth;
-
 		public bool clickdown = false;
+
+
         // Initialize graphics, etc here
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
 
@@ -148,6 +149,16 @@ namespace U5Designs
                 GameOverState GGbro = new GameOverState(menustate, eng);
                 eng.ChangeState(GGbro);
             }
+
+			//See if we need to trigger an event (like the end of the level or a boss)
+			if(endRegion.contains(player.location)) {
+				//Finished level
+				eng.ChangeState(new MainMenuState(eng)); //Later we should go to the next level when applicable
+			}
+			//Uncomment this when we have an actual boss
+			//if(bossRegion.contains(player.location) {
+			//    //Entered boss area - make changes to camera, etc
+			//}
 
 			//Determine which screen region everything is in
 			foreach(GameObject go in objList) {
