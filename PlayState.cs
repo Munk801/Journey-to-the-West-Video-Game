@@ -75,6 +75,41 @@ namespace U5Designs
             eng.StateTextureManager.LoadTexture("bHealth", "../../Resources/Textures/healthbar_bottom.png");
             bHealth = eng.StateTextureManager.GetTexture("bHealth");
             MaxHealth = player.health;
+
+			//Thanks to OpenTK samples for part of this shader code
+			//Initialize Shader
+			if(!GL.GetString(StringName.Extensions).Contains("EXT_geometry_shader4")) {
+				System.Windows.Forms.MessageBox.Show(
+					 "Your video card does not support EXT_geometry_shader4. Please update your drivers.",
+					 "EXT_geometry_shader4 not supported",
+					 System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation);
+				eng.Exit();
+				throw new NotSupportedException();
+			}
+
+			// create a shader object.
+			int shaderProgram = GL.CreateProgram();
+			int frag = GL.CreateShader(ShaderType.FragmentShader);
+
+			// GLSL for fragment shader.
+			String fragSource = @"
+				uniform sampler2D tex;
+
+				void main( void )
+				{
+					vec4 col = texture2D(tex,gl_TexCoord[0].st);
+					if( col.a < 0.5) {
+						discard;
+					}
+					gl_FragColor = col;
+				}	
+			";
+
+			GL.ShaderSource(frag, fragSource);
+			GL.CompileShader(frag);
+			GL.AttachShader(shaderProgram, frag);
+			GL.LinkProgram(shaderProgram);
+			GL.UseProgram(shaderProgram);
         }
 
 		public override void MakeActive() {
@@ -190,27 +225,27 @@ namespace U5Designs
 			}
 		}
 
-		//sorts RenderObjects by ascending Z coordinate
-		private static int compare2dView(RenderObject lhs, RenderObject rhs) {
-			if(lhs.location.Z < rhs.location.Z) {
-				return -1;
-			} else if(lhs.location.Z > rhs.location.Z) {
-				return 1;
-			} else {
-				return lhs.getID() - rhs.getID(); //consistent tiebreaker to avoid flicker
-			}
-		}
+		////sorts RenderObjects by ascending Z coordinate
+		//private static int compare2dView(RenderObject lhs, RenderObject rhs) {
+		//    if(lhs.location.Z < rhs.location.Z) {
+		//        return 1;
+		//    } else if(lhs.location.Z > rhs.location.Z) {
+		//        return -1;
+		//    } else {
+		//        return lhs.getID() - rhs.getID(); //consistent tiebreaker to avoid flicker
+		//    }
+		//}
 
-		//sorts RenderObjects by descending X coordinate
-		private static int compare3dView(RenderObject lhs, RenderObject rhs) {
-			if(lhs.location.X > rhs.location.X) {
-				return -1;
-			} else if(lhs.location.X < rhs.location.X) {
-				return 1;
-			} else {
-				return lhs.getID() - rhs.getID(); //consistent tiebreaker to avoid flicker
-			}
-		}
+		////sorts RenderObjects by descending X coordinate
+		//private static int compare3dView(RenderObject lhs, RenderObject rhs) {
+		//    if(lhs.location.X > rhs.location.X) {
+		//        return 1;
+		//    } else if(lhs.location.X < rhs.location.X) {
+		//        return -1;
+		//    } else {
+		//        return lhs.getID() - rhs.getID(); //consistent tiebreaker to avoid flicker
+		//    }
+		//}
 
         public override void Draw(FrameEventArgs e) {
             //e = new FrameEventArgs(e.Time * 0.1);
@@ -227,11 +262,11 @@ namespace U5Designs
             camera.SetModelView();
 
 			//Sort objects by depth for proper alpha rendering
-			if(nowBillboarding) {
-				renderList.Sort(compare3dView);
-			} else {
-				renderList.Sort(compare2dView);
-			}
+			//if(nowBillboarding) {
+			//    renderList.Sort(compare3dView);
+			//} else {
+			//    renderList.Sort(compare2dView);
+			//}
 
 			//First render all opaque sprites, and all 3d geometry (since they are assumed to be opaque)
 			foreach(RenderObject obj in renderList) {
@@ -240,23 +275,23 @@ namespace U5Designs
 						obj.doScaleTranslateAndTexture();
 						obj.mesh.Render();
 					} else {
-						if(!obj.sprite.hasAlpha) {
+						//if(!obj.sprite.hasAlpha) {
 							obj.doScaleTranslateAndTexture();
 							obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
-						}
+						//}
 					}
 				}
 			}
 
 			//Now render transparent sprites in sorted order
-			foreach(RenderObject obj in renderList) {
-				if((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d) || isInTransition) {
-					if((!obj.is3dGeo) && obj.sprite.hasAlpha) {
-						obj.doScaleTranslateAndTexture();
-						obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
-					}
-				}
-			}
+			//foreach(RenderObject obj in renderList) {
+			//    if((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d) || isInTransition) {
+			//        if((!obj.is3dGeo) && obj.sprite.hasAlpha) {
+			//            obj.doScaleTranslateAndTexture();
+			//            obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+			//        }
+			//    }
+			//}
 
 			float dec = (float)player.health / MaxHealth;
             bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 650, scaleX: 0.5f, scaleY: 0.8f);
