@@ -12,6 +12,7 @@ using Engine;
 using Engine.Input;
 using OpenTK.Input;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace U5Designs
 {
@@ -190,6 +191,13 @@ namespace U5Designs
                 // Grab Mouse coord.  Since Y goes down, just subtract from height to get correct orientation
                 Vector3d mousecoord = new Vector3d((double)playstate.eng.Mouse.X, (double)(playstate.eng.Height - playstate.eng.Mouse.Y), 1.0);
 
+				//If 3d view, get z coordinate of mouse
+				if(enable3d) {
+					float[] z = new float[1];
+					GL.ReadPixels((int)mousecoord.X, (int)mousecoord.Y, 1, 1, OpenTK.Graphics.OpenGL.PixelFormat.DepthComponent, OpenTK.Graphics.OpenGL.PixelType.Float, z);
+					mousecoord.Z = z[0];
+				}
+
                 // Pull the projection and model view matrix from the camera.   
                 Matrix4d project = playstate.camera.GetProjectionMatrix();
                 Matrix4d model = playstate.camera.GetModelViewMatrix();
@@ -198,43 +206,59 @@ namespace U5Designs
                 Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
 				
 				if(curProjectile.gravity) {
+					Vector3 projDir;
 					if(!playstate.enable3d) {
 						//Console.WriteLine(mouseWorld.Y.ToString());
-						Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
+						projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
 						projDir -= _location;
 						projDir.X = Math.Abs(projDir.X); //do this to simplify equation - will undo at end
+					} else {
+						projDir = new Vector3((float)(Math.Sqrt(Math.Pow(mouseWorld.X - _location.X, 2) + Math.Pow(mouseWorld.Z - _location.Z, 2))),
+												(float)(mouseWorld.Y - _location.Y), 0.0f);
+					}
 
-						//Following is adapted from http://en.wikipedia.org/wiki/Trajectory_of_a_projectile#Angle_required_to_hit_coordinate_.28x.2Cy.29
-						double velsquared = curProjectile.speed * curProjectile.speed;
-						double sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
-						double theta;
-						if(sqrtPart == sqrtPart) { //false when sqrtPart == NaN
-							theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+					//Following is adapted from http://en.wikipedia.org/wiki/Trajectory_of_a_projectile#Angle_required_to_hit_coordinate_.28x.2Cy.29
+					double velsquared = curProjectile.speed * curProjectile.speed;
+					double sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
+					double theta;
+					if(sqrtPart == sqrtPart) { //false when sqrtPart == NaN
+						theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+					} else {
+						//Calculate how far in that direction we can get
+						if(projDir.X == 0) { //Avoid divide by zero
+							theta = Math.PI / 2;
 						} else {
-							//TODO: Come up with a better looking solution than this.
-							//theta = Math.PI / 4; //can't reach that point, go as far as we can
-
-							//Calculate how far in that direction we can get
-							double phi = Math.Atan(projDir.Y / projDir.X); //TODO: What if we shoot straight up?
+							double phi = Math.Atan(projDir.Y / projDir.X);
 							double cosphi = Math.Cos(phi);
 							double r = (gravity * velsquared * (1 - Math.Sin(phi))) / (gravity * gravity * cosphi * cosphi);
-							r -= 0.01f;
+							r -= 0.01f; //This prevents a floating point roundoff bug
 							projDir.X = (float)(r * cosphi);
 							projDir.Y = (float)(r * Math.Sin(phi));
 							sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
 							theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
 						}
+					}
 
-						projDir.X = (float)Math.Cos(theta);
-						projDir.Y = (float)Math.Sin(theta);
+					projDir.X = (float)Math.Cos(theta);
+					projDir.Y = (float)Math.Sin(theta);
+
+					if(enable3d) {
+						double phi = Math.Atan((mouseWorld.X - _location.X) / (mouseWorld.Z - _location.Z));
+						if(mouseWorld.Z < _location.Z) {
+							phi += Math.PI;
+						}
+						projDir.Z = (float)(projDir.X * Math.Cos(phi));
+						projDir.X = (float)(projDir.X * Math.Sin(phi));
+					} else {
 						projDir.Z = 0.0f;
 						if(mouseWorld.X < _location.X) {
 							projDir.X = -projDir.X;
 						}
+					}
 
-						bananaSound.Play();
-						spawnProjectile(playstate, projDir);
-					} else {
+					bananaSound.Play();
+					spawnProjectile(playstate, projDir);
+					/*} else {
 						//Console.WriteLine(mouseWorld.Y.ToString());
 						// Cannot implicitly typecast a vector3d to vector3
 						float force = 25.0f;
@@ -248,7 +272,7 @@ namespace U5Designs
 
 						bananaSound.Play();
 						spawnProjectile(playstate, projDir);
-					}
+					}*/
 				} else { //projectile doesn't do gravity
 					Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
 					projDir -= _location;
