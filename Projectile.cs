@@ -25,6 +25,7 @@ namespace U5Designs {
         internal Vector3 accel;
         internal Vector3 direction;
         internal bool doesGravity, playerspawned; //true if gravity affects this object\
+		private double duration, liveTime;
 
         public Player player;
 
@@ -41,6 +42,8 @@ namespace U5Designs {
 			_sprite = p.sprite;
 			doesGravity = p.gravity;
             this.player = player;
+			this.duration = p.duration;
+			liveTime = 0.0;
 
 			_alive = true;
 			_health = 1; // health 1 = active, health 0 = despawning, waiting for cleanup in PlayState
@@ -68,7 +71,9 @@ namespace U5Designs {
             _damage = damage;
             _speed = speed;
             _alive = true;
-            _hascbox = true;
+			_hascbox = true;
+			duration = -1.0;
+			liveTime = 0.0;
 
 			_mesh = null;
 			_texture = null;
@@ -192,8 +197,18 @@ namespace U5Designs {
 		}
 
         public void physUpdate3d(double time, List<PhysicsObject> physList) {
+			//Update time
+			if(duration != -1.0) {
+				liveTime += time;
+				if(liveTime >= duration) {
+					health = 0;
+					return;
+				}
+			}
+
+
             if (doesGravity) {
-                accel.Y -= (float)(gravity * time); //TODO: turn this into a constant somewhere
+                accel.Y -= (float)(gravity * time);
             }
             //now do acceleration
             velocity += accel;
@@ -285,9 +300,18 @@ namespace U5Designs {
         }
 
         public void physUpdate2d(double time, List<PhysicsObject> physList) {
-            //first do gravity
+			//Update time
+			if(duration != -1.0) {
+				liveTime += time;
+				if(liveTime >= duration) {
+					health = 0;
+				}
+			}
+
+
+			//Do gravity
             if (doesGravity) {
-                accel.Y -= (float)(gravity * time); //TODO: turn this into a constant somewhere
+                accel.Y -= (float)(gravity * time);
             }
             
             //now deal with acceleration

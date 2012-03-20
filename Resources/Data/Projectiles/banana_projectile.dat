@@ -5,7 +5,8 @@
 	<draw2>true</draw2>
 	<draw3>true</draw3>
 	<damage>1</damage>
-	<speed>250.0</speed>
-	<gravity>true</gravity>
+	<speed>150.0</speed>
+	<gravity>false</gravity>
+  <duration>0.50</duration>
 	<sprite>player_banana_sprite.dat</sprite>
 </projectile>

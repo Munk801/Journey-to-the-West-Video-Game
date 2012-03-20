@@ -411,7 +411,7 @@ namespace U5Designs
 
 			//first deal with gravity
 			if(viewSwitchJumpTimer <= 0.0) {
-				accel.Y -= (float)(gravity * time); //TODO: turn this into a constant somewhere
+				accel.Y -= (float)(gravity * time);
 			}
 
 			//now do acceleration
@@ -579,7 +579,7 @@ namespace U5Designs
 			
 			//first do gravity
 			if(viewSwitchJumpTimer <= 0.0) {
-				accel.Y -= (float)(gravity * time); //TODO: turn this into a constant somewhere
+				accel.Y -= (float)(gravity * time);
 			}
 			
 			//now deal with acceleration
