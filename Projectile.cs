@@ -193,7 +193,7 @@ namespace U5Designs {
 
         public void physUpdate3d(double time, List<PhysicsObject> physList) {
             if (doesGravity) {
-                accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
+                accel.Y -= (float)(gravity * time); //TODO: turn this into a constant somewhere
             }
             //now do acceleration
             velocity += accel;
@@ -287,7 +287,7 @@ namespace U5Designs {
         public void physUpdate2d(double time, List<PhysicsObject> physList) {
             //first do gravity
             if (doesGravity) {
-                accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
+                accel.Y -= (float)(gravity * time); //TODO: turn this into a constant somewhere
             }
             
             //now deal with acceleration

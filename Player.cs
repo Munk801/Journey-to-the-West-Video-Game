@@ -21,7 +21,8 @@ namespace U5Designs
 		private const int fallDamage = 1;
 
         //Knockback physics constants:
-        private Vector3 kbspeed = new Vector3(70, 100, 70);
+        private Vector3 kbspeed;
+		private float jumpspeed;
 
         public PlayerState p_state;
 		public Vector3 velocity;
@@ -60,6 +61,8 @@ namespace U5Designs
             _cbox = new Vector3(4f, 11.5f, 4f);
 			velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);
+			kbspeed = new Vector3(70, 100, 70);
+			jumpspeed = 230.0f;
 			_cycleNum = 0;
 			_frameNum = 0;
 			_sprite = sprite;
@@ -165,7 +168,7 @@ namespace U5Designs
 
                 if (keyboard[Key.Space] && !spaceDown) {
 					if(onGround) {
-						accelerate(Vector3.UnitY * 230);
+						accelerate(Vector3.UnitY * jumpspeed);
 						onGround = false;
 						viewSwitchJumpTimer = 0.0;
 						//jumpSound.Play();
@@ -408,7 +411,7 @@ namespace U5Designs
 
 			//first deal with gravity
 			if(viewSwitchJumpTimer <= 0.0) {
-				accel.Y -= (float)(400*time); //TODO: turn this into a constant somewhere
+				accel.Y -= (float)(gravity * time); //TODO: turn this into a constant somewhere
 			}
 
 			//now do acceleration
@@ -576,7 +579,7 @@ namespace U5Designs
 			
 			//first do gravity
 			if(viewSwitchJumpTimer <= 0.0) {
-				accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
+				accel.Y -= (float)(gravity * time); //TODO: turn this into a constant somewhere
 			}
 			
 			//now deal with acceleration

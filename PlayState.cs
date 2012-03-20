@@ -79,16 +79,6 @@ namespace U5Designs
 
 			//Thanks to OpenTK samples for part of this shader code
 			//Initialize Shader
-			if(!GL.GetString(StringName.Extensions).Contains("EXT_geometry_shader4")) {
-				System.Windows.Forms.MessageBox.Show(
-					 "Your video card does not support EXT_geometry_shader4. Please update your drivers.",
-					 "EXT_geometry_shader4 not supported",
-					 System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation);
-				eng.Exit();
-				throw new NotSupportedException();
-			}
-
-			// create a shader object.
 			int shaderProgram = GL.CreateProgram();
 			int frag = GL.CreateShader(ShaderType.FragmentShader);
 
@@ -367,8 +357,7 @@ namespace U5Designs
                 //LoadLevel.Load(0, pst);
             }
 
-            //TODO: Change these keys to their final mappings when determined
-            if (eng.Keyboard[Key.Escape])
+            if (eng.Keyboard[Key.Escape] || eng.Keyboard[Key.Tilde])
             {
                 //eng.PushState(menustate);
                 eng.PushState(pms);

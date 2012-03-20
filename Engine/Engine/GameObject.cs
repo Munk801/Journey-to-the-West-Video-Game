@@ -64,7 +64,7 @@ namespace Engine
 		public int screenRegion; //0, 1, or 2 - see constants below
 
 		//CONSTANTS
-		public const double gravity = 400.0;
+		public const double gravity = 500.0;
 		public const int ON_SCREEN = 1;
 		public const int OFF_SCREEN = 0;
 	}
