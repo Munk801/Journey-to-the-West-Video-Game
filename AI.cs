@@ -203,4 +203,55 @@ namespace U5Designs {
     }
 
 
+    /**************************************************************************************************************************************** 
+* Ice cream kid
+* */
+    internal class Girlmoveto : Airoutine {
+        public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
+            me.attackspeed = 1; //delay between each projectile (hack initilization)
+            if (!me.frozen) {
+                    Vector3 dir = VectorUtil.getdir(playerposn, me.location);
+                    dir.Y = 0.0f;
+                    if (!enable3d) {
+                        dir.Z = 0.0f;
+                    }
+                    dir.NormalizeFast();
+                    me.velocity.X = dir.X * me.speed;
+                    me.velocity.Z = dir.Z * me.speed;
+                    //Don't change y - out of our control
+
+                    //Look ahead to see if we are at an edge
+                    Vector3 origLoc = me.location;
+                    me.location += me.velocity * 0.1f; //move a little bit in this direction (will undo later)
+                    if (!(enable3d ? VectorUtil.overGround3d(me, physList) : VectorUtil.overGround2d(me, physList))) {
+                        if (enable3d) {
+                            //If we're on edge, move along one axis to corner
+                            Vector3 origVel = new Vector3(me.velocity);
+
+                            //Check X first
+                            me.velocity.X = 0.0f;
+                            me.location = origLoc + me.velocity * 0.1f;
+                            if (!VectorUtil.overGround3d(me, physList)) {
+                                me.velocity.X = origVel.X;
+                                me.velocity.Z = 0.0f;
+                                me.location = origLoc + me.velocity * 0.1f;
+                                if (!VectorUtil.overGround3d(me, physList)) {
+                                    //Now we're at corner
+                                    me.velocity.X = 0.0f;
+                                    me.velocity.Z = 0.0f;
+                                }
+                            }
+                            //Velocity now resulted in something over ground or is zero
+                        }
+                        else {
+                            //Only one option, so just stop
+                            me.velocity.X = 0.0f;
+                            me.velocity.Z = 0.0f;
+                        }
+                    }
+                    me.location = origLoc; //undo above
+            }
+        }
+    }
+
 }

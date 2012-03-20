@@ -7,7 +7,7 @@
 	<health>2</health>
 	<damage>1</damage>
 	<speed>50</speed>
-	<AI>1</AI>
+	<AI>3</AI>
 	<sprite>girl_sprite.dat</sprite>
 	<proj>ice_cream_projectile.dat</proj>
 </enemy>

@@ -523,11 +523,13 @@ namespace U5Designs
 
         /* Hardcoded stuff time.
          * AItype:
-         * 1 = icecream throwing kid. walks to the player up to a set distance
+         * 1 = icecream throwing kid(boy). walks to the player up to a set distance
          *      once close enough, he throws his projectile at the player
          *      
          * 2 = flying bird, flyes to the player, when close enough will swoop down on player
          * 
+         * 
+         * 3 = Girl. runs at player
          * 
          */
         private void InitilizeAI() {
@@ -536,6 +538,9 @@ namespace U5Designs
             if (AItype == 2) {
                 doesGravity = false;
                 CurrentAI.Push(new Birdmoveto());
+            }
+            if (AItype == 3) {
+                CurrentAI.Push(new Girlmoveto());
             }
         }
 
