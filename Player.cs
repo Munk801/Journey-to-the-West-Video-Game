@@ -37,6 +37,8 @@ namespace U5Designs
         //projectile managment
 		List<ProjectileProperties> projectiles;
 		ProjectileProperties curProjectile;
+		public SpriteSheet marker;
+		public List<Decoration> markerList;
 
 
 		public float deltax; //used for updating position of camera, etc.
@@ -87,8 +89,22 @@ namespace U5Designs
 			_animDirection = 1;
 			this.projectiles = projectiles;
 			curProjectile = projectiles[0];
+			markerList = new List<Decoration>();
         }
 
+		public void addMarkers(PlayState ps) {
+			markerList.Clear();
+
+			Vector3 projDir = calcProjDir(ps) * curProjectile.speed;
+			//projDir -= new Vector3(velocity.X, 0.0f, velocity.Z);
+			Vector3 pos = new Vector3(_location);
+
+			for(int i = 0; i < 40; i++) {
+				projDir.Y -= 20.0f;
+				pos += (projDir / 20.0f);
+				markerList.Add(new Decoration(pos, new Vector3(5, 5, 5), true, true, Billboarding.Yes, marker));
+			}
+		}
         /// <summary>
         ///  Updates the player specific state. Gets called every update frame
         /// </summary>
@@ -112,8 +128,8 @@ namespace U5Designs
             }
 
             if (!HasControl)
-                NoControlTimer = NoControlTimer + time;
-            if (NoControlTimer >= 0.5) {
+                NoControlTimer = NoControlTimer - time;
+            if (NoControlTimer <= 0.0) {
                 NoControlTimer = 0;
                 HasControl = true;
             }
@@ -190,6 +206,100 @@ namespace U5Designs
 				handleMouseInput(playstate);
             }
         }
+
+		private Vector3 calcProjDir(PlayState playstate) {
+			// Grab Mouse coord.  Since Y goes down, just subtract from height to get correct orientation
+			Vector3d mousecoord = new Vector3d((double)playstate.eng.Mouse.X, (double)(playstate.eng.Height - playstate.eng.Mouse.Y), 1.0);
+
+			mousecoord.X -= 400.0;
+
+			//If 3d view, get z coordinate of mouse
+			if(enable3d) {
+				float[] z = new float[1];
+				GL.ReadPixels((int)mousecoord.X, (int)mousecoord.Y, 1, 1, OpenTK.Graphics.OpenGL.PixelFormat.DepthComponent, OpenTK.Graphics.OpenGL.PixelType.Float, z);
+				mousecoord.Z = z[0];
+			}
+
+			// Pull the projection and model view matrix from the camera.   
+			Matrix4d project = playstate.camera.GetProjectionMatrix();
+			Matrix4d model = playstate.camera.GetModelViewMatrix();
+
+			// Unproject the coordinates to convert from mouse to world coordinates
+			Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
+
+			Vector3 projDir;
+			if(curProjectile.gravity) {
+				if(!playstate.enable3d) {
+					//Console.WriteLine(mouseWorld.Y.ToString());
+					projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
+					projDir -= _location;
+					projDir.X = Math.Abs(projDir.X); //do this to simplify equation - will undo at end
+				} else {
+					projDir = new Vector3((float)(Math.Sqrt(Math.Pow(mouseWorld.X - _location.X, 2) + Math.Pow(mouseWorld.Z - _location.Z, 2))),
+											(float)(mouseWorld.Y - _location.Y), 0.0f);
+				}
+
+				//Following is adapted from http://en.wikipedia.org/wiki/Trajectory_of_a_projectile#Angle_required_to_hit_coordinate_.28x.2Cy.29
+				double velsquared = curProjectile.speed * curProjectile.speed;
+				double sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
+				double theta;
+				if(sqrtPart == sqrtPart) { //false when sqrtPart == NaN
+					theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+				} else {
+					//Calculate how far in that direction we can get
+					if(projDir.X == 0) { //Avoid divide by zero
+						theta = Math.PI / 2;
+					} else {
+						double phi = Math.Atan(projDir.Y / projDir.X);
+						double cosphi = Math.Cos(phi);
+						double r = (gravity * velsquared * (1 - Math.Sin(phi))) / (gravity * gravity * cosphi * cosphi);
+						r -= 0.01f; //This prevents a floating point roundoff bug
+						projDir.X = (float)(r * cosphi);
+						projDir.Y = (float)(r * Math.Sin(phi));
+						sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
+						theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+					}
+				}
+
+				projDir.X = (float)Math.Cos(theta);
+				projDir.Y = (float)Math.Sin(theta);
+
+				if(enable3d) {
+					double phi = Math.Atan((mouseWorld.X - _location.X) / (mouseWorld.Z - _location.Z));
+					if(mouseWorld.Z < _location.Z) {
+						phi += Math.PI;
+					}
+					projDir.Z = (float)(projDir.X * Math.Cos(phi));
+					projDir.X = (float)(projDir.X * Math.Sin(phi));
+				} else {
+					projDir.Z = 0.0f;
+					if(mouseWorld.X < _location.X) {
+						projDir.X = -projDir.X;
+					}
+				}
+
+				/*} else {
+					//Console.WriteLine(mouseWorld.Y.ToString());
+					// Cannot implicitly typecast a vector3d to vector3
+					float force = 25.0f;
+					Vector3 projDir = new Vector3((float)mouseWorld.X, force, (float)mouseWorld.Z);
+					projDir -= _location;
+
+					projDir.Y = Math.Abs(projDir.Y * (float)mousecoord.Y);
+					// Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
+					projDir.NormalizeFast();
+					Console.WriteLine(projDir.ToString());
+
+					bananaSound.Play();
+					spawnProjectile(playstate, projDir);
+				}*/
+			} else { //projectile doesn't do gravity
+				projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
+				projDir -= _location;
+				projDir.NormalizeFast();
+			}
+			return projDir;
+		}
 		
         /// <summary>
         /// Provides all the mouse input for the player.  Will currently check for a left click and shoot a projectile in the direction
@@ -198,98 +308,16 @@ namespace U5Designs
         private void handleMouseInput(PlayState playstate)
         {
             if (playstate.eng.ThisMouse.LeftPressed() && projectileTimer <= 0.0) {
-                // Grab Mouse coord.  Since Y goes down, just subtract from height to get correct orientation
-                Vector3d mousecoord = new Vector3d((double)playstate.eng.Mouse.X, (double)(playstate.eng.Height - playstate.eng.Mouse.Y), 1.0);
+				Vector3 projDir = calcProjDir(playstate);
 
-				//If 3d view, get z coordinate of mouse
-				if(enable3d) {
-					float[] z = new float[1];
-					GL.ReadPixels((int)mousecoord.X, (int)mousecoord.Y, 1, 1, OpenTK.Graphics.OpenGL.PixelFormat.DepthComponent, OpenTK.Graphics.OpenGL.PixelType.Float, z);
-					mousecoord.Z = z[0];
-				}
+				bananaSound.Play();
+				spawnProjectile(playstate, projDir);
 
-                // Pull the projection and model view matrix from the camera.   
-                Matrix4d project = playstate.camera.GetProjectionMatrix();
-                Matrix4d model = playstate.camera.GetModelViewMatrix();
-                
-                // Unproject the coordinates to convert from mouse to world coordinates
-                Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
-				
-				if(curProjectile.gravity) {
-					Vector3 projDir;
-					if(!playstate.enable3d) {
-						//Console.WriteLine(mouseWorld.Y.ToString());
-						projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
-						projDir -= _location;
-						projDir.X = Math.Abs(projDir.X); //do this to simplify equation - will undo at end
-					} else {
-						projDir = new Vector3((float)(Math.Sqrt(Math.Pow(mouseWorld.X - _location.X, 2) + Math.Pow(mouseWorld.Z - _location.Z, 2))),
-												(float)(mouseWorld.Y - _location.Y), 0.0f);
-					}
+				velocity.X = 0.0f;
+				velocity.Z = 0.0f;
+				HasControl = false;
+				NoControlTimer = 0.25;
 
-					//Following is adapted from http://en.wikipedia.org/wiki/Trajectory_of_a_projectile#Angle_required_to_hit_coordinate_.28x.2Cy.29
-					double velsquared = curProjectile.speed * curProjectile.speed;
-					double sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
-					double theta;
-					if(sqrtPart == sqrtPart) { //false when sqrtPart == NaN
-						theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
-					} else {
-						//Calculate how far in that direction we can get
-						if(projDir.X == 0) { //Avoid divide by zero
-							theta = Math.PI / 2;
-						} else {
-							double phi = Math.Atan(projDir.Y / projDir.X);
-							double cosphi = Math.Cos(phi);
-							double r = (gravity * velsquared * (1 - Math.Sin(phi))) / (gravity * gravity * cosphi * cosphi);
-							r -= 0.01f; //This prevents a floating point roundoff bug
-							projDir.X = (float)(r * cosphi);
-							projDir.Y = (float)(r * Math.Sin(phi));
-							sqrtPart = Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
-							theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
-						}
-					}
-
-					projDir.X = (float)Math.Cos(theta);
-					projDir.Y = (float)Math.Sin(theta);
-
-					if(enable3d) {
-						double phi = Math.Atan((mouseWorld.X - _location.X) / (mouseWorld.Z - _location.Z));
-						if(mouseWorld.Z < _location.Z) {
-							phi += Math.PI;
-						}
-						projDir.Z = (float)(projDir.X * Math.Cos(phi));
-						projDir.X = (float)(projDir.X * Math.Sin(phi));
-					} else {
-						projDir.Z = 0.0f;
-						if(mouseWorld.X < _location.X) {
-							projDir.X = -projDir.X;
-						}
-					}
-
-					bananaSound.Play();
-					spawnProjectile(playstate, projDir);
-					/*} else {
-						//Console.WriteLine(mouseWorld.Y.ToString());
-						// Cannot implicitly typecast a vector3d to vector3
-						float force = 25.0f;
-						Vector3 projDir = new Vector3((float)mouseWorld.X, force, (float)mouseWorld.Z);
-						projDir -= _location;
-
-						projDir.Y = Math.Abs(projDir.Y * (float)mousecoord.Y);
-						// Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
-						projDir.NormalizeFast();
-						Console.WriteLine(projDir.ToString());
-
-						bananaSound.Play();
-						spawnProjectile(playstate, projDir);
-					}*/
-				} else { //projectile doesn't do gravity
-					Vector3 projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
-					projDir -= _location;
-					projDir.NormalizeFast();
-					spawnProjectile(playstate, projDir);
-				}
-                
 				projectileTimer = 0.25;
             }
 
@@ -312,7 +340,7 @@ namespace U5Designs
 			}
             
 			Projectile shot = new Projectile(projlocation, direction, true, curProjectile, playstate.player); // spawn the actual projectile		
-			shot.accelerate(new Vector3(velocity.X, 0.0f, velocity.Z)); //account for player's current velocity
+			//shot.accelerate(new Vector3(velocity.X, 0.0f, velocity.Z)); //account for player's current velocity
 
             // add projectile to appropriate lists
             playstate.objList.Add(shot);
@@ -320,6 +348,12 @@ namespace U5Designs
             playstate.colisionList.Add(shot);
             playstate.physList.Add(shot);
             playstate.combatList.Add(shot);
+
+			//foreach(Decoration d in markerList) {
+			//    playstate.objList.Add(d);
+			//    playstate.renderList.Add(d);
+			//}
+				
         }
 
         /// <summary>
@@ -457,6 +491,7 @@ namespace U5Designs
                             _health = _health - ((CombatObject)collidingObj).damage;
 							Invincible = true;
 							HasControl = false;
+							NoControlTimer = 0.5;
 							((Enemy)collidingObj).frozen = true;
 
                             knockback(true, collidingObj);
@@ -469,7 +504,8 @@ namespace U5Designs
                                 
                                 _health = _health - ((CombatObject)collidingObj).damage;
                                 Invincible = true;
-                                HasControl = false;
+								HasControl = false;
+								NoControlTimer = 0.5;
                                 //despawn the projectile
                                 ((CombatObject)collidingObj).health = 0;
 
@@ -618,6 +654,7 @@ namespace U5Designs
 							Invincible = true;
 							Invincibletimer = 0.5;
 							HasControl = false;
+							NoControlTimer = 0.5;
 							((Enemy)collidingObj).frozen = true;
 
                             knockback(false, collidingObj);
@@ -631,6 +668,7 @@ namespace U5Designs
 								Invincible = true;
 								Invincibletimer = 0.5;
 								HasControl = false;
+								NoControlTimer = 0.5;
 								//despawn the projectile
                                 ((CombatObject)collidingObj).health = 0;
                                 knockback(false, collidingObj);

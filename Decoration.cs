@@ -11,7 +11,7 @@ using OpenTK.Graphics.OpenGL;
 using Engine;
 
 namespace U5Designs {
-	class Decoration : GameObject, RenderObject {
+	public class Decoration : GameObject, RenderObject {
 
 		public Decoration(Vector3 location, Vector3 scale, bool existsIn2d, bool existsIn3d, Billboarding bb, SpriteSheet sprite) : base() {
 			_location = location;

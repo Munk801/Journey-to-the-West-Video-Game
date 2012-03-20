@@ -135,6 +135,8 @@ namespace U5Designs
 			} else {
 				camera.Set2DCamera();
 			}
+
+			eng.CursorVisible = false;
 		}
 
         /// <summary>
@@ -227,6 +229,8 @@ namespace U5Designs
 				foreach(Background b in backgroundList) {
 					b.UpdatePositionX(player.deltax);
 				}
+
+				player.addMarkers(this);
             }
 		}
 
@@ -297,6 +301,11 @@ namespace U5Designs
 						//}
 					}
 				}
+			}
+
+			foreach(Decoration m in player.markerList) {
+				m.doScaleTranslateAndTexture();
+				m.frameNumber = m.sprite.draw(nowBillboarding, m.billboards, m.cycleNumber, m.frameNumber + m.animDirection * e.Time);
 			}
 
 			//Now render transparent sprites in sorted order
