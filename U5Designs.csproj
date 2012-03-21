@@ -135,7 +135,9 @@
     <Folder Include="Resources\lib\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Levels\level_test.dat" />
+    <EmbeddedResource Include="Resources\Data\Levels\level_test.dat">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Data\Enemies\test_enemy.dat" />
   </ItemGroup>
   <ItemGroup>
@@ -179,7 +181,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Enemies\Boy.dat" />
-    <EmbeddedResource Include="Resources\Data\Enemies\Girl.dat" />
+    <EmbeddedResource Include="Resources\Data\Enemies\Girl.dat">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Data\Enemies\Zoo_keeper.dat" />
   </ItemGroup>
   <ItemGroup>

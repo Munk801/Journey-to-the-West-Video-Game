@@ -36,6 +36,10 @@ namespace U5Designs
             return (Mouse[MouseButton.Left]);
         }
 
+        public bool RightPressed() {
+            return (Mouse[MouseButton.Right]);
+        }
+
 
         public Vector3d Get2DVectorFromPlayerToClick(Vector3 PlayerLocation, Vector3d unprojectedMouse)
         {

@@ -11,6 +11,9 @@ using OpenTK.Graphics.OpenGL;
 using Engine;
 
 namespace U5Designs {
+    /// <summary>
+    /// All AI routine's must conform to this update() spec.
+    /// </summary>
     internal interface Airoutine {
 		void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList);
     }

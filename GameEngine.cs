@@ -21,7 +21,6 @@ namespace U5Designs
          * Update()
          * Draw()
          * will call the corresponding methods in the State class that is on the "stack" List<>
-         * 
          * */
 
         Stack<GameState> states;// This is the "Stack" of states with an LIFO structure mimicing an actual memory Stack

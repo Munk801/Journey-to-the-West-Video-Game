@@ -15,17 +15,22 @@ namespace U5Designs
     public class Enemy : GameObject, AIObject, RenderObject, PhysicsObject, CombatObject
     {
 		private int AItype; //NOTE: to see what number corresponds to which AI look at the comments for InitlizeAI() (its below the 2 physics methods)
+
+        //physics vars
         internal Vector3 velocity;
         internal Vector3 accel;
         private bool doesGravity; //true if gravity affects this object
+
+        //timers
         public bool frozen;
         private double freezetimer;
-		internal ProjectileProperties projectile;
-
         //attack delay stuff
         internal int attackspeed;
         internal bool attackdelayed;
         internal double attacktimer;
+
+        //Internal projectile managment
+		internal ProjectileProperties projectile;
 
         Stack<Airoutine> CurrentAI; // This is the stack holding the AI routines, functions identical to the state stack in GameEngine
 
@@ -106,13 +111,18 @@ namespace U5Designs
 		}
 
 
-        /** Like the Player Status update call this every time you need to update an Enemies State before saving **/
+        /// <summary>
+        /// Like the Player Status update call this every time you need to update an Enemies State before saving (currently not used)
+        /// </summary>
         public void updateState()
         {
             // Add in the other State elements that will need to be maintained here..
 		}
 
-        // Pushes a new state onto the stack, calls the states Init method, deletes old state(ie launch game, nuke menu)
+        /// <summary>
+        /// Pushes a new state onto the stack, calls the states Init method, deletes old state(ie launch game, nuke menu)
+        /// </summary>
+        /// <param name="ai">The AI to be pushed onto the stack</param>
         internal void ChangeState(Airoutine ai) {
             if (CurrentAI.Count != 0) {
                 CurrentAI.Pop();
@@ -120,133 +130,29 @@ namespace U5Designs
 
             CurrentAI.Push(ai);
         }
-        // same as changestate but doesnt delete old state(ie pause game, bringup menu)
+
+        /// <summary>
+        /// same as changestate but doesnt delete old state(ie pause game, bringup menu)
+        /// </summary>
+        /// <param name="ai">The AI routine to be pushed onto the stack</param>
         internal void PushState(Airoutine ai) {
             CurrentAI.Push(ai);
         }
-        // pops the current state off and lets the next state have control(menu nukes self, resumes game)
+
+        /// <summary>
+        /// pops the current state off and lets the next state have control(menu nukes self, resumes game)
+        /// </summary>
         public void PopState() {
             if (CurrentAI.Count > 0) {
                 CurrentAI.Pop();
             }
         }
 
-		private bool _is3dGeo;
-		public bool is3dGeo {
-			get { return _is3dGeo; }
-		}
-
-		private ObjMesh _mesh; //null for sprites
-		public ObjMesh mesh {
-			get { return _mesh; }
-		}
-
-		private MeshTexture _texture; //null for sprites
-		public MeshTexture texture {
-			get { return _texture; }
-		}
-
-		private SpriteSheet _sprite; //null for 3d objects
-		public SpriteSheet sprite {
-			get { return _sprite; }
-		}
-
-        private Vector3 _scale;
-		public Vector3 scale
-        {
-            get { return _scale; }
-        }
-
-        private Vector3 _pbox;
-		public Vector3 pbox {
-            get { return _pbox; }
-        }
-
-        private Vector3 _cbox;
-		public Vector3 cbox {
-            get { return _cbox; }
-        }
-
-        private int _type;
-        public int type {
-            get { return _type; }
-        }
-
-		private int _cycleNum;
-		public int cycleNumber {
-			get { return _cycleNum; }
-			set { _cycleNum = value; }
-		}
-
-		private double _frameNum; //index of the current animation frame
-		public double frameNumber {
-			get { return _frameNum; }
-			set { _frameNum = value; }
-		}
-
-		public Billboarding billboards {
-			get { return Billboarding.Yes; }
-		}
-
-		public bool collidesIn3d {
-			get { return true; }
-		}
-
-		public bool collidesIn2d {
-			get { return true; }
-		}
-
-        public void reset() {
-            throw new NotImplementedException();
-        }
-
-        public void accelerate(Vector3 acceleration) {
-            accel += acceleration;
-        }
-
-        private int _health;
-        public int health {
-            get { return _health; }
-            set { _health = value; }
-        }
-
-        private int _damage;
-        public int damage {
-            get { return _damage; }
-        }
-
-        private float _speed;
-        public float speed {
-            get { return _speed; }
-            set { _speed = value; }
-        }
-
-        private bool _alive;
-        public bool alive {
-            get { return _alive; }
-            set { _alive = value; }
-		}
-
-		private int _animDirection;
-		public int animDirection {
-			get { return _animDirection; }
-		}
-
-		public int ScreenRegion {
-			get { return screenRegion; }
-		}
-
-		public void doScaleTranslateAndTexture() {
-            GL.PushMatrix();
-
-			if(_is3dGeo) {
-				_texture.doTexture();
-			}
-
-            GL.Translate(_location);
-            GL.Scale(_scale);
-		}
-
+        /// <summary>
+        /// Does a physics update for this enemy if we are in 3d view
+        /// </summary>
+        /// <param name="time">Time elapsed since last update</param>
+        /// <param name="physList">a pointer to physList, the list of all physics objects</param>
         public void physUpdate3d(double time, List<PhysicsObject> physList) {
             if (frozen)
                 freezetimer = freezetimer + time;
@@ -391,6 +297,11 @@ namespace U5Designs
             }
         }
 
+        /// <summary>
+        /// Does a physics update for this enemy if we are in 2d view
+        /// </summary>
+        /// <param name="time">Time elapsed since last update</param>
+        /// <param name="physList">a pointer to physList, the list of all physics objects</param>
         public void physUpdate2d(double time, List<PhysicsObject> physList) {
             if (frozen)
                 freezetimer = freezetimer + time;
@@ -521,17 +432,17 @@ namespace U5Designs
             }
         }
 
-        /* Hardcoded stuff time.
-         * AItype:
-         * 1 = icecream throwing kid(boy). walks to the player up to a set distance
-         *      once close enough, he throws his projectile at the player
-         *      
-         * 2 = flying bird, flyes to the player, when close enough will swoop down on player
-         * 
-         * 
-         * 3 = Girl. runs at player
-         * 
-         */
+        /// <summary>
+        /// Initlizes the AI based on the AI type paramater
+        /// Hardcoded stuff time.
+        ///  AItype:
+        /// 1 = icecream throwing kid(boy). walks to the player up to a set distance
+        ///       once close enough, he throws his projectile at the player
+        ///      
+        /// 2 = flying bird, flyes to the player, when close enough will swoop down on player
+        ///  
+        /// 3 = Girl. runs at player
+        /// </summary>
         private void InitilizeAI() {
             if (AItype == 1)
                 CurrentAI.Push(new Kidmoveto());
@@ -544,23 +455,44 @@ namespace U5Designs
             }
         }
 
+        /// <summary>
+        /// Peeks at the AI on the top of the AI stack and runs its update method
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="playstate"></param>
+        /// <param name="playerposn"></param>
+        /// <param name="enable3d"></param>
+        /// <param name="physList"></param>
 		public void aiUpdate(double time, PlayState playstate, Vector3 playerposn, bool enable3d, List<PhysicsObject> physList) {
-
 			CurrentAI.Peek().update(time, playstate, playerposn, this, enable3d, physList);
         }
 
-        // calculates the literal distance between 2 points
+        /// <summary>
+        ///  calculates the literal distance between 2 points
+        /// </summary>
+        /// <param name="v1">vector3 point one</param>
+        /// <param name="v2">vector3 point two</param>
+        /// <returns>a double value representing literal distance between the 2 points.</returns>
         double dist(Vector3 v1, Vector3 v2) {
             Vector3 tmp = new Vector3(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
             return Math.Sqrt((tmp.X*tmp.X)+(tmp.Y*tmp.Y)+(tmp.Z*tmp.Z));
         }
 
-        // returns a vector 3 containing the direction from this enemy to the player
+        /// <summary>
+        /// Gets the litteral direction between two vector3 locations
+        /// </summary>
+        /// <param name="player">The player</param>
+        /// <param name="enemy">An enemy</param>
+        /// <returns>a vector3, normalized direction vector between the two objets</returns>
         Vector3 getdir(Vector3 player, Vector3 enemy) {
             Vector3 tmp = new Vector3(player.X - enemy.X, player.Y - enemy.Y, player.Z - enemy.Z);
             tmp.Normalize();
             return tmp;
         }
+
+        /*  The following are helper methods + getter/setters
+        * 
+        */
 
 		//swaps physics box x and z coordinates (used for sprites that billboard)
 		public void swapPBox() {
@@ -575,5 +507,119 @@ namespace U5Designs
 			_cbox.X = _cbox.Z;
 			_cbox.Z = temp;
 		}
+        private bool _is3dGeo;
+        public bool is3dGeo {
+            get { return _is3dGeo; }
+        }
+
+        private ObjMesh _mesh; //null for sprites
+        public ObjMesh mesh {
+            get { return _mesh; }
+        }
+
+        private MeshTexture _texture; //null for sprites
+        public MeshTexture texture {
+            get { return _texture; }
+        }
+
+        private SpriteSheet _sprite; //null for 3d objects
+        public SpriteSheet sprite {
+            get { return _sprite; }
+        }
+
+        private Vector3 _scale;
+        public Vector3 scale {
+            get { return _scale; }
+        }
+
+        private Vector3 _pbox;
+        public Vector3 pbox {
+            get { return _pbox; }
+        }
+
+        private Vector3 _cbox;
+        public Vector3 cbox {
+            get { return _cbox; }
+        }
+
+        private int _type;
+        public int type {
+            get { return _type; }
+        }
+
+        private int _cycleNum;
+        public int cycleNumber {
+            get { return _cycleNum; }
+            set { _cycleNum = value; }
+        }
+
+        private double _frameNum; //index of the current animation frame
+        public double frameNumber {
+            get { return _frameNum; }
+            set { _frameNum = value; }
+        }
+
+        public Billboarding billboards {
+            get { return Billboarding.Yes; }
+        }
+
+        public bool collidesIn3d {
+            get { return true; }
+        }
+
+        public bool collidesIn2d {
+            get { return true; }
+        }
+
+        public void reset() {
+            throw new NotImplementedException();
+        }
+
+        public void accelerate(Vector3 acceleration) {
+            accel += acceleration;
+        }
+
+        private int _health;
+        public int health {
+            get { return _health; }
+            set { _health = value; }
+        }
+
+        private int _damage;
+        public int damage {
+            get { return _damage; }
+        }
+
+        private float _speed;
+        public float speed {
+            get { return _speed; }
+            set { _speed = value; }
+        }
+
+        private bool _alive;
+        public bool alive {
+            get { return _alive; }
+            set { _alive = value; }
+        }
+
+        private int _animDirection;
+        public int animDirection {
+            get { return _animDirection; }
+        }
+
+        public int ScreenRegion {
+            get { return screenRegion; }
+        }
+
+        public void doScaleTranslateAndTexture() {
+            GL.PushMatrix();
+
+            if (_is3dGeo) {
+                _texture.doTexture();
+            }
+
+            GL.Translate(_location);
+            GL.Scale(_scale);
+        }
 	}
 }
