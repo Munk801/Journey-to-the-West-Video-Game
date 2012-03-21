@@ -26,8 +26,8 @@ namespace U5Designs
 		internal Player player;
 		internal Camera camera;
 
-		//everything is in objList, and then also pointed to from the appropriate interface lists
-        internal List<GameObject> objList;
+        //These are the lists of all objects in the game
+        internal List<GameObject> objList; //everything is in objList, and then also pointed to from the appropriate interface lists
 		internal List<RenderObject> renderList;
         internal List<PhysicsObject> colisionList; // colision list = only things that are moving that need to detect colisions
 		internal List<PhysicsObject> physList; // physList is a list of everything that has a bounding box
@@ -49,27 +49,36 @@ namespace U5Designs
 		public bool clickdown = false;
 
 
-        // Initialize graphics, etc here
+        /// <summary>
+        /// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
+        /// </summary>
+        /// <param name="prvstate">The previous state(the menu that spawned this playstate)</param>
+        /// <param name="engine">Pointer to the game engine</param>
+        /// <param name="lvl">the level ID</param>
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
-
 			//TODO: pass this the right file to load from
+
 			// undo this when done testing ObjList = LoadLevel.Load(current_level);
 			LoadLevel.Load(0, this);
+
+            //Every AI object needs a pointer to the player, initlize this here
             foreach (AIObject aio in aiList) {
                 ((Enemy)aio).player = player;
             }
 
-
+            //deal with states
             menustate = prvstate;
             eng = engine;
             pms = new PauseMenuState(engine);
             enable3d = false;
 			tabDown = false;
             //test.Play();
+            //initlize camera
 			camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player, this, 
 									new int[] { eng.ClientRectangle.X, eng.ClientRectangle.Y, eng.ClientRectangle.Width, eng.ClientRectangle.Height });
 			player.cam = camera;
 			nowBillboarding = false;
+
             // Add healthbar texture to texture manager
             eng.StateTextureManager.LoadTexture("Healthbar", "../../Resources/Textures/healthbar_top.png");
             Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
@@ -79,16 +88,6 @@ namespace U5Designs
 
 			//Thanks to OpenTK samples for part of this shader code
 			//Initialize Shader
-//            if(!GL.GetString(StringName.Extensions).Contains("EXT_geometry_shader4")) {
-//                System.Windows.Forms.MessageBox.Show(
-//                     "Your video card does not support EXT_geometry_shader4. Please update your drivers.",
-//                     "EXT_geometry_shader4 not supported",
-//                     System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Exclamation);
-//                eng.Exit();
-//                throw new NotSupportedException();
-//            }
-
-            // create a shader object.
             int shaderProgram = GL.CreateProgram();
             int frag = GL.CreateShader(ShaderType.FragmentShader);
 
@@ -113,6 +112,9 @@ namespace U5Designs
             GL.UseProgram(shaderProgram);
         }
 
+        /// <summary>
+        /// Refreshes graphics when this state becomes active again after being frozen.
+        /// </summary>
 		public override void MakeActive() {
 			GL.Enable(EnableCap.Lighting);
 			GL.Enable(EnableCap.Light0);
@@ -136,13 +138,13 @@ namespace U5Designs
 			}
 		}
 
+        /// <summary>
+        /// Update, this gets called once every update frame
+        /// </summary>
+        /// <param name="e">FrameEventArgs from OpenTK's update</param>
         public override void Update(FrameEventArgs e) {
-			//e = new FrameEventArgs(e.Time * 0.1);
-
-            //Console.WriteLine(e.Time); // WORST. BUG. EVER.
             //First deal with hardware input
             DealWithInput();
-            //MouseInput();
 
             //Next check if the player is dead. If he is, game over man
             if (player.health <= 0) {
@@ -258,6 +260,10 @@ namespace U5Designs
 		//    }
 		//}
 
+        /// <summary>
+        /// The Draw update, happens every frame
+        /// </summary>
+        /// <param name="e">FrameEventArgs from OpenTK's update</param>
         public override void Draw(FrameEventArgs e) {
             //e = new FrameEventArgs(e.Time * 0.1);
 
@@ -315,8 +321,10 @@ namespace U5Designs
             //}
         }
 
-		//Switches the sprites and bounding boxes of anything that billboards
-		//Called by camera at appropriate time
+        /// <summary>
+        /// Switches the sprites and bounding boxes of anything that billboards
+        /// Called by camera at appropriate time
+        /// </summary>
 		public void doBillboards() {
 			if(enable3d) {
 				nowBillboarding = true;
@@ -353,6 +361,9 @@ namespace U5Designs
 			}
 		}
 
+        /// <summary>
+        /// Deals with Hardware input relivant to the playstate
+        /// </summary>
         private void DealWithInput()
         {
             // Testing the Level Design feature of re-loading LoadLevel after changing coords for a given game object
@@ -367,8 +378,7 @@ namespace U5Designs
                 //LoadLevel.Load(0, pst);
             }
 
-            //TODO: Change these keys to their final mappings when determined
-            if (eng.Keyboard[Key.Escape])
+            if (eng.Keyboard[Key.Escape] || eng.Keyboard[Key.Tilde])
             {
                 //eng.PushState(menustate);
                 eng.PushState(pms);
@@ -406,9 +416,11 @@ namespace U5Designs
 			}
         }
 
-        /**
-         * Change the current level being played to the parameter
-         * */
+
+        /// <summary>
+        /// Change the current level being played to the parameter
+        /// </summary>
+        /// <param name="l">Level to be changed to</param>
         public void changeCurrentLevel(int l)
         {
             current_level = l;

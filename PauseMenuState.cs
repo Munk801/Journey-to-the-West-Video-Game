@@ -50,8 +50,16 @@ namespace U5Designs
 
         }
 
-        public override void MakeActive() {
-           
+		public override void MakeActive() {
+			GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+			Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
+			GL.MatrixMode(MatrixMode.Modelview);
+			GL.LoadMatrix(ref modelview);
+
+			GL.MatrixMode(MatrixMode.Projection);
+			Matrix4d projection = Matrix4d.CreateOrthographic(192, 108, 1.0f, 6400.0f);
+			GL.LoadMatrix(ref projection);
 		}
 
         public override void Update(FrameEventArgs e)
@@ -62,11 +70,7 @@ namespace U5Designs
 
         public override void Draw(FrameEventArgs e)
         {
-            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-            Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadMatrix(ref modelview);
 
 			curFrame = (curFrame + e.Time * 2) % 4;
 

@@ -143,7 +143,12 @@ namespace U5Designs
 			bool grav = Convert.ToBoolean(doc.GetElementsByTagName("gravity")[0].InnerText);
 			SpriteSheet ss = parse_Sprite_File(doc.GetElementsByTagName("sprite")[0].InnerText);
 
-			return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss);
+			XmlNodeList duration = doc.GetElementsByTagName("duration");
+			if(duration.Count == 0) {
+				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss);
+			} else {
+				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss, Convert.ToDouble(duration[0].InnerText));
+			}
 		}
 
 		public static SpriteSheet parse_Sprite_File(string path) {

@@ -21,26 +21,31 @@ namespace U5Designs
 		private const int fallDamage = 1;
 
         //Knockback physics constants:
-        private Vector3 kbspeed = new Vector3(70, 100, 70);
+        private Vector3 kbspeed;
+		private float jumpspeed;
 
         public PlayerState p_state;
 		public Vector3 velocity;
 		private Vector3 accel;
         internal bool Invincible, HasControl;
-        private bool ClickDown;
         static Assembly assembly_new = Assembly.GetExecutingAssembly();
-		private Vector3 lastPosOnGround;
+		private Vector3 lastPosOnGround; // used for falling off detection
 
+        //timers
         private double Invincibletimer, NoControlTimer, projectileTimer;
 		public double fallTimer, viewSwitchJumpTimer;
+
+        //projectile managment
 		List<ProjectileProperties> projectiles;
 		ProjectileProperties curProjectile;
-        //SpriteSheet banana;
+
 
 		public float deltax; //used for updating position of camera, etc.
 		public Camera cam; //pointer to the camera, used for informing of y position changes
 		private bool enable3d; //track current world state (used in spawning projectiles)
 		public bool onGround; //true when on ground, or when we just switched to 3d and were in midair
+        public bool spinning; //true when spin attack is in progress
+
 		private bool spaceDown;
         
         // SOUND FILES
@@ -60,6 +65,8 @@ namespace U5Designs
             _cbox = new Vector3(4f, 11.5f, 4f);
 			velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);
+			kbspeed = new Vector3(70, 100, 70);
+			jumpspeed = 230.0f;
 			_cycleNum = 0;
 			_frameNum = 0;
 			_sprite = sprite;
@@ -83,9 +90,13 @@ namespace U5Designs
 			curProjectile = projectiles[0];
         }
 
-        /**
-         * Handles all player input and timers
-         * */
+        /// <summary>
+        ///  Updates the player specific state. Gets called every update frame
+        /// </summary>
+        /// <param name="enable3d"> true if we are in 3d view</param>
+        /// <param name="keyboard"> the keyboard object, for handling input</param>
+        /// <param name="time">time elapsed since last update</param>
+        /// <param name="playstate">a pointer to play state, for accessing the obj lists in playstate</param>
         internal void updateState(bool enable3d, KeyboardDevice keyboard, double time, PlayState playstate) {
 			this.enable3d = enable3d;
 
@@ -165,7 +176,7 @@ namespace U5Designs
 
                 if (keyboard[Key.Space] && !spaceDown) {
 					if(onGround) {
-						accelerate(Vector3.UnitY * 230);
+						accelerate(Vector3.UnitY * jumpspeed);
 						onGround = false;
 						viewSwitchJumpTimer = 0.0;
 						//jumpSound.Play();
@@ -184,7 +195,7 @@ namespace U5Designs
         /// <summary>
         /// Provides all the mouse input for the player.  Will currently check for a left click and shoot a projectile in the direction
         /// </summary>
-        /// <param name="playstate"></param>
+        /// <param name="playstate">a pointer to play state, for accessing the obj lists in playstate</param>
         private void handleMouseInput(PlayState playstate)
         {
             if (playstate.eng.ThisMouse.LeftPressed() && projectileTimer <= 0.0) {
@@ -282,19 +293,26 @@ namespace U5Designs
                 
 				projectileTimer = 0.25;
             }
-        }
 
+            if (playstate.eng.ThisMouse.RightPressed()) {
+                //TODO: impliment stamina constraints on right click/spin attack
+
+            }
+        }
+        /// <summary>
+        /// Spawns the players projectile in the param direction
+        /// </summary>
+        /// <param name="playstate">a pointer to play state, for accessing the obj lists in playstate</param>
+        /// <param name="direction">The direction to fire the projectile in</param>
         private void spawnProjectile(PlayState playstate, Vector3 direction) {
-            // make new projectile object
             Vector3 projlocation = new Vector3(location);
 
+            //break the rendering tie between player and projectile, or else they flicker
 			if(!enable3d) {
-				projlocation.Z += 0.001f; //break the rendering tie between player and projectile, or else they flicker
+				projlocation.Z += 0.001f;
 			}
             
-			Projectile shot = new Projectile(projlocation, direction, true, curProjectile, playstate.player);
-            //Projectile shot = new Projectile(projlocation, direction, new Vector3(9f, 9f, 9f), new Vector3(4.5f, 4.5f, 4.5f), new Vector3(3.5f, 3.5f, 3.5f), true, true, playstate.enable3d, damage, speed, true, true, banana);
-			
+			Projectile shot = new Projectile(projlocation, direction, true, curProjectile, playstate.player); // spawn the actual projectile		
 			shot.accelerate(new Vector3(velocity.X, 0.0f, velocity.Z)); //account for player's current velocity
 
             // add projectile to appropriate lists
@@ -305,110 +323,18 @@ namespace U5Designs
             playstate.combatList.Add(shot);
         }
 
-		//swaps physics box x and z coordinates (used for sprites that billboard)
-		public void swapPBox() {
-			float temp = _pbox.X;
-			_pbox.X = _pbox.Z;
-			_pbox.Z = temp;
-		}
-
-		//swaps combat box x and z coordinates (used for sprites that billboard)
-		public void swapCBox() {
-			float temp = _cbox.X;
-			_cbox.X = _cbox.Z;
-			_cbox.Z = temp;
-		}
-
-		public Vector3 setLocation {
-			set { _location = value; }
-		}
-
-		public bool is3dGeo {
-			get { return false; }
-		}
-
-		public ObjMesh mesh {
-			get { return null; }
-		}
-
-		public MeshTexture texture {
-			get { return null; }
-		}
-
-		private SpriteSheet _sprite;
-		public SpriteSheet sprite {
-			get { return _sprite; }
-		}
-
-        private Vector3 _scale;
-		public Vector3 scale
-        {
-            get { return _scale; }
-        }
-
-        private Vector3 _pbox;
-        public Vector3 pbox {
-            get { return _pbox; }
-        }
-
-        private Vector3 _cbox;
-        public Vector3 cbox {
-            get { return _cbox; }
-		}
-
-        private int _type;
-        public int type {
-            get { return _type; }
-            set { _type = value; }
-        }
-
-		private int _cycleNum;
-		public int cycleNumber {
-			get { return _cycleNum; }
-			set { _cycleNum = value; }
-		}
-
-		private double _frameNum; //index of the current animation frame
-		public double frameNumber {
-			get { return _frameNum; }
-			set { _frameNum = value; }
-		}
-
-		public Billboarding billboards {
-			get { return Billboarding.Yes; }
-		}
-
-		public bool collidesIn3d {
-			get { return true; }
-		}
-
-		public bool collidesIn2d {
-			get { return true; }
-		}
-
-		private int _animDirection;
-		public int animDirection {
-			get { return _animDirection; }
-		}
-
-		public int ScreenRegion {
-			get { return screenRegion; }
-		}
-
-        public void doScaleTranslateAndTexture() {
-			GL.PushMatrix();
-
-			GL.Translate(_location);
-			GL.Scale(_scale);
-        }
-
+        /// <summary>
+        /// Does a physics update for the player if we are in 3d view
+        /// </summary>
+        /// <param name="time">Time elapsed since last update</param>
+        /// <param name="physList">a pointer to physList, the list of all physics objects</param>
         public void physUpdate3d(double time, List<PhysicsObject> physList) {
 			double origTime = time;
 			bool collidedWithGround = false;
 
 			//first deal with gravity
 			if(viewSwitchJumpTimer <= 0.0) {
-				accel.Y -= (float)(400*time); //TODO: turn this into a constant somewhere
+				accel.Y -= (float)(gravity * time);
 			}
 
 			//now do acceleration
@@ -570,13 +496,18 @@ namespace U5Designs
 			}
 		}
 
+        /// <summary>
+        /// Does a physics update for the player if we are in 2d view
+        /// </summary>
+        /// <param name="time">Time elapsed since last update</param>
+        /// <param name="physList">a pointer to physList, the list of all physics objects</param>
         public void physUpdate2d(double time, List<PhysicsObject> physList) {
 			double origTime = time;
 			bool collidedWithGround = false;
 			
 			//first do gravity
 			if(viewSwitchJumpTimer <= 0.0) {
-				accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
+				accel.Y -= (float)(gravity * time);
 			}
 			
 			//now deal with acceleration
@@ -725,6 +656,11 @@ namespace U5Designs
 			}
 		}
 
+        /// <summary>
+        /// Kocks the player back relative to the param collidingObj ( can be any physics object)
+        /// </summary>
+        /// <param name="is3d"> True if we are in 3d</param>
+        /// <param name="collidingObj">The physics object we are colliding with</param>
         public void knockback(bool is3d, PhysicsObject collidingObj) {
 
             if (is3d) {
@@ -748,6 +684,104 @@ namespace U5Designs
             }
         }
 
+        /*  The following are helper methods + getter/setters
+         * 
+         */
+
+        //swaps physics box x and z coordinates (used for sprites that billboard)
+        public void swapPBox() {
+            float temp = _pbox.X;
+            _pbox.X = _pbox.Z;
+            _pbox.Z = temp;
+        }
+
+        //swaps combat box x and z coordinates (used for sprites that billboard)
+        public void swapCBox() {
+            float temp = _cbox.X;
+            _cbox.X = _cbox.Z;
+            _cbox.Z = temp;
+        }
+        public Vector3 setLocation {
+            set { _location = value; }
+        }
+
+        public bool is3dGeo {
+            get { return false; }
+        }
+
+        public ObjMesh mesh {
+            get { return null; }
+        }
+
+        public MeshTexture texture {
+            get { return null; }
+        }
+
+        private SpriteSheet _sprite;
+        public SpriteSheet sprite {
+            get { return _sprite; }
+        }
+
+        private Vector3 _scale;
+        public Vector3 scale {
+            get { return _scale; }
+        }
+
+        private Vector3 _pbox;
+        public Vector3 pbox {
+            get { return _pbox; }
+        }
+
+        private Vector3 _cbox;
+        public Vector3 cbox {
+            get { return _cbox; }
+        }
+
+        private int _type;
+        public int type {
+            get { return _type; }
+            set { _type = value; }
+        }
+
+        private int _cycleNum;
+        public int cycleNumber {
+            get { return _cycleNum; }
+            set { _cycleNum = value; }
+        }
+
+        private double _frameNum; //index of the current animation frame
+        public double frameNumber {
+            get { return _frameNum; }
+            set { _frameNum = value; }
+        }
+
+        public Billboarding billboards {
+            get { return Billboarding.Yes; }
+        }
+
+        public bool collidesIn3d {
+            get { return true; }
+        }
+
+        public bool collidesIn2d {
+            get { return true; }
+        }
+
+        private int _animDirection;
+        public int animDirection {
+            get { return _animDirection; }
+        }
+
+        public int ScreenRegion {
+            get { return screenRegion; }
+        }
+
+        public void doScaleTranslateAndTexture() {
+            GL.PushMatrix();
+
+            GL.Translate(_location);
+            GL.Scale(_scale);
+        }
 		public void accelerate(Vector3 acceleration) {
 			accel += acceleration;
 		}

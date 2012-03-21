@@ -11,7 +11,7 @@ using OpenTK.Graphics.OpenGL;
 using Engine;
 
 namespace U5Designs {
-    /*
+    /* NOTE
      * projectiles belong on the following lists:
      * objList
      * renderList
@@ -21,10 +21,14 @@ namespace U5Designs {
      * */
     class Projectile : GameObject, RenderObject, CombatObject, PhysicsObject {
 
+        //physics vars
         internal Vector3 velocity;
         internal Vector3 accel;
         internal Vector3 direction;
-        internal bool doesGravity, playerspawned; //true if gravity affects this object\
+        internal bool doesGravity, playerspawned; //true if gravity affects this object
+
+        //timers
+		private double duration, liveTime;
 
         public Player player;
 
@@ -41,6 +45,8 @@ namespace U5Designs {
 			_sprite = p.sprite;
 			doesGravity = p.gravity;
             this.player = player;
+			this.duration = p.duration;
+			liveTime = 0.0;
 
 			_alive = true;
 			_health = 1; // health 1 = active, health 0 = despawning, waiting for cleanup in PlayState
@@ -68,7 +74,9 @@ namespace U5Designs {
             _damage = damage;
             _speed = speed;
             _alive = true;
-            _hascbox = true;
+			_hascbox = true;
+			duration = -1.0;
+			liveTime = 0.0;
 
 			_mesh = null;
 			_texture = null;
@@ -84,116 +92,22 @@ namespace U5Designs {
 			_animDirection = 1;
 		}
 
-		public bool is3dGeo {
-			get { return false; } //currently all projectiles are sprites - change if needed
-		}
-
-		private int _health;
-		public int health {
-			get { return _health; }
-			set { _health = value; }
-		}
-
-		private int _damage;
-		public int damage {
-			get { return _damage; }
-		}
-
-        private float _speed;
-		public float speed {
-            get { return _speed; }
-            set { _speed = value; }
-        }
-		private bool _alive;
-		public bool alive {
-			get { return _alive; }
-			set { _alive = value; }
-		}
-
-		private ObjMesh _mesh; //null for sprites
-		public ObjMesh mesh {
-			get { return _mesh; }
-		}
-
-		private MeshTexture _texture; //null for sprites
-		public MeshTexture texture {
-			get { return _texture; }
-		}
-
-		private SpriteSheet _sprite; //null for 3d objects
-		public SpriteSheet sprite {
-			get { return _sprite; }
-		}
-        private Vector3 _scale;
-		public Vector3 scale {
-            get { return _scale; }
-        }
-
-        private Vector3 _pbox;
-		public Vector3 pbox {
-            get { return _pbox; }
-        }
-
-        private Vector3 _cbox;
-		public Vector3 cbox {
-            get { return _cbox; }
-		}
-
-        public int type {
-            get { return 2; } //2 for projectile
-        }
-
-		private int _cycleNum;
-		public int cycleNumber {
-			get { return _cycleNum; }
-			set { _cycleNum = value; }
-		}
-
-		private double _frameNum; //index of the current animation frame
-		public double frameNumber {
-			get { return _frameNum; }
-			set { _frameNum = value; }
-		}
-
-		public Billboarding billboards {
-			get { return Billboarding.Yes; }
-		}
-
-		public bool collidesIn3d {
-			get { return true; }
-		}
-
-		public bool collidesIn2d {
-			get { return true; }
-		}
-
-        public void accelerate(Vector3 acceleration) {
-            accel += acceleration;
-		}
-
-		private int _animDirection;
-		public int animDirection {
-			get { return _animDirection; }
-		}
-
-		public int ScreenRegion {
-			get { return screenRegion; }
-		}
-
-		public void doScaleTranslateAndTexture() {
-            GL.PushMatrix();
-
-            if (is3dGeo) {
-                _texture.doTexture();
-            }
-
-            GL.Translate(_location);
-            GL.Scale(_scale);
-		}
-
+        /// <summary>
+        /// Does a physics update for this projectile if we are in 3d view
+        /// </summary>
+        /// <param name="time">Time elapsed since last update</param>
+        /// <param name="physList">a pointer to physList, the list of all physics objects</param>
         public void physUpdate3d(double time, List<PhysicsObject> physList) {
+			//Update time
+			if(duration != -1.0) {
+				liveTime += time;
+				if(liveTime >= duration) {
+					health = 0;
+					return;
+				}
+			}
             if (doesGravity) {
-                accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
+                accel.Y -= (float)(gravity * time);
             }
             //now do acceleration
             velocity += accel;
@@ -284,10 +198,24 @@ namespace U5Designs {
             }
         }
 
+        /// <summary>
+        /// Does a physics update for this projectile if we are in 2d view
+        /// </summary>
+        /// <param name="time">Time elapsed since last update</param>
+        /// <param name="physList">a pointer to physList, the list of all physics objects</param>
         public void physUpdate2d(double time, List<PhysicsObject> physList) {
-            //first do gravity
+			//Update time
+			if(duration != -1.0) {
+				liveTime += time;
+				if(liveTime >= duration) {
+					health = 0;
+				}
+			}
+
+
+			//Do gravity
             if (doesGravity) {
-                accel.Y -= (float)(400 * time); //TODO: turn this into a constant somewhere
+                accel.Y -= (float)(gravity * time);
             }
             
             //now deal with acceleration
@@ -370,6 +298,11 @@ namespace U5Designs {
             }
         }
 
+
+        /*  The following are helper methods + getter/setters
+        * 
+        */
+
 		//swaps physics box x and z coordinates (used for sprites that billboard)
 		public void swapPBox() {
 			float temp = _pbox.X;
@@ -384,6 +317,110 @@ namespace U5Designs {
 			_cbox.Z = temp;
 		}
 
+        public bool is3dGeo {
+            get { return false; } //currently all projectiles are sprites - change if needed
+        }
+
+        private int _health;
+        public int health {
+            get { return _health; }
+            set { _health = value; }
+        }
+
+        private int _damage;
+        public int damage {
+            get { return _damage; }
+        }
+
+        private float _speed;
+        public float speed {
+            get { return _speed; }
+            set { _speed = value; }
+        }
+        private bool _alive;
+        public bool alive {
+            get { return _alive; }
+            set { _alive = value; }
+        }
+
+        private ObjMesh _mesh; //null for sprites
+        public ObjMesh mesh {
+            get { return _mesh; }
+        }
+
+        private MeshTexture _texture; //null for sprites
+        public MeshTexture texture {
+            get { return _texture; }
+        }
+
+        private SpriteSheet _sprite; //null for 3d objects
+        public SpriteSheet sprite {
+            get { return _sprite; }
+        }
+        private Vector3 _scale;
+        public Vector3 scale {
+            get { return _scale; }
+        }
+
+        private Vector3 _pbox;
+        public Vector3 pbox {
+            get { return _pbox; }
+        }
+
+        private Vector3 _cbox;
+        public Vector3 cbox {
+            get { return _cbox; }
+        }
+
+        public int type {
+            get { return 2; } //2 for projectile
+        }
+
+        private int _cycleNum;
+        public int cycleNumber {
+            get { return _cycleNum; }
+            set { _cycleNum = value; }
+        }
+
+        private double _frameNum; //index of the current animation frame
+        public double frameNumber {
+            get { return _frameNum; }
+            set { _frameNum = value; }
+        }
+
+        public Billboarding billboards {
+            get { return Billboarding.Yes; }
+        }
+
+        public bool collidesIn3d {
+            get { return true; }
+        }
+
+        public bool collidesIn2d {
+            get { return true; }
+        }
+
+        public void accelerate(Vector3 acceleration) {
+            accel += acceleration;
+        }
+
+        private int _animDirection;
+        public int animDirection {
+            get { return _animDirection; }
+        }
+
+        public int ScreenRegion {
+            get { return screenRegion; }
+        }
+
+        public void doScaleTranslateAndTexture() {
+            GL.PushMatrix();
+            if (is3dGeo) {
+                _texture.doTexture();
+            }
+            GL.Translate(_location);
+            GL.Scale(_scale);
+        }
 		public void reset() {
 			throw new NotImplementedException();
 		}

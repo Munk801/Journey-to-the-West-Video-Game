@@ -14,7 +14,7 @@
 	<enemylist>
 		<enemy>
 			<path>Boy.dat</path>
-			<loc x="250" y="12.5" z="50"/>	
+      <loc x="200" y="12.5" z="50"/>
 			<loc x="500" y="12.5" z="50"/>
 			<loc x="800" y="62.5" z="50"/>
 			<loc x="1100" y="112.5" z="50"/>			
@@ -23,6 +23,10 @@
 			<path>Bird.dat</path>
 			<loc x="200" y="60" z="50"/>
 		</enemy>
+    <enemy>
+      <path>Girl.dat</path>
+      <loc x="400" y="12.5" z="160"/>
+    </enemy>
 	</enemylist>
 	<obstaclelist>
 		<obstacle>			
