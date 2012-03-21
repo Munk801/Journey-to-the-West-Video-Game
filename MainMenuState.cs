@@ -91,31 +91,8 @@ namespace U5Designs
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
 
-            //SpriteSheet.quad = new ObjMesh("../../Geometry/quad.obj");
-            //int[] cycleStarts = { 0 };
-            //int[] cycleLengths = { 1 };
-            //SpriteSheet ss = new SpriteSheet(new Bitmap("../../Geometry/testbg.png"), cycleStarts, cycleLengths, 1280, 720);
-            //background = new Obstacle(new Vector3(0, 0, 2), new Vector3(1280, 720, 1), new Vector3(0,0,0), true, true, ss);
-
-
-
-            // testing buttons
             _old_state = OpenTK.Input.Keyboard.GetState(); // Get the current state of the keyboard           
-            //SpriteSheet pb_np_ss = new SpriteSheet(new Bitmap("../../Geometry/play_button_no_press.png"), cycleStarts, cycleLengths, 320, 100);
-            //play_button_npress = new Obstacle(new Vector3(0, 100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, pb_np_ss);
-            //SpriteSheet pb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/play_button_press.png"), cycleStarts, cycleLengths, 320, 100);
-            //play_button_press = new Obstacle(new Vector3(0, 100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, pb_p_ss);
 
-            //SpriteSheet lb_np_ss = new SpriteSheet(new Bitmap("../../Geometry/load_button_no_press.png"), cycleStarts, cycleLengths, 320, 100);
-            //load_button_npress = new Obstacle(new Vector3(0, 0, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, lb_np_ss);
-            //SpriteSheet lb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/load_button_press.png"), cycleStarts, cycleLengths, 320, 100);
-            //load_button_press = new Obstacle(new Vector3(0, 0, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, lb_p_ss);
-
-            //SpriteSheet qb_np_ss = new SpriteSheet(new Bitmap("../../Geometry/quit_button_no_press.png"), cycleStarts, cycleLengths, 320, 100);
-            //quit_button_npress = new Obstacle(new Vector3(0, -100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, qb_np_ss);
-            //SpriteSheet qb_p_ss = new SpriteSheet(new Bitmap("../../Geometry/quit_button_press.png"), cycleStarts, cycleLengths, 320, 100);
-            //quit_button_press = new Obstacle(new Vector3(0, -100, 2), new Vector3(320, 100, 1), new Vector3(0, 0, 0), true, true, qb_p_ss);
-            
             arX = -150.0f;
             b1Y = 0.0f;
             b2Y = -100.0f;
@@ -136,14 +113,6 @@ namespace U5Designs
             GL.MatrixMode(MatrixMode.Projection);
             Matrix4 projection = Matrix4.CreateOrthographic(1280, 720, 1.0f, 6400.0f);
             GL.LoadMatrix(ref projection);
-
-            //Set up texture properties for sprites
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
-            //GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Blend);
-            //GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvColor, new OpenTK.Graphics.Color4(1, 1, 1, 0)); //transparent
         }
 
         public override void Update(FrameEventArgs e)
@@ -154,7 +123,6 @@ namespace U5Designs
 
         public override void Draw(FrameEventArgs e)
         {
-            //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -162,7 +130,6 @@ namespace U5Designs
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref modelview);
             menu.Draw2DTexture();
-            //((RenderObject)background).doScaleTranslateAndTexture();
 
             // testing buttons
             switch (_cur_butn)
@@ -172,67 +139,27 @@ namespace U5Designs
                     play_press.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
                     load_nopress.Draw2DTexture(0, b2Y);
                     quit_nopress.Draw2DTexture(0, b3Y);
-                    //((RenderObject)play_button_press).doScaleTranslateAndTexture();
-                    //((RenderObject)play_button_press).sprite.draw(false);
-                    //((RenderObject)load_button_npress).doScaleTranslateAndTexture();
-                    //((RenderObject)load_button_npress).sprite.draw(false);
-                    //((RenderObject)quit_button_npress).doScaleTranslateAndTexture();
-                    //((RenderObject)quit_button_npress).sprite.draw(false);
                     break;
                 case 1:
                     arrow.Draw2DTexture(arX, b2Y);
                     play_nopress.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
                     load_press.Draw2DTexture(0, b2Y);
                     quit_nopress.Draw2DTexture(0, b3Y);
-                    //((RenderObject)play_button_npress).doScaleTranslateAndTexture();
-                    //((RenderObject)play_button_npress).sprite.draw(false);
-                    //((RenderObject)load_button_press).doScaleTranslateAndTexture();
-                    //((RenderObject)load_button_press).sprite.draw(false);
-                    //((RenderObject)quit_button_npress).doScaleTranslateAndTexture();
-                    //((RenderObject)quit_button_npress).sprite.draw(false);
                     break;
                 case 2:
                     arrow.Draw2DTexture(arX, b3Y);
                     play_nopress.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
                     load_nopress.Draw2DTexture(0, b2Y);
                     quit_press.Draw2DTexture(0, b3Y);
-                    //((RenderObject)play_button_npress).doScaleTranslateAndTexture();
-                    //((RenderObject)play_button_npress).sprite.draw(false);
-                    //((RenderObject)load_button_npress).doScaleTranslateAndTexture();
-                    //((RenderObject)load_button_npress).sprite.draw(false);
-                    //((RenderObject)quit_button_press).doScaleTranslateAndTexture();
-                    //((RenderObject)quit_button_press).sprite.draw(false);
                     break;
             }
-
-            //GL.PushMatrix();
-            //GL.Translate(-640, -360, -10);
-            //GL.Scale(426.5f, 240, 1);
-            //GL.Scale(1280, 720, 100);    // Weird coincidence that this is really close to the images dimensions???   
-            // Actually, not a coincidence at all...
-            //((RenderObject)background).sprite.draw(false);                      
         }
 
+        /// <summary>
+        /// For mouse input on the main menu, allow the user to click on the buttons to select items
+        /// </summary>
         private void MouseInput()
         {
-            //if (mouse.X - eng.Width/2 > play_press.XLoc && mouse.X - eng.Width/2 < play_press.XLoc + play_press.Width
-            //    && -(mouse.Y - eng.Height / 2) < play_press.YLoc && -(mouse.Y - eng.Height / 2) > play_press.YLoc - play_press.Height)
-            //{
-            //    _cur_butn = 0;
-            //}
-
-            //if (mouse.X - eng.Width / 2 > load_press.XLoc && mouse.X - eng.Width / 2 < load_press.XLoc + load_press.Width
-            //    && -(mouse.Y - eng.Height / 2) < load_press.YLoc && -(mouse.Y - eng.Height / 2) > load_press.YLoc - load_press.Height)
-            //{
-            //    _cur_butn = 1;
-            //}
-
-            //if (mouse.X - eng.Width / 2 > quit_press.XLoc && mouse.X - eng.Width / 2 < quit_press.XLoc + quit_press.Width
-            //    && -(mouse.Y - eng.Height / 2) < quit_press.YLoc && -(mouse.Y - eng.Height / 2) > quit_press.YLoc - quit_press.Height)
-            //{
-            //    _cur_butn = 2;
-            //}
-
             if (eng.ThisMouse.inButtonRegion(play_press))
             {
                 _cur_butn = 0;
@@ -300,7 +227,6 @@ namespace U5Designs
         private void DealWithInput()
         {
             // Testing buttons
-            //if (eng.Keyboard[Key.Down])
             OpenTK.Input.KeyboardState _new_state = OpenTK.Input.Keyboard.GetState();
             if ((_new_state.IsKeyDown(Key.Down) && !_old_state.IsKeyDown(Key.Down)) ||
                 (_new_state.IsKeyDown(Key.S) && !_old_state.IsKeyDown(Key.S)))

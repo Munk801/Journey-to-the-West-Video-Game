@@ -77,7 +77,6 @@ namespace U5Designs
 
         public override void Draw(FrameEventArgs e)
         {
-            //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
             logo.Draw2DTexture(0, 0, 0.5f, 0.5f);   
