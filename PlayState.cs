@@ -125,8 +125,6 @@ namespace U5Designs
 			GL.Enable(EnableCap.Blend);
 			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
-			GL.Fog(FogParameter.FogDensity, 0.0005f);
-
 			GL.ShadeModel(ShadingModel.Smooth);
 			GL.ClearColor(0.26667f, 0.86667f, 1.0f, 1.0f);
 
@@ -136,7 +134,11 @@ namespace U5Designs
 				camera.Set2DCamera();
 			}
 
-			eng.CursorVisible = false;
+			if(player.curProjectile.gravity) {
+				eng.CursorVisible = false;
+			} else {
+				eng.CursorVisible = true; //TODO: When we have a crosshair, we'll change this
+			}
 		}
 
         /// <summary>

@@ -36,7 +36,7 @@ namespace U5Designs
 
         //projectile managment
 		List<ProjectileProperties> projectiles;
-		ProjectileProperties curProjectile;
+		public ProjectileProperties curProjectile;
 		public SpriteSheet marker;
 		public List<Decoration> markerList;
 
@@ -92,19 +92,27 @@ namespace U5Designs
 			markerList = new List<Decoration>();
         }
 
+		/// <summary>
+		/// Adds indicators to show where the players projectile is going to go
+		/// Used for gravity based projectiles (specifically the grenade)
+		/// </summary>
+		/// <param name="ps">Pointer to the current PlayState, used to calculate directions</param>
 		public void addMarkers(PlayState ps) {
-			markerList.Clear();
+			if(curProjectile.gravity) {
+				markerList.Clear();
 
-			Vector3 projDir = calcProjDir(ps) * curProjectile.speed;
-			//projDir -= new Vector3(velocity.X, 0.0f, velocity.Z);
-			Vector3 pos = new Vector3(_location);
+				Vector3 projDir = calcProjDir(ps) * curProjectile.speed;
+				//projDir -= new Vector3(velocity.X, 0.0f, velocity.Z);
+				Vector3 pos = new Vector3(_location);
 
-			for(int i = 0; i < 40; i++) {
-				projDir.Y -= 20.0f;
-				pos += (projDir / 20.0f);
-				markerList.Add(new Decoration(pos, new Vector3(5, 5, 5), true, true, Billboarding.Yes, marker));
+				for(int i = 0; i < 40; i++) {
+					projDir.Y -= 20.0f;
+					pos += (projDir / 20.0f);
+					markerList.Add(new Decoration(pos, new Vector3(5, 5, 5), true, true, Billboarding.Yes, marker));
+				}
 			}
 		}
+
         /// <summary>
         ///  Updates the player specific state. Gets called every update frame
         /// </summary>
@@ -127,10 +135,10 @@ namespace U5Designs
                 Invincible = false;
             }
 
-            if (!HasControl)
+            if (!HasControl && NoControlTimer > 0.0)
                 NoControlTimer = NoControlTimer - time;
             if (NoControlTimer <= 0.0) {
-                NoControlTimer = 0;
+                NoControlTimer = 0.0;
                 HasControl = true;
             }
 
@@ -211,7 +219,7 @@ namespace U5Designs
 			// Grab Mouse coord.  Since Y goes down, just subtract from height to get correct orientation
 			Vector3d mousecoord = new Vector3d((double)playstate.eng.Mouse.X, (double)(playstate.eng.Height - playstate.eng.Mouse.Y), 1.0);
 
-			mousecoord.X -= 400.0;
+			//mousecoord.X -= 400.0;
 
 			//If 3d view, get z coordinate of mouse
 			if(enable3d) {
@@ -315,8 +323,6 @@ namespace U5Designs
 
 				velocity.X = 0.0f;
 				velocity.Z = 0.0f;
-				HasControl = false;
-				NoControlTimer = 0.25;
 
 				projectileTimer = 0.25;
             }
@@ -326,6 +332,7 @@ namespace U5Designs
 
             }
         }
+
         /// <summary>
         /// Spawns the players projectile in the param direction
         /// </summary>
@@ -348,12 +355,6 @@ namespace U5Designs
             playstate.colisionList.Add(shot);
             playstate.physList.Add(shot);
             playstate.combatList.Add(shot);
-
-			//foreach(Decoration d in markerList) {
-			//    playstate.objList.Add(d);
-			//    playstate.renderList.Add(d);
-			//}
-				
         }
 
         /// <summary>
@@ -632,7 +633,7 @@ namespace U5Designs
 									onGround = true;
 									collidedWithGround = true;
 
-									//Using 2D instead of 3D is intentional here - don't save position if switching views could make you fall
+									//Using 3D instead of 2D is intentional here - don't save position if switching views could make you fall
 									if(VectorUtil.overGround3d(this, physList)) {
 										lastPosOnGround = new Vector3(_location);
 									}
@@ -694,7 +695,7 @@ namespace U5Designs
 		}
 
         /// <summary>
-        /// Kocks the player back relative to the param collidingObj ( can be any physics object)
+        /// Knocks the player back relative to the param collidingObj ( can be any physics object)
         /// </summary>
         /// <param name="is3d"> True if we are in 3d</param>
         /// <param name="collidingObj">The physics object we are colliding with</param>

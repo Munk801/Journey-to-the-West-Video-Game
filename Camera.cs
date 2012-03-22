@@ -78,7 +78,6 @@ namespace U5Designs
 			lightOffset = new Vector4(50, 50, 0, 1);
 			SetModelView();
 			UpdateLight();
-			GL.Disable(EnableCap.Fog);
         }
 
         public void Set3DCamera()
@@ -96,7 +95,6 @@ namespace U5Designs
 			lightOffset = new Vector4(0, 50, 50, 1);
 			SetModelView();
 			UpdateLight();
-			//GL.Enable(EnableCap.Fog);
         }
 
         public Matrix4d GetProjectionMatrix()
@@ -160,7 +158,6 @@ namespace U5Designs
 			fov = (float)Math.Min(2.0 * Math.Atan(170.0 * Math.Tan(Math.PI / 10) / (Position - End).LengthFast), Math.PI / 5);
 
 			SetPerspective();
-			GL.Disable(EnableCap.Fog);
 		}
 
 		public bool TransitionState(bool enable3D, double time)
