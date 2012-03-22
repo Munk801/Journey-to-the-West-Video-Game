@@ -218,22 +218,38 @@ namespace U5Designs
 		private Vector3 calcProjDir(PlayState playstate) {
 			// Grab Mouse coord.  Since Y goes down, just subtract from height to get correct orientation
 			Vector3d mousecoord = new Vector3d((double)playstate.eng.Mouse.X, (double)(playstate.eng.Height - playstate.eng.Mouse.Y), 1.0);
+			Vector3d mouseWorld;
 
 			//mousecoord.X -= 400.0;
 
 			//If 3d view, get z coordinate of mouse
 			if(enable3d) {
-				float[] z = new float[1];
-				GL.ReadPixels((int)mousecoord.X, (int)mousecoord.Y, 1, 1, OpenTK.Graphics.OpenGL.PixelFormat.DepthComponent, OpenTK.Graphics.OpenGL.PixelType.Float, z);
-				mousecoord.Z = z[0];
+				//float[] z = new float[1];
+				//GL.ReadPixels((int)mousecoord.X, (int)mousecoord.Y, 1, 1, OpenTK.Graphics.OpenGL.PixelFormat.DepthComponent, OpenTK.Graphics.OpenGL.PixelType.Float, z);
+				//mousecoord.Z = z[0];
+
+				// Pull the projection and model view matrix from the camera.   
+				Matrix4d project = playstate.camera.GetProjectionMatrix();
+				Matrix4d model = playstate.camera.GetModelViewMatrix();
+
+				// Unproject the coordinates to convert from mouse to world coordinates
+				mousecoord.Z = 0.0;
+				Vector3d near = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
+				mousecoord.Z = 1.0;
+				Vector3d far = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
+
+				//Interpolate to find coordinates just in front of player
+				double t = (_location.X + 100.0f - near.X) / (far.X - near.X);
+				mouseWorld = new Vector3d(_location.X + 100.0, near.Y + (far.Y - near.Y) * t, near.Z + (far.Z - near.Z) * t);
+
+			} else {
+				// Pull the projection and model view matrix from the camera.   
+				Matrix4d project = playstate.camera.GetProjectionMatrix();
+				Matrix4d model = playstate.camera.GetModelViewMatrix();
+
+				// Unproject the coordinates to convert from mouse to world coordinates
+				mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
 			}
-
-			// Pull the projection and model view matrix from the camera.   
-			Matrix4d project = playstate.camera.GetProjectionMatrix();
-			Matrix4d model = playstate.camera.GetModelViewMatrix();
-
-			// Unproject the coordinates to convert from mouse to world coordinates
-			Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
 
 			Vector3 projDir;
 			if(curProjectile.gravity) {
@@ -285,25 +301,12 @@ namespace U5Designs
 						projDir.X = -projDir.X;
 					}
 				}
-
-				/*} else {
-					//Console.WriteLine(mouseWorld.Y.ToString());
-					// Cannot implicitly typecast a vector3d to vector3
-					float force = 25.0f;
-					Vector3 projDir = new Vector3((float)mouseWorld.X, force, (float)mouseWorld.Z);
-					projDir -= _location;
-
-					projDir.Y = Math.Abs(projDir.Y * (float)mousecoord.Y);
-					// Must normalize or else the direction is wrong.  Using fast but may  need to user the slower one
-					projDir.NormalizeFast();
-					Console.WriteLine(projDir.ToString());
-
-					bananaSound.Play();
-					spawnProjectile(playstate, projDir);
-				}*/
 			} else { //projectile doesn't do gravity
-				projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
+				projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, (float)mouseWorld.Z);
 				projDir -= _location;
+				if(!enable3d) {
+					projDir.Z = 0.0f;
+				}
 				projDir.NormalizeFast();
 			}
 			return projDir;
