@@ -35,21 +35,21 @@ namespace U5Designs {
             // TO DO: CHANGE THE GAME OVER SCREEN
             eng.StateTextureManager.RenderSetup();
             Assembly audAssembly = Assembly.GetExecutingAssembly();
-            eng.StateTextureManager.LoadTexture("go", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.gameover.png"));
+            eng.StateTextureManager.LoadTexture("go", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.GameOverTextures.gameover.png"));
             goBackground = eng.StateTextureManager.GetTexture("go");
-            eng.StateTextureManager.LoadTexture("arrow", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.arrow.png"));
+            eng.StateTextureManager.LoadTexture("arrow", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.GameOverTextures.arrow.png"));
             arrow = eng.StateTextureManager.GetTexture("arrow");
-            eng.StateTextureManager.LoadTexture("back2menu", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel.png"));
+            eng.StateTextureManager.LoadTexture("back2menu", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.GameOverTextures.btn_backtomenu.png"));
             mainmenu = eng.StateTextureManager.GetTexture("back2menu");
-            eng.StateTextureManager.LoadTexture("back2menupress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel_hover.png"));
+            eng.StateTextureManager.LoadTexture("back2menupress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.GameOverTextures.btn_backtomenu_hover.png"));
             menu_pressed = eng.StateTextureManager.GetTexture("back2menupress");
-            eng.StateTextureManager.LoadTexture("restartlevel", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_exit.png"));
+            eng.StateTextureManager.LoadTexture("restartlevel", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.GameOverTextures.btn_restart.png"));
             restart = eng.StateTextureManager.GetTexture("restartlevel");
-            eng.StateTextureManager.LoadTexture("restartlevelpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_exit_hover.png"));
+            eng.StateTextureManager.LoadTexture("restartlevelpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.GameOverTextures.btn_restart_hover.png"));
             restart_pressed = eng.StateTextureManager.GetTexture("restartlevelpress");
-            eng.StateTextureManager.LoadTexture("exitgame", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play.png"));
+            eng.StateTextureManager.LoadTexture("exitgame", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.GameOverTextures.btn_exit.png"));
             exit = eng.StateTextureManager.GetTexture("exitgame");
-            eng.StateTextureManager.LoadTexture("exitpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play_hover.png"));
+            eng.StateTextureManager.LoadTexture("exitpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.GameOverTextures.btn_exit_hover.png"));
             exit_pressed = eng.StateTextureManager.GetTexture("exitpress");
             
             //restart_btn = eng.StateTextureManager.GetTexture("restart");
@@ -65,7 +65,7 @@ namespace U5Designs {
 			GL.LoadMatrix(ref modelview);
 
 			GL.MatrixMode(MatrixMode.Projection);
-			Matrix4d projection = Matrix4d.CreateOrthographic(192, 108, 1.0f, 6400.0f);
+            Matrix4d projection = Matrix4d.CreateOrthographic(1280, 720, 1.0f, 6400.0f);
 			GL.LoadMatrix(ref projection);
 		}
 
@@ -78,18 +78,13 @@ namespace U5Designs {
         {
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
 
-            if (xf >= 0.4)
-            {
-                xf -= (float)(e.Time);
-                yf -= (float)(e.Time);
-                go_texture.Draw2DTexture(0, 0, xf, yf);
-            }
-            else
-            {                
-                go_texture.Draw2DTexture(0, 0, xf, yf);
-                //restart_btn.Draw2DTexture(0, -400);
-                //quit_btn.Draw2DTexture(0, -400);
-            }            
+           GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+            Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadMatrix(ref modelview);
+            goBackground.Draw2DTexture();
         }
 
         private void DealWithInput()
