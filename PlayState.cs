@@ -14,6 +14,7 @@ using OpenTK.Input;
 using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace U5Designs
 {
@@ -80,9 +81,10 @@ namespace U5Designs
 			nowBillboarding = false;
 
             // Add healthbar texture to texture manager
-            eng.StateTextureManager.LoadTexture("Healthbar", "../../Resources/Textures/healthbar_top.png");
+            Assembly audAssembly = Assembly.GetExecutingAssembly();
+            eng.StateTextureManager.LoadTexture("Healthbar", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_top.png"));
             Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
-            eng.StateTextureManager.LoadTexture("bHealth", "../../Resources/Textures/healthbar_bottom.png");
+            eng.StateTextureManager.LoadTexture("bHealth", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_bottom.png"));
             bHealth = eng.StateTextureManager.GetTexture("bHealth");
             MaxHealth = player.health;
 

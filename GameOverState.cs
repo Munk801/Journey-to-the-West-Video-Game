@@ -32,6 +32,7 @@ namespace U5Designs {
             xf = 1.0f;
             yf = 1.0f;
 
+            // TO DO: CHANGE THE GAME OVER SCREEN
             eng.StateTextureManager.RenderSetup();
             eng.StateTextureManager.LoadTexture("game_over", "../../Resources/Textures/game_over_text.png");
            
