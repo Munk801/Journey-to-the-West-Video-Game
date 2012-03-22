@@ -1,5 +1,5 @@
 ﻿<sprite>
-	<bmp>baum2.png</bmp>
+	<bmp>tree.png</bmp>
 	<c_starts>0</c_starts>
 	<c_lengths>1</c_lengths>
 	<t_width>512</t_width>
