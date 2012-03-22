@@ -21,7 +21,7 @@ namespace U5Designs
 		private int texID;
 
         public Background(Vector3 location, Vector3 scale, SpriteSheet sprite, float speed)
-					: base(location, scale, true, false, Billboarding.Lock2d, sprite) {
+					: base(location, scale, true, true, Billboarding.Lock2d, sprite) {
 			this.speed = speed;
 			texID = GL.GenTexture();
 		}

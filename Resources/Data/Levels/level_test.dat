@@ -5,10 +5,10 @@
 			<scale x="350" y="135" z="1"/>
 			<sprite>zoo_side_background_sprite.dat</sprite>
 			<speed>0.75</speed>
-			<loc x="120" y="35" z="-100"/>
-			<loc x="470" y="35" z="-100"/>
-			<loc x="820" y="35" z="-100"/>
-			<loc x="1170" y="35" z="-100"/>
+			<loc x="120" y="35" z="-200"/>
+			<loc x="470" y="35" z="-200"/>
+			<loc x="820" y="35" z="-200"/>
+			<loc x="1170" y="35" z="-200"/>
 		</background>
 	</backgroundlist>
 	<enemylist>
