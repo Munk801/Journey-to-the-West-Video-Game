@@ -45,7 +45,11 @@ namespace U5Designs
 		public Camera cam; //pointer to the camera, used for informing of y position changes
 		private bool enable3d; //track current world state (used in spawning projectiles)
 		public bool onGround; //true when on ground, or when we just switched to 3d and were in midair
+
+        //spin attack
         public bool spinning; //true when spin attack is in progress
+        public double spinSize; // the distance from the center of the player the spin attack extends
+        public int spinDamage;
 
 		private bool spaceDown;
         
@@ -64,6 +68,7 @@ namespace U5Designs
             _scale = new Vector3(16.25f, 25f, 16.25f);
             _pbox = new Vector3(5f, 12.5f, 5f);
             _cbox = new Vector3(4f, 11.5f, 4f);
+            spinSize = 12; //?? experiment with this, TODO: change it to match the sprites size
 			velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);
 			kbspeed = new Vector3(70, 100, 70);
@@ -76,8 +81,12 @@ namespace U5Designs
 			_existsIn2d = true;
 			_existsIn3d = true;
 			onGround = true;
+            //combat things
+
             _damage = 1;
-            _health = 5;
+            spinDamage = 2;
+            _health = 7;
+
             Invincible = false;
             HasControl = true;
             Invincibletimer = 0.0;
@@ -332,7 +341,7 @@ namespace U5Designs
 
             if (playstate.eng.ThisMouse.RightPressed()) {
                 //TODO: impliment stamina constraints on right click/spin attack
-
+                spinning = true;
             }
         }
 
@@ -388,8 +397,34 @@ namespace U5Designs
 				PhysicsObject collidingObj = null;
 				float collidingT = 1.0f / 0.0f; //pos infinity
 				int collidingAxis = -1;
+                bool endspin = false; // flag to end spinn
 
                 foreach (PhysicsObject obj in physList) {
+                    //if we are spinning, do a simple non-physics collision test against combat objects
+                    //If we hit a Combat obj, damage it, despwan it w/e, then flag the spin attack to end
+                    if (spinning && obj.collidesIn2d && obj.hascbox && obj != this && !alreadyCollidedList.Contains(obj)) {
+                        //note: we cant do collisions the 'good' way like below with a cbox or pbox
+                        // because we may start spinning with an enemy already inside of our box. Thus we must just simply check whether an enemy
+                        // is inside our 'zone'(location + spinSize in x and z)
+                        //Note: if we impliment an enemy with a not square cbox this may look... odd. until then, doing zones is very fast/easy
+                        double enemyZone = (((CombatObject)obj).cbox.X + ((CombatObject)obj).cbox.Z) / 2; // avg(in case z and x are not equal)
+                        double xdist = Math.Abs(obj.location.X - location.X);
+                        double zdist = Math.Abs(obj.location.Z - location.Z);
+                        double ydist = Math.Abs(obj.location.Y - location.Y);
+                        if ((xdist < (enemyZone + spinSize)) && (zdist < (enemyZone + spinSize)) && ydist < ((CombatObject)obj).cbox.Y + cbox.Y) {
+                            if (((CombatObject)obj).type == 1) {// obj is an enemy, hurt it
+                                ((CombatObject)obj).health = ((CombatObject)obj).health - spinDamage;
+                            }
+                            if (((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
+                                //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
+                                if (!((Projectile)obj).playerspawned) {
+                                    //despawn the projectile
+                                    ((CombatObject)obj).health = 0;
+                                }
+                            }
+                            endspin = true;
+                        }
+                    }
 					// don't do collision physics to yourself, or on things you already hit this frame
 					if(obj.collidesIn3d && obj != this && !alreadyCollidedList.Contains(obj)) {
 						Vector3 mybox, objbox;
@@ -422,6 +457,8 @@ namespace U5Designs
 						}
 					}
 				}
+                if (endspin)
+                    spinning = false;
 
 				Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
 				if(collidingAxis == -1) { //no collision
@@ -565,8 +602,34 @@ namespace U5Designs
 				PhysicsObject collidingObj = null;
 				float collidingT = 1.0f / 0.0f; //pos infinity
 				int collidingAxis = -1;
+                bool endspin = false; // flag to end spinn
 
                 foreach (PhysicsObject obj in physList) {
+                    //if we are spinning, do a simple non-physics collision test against combat objects
+                    //If we hit a Combat obj, damage it, despwan it w/e, then flag the spin attack to end
+                    if (spinning && obj.collidesIn2d && obj.hascbox && obj != this && !alreadyCollidedList.Contains(obj)) {
+                        //note: we cant do collisions the 'good' way like below with a cbox or pbox
+                        // because we may start spinning with an enemy already inside of our box. Thus we must just simply check whether an enemy
+                        // is inside our 'zone'(location + spinSize in x and z)
+                        //Note: if we impliment an enemy with a not square cbox this may look... odd. until then, doing zones is very fast/easy
+                        double enemyZone = (((CombatObject)obj).cbox.X + ((CombatObject)obj).cbox.Z) / 2; // avg(in case z and x are not equal)
+                        double xdist = Math.Abs(obj.location.X - location.X);//only do x dist in 2d
+                        double ydist = Math.Abs(obj.location.Y - location.Y);
+                        if ((xdist < (enemyZone + spinSize)) && ydist < ((CombatObject)obj).cbox.Y + cbox.Y) {
+
+                            if (((CombatObject)obj).type == 1) {// obj is an enemy, hurt it
+                                ((CombatObject)obj).health = ((CombatObject)obj).health - spinDamage;
+                            }
+                            if (((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
+                                //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
+                                if (!((Projectile)obj).playerspawned) {
+                                    //despawn the projectile
+                                    ((CombatObject)obj).health = 0;
+                                }
+                            }
+                            endspin = true;
+                        }
+                    }
 					// don't do collision physics to yourself, or on things you already hit this frame
 					if(obj.collidesIn2d && obj != this && !alreadyCollidedList.Contains(obj)) {
 						Vector3 mybox, objbox;
@@ -599,6 +662,8 @@ namespace U5Designs
 						}
 					}
 				}
+                if (endspin)
+                    spinning = false;
 
 				Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
 				if(collidingAxis == -1) { //no collision
@@ -849,6 +914,11 @@ namespace U5Designs
 			get { return _alive; }
 			set { _alive = value; }
 		}
+
+        double dist2d(Vector3 v1, Vector3 v2) { // does a dist using only x and z
+            Vector2 tmp = new Vector2(v1.X - v2.X, v1.Z - v2.Z);
+            return Math.Sqrt((tmp.X * tmp.X) + (tmp.Y * tmp.Y));
+        }
 
 		//TODO: Don't know if reset really applies to player or not...
 		public void reset() {

@@ -20,6 +20,9 @@ namespace U5Designs
     /** Main State of the game that will be active while the player is Playing **/
     public class PlayState : GameState
     {
+        //debug
+        bool aienabled = true;
+
 		internal GameEngine eng;
 		MainMenuState menustate;
 		PauseMenuState pms;
@@ -210,7 +213,9 @@ namespace U5Designs
 				player.updateState(enable3d, eng.Keyboard, e.Time, this);
 				foreach(AIObject aio in aiList) {
 					if(aio.ScreenRegion == GameObject.ON_SCREEN) {
-						aio.aiUpdate(e.Time, this, player.location, enable3d, physList);
+                        if (aienabled) {
+                            aio.aiUpdate(e.Time, this, player.location, enable3d, physList);
+                        }
 					}
 				}
 

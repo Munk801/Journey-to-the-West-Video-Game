@@ -5,7 +5,7 @@
 	<draw2>true</draw2>
 	<draw3>true</draw3>
 	<health>2</health>
-	<damage>1</damage>
+	<damage>2</damage>
 	<speed>50</speed>
 	<AI>3</AI>
 	<sprite>girl_sprite.dat</sprite>
