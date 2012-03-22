@@ -311,7 +311,6 @@ namespace U5Designs
 
                 // Projectile stuff
                 XmlNodeList _p = doc.GetElementsByTagName("proj");
-                ProjectileProperties p = parseProjectileFile(_p.Item(0).InnerText);
                 
 
 				// Pause now and parse the Sprite.dat to create the necessary Sprite that is associated with the current Enemy object
@@ -320,13 +319,23 @@ namespace U5Designs
 				// Create the SpriteSheet              
 				SpriteSheet ss = parse_Sprite_File(_sprite_path);
 
-				// Create the Enemies
-				for(int j = 1; j < EList[i].ChildNodes.Count; j++) {
-					Vector3 loc = parseVector3(EList[i].ChildNodes[j]);
-                    //TODO: SETH: change the last 'ss' in this enemy declaration to be the projectile sprite!!!!!!!
-					_e.Add(new Enemy(loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, p));
+				if(_p.Count == 0) {
+					// Create the Enemies
+					for(int j = 1; j < EList[i].ChildNodes.Count; j++) {
+						Vector3 loc = parseVector3(EList[i].ChildNodes[j]);
+						//TODO: SETH: change the last 'ss' in this enemy declaration to be the projectile sprite!!!!!!!
+						_e.Add(new Enemy(loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss));
+					}
+				} else {
+					ProjectileProperties p = parseProjectileFile(_p.Item(0).InnerText);
+
+					// Create the Enemies
+					for(int j = 1; j < EList[i].ChildNodes.Count; j++) {
+						Vector3 loc = parseVector3(EList[i].ChildNodes[j]);
+						//TODO: SETH: change the last 'ss' in this enemy declaration to be the projectile sprite!!!!!!!
+						_e.Add(new Enemy(loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, p));
+					}
 				}
-				fstream.Close();
 			}
 
 			// Return list of Enemies               

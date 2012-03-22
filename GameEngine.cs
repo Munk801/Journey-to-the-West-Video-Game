@@ -8,7 +8,6 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
 using Engine;
-using Engine.Input;
 using System.Reflection;
 
 namespace U5Designs

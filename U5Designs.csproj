@@ -113,12 +113,7 @@
     <EmbeddedResource Include="Resources\Textures\boy_sprite.png" />
     <EmbeddedResource Include="Resources\Textures\girl_sprite.png" />
     <EmbeddedResource Include="Resources\Textures\zoo_keeper_sprite.png" />
-    <EmbeddedResource Include="Resources\Textures\baum2.png" />
-    <EmbeddedResource Include="Resources\Textures\test_proj2.png" />
     <EmbeddedResource Include="Resources\Textures\banana.png" />
-    <EmbeddedResource Include="Resources\Textures\test_projectile_sprite.png" />
-    <EmbeddedResource Include="Resources\Textures\test_player_sprite.png" />
-    <EmbeddedResource Include="Resources\Textures\test_monkey.png" />
     <EmbeddedResource Include="Resources\Textures\test_flying_sprite.png" />
     <EmbeddedResource Include="Resources\Textures\load_button_no_press.png" />
     <EmbeddedResource Include="Resources\Textures\load_button_press.png" />
@@ -128,8 +123,6 @@
     <EmbeddedResource Include="Resources\Textures\quit_button_press.png" />
     <EmbeddedResource Include="Resources\Textures\testbg.png" />
     <EmbeddedResource Include="Resources\Textures\test.png" />
-    <EmbeddedResource Include="Resources\Textures\test_background.png" />
-    <EmbeddedResource Include="Resources\Textures\test_background_3d.png" />
     <EmbeddedResource Include="Resources\Textures\test_sprite.png" />
   </ItemGroup>
   <ItemGroup>
@@ -139,7 +132,6 @@
     <EmbeddedResource Include="Resources\Data\Levels\level_test.dat">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Data\Enemies\test_enemy.dat" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Obstacles\test_obstacle.dat" />
@@ -278,6 +270,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Enemies\Bird.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\tree.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
