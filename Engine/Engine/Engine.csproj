@@ -94,8 +94,6 @@
     <Compile Include="Audio\csvorbis\VorbisFile.cs" />
     <Compile Include="Audio\csvorbis\VorbisFileInstance.cs" />
     <Compile Include="GameObject.cs" />
-    <Compile Include="Input\Input.cs" />
-    <Compile Include="Input\Keyboard.cs" />
     <Compile Include="MeshTexture.cs" />
     <Compile Include="ObjMesh.cs" />
     <Compile Include="ObjMeshLoader.cs" />

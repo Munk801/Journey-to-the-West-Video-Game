@@ -74,7 +74,7 @@ namespace U5Designs
 		}
 
 
-        public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, SpriteSheet sprite, ProjectileProperties proj)
+        public Enemy(Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed, int AItype, SpriteSheet sprite, ProjectileProperties proj = null)
         {
 			_location = location;
 			_scale = scale;
