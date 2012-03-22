@@ -127,8 +127,6 @@ namespace U5Designs
 			GL.Enable(EnableCap.Blend);
 			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
-			GL.Fog(FogParameter.FogDensity, 0.0005f);
-
 			GL.ShadeModel(ShadingModel.Smooth);
 			GL.ClearColor(0.26667f, 0.86667f, 1.0f, 1.0f);
 
@@ -136,6 +134,12 @@ namespace U5Designs
 				camera.Set3DCamera();
 			} else {
 				camera.Set2DCamera();
+			}
+
+			if(player.curProjectile.gravity) {
+				eng.CursorVisible = false;
+			} else {
+				eng.CursorVisible = true; //TODO: When we have a crosshair, we'll change this
 			}
 		}
 
@@ -229,6 +233,8 @@ namespace U5Designs
 				foreach(Background b in backgroundList) {
 					b.UpdatePositionX(player.deltax);
 				}
+
+				player.addMarkers(this);
             }
 		}
 
@@ -299,6 +305,11 @@ namespace U5Designs
 						//}
 					}
 				}
+			}
+
+			foreach(Decoration m in player.markerList) {
+				m.doScaleTranslateAndTexture();
+				m.frameNumber = m.sprite.draw(nowBillboarding, m.billboards, m.cycleNumber, m.frameNumber + m.animDirection * e.Time);
 			}
 
 			//Now render transparent sprites in sorted order

@@ -82,6 +82,7 @@ namespace U5Designs
 			//add other projectiles here
 
 			ps.player = new Player(parse_Sprite_File("player_sprite.dat"), playerProjectiles);
+			ps.player.marker = parse_Sprite_File("marker_sprite.dat");
 			ps.physList.Add(ps.player);
 			ps.renderList.Add(ps.player);
 		}
