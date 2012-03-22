@@ -280,6 +280,16 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Textures\marker.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\GameOverTextures\arrow.png" />
+    <EmbeddedResource Include="Resources\Textures\GameOverTextures\btn_backtomenu.png" />
+    <EmbeddedResource Include="Resources\Textures\GameOverTextures\btn_backtomenu_hover.png" />
+    <EmbeddedResource Include="Resources\Textures\GameOverTextures\btn_exit.png" />
+    <EmbeddedResource Include="Resources\Textures\GameOverTextures\btn_exit_hover.png" />
+    <EmbeddedResource Include="Resources\Textures\GameOverTextures\btn_restart.png" />
+    <EmbeddedResource Include="Resources\Textures\GameOverTextures\btn_restart_hover.png" />
+    <EmbeddedResource Include="Resources\Textures\GameOverTextures\gameover.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

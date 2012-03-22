@@ -55,21 +55,22 @@ namespace U5Designs
             mouse = eng.Mouse;
             // Load all the textures
             eng.StateTextureManager.RenderSetup();
-            eng.StateTextureManager.LoadTexture("menu", "../../Resources/Textures/menu.png");
+            Assembly audAssembly = Assembly.GetExecutingAssembly();
+            eng.StateTextureManager.LoadTexture("menu", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
             menu = eng.StateTextureManager.GetTexture("menu");
-            eng.StateTextureManager.LoadTexture("arrow", "../../Resources/Textures/arrow.png");
+            eng.StateTextureManager.LoadTexture("arrow", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.arrow.png"));
             arrow = eng.StateTextureManager.GetTexture("arrow");
-            eng.StateTextureManager.LoadTexture("load", "../../Resources/Textures/btn_loadlevel.png");
+            eng.StateTextureManager.LoadTexture("load", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel.png"));
             load_nopress = eng.StateTextureManager.GetTexture("load");
-            eng.StateTextureManager.LoadTexture("loadpress", "../../Resources/Textures/btn_loadlevel_hover.png");
+            eng.StateTextureManager.LoadTexture("loadpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel_hover.png"));
             load_press = eng.StateTextureManager.GetTexture("loadpress");
-            eng.StateTextureManager.LoadTexture("quit", "../../Resources/Textures/btn_exit.png");
+            eng.StateTextureManager.LoadTexture("quit", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_exit.png"));
             quit_nopress = eng.StateTextureManager.GetTexture("quit");
-            eng.StateTextureManager.LoadTexture("quitpress", "../../Resources/Textures/btn_exit_hover.png");
+            eng.StateTextureManager.LoadTexture("quitpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_exit_hover.png"));
             quit_press = eng.StateTextureManager.GetTexture("quitpress");
-            eng.StateTextureManager.LoadTexture("play", "../../Resources/Textures/btn_play.png");
+            eng.StateTextureManager.LoadTexture("play", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play.png"));
             play_nopress = eng.StateTextureManager.GetTexture("play");
-            eng.StateTextureManager.LoadTexture("playpress", "../../Resources/Textures/btn_play_hover.png");
+            eng.StateTextureManager.LoadTexture("playpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play_hover.png"));
             play_press = eng.StateTextureManager.GetTexture("playpress");
 
 

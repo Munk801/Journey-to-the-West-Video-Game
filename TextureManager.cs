@@ -9,6 +9,7 @@ using OpenTK.Graphics.OpenGL;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 
 namespace U5Designs
 {
@@ -58,6 +59,30 @@ namespace U5Designs
         private bool HasTexture(string id)
         {
            return this.Textures.ContainsKey(id);
+        }
+
+        public void LoadTexture(string id, Stream path)
+        {
+            var bitmap = new Bitmap(path);
+            var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                                             ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+
+            int textureId = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, textureId);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
+            //GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Blend);
+            //GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvColor, new OpenTK.Graphics.Color4(1, 1, 1, 0)); //transparent
+            GL.BindTexture(TextureTarget.Texture2D, textureId);
+            if (!Textures.ContainsKey(id))
+            {
+                Textures.Add(id, new Texture(textureId, bitmap.Width, bitmap.Height));
+            }
+            bitmap.UnlockBits(bitmapData);
+            bitmap.Dispose();
         }
 
         public void LoadTexture(string id, string path)
