@@ -8,6 +8,7 @@ using OpenTK.Audio.OpenAL;
 using Engine;
 using OpenTK.Input;
 using System.Drawing;
+using System.Reflection;
 
 
 namespace U5Designs {
@@ -19,7 +20,7 @@ namespace U5Designs {
         Obstacle background;
         MainMenuState menu;
         float xf, yf;
-        Texture go_texture, restart_btn, quit_btn;
+        Texture goBackground, arrow, mainmenu, menu_pressed, restart, restart_pressed, exit, exit_pressed;
 
         public GameOverState(MainMenuState prvstate, GameEngine engine)
         {
@@ -33,9 +34,23 @@ namespace U5Designs {
 
             // TO DO: CHANGE THE GAME OVER SCREEN
             eng.StateTextureManager.RenderSetup();
-            eng.StateTextureManager.LoadTexture("game_over", "../../Resources/Textures/game_over_text.png");
-           
-            go_texture = eng.StateTextureManager.GetTexture("game_over");
+            Assembly audAssembly = Assembly.GetExecutingAssembly();
+            eng.StateTextureManager.LoadTexture("go", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.gameover.png"));
+            goBackground = eng.StateTextureManager.GetTexture("go");
+            eng.StateTextureManager.LoadTexture("arrow", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.arrow.png"));
+            arrow = eng.StateTextureManager.GetTexture("arrow");
+            eng.StateTextureManager.LoadTexture("back2menu", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel.png"));
+            mainmenu = eng.StateTextureManager.GetTexture("back2menu");
+            eng.StateTextureManager.LoadTexture("back2menupress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel_hover.png"));
+            menu_pressed = eng.StateTextureManager.GetTexture("back2menupress");
+            eng.StateTextureManager.LoadTexture("restartlevel", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_exit.png"));
+            restart = eng.StateTextureManager.GetTexture("restartlevel");
+            eng.StateTextureManager.LoadTexture("restartlevelpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_exit_hover.png"));
+            restart_pressed = eng.StateTextureManager.GetTexture("restartlevelpress");
+            eng.StateTextureManager.LoadTexture("exitgame", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play.png"));
+            exit = eng.StateTextureManager.GetTexture("exitgame");
+            eng.StateTextureManager.LoadTexture("exitpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play_hover.png"));
+            exit_pressed = eng.StateTextureManager.GetTexture("exitpress");
             
             //restart_btn = eng.StateTextureManager.GetTexture("restart");
             
