@@ -1,7 +1,7 @@
 <enemy>
-	<scale x="12.5" y="12.5" z="12.5"/>
-	<pbox x="6.25" y="6.25" z="6.25"/>
-	<cbox x="6.25" y="6.25" z="6.25"/>
+	<scale x="25" y="25" z="25"/>
+	<pbox x="12.5" y="12.5" z="12.5"/>
+	<cbox x="12.5" y="12.5" z="12.5"/>
 	<draw2>true</draw2>
 	<draw3>true</draw3>
 	<health>2</health>
