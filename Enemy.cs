@@ -24,10 +24,14 @@ namespace U5Designs
         //timers
         public bool frozen;
         private double freezetimer;
+
         //attack delay stuff
         internal int attackspeed;
         internal bool attackdelayed;
         internal double attacktimer;
+
+		//Knockback physics constant
+		private Vector3 kbspeed;
 
         //Internal projectile managment
 		internal ProjectileProperties projectile;
@@ -66,7 +70,8 @@ namespace U5Designs
 			_animDirection = 1;
 
             velocity = new Vector3(0, 0, 0);
-            accel = new Vector3(0, 0, 0);
+			accel = new Vector3(0, 0, 0);
+			kbspeed = new Vector3(70, 100, 70);
             doesGravity = true;
 
             CurrentAI = new Stack<Airoutine>();
@@ -489,6 +494,32 @@ namespace U5Designs
             tmp.Normalize();
             return tmp;
         }
+
+		/// <summary>
+		/// Knocks the enemy back relative to the param collidingObj ( can be any physics object)
+		/// </summary>
+		/// <param name="is3d"> True if we are in 3d</param>
+		/// <param name="collidingObj">The physics object we are colliding with</param>
+		public void knockback(bool is3d, PhysicsObject collidingObj) {
+			if(is3d) {
+				// direction we need to be knocked back in.
+				Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, location.Z - collidingObj.location.Z);
+				direction.Normalize();
+
+				location = new Vector3(collidingObj.location.X + (collidingObj.pbox.X * direction.X), collidingObj.location.Y + collidingObj.pbox.Y, collidingObj.location.Z + (collidingObj.pbox.Z * direction.Z));
+				velocity = new Vector3(0, 0, 0);
+				accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
+			} else {
+				Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, 0);
+				direction.Normalize();
+
+				float origX = location.X;
+
+				location = new Vector3(collidingObj.location.X + (collidingObj.pbox.X * direction.X), collidingObj.location.Y + collidingObj.pbox.Y, location.Z);
+				velocity = new Vector3(0, 0, 0);
+				accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, 0);
+			}
+		}
 
         /*  The following are helper methods + getter/setters
         * 

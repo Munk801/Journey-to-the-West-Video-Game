@@ -85,6 +85,10 @@ namespace U5Designs
 			ps.player.marker = parse_Sprite_File("marker_sprite.dat");
 			ps.physList.Add(ps.player);
 			ps.renderList.Add(ps.player);
+
+			ps.staminaBack = parse_Sprite_File("stamina_back.dat");
+			ps.staminaBar = parse_Sprite_File("stamina_bar.dat");
+			ps.staminaFrame = parse_Sprite_File("stamina_frame.dat");
 		}
 
 		//Takes an XmlNode with attributes x, y, and z and turns it into a Vector3

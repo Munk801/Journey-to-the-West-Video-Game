@@ -290,6 +290,19 @@
     <EmbeddedResource Include="Resources\Textures\GameOverTextures\btn_restart_hover.png" />
     <EmbeddedResource Include="Resources\Textures\GameOverTextures\gameover.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\stamina_back.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\stamina_bar.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\stamina_frame.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\stamina_back.png" />
+    <EmbeddedResource Include="Resources\Textures\stamina_bar.png" />
+    <EmbeddedResource Include="Resources\Textures\stamina_frame.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\windmill_test.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

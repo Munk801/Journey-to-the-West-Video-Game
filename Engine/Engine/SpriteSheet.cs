@@ -23,9 +23,9 @@ namespace Engine {
 
 	public class SpriteSheet {
 
-		private static readonly float[] vertices = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f};
-		private static readonly float[] texverts = {0.0f, 0.0f,        1.0f, 0.0f,        1.0f, 1.0f,        0.0f, 1.0f};
-		private static readonly byte[] indices = {0, 1, 2, 3};
+		//private static readonly float[] vertices = {0.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f};
+		//private static readonly float[] texverts = {0.0f, 0.0f,        1.0f, 0.0f,        1.0f, 1.0f,        0.0f, 1.0f};
+		//private static readonly byte[] indices = {0, 1, 2, 3};
 		public static ObjMesh quad;
 
 		private byte[][][] tex; //tex[cycleNumber][frameNumber][y*w + x]

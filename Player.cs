@@ -23,15 +23,16 @@ namespace U5Designs
         private Vector3 kbspeed;
 		private float jumpspeed;
 
+		//Player state
         public PlayerState p_state;
 		public Vector3 velocity;
 		private Vector3 accel;
+		public double stamina, maxStamina;
         internal bool Invincible, HasControl;
-        static Assembly assembly_new = Assembly.GetExecutingAssembly();
-		private Vector3 lastPosOnGround; // used for falling off detection
+        private Vector3 lastPosOnGround; // used for falling off detection
 
         //timers
-        private double Invincibletimer, NoControlTimer, projectileTimer;
+        private double Invincibletimer, NoControlTimer, projectileTimer, spinTimer;
 		public double fallTimer, viewSwitchJumpTimer;
 
         //projectile managment
@@ -54,10 +55,7 @@ namespace U5Designs
 		private bool spaceDown;
         
         // SOUND FILES
-        static string jumpSoundFile = "../../Resources/Sound/jump_sound.ogg";
-        AudioFile jumpSound = new AudioFile(jumpSoundFile);
-        AudioFile bananaSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
-        AudioFile hurtSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
+        AudioFile jumpSound, bananaSound, hurtSound;
 
         public Player(SpriteSheet sprite, List<ProjectileProperties> projectiles) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
         {
@@ -86,6 +84,8 @@ namespace U5Designs
             _damage = 1;
             spinDamage = 2;
             _health = 7;
+			stamina = 5.0;
+			maxStamina = 5.0;
 
             Invincible = false;
             HasControl = true;
@@ -94,11 +94,17 @@ namespace U5Designs
 			fallTimer = 0.0;
 			viewSwitchJumpTimer = 0.0;
 			projectileTimer = 0.0;
+			spinTimer = 0.0;
 			lastPosOnGround = new Vector3(_location);
 			_animDirection = 1;
 			this.projectiles = projectiles;
 			curProjectile = projectiles[0];
 			markerList = new List<Decoration>();
+
+			Assembly assembly_new = Assembly.GetExecutingAssembly();
+			jumpSound = new AudioFile("../../Resources/Sound/jump_sound.ogg");
+			bananaSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
+			hurtSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
         }
 
 		/// <summary>
@@ -133,6 +139,37 @@ namespace U5Designs
 			this.enable3d = enable3d;
 
 			//Update timers
+			if(stamina < maxStamina) {
+				stamina = Math.Min(stamina + time, maxStamina);
+			}
+
+			if(spinning) {
+				stamina = Math.Max(stamina - 5.0 * time, 0.0);
+				if(stamina <= 0.0) {
+					spinning = false;
+					_speed = 75;
+					if(velocity.X == 0) {
+						_cycleNum = (enable3d ? 1 : 0);
+					} else {
+						_cycleNum = (enable3d ? 3 : 2);
+					}
+				}
+			}
+
+			//Update spinTimer even if not spinning, because it's also the timeout before you can spin again
+			if(spinTimer > 0.0) {
+				spinTimer -= time;
+				if(spinTimer <= 0.0 && spinning) {
+					spinning = false;
+					_speed = 75;
+					if(velocity.X == 0) {
+						_cycleNum = (enable3d ? 1 : 0);
+					} else {
+						_cycleNum = (enable3d ? 3 : 2);
+					}
+				}
+			}
+
 			if(projectileTimer > 0.0) {
 				projectileTimer -= time;
 			}
@@ -173,10 +210,8 @@ namespace U5Designs
 					velocity.Z = newVel.Y*speed;
 
 					_animDirection = (velocity.X >= 0 ? 1 : -1);
-					if(velocity.X == 0) {
-						_cycleNum = (enable3d ? 1 : 0);
-					} else {
-						_cycleNum = (enable3d ? 3 : 2);
+					if(!spinning) {
+						_cycleNum = (velocity.X == 0 ? 1 : 3);
 					}
                 } else {
                     if (keyboard[Key.A] == keyboard[Key.D]) {
@@ -188,10 +223,8 @@ namespace U5Designs
 					}
 
 					_animDirection = (velocity.X >= 0 ? 1 : -1);
-					if(velocity.X == 0) {
-						_cycleNum = (enable3d ? 1 : 0);
-					} else {
-						_cycleNum = (enable3d ? 3 : 2);
+					if(!spinning) {
+						_cycleNum = (velocity.X == 0 ? 0 : 2);
 					}
                 }
 
@@ -229,10 +262,10 @@ namespace U5Designs
 			Vector3d mousecoord = new Vector3d((double)playstate.eng.Mouse.X, (double)(playstate.eng.Height - playstate.eng.Mouse.Y), 1.0);
 			Vector3d mouseWorld;
 
-			//mousecoord.X -= 400.0;
-
-			//If 3d view, get z coordinate of mouse
 			if(enable3d) {
+				//mousecoord.X -= 400.0;
+
+				//If 3d view, get z coordinate of mouse
 				//float[] z = new float[1];
 				//GL.ReadPixels((int)mousecoord.X, (int)mousecoord.Y, 1, 1, OpenTK.Graphics.OpenGL.PixelFormat.DepthComponent, OpenTK.Graphics.OpenGL.PixelType.Float, z);
 				//mousecoord.Z = z[0];
@@ -327,7 +360,7 @@ namespace U5Designs
         /// <param name="playstate">a pointer to play state, for accessing the obj lists in playstate</param>
         private void handleMouseInput(PlayState playstate)
         {
-            if (playstate.eng.ThisMouse.LeftPressed() && projectileTimer <= 0.0) {
+            if (playstate.eng.ThisMouse.LeftPressed() && stamina >= 0.40 && projectileTimer <= 0.0) {
 				Vector3 projDir = calcProjDir(playstate);
 
 				bananaSound.Play();
@@ -336,12 +369,16 @@ namespace U5Designs
 				velocity.X = 0.0f;
 				velocity.Z = 0.0f;
 
+				stamina -= 0.40;
 				projectileTimer = 0.25;
             }
 
-            if (playstate.eng.ThisMouse.RightPressed()) {
+            if (playstate.eng.ThisMouse.RightPressed() && spinTimer <= 0.0 && stamina > 0.0) {
                 //TODO: impliment stamina constraints on right click/spin attack
                 spinning = true;
+				spinTimer = 0.5;
+				_speed = 125;
+				_cycleNum = (enable3d ? 5 : 4);
             }
         }
 
@@ -397,12 +434,12 @@ namespace U5Designs
 				PhysicsObject collidingObj = null;
 				float collidingT = 1.0f / 0.0f; //pos infinity
 				int collidingAxis = -1;
-                bool endspin = false; // flag to end spinn
+                bool endspin = false; // flag to end spin
 
                 foreach (PhysicsObject obj in physList) {
                     //if we are spinning, do a simple non-physics collision test against combat objects
                     //If we hit a Combat obj, damage it, despwan it w/e, then flag the spin attack to end
-                    if (spinning && obj.collidesIn2d && obj.hascbox && obj != this && !alreadyCollidedList.Contains(obj)) {
+                    if (spinning && obj.collidesIn3d && obj.hascbox && obj != this && !alreadyCollidedList.Contains(obj)) {
                         //note: we cant do collisions the 'good' way like below with a cbox or pbox
                         // because we may start spinning with an enemy already inside of our box. Thus we must just simply check whether an enemy
                         // is inside our 'zone'(location + spinSize in x and z)
@@ -414,8 +451,8 @@ namespace U5Designs
                         if ((xdist < (enemyZone + spinSize)) && (zdist < (enemyZone + spinSize)) && ydist < ((CombatObject)obj).cbox.Y + cbox.Y) {
                             if (((CombatObject)obj).type == 1) {// obj is an enemy, hurt it
                                 ((CombatObject)obj).health = ((CombatObject)obj).health - spinDamage;
-                            }
-                            if (((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
+								((Enemy)obj).knockback(enable3d, this);
+                            } else if (((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
                                 //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
                                 if (!((Projectile)obj).playerspawned) {
                                     //despawn the projectile
@@ -457,8 +494,16 @@ namespace U5Designs
 						}
 					}
 				}
-                if (endspin)
-                    spinning = false;
+
+				if(endspin) {
+					spinning = false;
+					_speed = 75;
+					if(velocity.X == 0) {
+						_cycleNum = (enable3d ? 1 : 0);
+					} else {
+						_cycleNum = (enable3d ? 3 : 2);
+					}
+				}
 
 				Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
 				if(collidingAxis == -1) { //no collision
@@ -618,9 +663,9 @@ namespace U5Designs
                         if ((xdist < (enemyZone + spinSize)) && ydist < ((CombatObject)obj).cbox.Y + cbox.Y) {
 
                             if (((CombatObject)obj).type == 1) {// obj is an enemy, hurt it
-                                ((CombatObject)obj).health = ((CombatObject)obj).health - spinDamage;
-                            }
-                            if (((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
+								((CombatObject)obj).health = ((CombatObject)obj).health - spinDamage;
+								((Enemy)obj).knockback(enable3d, this);
+                            } else if (((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
                                 //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
                                 if (!((Projectile)obj).playerspawned) {
                                     //despawn the projectile
@@ -662,8 +707,16 @@ namespace U5Designs
 						}
 					}
 				}
-                if (endspin)
-                    spinning = false;
+
+				if(endspin) {
+					spinning = false;
+					_speed = 75;
+					if(velocity.X == 0) {
+						_cycleNum = (enable3d ? 1 : 0);
+					} else {
+						_cycleNum = (enable3d ? 3 : 2);
+					}
+				}
 
 				Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
 				if(collidingAxis == -1) { //no collision

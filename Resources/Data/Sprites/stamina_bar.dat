@@ -1,0 +1,9 @@
+<sprite>
+	<bmp>stamina_bar.png</bmp>
+  <c_starts>0</c_starts>
+  <c_lengths>1</c_lengths>
+  <t_width>1026</t_width>
+  <t_height>50</t_height>
+  <hasAlpha>true</hasAlpha>
+  <fps>1.0</fps>
+</sprite>

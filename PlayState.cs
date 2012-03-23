@@ -47,6 +47,7 @@ namespace U5Designs
 		private bool nowBillboarding; //true when billboarding objects should rotate into 3d view
         Texture Healthbar, bHealth;
 		int MaxHealth;
+		public SpriteSheet staminaBar, staminaBack, staminaFrame;
 
 		bool tabDown;
 		public bool clickdown = false;
@@ -306,7 +307,11 @@ namespace U5Designs
 					} else {
 						//if(!obj.sprite.hasAlpha) {
 							obj.doScaleTranslateAndTexture();
-							obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+							if(isInTransition) { //Pause all animations in transition
+								obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+							} else {
+								obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+							}
 						//}
 					}
 				}
@@ -331,12 +336,55 @@ namespace U5Designs
             bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 650, scaleX: 0.5f, scaleY: 0.8f);
 			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 300, 650, scaleX: 0.5f, scaleY: 0.8f, decrementX: dec);
 
+			drawStaminaBar();
+
             // UNCOMMENT TO ADD MOTION BLUR
             //if (isInTransition)
             //{
             //    GL.Accum(AccumOp.Accum, 0.9f);
             //}
         }
+
+		public void drawStaminaBar() {
+			GL.Disable(EnableCap.DepthTest);
+
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Replace);
+
+			GL.MatrixMode(MatrixMode.Projection);
+			GL.PushMatrix();
+			GL.LoadIdentity();
+			GL.Ortho(0, 1280, 0, 720, 0, 1);
+			GL.MatrixMode(MatrixMode.Modelview);
+			GL.PushMatrix();
+			GL.LoadIdentity();
+
+			GL.PushMatrix();
+			GL.Translate(1000, 675, 0);
+			GL.Scale(512, 25, 0);
+			staminaBack.draw(false, Billboarding.Lock2d);
+
+			GL.PushMatrix();
+			double scale = player.stamina / player.maxStamina;
+			GL.Translate(744.0 + 256.0 * scale, 675, 0);
+			GL.Scale(512.0 * scale, 25, 0);
+
+			staminaBar.draw(false, Billboarding.Lock2d);
+
+			GL.PushMatrix();
+			GL.Translate(1000, 675, 0);
+			GL.Scale(512, 25, 0);
+			staminaFrame.draw(false, Billboarding.Lock2d);
+
+			GL.PopMatrix();
+			GL.Enable(EnableCap.DepthTest);
+			GL.MatrixMode(MatrixMode.Projection);
+			GL.PopMatrix();
+			GL.MatrixMode(MatrixMode.Modelview);
+		}
 
         /// <summary>
         /// Switches the sprites and bounding boxes of anything that billboards
