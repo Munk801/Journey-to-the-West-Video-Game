@@ -30,19 +30,17 @@ namespace U5Designs
         protected Vector3 eye, lookat;
         Obstacle background;
         MouseDevice mouse;
-
-        static string test = "../../Resources/Sound/Retribution.ogg";
-        public AudioFile testFile = new AudioFile(test);
+        AudioFile testFile;
 
         // testing buttons
         //Obstacle play_button_npress, play_button_press, load_button_npress, load_button_press, quit_button_press, quit_button_npress;
+        private int numOfButtons = 3;
         int _cur_butn = 0;
         OpenTK.Input.KeyboardState _old_state;
 
         // New Buttons
-        //TextureManager StateTextureManager;
-        Texture menu, arrow, play_press, play_nopress, load_nopress, load_press, quit_nopress, quit_press;
-        float arX, b1Y, b2Y, b3Y;
+        Texture menu, arrow, play_press, play_nopress, load_nopress, load_press, quit_nopress, quit_press, ld_nopress, ld_press;
+        float arX, b1Y, b2Y, b3Y, b4Y;
         public bool enterdown;
 
         public bool clickdown = false;
@@ -72,7 +70,12 @@ namespace U5Designs
             play_nopress = eng.StateTextureManager.GetTexture("play");
             eng.StateTextureManager.LoadTexture("playpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play_hover.png"));
             play_press = eng.StateTextureManager.GetTexture("playpress");
+            eng.StateTextureManager.LoadTexture("ld", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_leveldesign.png"));
+            ld_nopress = eng.StateTextureManager.GetTexture("ld");
+            eng.StateTextureManager.LoadTexture("ldpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_leveldesign_hover.png"));
+            ld_press = eng.StateTextureManager.GetTexture("ldpress");
 
+            testFile = new AudioFile(audAssembly.GetManifestResourceStream("U5Designs.Resources.Sound.Retribution.ogg"));
 
 
             // Setup saved game data 
@@ -97,6 +100,7 @@ namespace U5Designs
             b1Y = 0.0f;
             b2Y = -100.0f;
             b3Y = -200.0f;
+            b4Y = -250.0f;
 
             // TEST //
             enterdown = false;
@@ -139,18 +143,28 @@ namespace U5Designs
                     play_press.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
                     load_nopress.Draw2DTexture(0, b2Y);
                     quit_nopress.Draw2DTexture(0, b3Y);
+                    ld_nopress.Draw2DTexture(0, b4Y);
                     break;
                 case 1:
                     arrow.Draw2DTexture(arX, b2Y);
                     play_nopress.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
                     load_press.Draw2DTexture(0, b2Y);
                     quit_nopress.Draw2DTexture(0, b3Y);
+                    ld_nopress.Draw2DTexture(0, b4Y);
                     break;
                 case 2:
                     arrow.Draw2DTexture(arX, b3Y);
                     play_nopress.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
                     load_nopress.Draw2DTexture(0, b2Y);
                     quit_press.Draw2DTexture(0, b3Y);
+                    ld_nopress.Draw2DTexture(0, b4Y);
+                    break;
+                case 3:
+                    arrow.Draw2DTexture(arX, b4Y);
+                    play_nopress.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
+                    load_nopress.Draw2DTexture(0, b2Y);
+                    quit_nopress.Draw2DTexture(0, b3Y);
+                    ld_press.Draw2DTexture(0, b4Y);
                     break;
             }
         }
@@ -172,6 +186,10 @@ namespace U5Designs
             if (eng.ThisMouse.inButtonRegion(quit_press))
             {
                 _cur_butn = 2;
+            }
+            if (eng.ThisMouse.inButtonRegion(ld_press))
+            {
+                _cur_butn = 3;
             }
 
             if (eng.ThisMouse.LeftPressed() && !clickdown)
@@ -232,13 +250,13 @@ namespace U5Designs
                 (_new_state.IsKeyDown(Key.S) && !_old_state.IsKeyDown(Key.S)))
             {
                 // Down key was just pressed
-                if (_cur_butn < 2)
+                if (_cur_butn < numOfButtons)
                 {
                     // Increment the current button index so you draw the highlighted button of the next button 
                     _cur_butn += 1;
                     eng.selectSound.Play();
                 }
-                else if (_cur_butn >= 2)
+                else if (_cur_butn >= numOfButtons)
                 {
                     // Were on the last button in the list so reset to the top of the button list
                     _cur_butn = 0;
@@ -258,7 +276,7 @@ namespace U5Designs
                 else if (_cur_butn <= 0)
                 {
                     // Were on the last button in the list so reset to the top of the button list
-                    _cur_butn = 2;
+                    _cur_butn = numOfButtons;
                     eng.selectSound.Play();
                 }
             }
@@ -311,6 +329,25 @@ namespace U5Designs
                 if (_cur_butn == 2)
                 {
                     eng.Exit();
+                }
+                if (_cur_butn == 3)
+                {
+                    // load saved game pressed
+                    //transition into PlayState
+                    if (eng.GameInProgress)
+                    {
+                        eng.PopState();
+                    }
+                    else
+                    {
+                        // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
+                        testFile.Stop();
+
+                        // Otherwise pass the level index from the saved game
+                        LevelDesignerState ps = new LevelDesignerState(this, eng, saved_level_index);
+                        eng.ChangeState(ps);
+                        eng.GameInProgress = true;
+                    }
                 }
             }
             else if (!eng.Keyboard[Key.Enter])

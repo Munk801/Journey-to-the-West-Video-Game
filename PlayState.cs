@@ -37,6 +37,8 @@ namespace U5Designs
 		internal List<AIObject> aiList;// aka list of enemies
 		internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
 		internal List<Background> backgroundList;
+        
+        internal AudioFile levelMusic;
 
 		public SphereRegion bossRegion;
 		public SphereRegion endRegion;
@@ -48,7 +50,7 @@ namespace U5Designs
         Texture Healthbar, bHealth;
 		int MaxHealth;
 		public SpriteSheet staminaBar, staminaBack, staminaFrame;
-
+        
 		bool tabDown;
 		public bool clickdown = false;
 
@@ -90,6 +92,9 @@ namespace U5Designs
             eng.StateTextureManager.LoadTexture("bHealth", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_bottom.png"));
             bHealth = eng.StateTextureManager.GetTexture("bHealth");
             MaxHealth = player.health;
+            Assembly musicAssembly = Assembly.GetExecutingAssembly();
+            //levelMusic = new AudioFile(musicAssembly.GetManifestResourceStream("U5Designs.Resources.Sound.Level1.ogg"));
+            
 
 			//Thanks to OpenTK samples for part of this shader code
 			//Initialize Shader
@@ -115,6 +120,8 @@ namespace U5Designs
             GL.AttachShader(shaderProgram, frag);
             GL.LinkProgram(shaderProgram);
             GL.UseProgram(shaderProgram);
+
+            levelMusic.ReplayFile();
         }
 
         /// <summary>
@@ -155,6 +162,12 @@ namespace U5Designs
             //First deal with hardware input
             DealWithInput();
 
+
+            if (levelMusic.CurrentSource.FileHasEnded)
+            {
+                levelMusic.CurrentSource.FileHasEnded = false;
+                levelMusic.ReplayFile();
+            }
             //Next check if the player is dead. If he is, game over man
             if (player.health <= 0) {
                 GameOverState GGbro = new GameOverState(menustate, eng);
@@ -333,8 +346,8 @@ namespace U5Designs
 			//}
 
 			float dec = (float)player.health / MaxHealth;
-            bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 650, scaleX: 0.5f, scaleY: 0.8f);
-			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 300, 650, scaleX: 0.5f, scaleY: 0.8f, decrementX: dec);
+            bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 650, scaleX: 0.5f, scaleY: 0.6f);
+			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 300, 650, scaleX: 0.5f, scaleY: 0.6f, decrementX: dec);
 
 			drawStaminaBar();
 
@@ -438,6 +451,7 @@ namespace U5Designs
                 
                 //eng.PushState(pst);
                 // test
+                levelMusic.Stop();
                 eng.ChangeState(pst);
                 
                 //LoadLevel.Load(0, pst);
@@ -446,6 +460,7 @@ namespace U5Designs
             if (eng.Keyboard[Key.Escape] || eng.Keyboard[Key.Tilde])
             {
                 //eng.PushState(menustate);
+                levelMusic.Stop();
                 eng.PushState(pms);
             }
 

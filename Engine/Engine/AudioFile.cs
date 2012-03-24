@@ -12,12 +12,12 @@ namespace Engine
         public class AudioFile
         {
             VorbisFile sourceAudio;
-
+            public AudioSource CurrentSource;
+            bool IsOver = false;
             public AudioFile(string fileName)
             {
                 sourceAudio = new VorbisFile(fileName);
                 RemoveDelay(64 * 1024);
-
             }
 
             public AudioFile(Stream inputStream)
@@ -29,7 +29,7 @@ namespace Engine
             protected void RemoveDelay(int bytes)
             {
                 VorbisFileInstance sourceInstance = sourceAudio.makeInstance();
-
+                
                 int totalBytes = 0;
                 byte[] buffer = new byte[4096];
 
@@ -41,6 +41,15 @@ namespace Engine
                         break;
 
                     totalBytes += bytesRead;
+                }
+            }
+
+            public void ReplayFile()
+            {
+                lock (AudioManager.Manager)
+                {
+                    
+                    AudioManager.Manager.PlayFile(sourceAudio.makeInstance(), out CurrentSource);
                 }
             }
 

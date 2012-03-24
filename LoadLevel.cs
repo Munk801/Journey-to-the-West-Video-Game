@@ -27,7 +27,7 @@ namespace U5Designs
 			ps.physList = new List<PhysicsObject>();
 			ps.colisionList = new List<PhysicsObject>();
 			ps.backgroundList = new List<Background>();
-
+            
 			/**
 			 * This next section of code will read in a level file and create an array of Enemy files to be parsed.
 			 * */
@@ -41,11 +41,15 @@ namespace U5Designs
 			XmlNodeList _e_list = doc.GetElementsByTagName("enemy");
 			XmlNodeList _o_list = doc.GetElementsByTagName("obstacle");
 			XmlNodeList _d_list = doc.GetElementsByTagName("decoration");
+            XmlNodeList _a_list = doc.GetElementsByTagName("audiofile");
 			fstream.Close();
 
 			ps.endRegion = parseRegion(endRegion);
 
-			List<Enemy> _elist = parse_Enemy_File(_e_list);
+            XmlNode aud = _a_list[0];
+            ps.levelMusic = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music." + aud.InnerText));
+			
+            List<Enemy> _elist = parse_Enemy_File(_e_list);
 			foreach(Enemy e in _elist) {
 				ps.objList.Add(e);
 				ps.physList.Add(e);

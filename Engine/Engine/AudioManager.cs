@@ -138,6 +138,7 @@ namespace Engine
             }
         }
 
+
         // Play Call
         public void PlayFile(VorbisFileInstance audioFile)
         {
@@ -150,11 +151,37 @@ namespace Engine
                         source.PlaySource(audioFile);
                         return;
                     }
+
                 }
                 catch (Exception e)
                 {
 					Console.WriteLine("AudioManager threw exception!");
                     Console.WriteLine(e.StackTrace);
+                }
+            }
+        }
+
+        public void PlayFile(VorbisFileInstance audioFile, out AudioSource currentSource)
+        {
+            currentSource = null;
+            foreach (AudioSource source in AudioSources)
+            {
+                try
+                {
+                    if (source.IsFree)
+                    {
+                        Thread.Sleep(500);
+                        source.PlaySource(audioFile);
+                        currentSource = source;
+                        return;
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("AudioManager threw exception!");
+                    Console.WriteLine(e.StackTrace);
+                    currentSource = null;
                 }
             }
         }

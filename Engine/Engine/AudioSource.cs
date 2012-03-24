@@ -29,8 +29,8 @@ namespace Engine
         public ALFormat AudioFormat {get; private set;}
         public int AudioRate {get; private set;}
 
-        private bool FileHasEnded; 
-
+        public bool FileHasEnded;
+        public bool Replay;
         public bool IsFree
         {
             get
@@ -156,7 +156,6 @@ namespace Engine
             for (int i = 0; i < BufferCount; i++)
             {
                 int bytesRead = source.read(SegmentBuffer, SegmentBuffer.Length, _BIGENDIANREADMODE, _WORDREADMODE, _SGNEDREADMODE, null);
-
                 if (bytesRead > 0)
                 {
                     AL.BufferData(Buffers[i], AudioFormat, SegmentBuffer, bytesRead, AudioRate);
@@ -200,15 +199,16 @@ namespace Engine
 
                 // Check if we reached an end of file situation
                 // CHANGE BACK TO TWO SEPARATE IF CALLS IF DOESN'T WORK
+
                 if (FileHasEnded && queuedBuffers <= processedBuffers)
                 {
                         // Source is done
-                        AL.SourceStop(Source);
-                        SourceFile = null;
+                    AL.SourceStop(Source);
+                    SourceFile = null;
 
-                        RemoveEmptyBuffers();
+                    RemoveEmptyBuffers();
 
-                        return;
+                    return;
                 }
 
                 // Buffering isn't done so continue
@@ -250,10 +250,12 @@ namespace Engine
                         else if (bytesRead == 0)
                         {
                             FileHasEnded = true;
+                            
                         }
 
                         else
                         {
+                            
                             AL.SourceStop(Source);
                             SourceFile = null;
                             break;
@@ -273,6 +275,9 @@ namespace Engine
             }
         }
 
-
+        internal void SetReplayBool()
+        {
+            Replay = true;
+        }
     }
 }

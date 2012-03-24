@@ -102,7 +102,7 @@ namespace U5Designs
 			markerList = new List<Decoration>();
 
 			Assembly assembly_new = Assembly.GetExecutingAssembly();
-			jumpSound = new AudioFile("../../Resources/Sound/jump_sound.ogg");
+			jumpSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.jump_sound.ogg"));
 			bananaSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
 			hurtSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
         }
