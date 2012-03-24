@@ -20,6 +20,7 @@ namespace U5Designs
         internal Vector3 velocity;
         internal Vector3 accel;
         private bool doesGravity; //true if gravity affects this object
+		public bool moving; //true when the enemy is currently moving (used for animations)
 
         //timers
         public bool frozen;
@@ -72,6 +73,7 @@ namespace U5Designs
             velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);
 			kbspeed = new Vector3(70, 100, 70);
+			moving = false;
             doesGravity = true;
 
             CurrentAI = new Stack<Airoutine>();
@@ -166,6 +168,9 @@ namespace U5Designs
                 freezetimer = 0;
             }
             if (!frozen) {
+				//save location to determine later if we moved
+				Vector3 initLoc = new Vector3(_location);
+
                 if (doesGravity) {
                     accel.Y -= (float)(gravity * time);
                 }
@@ -298,7 +303,12 @@ namespace U5Designs
                     }
                 }
 
-                
+                //Set moving flag
+				if(_location.X != initLoc.X || _location.Y != initLoc.Y) {
+					moving = true;
+				} else {
+					moving = false;
+				}
             }
         }
 
@@ -314,7 +324,10 @@ namespace U5Designs
                 frozen = false;
                 freezetimer = 0;
             }
-            if (!frozen) {
+			if(!frozen) {
+				//save location to determine later if we moved
+				Vector3 initLoc = new Vector3(_location);
+
                 //first do gravity
                 if (doesGravity) {
                     accel.Y -= (float)(gravity * time);
@@ -434,6 +447,13 @@ namespace U5Designs
                         }
                     }
                 }
+
+				//Set moving flag
+				if(_location.X != initLoc.X || _location.Y != initLoc.Y) {
+					moving = true;
+				} else {
+					moving = false;
+				}
             }
         }
 

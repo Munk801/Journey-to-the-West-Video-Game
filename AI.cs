@@ -24,6 +24,9 @@ namespace U5Designs {
  * */
     internal class Kidmoveto : Airoutine{
         public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
+			//update current animation
+			me.cycleNumber = (me.moving ? 0 : 1);
+
             me.attackspeed = 1; //delay between each projectile (hack initilization)
             if (!me.frozen) {
                 if (VectorUtil.dist(playerposn, me.location) > 90) {
@@ -78,7 +81,10 @@ namespace U5Designs {
     }
 
     internal class KidThrowTime : Airoutine {
-        public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
+		public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
+			//update current animation
+			me.cycleNumber = 1;
+
             if (!me.frozen) {
                 if (VectorUtil.dist(playerposn, me.location) <= 90) {
                     if (me.attackdelayed)
