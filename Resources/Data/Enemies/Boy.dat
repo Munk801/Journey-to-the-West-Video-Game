@@ -1,7 +1,13 @@
 <enemy>
-	<scale x="25" y="25" z="25"/>
-	<pbox x="12.5" y="12.5" z="12.5"/>
-	<cbox x="12.5" y="12.5" z="12.5"/>
+  <scale x="26.25" y="35" z="26.25"/>
+  <pbox x="7.6125" y="17.5" z="7.6125"/>
+  <cbox x="7.0" y="17.5" z="7.0"/>
+  
+  <!-- scale, pbox, and cbox below (ignored) are for the boy slightly smaller,
+       delete when we're sure we're happy with the size -->
+	<scale x="18.75" y="25" z="18.75"/>
+	<pbox x="5.4375" y="12.5" z="5.4375"/>
+	<cbox x="5.4375" y="12.5" z="5.4375"/>
 	<draw2>true</draw2>
 	<draw3>true</draw3>
 	<health>2</health>
