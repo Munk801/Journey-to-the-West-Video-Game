@@ -24,8 +24,6 @@
 		<enemy>
 			<path>Bird.dat</path>
 			<loc x="200" y="60" z="50"/>
-			<loc x="3800" y="250" z="50"/>
-			<loc x="4000" y="250" z="50"/>
 		</enemy>
 		<enemy>
 		  <path>Girl.dat</path>

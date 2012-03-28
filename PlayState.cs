@@ -22,11 +22,14 @@ namespace U5Designs
     {
         //debug
         bool aienabled = true;
+        bool bossdebug = true;
 
 		internal GameEngine eng;
 		MainMenuState menustate;
 		PauseMenuState pms;
 		internal Player player;
+        internal ZookeeperAI bossAI;
+        internal bool bossMode;
 		internal Camera camera;
 
         //These are the lists of all objects in the game
@@ -62,6 +65,10 @@ namespace U5Designs
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
 			//TODO: pass this the right file to load from
 
+            //TODO: initlize the boss in loadlevel
+            bossAI = new ZookeeperAI(player);
+            bossMode = false;
+            
 			// undo this when done testing ObjList = LoadLevel.Load(current_level);
 			LoadLevel.Load(0, this);
 
@@ -115,6 +122,11 @@ namespace U5Designs
             GL.AttachShader(shaderProgram, frag);
             GL.LinkProgram(shaderProgram);
             GL.UseProgram(shaderProgram);
+
+            if (bossdebug) {
+                bossMode = true;
+                player.location = new Vector3(4000, 150, 50);
+            }
         }
 
         /// <summary>
@@ -169,6 +181,7 @@ namespace U5Designs
 			//Uncomment this when we have an actual boss
 			//if(bossRegion.contains(player.location) {
 			//    //Entered boss area - make changes to camera, etc
+            //    bossMode = true;
 			//}
 
 			//Determine which screen region everything is in
@@ -210,15 +223,21 @@ namespace U5Designs
             if (isInTransition) {
 				isInTransition = camera.TransitionState(enable3d, e.Time);
 			} else {
-				//Deal with everyone's acceleration
+				//Deal with everyone's acceleration, run AI on enemies
 				player.updateState(enable3d, eng.Keyboard, e.Time, this);
-				foreach(AIObject aio in aiList) {
-					if(aio.ScreenRegion == GameObject.ON_SCREEN) {
-                        if (aienabled) {
-                            aio.aiUpdate(e.Time, this, player.location, enable3d, physList);
+                if (!bossMode) {
+                    foreach (AIObject aio in aiList) {
+                        if (aio.ScreenRegion == GameObject.ON_SCREEN) {
+                            if (aienabled) {
+                                aio.aiUpdate(e.Time, this, player.location, enable3d, physList);
+                            }
                         }
-					}
-				}
+                    }
+                }
+                else { //if we are in boss mode then route controll to the bosses code instead of the enemy updates
+                    //update the boss
+                    bossAI.update(e.Time, this, player.location, enable3d);
+                }
 
 				//Now that everyone's had a chance to accelerate, actually
 				//translate that into velocity and position
