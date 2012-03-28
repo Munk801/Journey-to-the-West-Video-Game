@@ -195,6 +195,41 @@ namespace U5Designs
 				return new SpriteSheet(bmps, cycleStarts, cycleLengths, _width, _height, _hasAlpha, _fps);
 			}
 		}
+        public static Obstacle parse_single_3d_obstacle(string path) {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            Stream fstream;
+            string _o_path = "U5Designs.Resources.Data.Obstacles." + path;
+            fstream = assembly.GetManifestResourceStream(_o_path);
+            XmlDocument doc = new XmlDocument();
+            doc.Load(fstream);
+
+            Vector3 scale = parseVector3(doc.GetElementsByTagName("scale")[0]);
+            Vector3 pbox = parseVector3(doc.GetElementsByTagName("pbox")[0]);
+
+            bool _draw2 = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
+            bool _draw3 = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
+
+            bool _collides2d = Convert.ToBoolean(doc.GetElementsByTagName("collidesIn2d")[0].InnerText);
+            bool _collides3d = Convert.ToBoolean(doc.GetElementsByTagName("collidesIn3d")[0].InnerText);
+
+            // Check to see if the current Obstacle is 2D or 3D and handle accordingly
+            XmlNodeList _type = doc.GetElementsByTagName("is2d");
+            if (Convert.ToBoolean(_type.Item(0).InnerText)) {
+                Console.Out.WriteLine("ERROR: obstacle +" + _o_path + "is not a 3d object, it must be 3d");
+                return null;
+            }
+            else {
+                XmlNodeList _m = doc.GetElementsByTagName("mesh");
+                ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
+
+                XmlNodeList _b = doc.GetElementsByTagName("bmp");
+                MeshTexture _tex = new MeshTexture(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + _b.Item(0).InnerText)));
+
+                fstream.Close();
+                Vector3 loc = new Vector3(0, 0, 0);
+                    return new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, _mesh, _tex);  
+            }
+        }
 
 		/**
 		 * This method will take an XMLNodeList that contains all the Obstacle objects that need to be created

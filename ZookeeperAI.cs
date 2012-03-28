@@ -10,19 +10,51 @@ using OpenTK.Graphics.OpenGL;
 
 using Engine;
 namespace U5Designs {
+    /*  Sizes for the boss and his boxes
+     * each box must be 75x75
+     * pbox = 37.5
+     * scale = 37.5
+     * 
+     * floor is at 125
+     * */
 
     public class ZookeeperAI {
-        Crate bossobject;
-        public ZookeeperAI(Player player) {
-            bossobject = new Crate(player);
+        Boss bossobject;
+        int maxHeight = 300;
+        public ZookeeperAI(Player player, PlayState ps) {
+            bossobject = new Boss(player, ps, new Vector3(4200, 125, 25), maxHeight);
+            ps.objList.Add(bossobject);
+            ps.physList.Add(bossobject);
+            ps.colisionList.Add(bossobject);
+            ps.renderList.Add(bossobject);
+            ps.combatList.Add(bossobject);
             //initlize arrays of crates + boss(fallingbox)
-            // the boss will be swapped around into diffrent locations in the array.
+
+            bossobject.setPosition(new Vector3(4200, maxHeight, 25));
         }
         public void update(double time, PlayState playstate, Vector3 playerposn, bool enable3d) {
-            //do Ai code, update the array of crates
-            
+            //do Ai code, update the list of crates
             //tmp: pass update to the just the lone boss object for now
-            bossobject.update(time, playstate, playerposn, enable3d);
+            if (bossobject.idle)
+                bossobject.fall();
+
+
+
+
+            bossobject.update(time, playstate, playerposn, enable3d);// always pass controll to update
+        }
+
+        public int gethealth() {
+            return bossobject.health;
+        }
+
+        public void killBoss(PlayState ps) {
+            //TODO: whatever happens when the boss dies
+            ps.objList.Remove(bossobject);
+            ps.physList.Remove(bossobject);
+            ps.colisionList.Remove(bossobject);
+            ps.renderList.Remove(bossobject);
+            ps.combatList.Remove(bossobject);
         }
     }
 
@@ -32,24 +64,27 @@ namespace U5Designs {
     }
 
     public class Boss : GameObject, RenderObject, PhysicsObject, CombatObject, fallingbox {
-
         //see below this class for the crate object that isnt the boss (TODO)
+
         //physics vars
         internal Vector3 velocity;
         internal Vector3 accel;
         private bool doesGravity; //true if gravity affects this object
+        private int minHeight, maxHeight, preHeight;
 
         public Player player;
 
         private bool pbox2d, pbox3d; //these controll if normal physics happens
 
-        public Boss(Player player) {
+        private Obstacle mybox;
+
+        public Boss(Player player, PlayState ps, Vector3 location, int maxheight) {
             //TODO: set this up, make sure its right(especially animation).
+            //NOTE: the stuff here is the actual boss, the sprite that takes damage.
             //physics stuff
             velocity = new Vector3(0, 0, 0);
             accel = new Vector3(0, 0, 0);
             doesGravity = false;
-            _location = new Vector3(4200, 150, 50);
             _scale = new Vector3(12,12,12);
             _pbox = new Vector3(6,6,6);
             _cbox = new Vector3(6,6,6);
@@ -57,36 +92,113 @@ namespace U5Designs {
             _existsIn2d = true;
             pbox2d = true;
             pbox3d = true;
+            maxHeight = maxheight;
+            falling = false;
+            rising = false;
+            prefalling = false;
+            idle = true;
 
             //combat stuff
-            _health = 20;
+            _health = 10;
             _damage = 1;
             _speed = 1;
             _alive = true;
             _hascbox = true;
-            //this should make the boss's sprite take damage like any enemy
-            _type = 1;// type one means this is an enemy;
+            _type = 3; //Type 3 means this is the boss
 
             //animation
-            _mesh = mesh;
-            _texture = texture;
-            _sprite = null;
+            _mesh = null; //
+            _texture = null;
+            _sprite = LoadLevel.parse_Sprite_File("zoo_keeper_sprite.dat");
             _cycleNum = 0;
             _frameNum = 0;
-            _is3dGeo = true;
+            _is3dGeo = false;
             _animDirection = 1;
+
+            //setup the sub-objects of the boss
+            mybox = LoadLevel.parse_single_3d_obstacle("zoo_keeper_crate.dat");
+            ps.objList.Add(mybox);
+            ps.physList.Add(mybox);
+            ps.renderList.Add(mybox);
+
+
+            //initlize everythings location based on the seed location
+            mybox.location = location + new Vector3(0, mybox.pbox.Y, 0);
+            _location = location + new Vector3(0, (mybox.pbox.Y *2) + pbox.Y, 0); //boss sprite
+            minHeight = 125;
+            preHeight = 210;
+        }
+        double downtimer, pretimer;
+        double downtime = 3;
+        double pretime = 1.5;
+        public bool falling, rising, prefalling, idle; // true when currently doing an anamation
+        public void update(double time, PlayState playstate, Vector3 playerposn, bool enable3d) {
+            if (prefalling) {
+                if ((mybox.location.Y - mybox.pbox.Y) <= preHeight) {
+                    setPosition(new Vector3(mybox.location.X, preHeight, mybox.location.Z));
+                    velocity = new Vector3(0, 0, 0);
+
+                    pretimer = pretimer + time;
+                    if (pretimer >= pretime) {
+                        pretimer = 0;
+                        falling = true;
+                        prefalling = false;
+                    }
+                }
+                else {
+                    velocity = new Vector3(0, -200, 0);
+                }
+            }
+            if (falling) {
+                if ((mybox.location.Y - mybox.pbox.Y) <= minHeight) {
+                    setPosition(new Vector3(mybox.location.X, minHeight, mybox.location.Z));
+                    velocity = new Vector3(0, 0, 0);
+
+                    downtimer = downtimer + time;
+                    if (downtimer >= downtime) {
+                        downtimer = 0;
+                        falling = false;
+                        rising = true;
+                    }
+                }
+                else {
+                    velocity = new Vector3(0, -200, 0);
+                }
+            }
+            if (rising) {
+                if (mybox.location.Y >= maxHeight) {
+                    setPosition(new Vector3(mybox.location.X, maxHeight, mybox.location.Z));
+                    velocity = new Vector3(0, 0, 0);
+                    rising = false;
+                    idle = true;
+                }
+                else {
+                    velocity = new Vector3(0, 80, 0);
+                }
+            }
         }
 
-        public void update(double time, PlayState playstate, Vector3 playerposn, bool enable3d) {
+        public void fall(){
+            if (idle) {
+                idle = false;
+                prefalling = true;
+            }
+        }
 
-
+        public void setPosition(Vector3 newposn) {
+            mybox.location = newposn + new Vector3(0, mybox.pbox.Y, 0);
+            _location = newposn + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y, 0); //boss sprite
         }
 
 
         public void physUpdate3d(double time, List<PhysicsObject> physList) {
+            mybox.location += velocity * (float)time;
+            _location += velocity * (float)time;
         }
 
         public void physUpdate2d(double time, List<PhysicsObject> physList) {
+            mybox.location += velocity * (float)time;
+            _location += velocity * (float)time;
         }
         /*  The following are helper methods + getter/setters
        * 

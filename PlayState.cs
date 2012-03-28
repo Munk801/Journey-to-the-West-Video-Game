@@ -65,9 +65,7 @@ namespace U5Designs
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
 			//TODO: pass this the right file to load from
 
-            //TODO: initlize the boss in loadlevel
-            bossAI = new ZookeeperAI(player);
-            bossMode = false;
+            
             
 			// undo this when done testing ObjList = LoadLevel.Load(current_level);
 			LoadLevel.Load(0, this);
@@ -76,6 +74,10 @@ namespace U5Designs
             foreach (AIObject aio in aiList) {
                 ((Enemy)aio).player = player;
             }
+
+            //TODO: initlize the boss in loadlevel
+            bossAI = new ZookeeperAI(player, this);
+            bossMode = false;
 
             //deal with states
             menustate = prvstate;
@@ -125,7 +127,8 @@ namespace U5Designs
 
             if (bossdebug) {
                 bossMode = true;
-                player.location = new Vector3(4000, 150, 50);
+                //floor at 125 + 12.5 player pbox
+                player.location = new Vector3(3950, 137.5f, 50);
             }
         }
 
@@ -183,6 +186,11 @@ namespace U5Designs
 			//    //Entered boss area - make changes to camera, etc
             //    bossMode = true;
 			//}
+            //do boss dies stuff, transition to next level?
+            if (bossMode && (bossAI.gethealth() <= 0)) {
+                bossAI.killBoss(this);
+                //transition to next level? or state? or w/e
+            }
 
 			//Determine which screen region everything is in
 			foreach(GameObject go in objList) {

@@ -22,9 +22,11 @@ namespace Engine {
 		int ScreenRegion { get; }
 
         /*
-         * IMPORTANT!!! this variable determins the type of combat object for the sake of handling collision with the player
+         * IMPORTANT!!! this variable determins the type of combat object for the sake of handling collision between objects
+         * 0 = player
          * 1 = enemy
          * 2 = projectile
+         * 3 = zookeeper
          */
         int type { get; }
 

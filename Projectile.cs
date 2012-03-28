@@ -182,7 +182,7 @@ namespace U5Designs {
 							//    time = 0.0;
 							//}
                         }
-                        if (((CombatObject)collidingObj).type == 1) { //hit an enemy
+                        if (((CombatObject)collidingObj).type == 1 || ((CombatObject)collidingObj).type == 3) { //hit an enemy or a boss
                             if (playerspawned) {
                                 time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
@@ -286,7 +286,7 @@ namespace U5Designs {
                                 player.knockback(false, this);
                             }
                         }
-                        if (((CombatObject)collidingObj).type == 1) { //hit an enemy
+                        if (((CombatObject)collidingObj).type == 1 || ((CombatObject)collidingObj).type == 3) { //hit an enemy or boss
                             if (playerspawned) {
                                 time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
