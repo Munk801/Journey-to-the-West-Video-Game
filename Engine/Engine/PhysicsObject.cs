@@ -10,6 +10,7 @@ namespace Engine {
 		//duplicated from GameObject
 		Vector3 location { get; }
 		bool hascbox { get; }
+        bool canSquish { get; }
 		bool existsIn3d { get; }
 		bool existsIn2d { get; }
 

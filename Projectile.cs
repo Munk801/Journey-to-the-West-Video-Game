@@ -43,6 +43,7 @@ namespace U5Designs {
 			_damage = p.damage;
 			_speed = p.speed;
 			_sprite = p.sprite;
+            _type = 2;
 			doesGravity = p.gravity;
             this.player = player;
 			this.duration = p.duration;
@@ -74,6 +75,7 @@ namespace U5Designs {
             _damage = damage;
             _speed = speed;
             _alive = true;
+            _type = 2;
 			_hascbox = true;
 			duration = -1.0;
 			liveTime = 0.0;
@@ -171,27 +173,29 @@ namespace U5Designs {
                     else { //this is a combat collision
                         //time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
                         if (((CombatObject)collidingObj).type == 0) { //hit the player
-                            if (!playerspawned) {
+                            if (type != 4) {
                                 time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
-                                player.knockback(true, this);
+                                player.knockback(false, this);
                             }
-							//else {
-							//    _location += velocity * (float)time;
-							//    time = 0.0;
-							//}
+                            else {
+                                time = 0.0;
+                                if (player.onGround)
+                                    player.squish();
+                                else {
+                                    player.squish();
+                                    player.accelerate(velocity);
+                                }
+                                health = 0;
+                            }
                         }
-                        if (((CombatObject)collidingObj).type == 1) { //hit an enemy
+                        if (((CombatObject)collidingObj).type == 1 || ((CombatObject)collidingObj).type == 3) { //hit an enemy or a boss
                             if (playerspawned) {
                                 time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
                             }
-							//else {
-							//    _location += velocity * (float)time;
-							//    time = 0.0;
-							//}
                         }
                     }
                 }
@@ -280,13 +284,25 @@ namespace U5Designs {
                     else { //this is a combat collision
                         if (((CombatObject)collidingObj).type == 0) { //hit the player
                             if (!playerspawned) {
-                                time = 0.0;
-                                ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
-                                health = 0;
-                                player.knockback(false, this);
+                                if (type != 4) {
+                                    time = 0.0;
+                                    ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
+                                    health = 0;
+                                    player.knockback(false, this);
+                                }
+                                else {
+                                    time = 0.0;
+                                    if (player.onGround)
+                                        player.squish();
+                                    else {
+                                        player.squish();
+                                        player.accelerate(velocity);
+                                    }
+                                    health = 0;
+                                }
                             }
                         }
-                        if (((CombatObject)collidingObj).type == 1) { //hit an enemy
+                        if (((CombatObject)collidingObj).type == 1 || ((CombatObject)collidingObj).type == 3) { //hit an enemy or boss
                             if (playerspawned) {
                                 time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
@@ -316,6 +332,10 @@ namespace U5Designs {
 			_cbox.X = _cbox.Z;
 			_cbox.Z = temp;
 		}
+
+        public bool canSquish {
+            get { return false; }
+        }
 
         public bool is3dGeo {
             get { return false; } //currently all projectiles are sprites - change if needed
@@ -372,8 +392,10 @@ namespace U5Designs {
             get { return _cbox; }
         }
 
+        private int _type;
         public int type {
-            get { return 2; } //2 for projectile
+            get { return _type; }
+            set { _type = value; }
         }
 
         private int _cycleNum;

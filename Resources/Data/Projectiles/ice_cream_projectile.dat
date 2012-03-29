@@ -4,7 +4,6 @@
 	<cbox x="4" y="4" z="4" />
 	<draw2>true</draw2>
 	<draw3>true</draw3>
-	<damage>1</damage>
 	<speed>150.0</speed>
 	<gravity>false</gravity>
 	<sprite>ice_cream_sprite.dat</sprite>

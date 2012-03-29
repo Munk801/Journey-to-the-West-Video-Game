@@ -22,11 +22,14 @@ namespace U5Designs
     {
         //debug
         bool aienabled = true;
+        bool bossdebug = true;
 
 		internal GameEngine eng;
 		MainMenuState menustate;
 		PauseMenuState pms;
 		internal Player player;
+        internal ZookeeperAI bossAI;
+        public bool bossMode;
 		internal Camera camera;
 
         //These are the lists of all objects in the game
@@ -64,13 +67,19 @@ namespace U5Designs
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
 			//TODO: pass this the right file to load from
 
+            
+            
 			// undo this when done testing ObjList = LoadLevel.Load(current_level);
 			LoadLevel.Load(0, this);
-
+            player.ps = this;
             //Every AI object needs a pointer to the player, initlize this here
             foreach (AIObject aio in aiList) {
                 ((Enemy)aio).player = player;
             }
+
+            //TODO: initlize the boss in loadlevel
+            bossAI = new ZookeeperAI(player, this);
+            bossMode = false;
 
             //deal with states
             menustate = prvstate;
@@ -120,8 +129,12 @@ namespace U5Designs
             GL.AttachShader(shaderProgram, frag);
             GL.LinkProgram(shaderProgram);
             GL.UseProgram(shaderProgram);
-
             levelMusic.ReplayFile();
+            if (bossdebug) {
+                bossMode = true;
+                //floor at 125 + 12.5 player pbox
+                player.location = new Vector3(3950, 137.5f, 50);
+            }
         }
 
         /// <summary>
@@ -182,7 +195,13 @@ namespace U5Designs
 			//Uncomment this when we have an actual boss
 			//if(bossRegion.contains(player.location) {
 			//    //Entered boss area - make changes to camera, etc
+            //    bossMode = true;
 			//}
+            //do boss dies stuff, transition to next level?
+            if (bossMode && (bossAI.gethealth() <= 0)) {
+                bossAI.killBoss(this);
+                //transition to next level? or state? or w/e
+            }
 
 			//Determine which screen region everything is in
 			foreach(GameObject go in objList) {
@@ -208,7 +227,7 @@ namespace U5Designs
 						combatList.Remove(co);
                     }
                 }
-                if (co.type == 2) {//projectile
+                if (co.type == 2 || co.type == 4) {//projectile
 					if(co.health <= 0 || co.ScreenRegion == GameObject.OFF_SCREEN) {
 						objList.Remove((GameObject)co);
 						physList.Remove((PhysicsObject)co);
@@ -223,15 +242,21 @@ namespace U5Designs
             if (isInTransition) {
 				isInTransition = camera.TransitionState(enable3d, e.Time);
 			} else {
-				//Deal with everyone's acceleration
+				//Deal with everyone's acceleration, run AI on enemies
 				player.updateState(enable3d, eng.Keyboard, e.Time, this);
-				foreach(AIObject aio in aiList) {
-					if(aio.ScreenRegion == GameObject.ON_SCREEN) {
-                        if (aienabled) {
-                            aio.aiUpdate(e.Time, this, player.location, enable3d, physList);
+                if (!bossMode) {
+                    foreach (AIObject aio in aiList) {
+                        if (aio.ScreenRegion == GameObject.ON_SCREEN) {
+                            if (aienabled) {
+                                aio.aiUpdate(e.Time, this, player.location, enable3d, physList);
+                            }
                         }
-					}
-				}
+                    }
+                }
+                else { //if we are in boss mode then route controll to the bosses code instead of the enemy updates
+                    //update the boss
+                    bossAI.update(e.Time, this, player.location, enable3d);
+                }
 
 				//Now that everyone's had a chance to accelerate, actually
 				//translate that into velocity and position

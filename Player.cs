@@ -30,6 +30,7 @@ namespace U5Designs
 		public double stamina, maxStamina;
         internal bool Invincible, HasControl;
         private Vector3 lastPosOnGround; // used for falling off detection
+        public PlayState ps;
 
         //timers
         private double Invincibletimer, NoControlTimer, projectileTimer, spinTimer;
@@ -99,6 +100,7 @@ namespace U5Designs
 			_animDirection = 1;
 			this.projectiles = projectiles;
 			curProjectile = projectiles[0];
+            curProjectile.damage = _damage;
 			markerList = new List<Decoration>();
 
 			Assembly assembly_new = Assembly.GetExecutingAssembly();
@@ -407,6 +409,13 @@ namespace U5Designs
         }
 
         /// <summary>
+        /// Starts the timer and anamation to squish the player if he got squished in the zookeeper encounter
+        /// </summary>
+        public void squish() {
+            health = health - 4;
+        }
+
+        /// <summary>
         /// Does a physics update for the player if we are in 3d view
         /// </summary>
         /// <param name="time">Time elapsed since last update</param>
@@ -449,9 +458,13 @@ namespace U5Designs
                         double zdist = Math.Abs(obj.location.Z - location.Z);
                         double ydist = Math.Abs(obj.location.Y - location.Y);
                         if ((xdist < (enemyZone + spinSize)) && (zdist < (enemyZone + spinSize)) && ydist < ((CombatObject)obj).cbox.Y + cbox.Y) {
-                            if (((CombatObject)obj).type == 1) {// obj is an enemy, hurt it
+                            if (((CombatObject)obj).type == 1 || ((CombatObject)obj).type ==3) {// obj is an enemy or boss, hurt it
                                 ((CombatObject)obj).health = ((CombatObject)obj).health - spinDamage;
-								((Enemy)obj).knockback(enable3d, this);
+                                HasControl = false;
+                                NoControlTimer = 0.5;
+                                knockback(true, obj);
+                                if (((CombatObject)obj).type == 1)
+                                    ((Enemy)obj).frozen = true;
                             } else if (((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
                                 //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
                                 if (!((Projectile)obj).playerspawned) {
@@ -579,10 +592,7 @@ namespace U5Designs
 							HasControl = false;
 							NoControlTimer = 0.5;
 							((Enemy)collidingObj).frozen = true;
-
                             knockback(true, collidingObj);
-
-                            
 						}
 						if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
                             //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
@@ -598,6 +608,24 @@ namespace U5Designs
                                 knockback(true, collidingObj);
                             }
 						}
+                        if (((CombatObject)collidingObj).type == 3) {// obj is the boss
+                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+                            _health = _health - ((CombatObject)collidingObj).damage;
+                            Invincible = true;
+                            HasControl = false;
+                            NoControlTimer = 0.5;
+                            knockback(true, collidingObj);
+                        }
+                        if (((CombatObject)collidingObj).type == 4) {// obj is a special projectile that will squish the player(underside of a box)
+                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+                            if (onGround)
+                                squish();
+                            else {
+                                squish();
+                                accelerate(((Projectile)collidingObj).velocity);
+                            }
+                            ((CombatObject)collidingObj).health = 0;
+                        }
 					}
 				}
 			}
@@ -662,9 +690,13 @@ namespace U5Designs
                         double ydist = Math.Abs(obj.location.Y - location.Y);
                         if ((xdist < (enemyZone + spinSize)) && ydist < ((CombatObject)obj).cbox.Y + cbox.Y) {
 
-                            if (((CombatObject)obj).type == 1) {// obj is an enemy, hurt it
+                            if (((CombatObject)obj).type == 1 ||((CombatObject)obj).type == 3) {// obj is an enemy or boss, hurt it
 								((CombatObject)obj).health = ((CombatObject)obj).health - spinDamage;
-								((Enemy)obj).knockback(enable3d, this);
+                                HasControl = false;
+                                NoControlTimer = 0.5;
+                                knockback(false, obj);
+                                if (((CombatObject)obj).type == 1)
+                                    ((Enemy)obj).frozen = true;
                             } else if (((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
                                 //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
                                 if (!((Projectile)obj).playerspawned) {
@@ -778,10 +810,7 @@ namespace U5Designs
 							HasControl = false;
 							NoControlTimer = 0.5;
 							((Enemy)collidingObj).frozen = true;
-
                             knockback(false, collidingObj);
-
-
 						}
 						if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
                             //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
@@ -796,6 +825,27 @@ namespace U5Designs
                                 knockback(false, collidingObj);
 							}
 						}
+                        if (((CombatObject)collidingObj).type == 3) {// obj is the boss, treat it basicially like an enemy
+                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+                            _health = _health - ((CombatObject)collidingObj).damage;
+                            Invincible = true;
+                            Invincibletimer = 0.5;
+                            HasControl = false;
+                            NoControlTimer = 0.5;
+                            knockback(false, collidingObj);
+                        }
+                        if (((CombatObject)collidingObj).type == 4) {// obj is a special projectile that will squish the player(underside of a box)
+                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+                            //despawn the projectile
+                            if (onGround)
+                                squish();
+                            else {
+                                squish();
+                                accelerate(((Projectile)collidingObj).velocity);
+                            }
+                            ((CombatObject)collidingObj).health = 0;
+                        }
+                        
 					}
 				}
 			}
@@ -821,7 +871,6 @@ namespace U5Designs
         /// <param name="is3d"> True if we are in 3d</param>
         /// <param name="collidingObj">The physics object we are colliding with</param>
         public void knockback(bool is3d, PhysicsObject collidingObj) {
-
             if (is3d) {
                 // direction we need to be knocked back in.
                 Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, location.Z - collidingObj.location.Z);
@@ -862,6 +911,10 @@ namespace U5Designs
         }
         public Vector3 setLocation {
             set { _location = value; }
+        }
+
+        public bool canSquish {
+            get { return false; }
         }
 
         public bool is3dGeo {

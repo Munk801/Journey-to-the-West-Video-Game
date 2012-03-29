@@ -52,6 +52,7 @@
     <Compile Include="AI.cs" />
     <Compile Include="AIObject.cs" />
     <Compile Include="Background.cs" />
+    <Compile Include="ZookeeperAI.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Decoration.cs" />
     <Compile Include="Enemy.cs" />
@@ -177,7 +178,6 @@
     <EmbeddedResource Include="Resources\Data\Enemies\Girl.dat">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Data\Enemies\Zoo_keeper.dat" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Sprites\boy_sprite.dat" />
@@ -314,7 +314,13 @@
     <EmbeddedResource Include="Resources\Textures\hawk_flight_03.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Music\Level1.ogg" />
+    <EmbeddedResource Include="Resources\Textures\hawk_attack.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Obstacles\zoo_keeper_crate.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Projectiles\invisible_projectile.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
