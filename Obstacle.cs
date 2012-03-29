@@ -12,7 +12,6 @@ using Engine;
 
 namespace U5Designs {
 	class Obstacle : GameObject, RenderObject, PhysicsObject{
-		private int texID;
 
 		public Obstacle(Vector3 location, Vector3 scale, Vector3 pbox, bool existsIn2d, bool existsIn3d, bool collidesIn2d, bool collidesIn3d,
 							ObjMesh mesh, MeshTexture texture) : base() {
@@ -28,6 +27,7 @@ namespace U5Designs {
 			_frameNum = 0;
 			_is3dGeo = true;
             _hascbox = false;
+            canSquish = false;
 			_collidesIn2d = collidesIn2d;
 			_collidesIn3d = collidesIn3d;
 			_animDirection = 1;
@@ -47,6 +47,7 @@ namespace U5Designs {
 			_frameNum = 0;
 			_is3dGeo = false;
 			_hascbox = false;
+            canSquish = false;
 			_collidesIn2d = collidesIn2d;
 			_collidesIn3d = collidesIn3d;
 			_billboards = bb;
@@ -89,6 +90,12 @@ namespace U5Designs {
         private Vector3 _pbox;
 		public Vector3 pbox {
             get { return _pbox; }
+        }
+
+        private bool _canSquish;
+        public bool canSquish {
+            get { return _canSquish; }
+            set { _canSquish = value; }
         }
 
 		private int _cycleNum;

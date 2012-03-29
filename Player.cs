@@ -30,6 +30,7 @@ namespace U5Designs
 		public double stamina, maxStamina;
         internal bool Invincible, HasControl;
         private Vector3 lastPosOnGround; // used for falling off detection
+        public PlayState ps;
 
         //timers
         private double Invincibletimer, NoControlTimer, projectileTimer, spinTimer;
@@ -99,6 +100,7 @@ namespace U5Designs
 			_animDirection = 1;
 			this.projectiles = projectiles;
 			curProjectile = projectiles[0];
+            curProjectile.damage = _damage;
 			markerList = new List<Decoration>();
 
 			Assembly assembly_new = Assembly.GetExecutingAssembly();
@@ -407,6 +409,13 @@ namespace U5Designs
         }
 
         /// <summary>
+        /// Starts the timer and anamation to squish the player if he got squished in the zookeeper encounter
+        /// </summary>
+        public void squish() {
+            health = health - 4;
+        }
+
+        /// <summary>
         /// Does a physics update for the player if we are in 3d view
         /// </summary>
         /// <param name="time">Time elapsed since last update</param>
@@ -606,6 +615,16 @@ namespace U5Designs
                             HasControl = false;
                             NoControlTimer = 0.5;
                             knockback(true, collidingObj);
+                        }
+                        if (((CombatObject)collidingObj).type == 4) {// obj is a special projectile that will squish the player(underside of a box)
+                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+                            if (onGround)
+                                squish();
+                            else {
+                                squish();
+                                accelerate(((Projectile)collidingObj).velocity);
+                            }
+                            ((CombatObject)collidingObj).health = 0;
                         }
 					}
 				}
@@ -813,9 +832,20 @@ namespace U5Designs
                             Invincibletimer = 0.5;
                             HasControl = false;
                             NoControlTimer = 0.5;
-                            //((Boss)collidingObj).frozen = true;
                             knockback(false, collidingObj);
                         }
+                        if (((CombatObject)collidingObj).type == 4) {// obj is a special projectile that will squish the player(underside of a box)
+                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+                            //despawn the projectile
+                            if (onGround)
+                                squish();
+                            else {
+                                squish();
+                                accelerate(((Projectile)collidingObj).velocity);
+                            }
+                            ((CombatObject)collidingObj).health = 0;
+                        }
+                        
 					}
 				}
 			}
@@ -881,6 +911,10 @@ namespace U5Designs
         }
         public Vector3 setLocation {
             set { _location = value; }
+        }
+
+        public bool canSquish {
+            get { return false; }
         }
 
         public bool is3dGeo {

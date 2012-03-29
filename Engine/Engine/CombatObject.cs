@@ -27,6 +27,7 @@ namespace Engine {
          * 1 = enemy
          * 2 = projectile
          * 3 = zookeeper
+         * 4 = projectile that causes squish player to happen(underside of a box)
          */
         int type { get; }
 

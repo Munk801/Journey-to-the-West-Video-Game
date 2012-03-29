@@ -315,6 +315,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Obstacles\zoo_keeper_crate.dat" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Projectiles\invisible_projectile.dat" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

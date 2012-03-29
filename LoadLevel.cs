@@ -143,16 +143,16 @@ namespace U5Designs
 			Vector3 cbox = parseVector3(doc.GetElementsByTagName("cbox")[0]);
 			bool draw2 = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
 			bool draw3 = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
-			int damage = Convert.ToInt32(doc.GetElementsByTagName("damage")[0].InnerText);
+			//int damage = Convert.ToInt32(doc.GetElementsByTagName("damage")[0].InnerText);
 			float speed = Convert.ToSingle(doc.GetElementsByTagName("speed")[0].InnerText);
 			bool grav = Convert.ToBoolean(doc.GetElementsByTagName("gravity")[0].InnerText);
 			SpriteSheet ss = parse_Sprite_File(doc.GetElementsByTagName("sprite")[0].InnerText);
 
 			XmlNodeList duration = doc.GetElementsByTagName("duration");
 			if(duration.Count == 0) {
-				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss);
+				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, 0, speed, grav, ss);
 			} else {
-				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss, Convert.ToDouble(duration[0].InnerText));
+				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, 0, speed, grav, ss, Convert.ToDouble(duration[0].InnerText));
 			}
 		}
 

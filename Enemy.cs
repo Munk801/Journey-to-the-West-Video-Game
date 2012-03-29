@@ -105,6 +105,8 @@ namespace U5Designs
 			_texture = null;
 			_sprite = sprite;
 			projectile = proj;
+            if (projectile != null)
+                projectile.damage = damage;
 			_frameNum = 0;
 			_is3dGeo = false;
 			_animDirection = 1;
@@ -561,6 +563,10 @@ namespace U5Designs
         private bool _is3dGeo;
         public bool is3dGeo {
             get { return _is3dGeo; }
+        }
+
+        public bool canSquish {
+            get { return false; }
         }
 
         private ObjMesh _mesh; //null for sprites

@@ -29,7 +29,7 @@ namespace U5Designs
 		PauseMenuState pms;
 		internal Player player;
         internal ZookeeperAI bossAI;
-        internal bool bossMode;
+        public bool bossMode;
 		internal Camera camera;
 
         //These are the lists of all objects in the game
@@ -69,7 +69,7 @@ namespace U5Designs
             
 			// undo this when done testing ObjList = LoadLevel.Load(current_level);
 			LoadLevel.Load(0, this);
-
+            player.ps = this;
             //Every AI object needs a pointer to the player, initlize this here
             foreach (AIObject aio in aiList) {
                 ((Enemy)aio).player = player;
@@ -216,7 +216,7 @@ namespace U5Designs
 						combatList.Remove(co);
                     }
                 }
-                if (co.type == 2) {//projectile
+                if (co.type == 2 || co.type == 4) {//projectile
 					if(co.health <= 0 || co.ScreenRegion == GameObject.OFF_SCREEN) {
 						objList.Remove((GameObject)co);
 						physList.Remove((PhysicsObject)co);
