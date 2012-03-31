@@ -52,17 +52,17 @@ namespace U5Designs
             assembly = Assembly.GetExecutingAssembly();
 
             // Splash Screen
-            StateTextureManager.LoadTexture("logo", "../../Resources/Textures/u5_logo.jpg");
+            StateTextureManager.LoadTexture("logo", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.u5_logo.jpg"));
             // Game over State
-            StateTextureManager.LoadTexture("game_over", "../../Resources/Textures/game_over_text.png");
+            StateTextureManager.LoadTexture("game_over", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.game_over_text.png"));
             //StateTextureManager.LoadTexture("restart", "../../Resources/Textures/restart_button.png");
             //StateTextureManager.LoadTexture("quit_button", "../../Resources/Textures/go_quit_button.png");
 
             // Pause State
-            StateTextureManager.LoadTexture("p1", "../../Resources/Textures/PauseTextures/p1.png");
-            StateTextureManager.LoadTexture("p2", "../../Resources/Textures/PauseTextures/p2.png");
-            StateTextureManager.LoadTexture("p3", "../../Resources/Textures/PauseTextures/p3.png");
-            StateTextureManager.LoadTexture("p4", "../../Resources/Textures/PauseTextures/p4.png");
+            StateTextureManager.LoadTexture("p1", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.PauseTextures.p1.png"));
+            StateTextureManager.LoadTexture("p2", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.PauseTextures.p2.png"));
+            StateTextureManager.LoadTexture("p3", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.PauseTextures.p3.png"));
+            StateTextureManager.LoadTexture("p4", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.PauseTextures.p4.png"));
         
             ThisMouse = new GameMouse(this);
             states = new Stack<GameState>();

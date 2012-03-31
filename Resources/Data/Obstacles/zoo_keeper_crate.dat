@@ -6,6 +6,6 @@
 	<draw3>true</draw3>
 	<collidesIn2d>true</collidesIn2d>
 	<collidesIn3d>true</collidesIn3d>
-	<mesh>box.obj</mesh>
-	<bmp>city_ground.png</bmp>	
+	<mesh>box_all_faces_same.obj</mesh>
+	<bmp>crate.png</bmp>	
 </obstacle>

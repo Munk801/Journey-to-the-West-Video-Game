@@ -106,10 +106,10 @@ namespace U5Designs
             curProjectile.damage = _damage;
 			markerList = new List<Decoration>();
 
-			Assembly assembly_new = Assembly.GetExecutingAssembly();
-			jumpSound = new AudioFile("../../Resources/Sound/jump_sound.ogg");
-			bananaSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
-			hurtSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			jumpSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.jump_sound.ogg"));
+			bananaSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
+			hurtSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
         }
 
         /// <summary>
@@ -963,7 +963,8 @@ namespace U5Designs
 
         private Vector3 _scale;
         public Vector3 scale {
-            get { return _scale; }
+			get { return _scale; }
+			set { _scale = value; }
         }
 
         private Vector3 _pbox;

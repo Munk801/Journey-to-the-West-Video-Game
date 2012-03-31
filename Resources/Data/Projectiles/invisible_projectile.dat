@@ -6,5 +6,5 @@
 	<draw3>false</draw3>
 	<speed>150.0</speed>
 	<gravity>false</gravity>
-	<sprite>ice_cream_sprite.dat</sprite>
+	<sprite>invisible_sprite.dat</sprite>
 </projectile>

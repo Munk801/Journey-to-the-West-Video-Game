@@ -22,7 +22,6 @@ namespace U5Designs
     {
         //debug
         bool aienabled = true;
-        bool bossdebug = false;
 
 		internal GameEngine eng;
 		MainMenuState menustate;
@@ -123,12 +122,6 @@ namespace U5Designs
             GL.AttachShader(shaderProgram, frag);
             GL.LinkProgram(shaderProgram);
             GL.UseProgram(shaderProgram);
-
-            if (bossdebug) {
-                bossMode = true;
-                //floor at 125 + 12.5 player pbox
-                player.location = new Vector3(3950, 137.5f, 50);
-            }
         }
 
         /// <summary>

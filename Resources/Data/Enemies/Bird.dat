@@ -1,5 +1,5 @@
 <enemy>
-	<scale x="18" y="18" z="18"/>
+	<scale x="30" y="20" z="30"/>
 	<pbox x="9.5" y="9.5" z="9.5"/>
 	<cbox x="9.5" y="9.5" z="9.5"/>
 	<draw2>true</draw2>
@@ -8,5 +8,5 @@
 	<damage>1</damage>
 	<speed>60</speed>
 	<AI>2</AI>
-	<sprite>test_flying_sprite.dat</sprite>
+	<sprite>hawk_sprite.dat</sprite>
 </enemy>

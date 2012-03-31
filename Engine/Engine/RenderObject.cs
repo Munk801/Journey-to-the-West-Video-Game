@@ -30,7 +30,7 @@ namespace Engine {
 		//null for 3d objects
 		SpriteSheet sprite { get; }
 
-        Vector3 scale { get; }
+		Vector3 scale { get; set; }
 
 		//index of animation for current action
 		int cycleNumber { get; set; }

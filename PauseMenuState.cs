@@ -25,9 +25,6 @@ namespace U5Designs
         protected Vector3 eye, lookat;
         Obstacle background;
 
-        static string test = "../../Resources/Sound/Retribution.ogg";        
-        AudioFile testFile = new AudioFile(test);
-
         Texture _p1, _p2, _p3, _p4;
 		double curFrame;
 

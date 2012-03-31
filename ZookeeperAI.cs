@@ -304,7 +304,8 @@ namespace U5Designs {
 
         private Vector3 _scale;
         public Vector3 scale {
-            get { return _scale; }
+			get { return _scale; }
+			set { _scale = value; }
         }
 
         private Vector3 _pbox;
@@ -576,7 +577,8 @@ namespace U5Designs {
 
         private Vector3 _scale;
         public Vector3 scale {
-            get { return _scale; }
+			get { return _scale; }
+			set { _scale = value; }
         }
 
         private Vector3 _pbox;

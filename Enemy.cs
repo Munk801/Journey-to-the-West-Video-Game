@@ -306,7 +306,7 @@ namespace U5Designs
                 }
 
                 //Set moving flag
-				if(_location.X != initLoc.X || _location.Y != initLoc.Y) {
+				if(_location.X != initLoc.X || _location.Y != initLoc.Y || _location.Z != initLoc.Z) {
 					moving = true;
 				} else {
 					moving = false;
@@ -587,6 +587,7 @@ namespace U5Designs
         private Vector3 _scale;
         public Vector3 scale {
             get { return _scale; }
+			set { _scale = value; }
         }
 
         private Vector3 _pbox;
