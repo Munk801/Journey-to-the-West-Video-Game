@@ -43,7 +43,7 @@ namespace U5Designs {
                     //Look ahead to see if we are at an edge
                     Vector3 origLoc = me.location;
                     me.location += me.velocity * 0.1f; //move a little bit in this direction (will undo later)
-                    if (!(enable3d ? VectorUtil.overGround3d(me, physList) : VectorUtil.overGround2d(me, physList))) {
+                    if (!(enable3d ? VectorUtil.overGround3dStrict(me, physList) : VectorUtil.overGround2d(me, physList))) {
                         if (enable3d) {
                             //If we're on edge, move along one axis to corner
                             Vector3 origVel = new Vector3(me.velocity);
@@ -51,11 +51,11 @@ namespace U5Designs {
                             //Check X first
                             me.velocity.X = 0.0f;
                             me.location = origLoc + me.velocity * 0.1f;
-                            if (!VectorUtil.overGround3d(me, physList)) {
+                            if (!VectorUtil.overGround3dStrict(me, physList)) {
                                 me.velocity.X = origVel.X;
                                 me.velocity.Z = 0.0f;
                                 me.location = origLoc + me.velocity * 0.1f;
-                                if (!VectorUtil.overGround3d(me, physList)) {
+                                if (!VectorUtil.overGround3dStrict(me, physList)) {
                                     //Now we're at corner
                                     me.velocity.X = 0.0f;
                                     me.velocity.Z = 0.0f;
@@ -232,7 +232,7 @@ namespace U5Designs {
                     //Look ahead to see if we are at an edge
                     Vector3 origLoc = me.location;
                     me.location += me.velocity * 0.1f; //move a little bit in this direction (will undo later)
-                    if (!(enable3d ? VectorUtil.overGround3d(me, physList) : VectorUtil.overGround2d(me, physList))) {
+                    if (!(enable3d ? VectorUtil.overGround3dStrict(me, physList) : VectorUtil.overGround2d(me, physList))) {
                         if (enable3d) {
                             //If we're on edge, move along one axis to corner
                             Vector3 origVel = new Vector3(me.velocity);
@@ -240,11 +240,11 @@ namespace U5Designs {
                             //Check X first
                             me.velocity.X = 0.0f;
                             me.location = origLoc + me.velocity * 0.1f;
-                            if (!VectorUtil.overGround3d(me, physList)) {
+                            if (!VectorUtil.overGround3dStrict(me, physList)) {
                                 me.velocity.X = origVel.X;
                                 me.velocity.Z = 0.0f;
                                 me.location = origLoc + me.velocity * 0.1f;
-                                if (!VectorUtil.overGround3d(me, physList)) {
+                                if (!VectorUtil.overGround3dStrict(me, physList)) {
                                     //Now we're at corner
                                     me.velocity.X = 0.0f;
                                     me.velocity.Z = 0.0f;

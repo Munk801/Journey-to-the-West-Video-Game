@@ -120,9 +120,16 @@ namespace Engine {
 					&& point.Y < po.location.Z + po.pbox.Z && point.Y > po.location.Z - po.pbox.Z;
 		}
 
-		//Test if an object is entirely over the ground
-		//Used for saving safe player locations to respawn, and keeping enemies from jumping to death
-		public static bool overGround3d(PhysicsObject obj, List<PhysicsObject> physList) {
+		/// <summary>
+		/// Test if an object is over the ground
+		/// Used for saving safe player locations to respawn, and keeping enemies from jumping to death
+		/// 
+		/// The strict version requires that all four corners be over the ground; see also overGround3dLoose
+		/// </summary>
+		/// <param name="obj">Object to be tested</param>
+		/// <param name="physList">List of all other objects for collision</param>
+		/// <returns></returns>
+		public static bool overGround3dStrict(PhysicsObject obj, List<PhysicsObject> physList) {
 			Vector2 loc = new Vector2(obj.location.X, obj.location.Z);
 			Vector2 box = new Vector2(obj.pbox.X, obj.pbox.Z);
 			Vector2 frontRight = new Vector2(obj.location.X + obj.pbox.X, obj.location.Z + obj.pbox.Z);
@@ -146,6 +153,40 @@ namespace Engine {
 					if(fl && fr && bl && br) {
 						return true;
 					}
+				}
+			}
+			//No match
+			return false;
+		}
+
+		/// <summary>
+		/// Test if an object is over the ground
+		/// Used for saving safe player locations to respawn, and keeping enemies from jumping to death
+		/// 
+		/// The loose version requires that one corner be over the ground; see also overGround3dStrict
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <param name="physList"></param>
+		/// <returns></returns>
+		public static bool overGround3dLoose(PhysicsObject obj, List<PhysicsObject> physList) {
+			Vector2 loc = new Vector2(obj.location.X, obj.location.Z);
+			Vector2 box = new Vector2(obj.pbox.X, obj.pbox.Z);
+			Vector2 frontRight = new Vector2(obj.location.X + obj.pbox.X, obj.location.Z + obj.pbox.Z);
+			Vector2 backLeft = new Vector2(obj.location.X - obj.pbox.X, obj.location.Z - obj.pbox.Z);
+			Vector2 frontLeft = new Vector2(backLeft.X, frontRight.Y);
+			Vector2 backRight = new Vector2(frontRight.X, backLeft.Y);
+			bool fl = false, fr = false, bl = false, br = false;
+
+			foreach(PhysicsObject po in physList) {
+				if(po.hascbox) {
+					//Anything with a cbox is not a valid ground object
+					continue;
+				}
+				if(obj.location.Y - obj.pbox.Y >= po.location.Y + po.pbox.Y) {
+					if(inBox(frontLeft, po)) { return true; }
+					if(inBox(frontRight, po)) { return true; }
+					if(inBox(backLeft, po)) { return true; }
+					if(inBox(backRight, po)) { return true; }
 				}
 			}
 			//No match

@@ -87,7 +87,7 @@ namespace U5Designs {
 
 
 
-            bossobject.update(time, playstate, playerposn, enable3d);// always pass controll to update
+            bossobject.update(time, playstate, playerposn, enable3d);// always pass control to update
         }
 
         public int gethealth() {
@@ -175,17 +175,19 @@ namespace U5Designs {
             ps.renderList.Add(mybox);
 
 
-            //initlize everythings location based on the seed location
+            //initialize everything's locations based on the seed location
             mybox.canSquish = true;
             mybox.location = location + new Vector3(0, mybox.pbox.Y, 0);
             _location = location + new Vector3(0, (mybox.pbox.Y *2) + pbox.Y, 0); //boss sprite
             minHeight = 125;
             preHeight = 210;
         }
+
         double downtimer, pretimer;
         double downtime = 3;
         double pretime = 1.5;
-        public bool falling, rising, prefalling, idle; // true when currently doing an anamation
+        public bool falling, rising, prefalling, idle; // true when currently doing an animation
+
         public void update(double time, PlayState playstate, Vector3 playerposn, bool enable3d) {
             if (prefalling) {
                 if ((mybox.location.Y - mybox.pbox.Y) <= preHeight) {
@@ -261,9 +263,9 @@ namespace U5Designs {
             mybox.location += velocity * (float)time;
             _location += velocity * (float)time;
         }
-        /*  The following are helper methods + getter/setters
-       * 
-       */
+
+		/*  The following are helper methods + getter/setters */
+
         //swaps physics box x and z coordinates (used for sprites that billboard)
         public void swapPBox() {
             float temp = _pbox.X;
@@ -459,10 +461,12 @@ namespace U5Designs {
             minHeight = 125;
             preHeight = 210;
         }
+
         double downtimer, pretimer;
         double downtime = 3;
         double pretime = 1.5;
         public bool falling, rising, prefalling, idle; // true when currently doing an anamation
+
         public void update(double time, PlayState playstate, Vector3 playerposn, bool enable3d) {
             if (prefalling) {
                 if ((mybox.location.Y - mybox.pbox.Y) <= preHeight) {
@@ -538,9 +542,8 @@ namespace U5Designs {
             mybox.location += velocity * (float)time;
             _location += velocity * (float)time;
         }
-        /*  The following are helper methods + getter/setters
-       * 
-       */
+        /*  The following are helper methods + getter/setters */
+
         //swaps physics box x and z coordinates (used for sprites that billboard)
         public void swapPBox() {
             float temp = _pbox.X;

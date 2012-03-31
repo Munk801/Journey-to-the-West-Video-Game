@@ -1,5 +1,8 @@
 <level>
+  <bossRegion x="4150" y ="150" z="50" r="150" />
   <endRegion x="5000" y="100" z="50" r="75" />
+  <bossAreaCenter x="4150" y="125" z="50" />
+  <bossAreaBounds x="100" y="200" z="100" />
 	<backgroundlist>
 		<background>
 			<scale x="350" y="135" z="1"/>
@@ -91,14 +94,12 @@
 			<loc x="3700" y="25" z="50"/>
 			<loc x="3800" y="75" z="50"/>
 			<loc x="3900" y="75" z="50"/>
-      
-      
-			
-			<loc x="4100" y="75" z="0"/>
 
+
+      <!--Boss encounter area-->
+			<loc x="4100" y="75" z="0"/>
 			<loc x="4100" y="75" z="100"/>
 			<loc x="4200" y="75" z="0"/>
-
 			<loc x="4200" y="75" z="100"/>
 
 		</obstacle>

@@ -35,17 +35,29 @@ namespace U5Designs
 			string file = "U5Designs.Resources.Data.Levels.level_test.dat";
 			Stream fstream = assembly.GetManifestResourceStream(file);
 			XmlDocument doc = new XmlDocument();
-			doc.Load(fstream);
+			XmlReaderSettings settings = new XmlReaderSettings();
+			settings.IgnoreComments = true;
+			XmlReader reader = XmlReader.Create(fstream, settings);
+			doc.Load(reader);
+			XmlNode bossRegion = doc.GetElementsByTagName("bossRegion")[0];
 			XmlNode endRegion = doc.GetElementsByTagName("endRegion")[0];
+			XmlNode bossAreaCenter = doc.GetElementsByTagName("bossAreaCenter")[0];
+			XmlNode bossAreaBounds = doc.GetElementsByTagName("bossAreaBounds")[0];
 			XmlNodeList _b_list = doc.GetElementsByTagName("background");
 			XmlNodeList _e_list = doc.GetElementsByTagName("enemy");
 			XmlNodeList _o_list = doc.GetElementsByTagName("obstacle");
 			XmlNodeList _d_list = doc.GetElementsByTagName("decoration");
 			fstream.Close();
 
+			//Regions and Boss Area
+			ps.bossRegion = parseRegion(bossRegion);
 			ps.endRegion = parseRegion(endRegion);
+			ps.bossAreaCenter = parseVector3(bossAreaCenter);
+			ps.bossAreaBounds = parseVector3(bossAreaBounds);
 
-			List<Enemy> _elist = parse_Enemy_File(_e_list);
+			//Various GameObjects
+
+			List<Enemy> _elist = parse_Enemy_Files(_e_list);
 			foreach(Enemy e in _elist) {
 				ps.objList.Add(e);
 				ps.physList.Add(e);
@@ -55,7 +67,7 @@ namespace U5Designs
                 ps.combatList.Add(e);
 			}
 
-			List<Obstacle> _olist = parse_Obstacle_File(_o_list);
+			List<Obstacle> _olist = parse_Obstacle_Files(_o_list);
 			foreach(Obstacle o in _olist) {
 				ps.objList.Add(o);
 				ps.physList.Add(o);
@@ -81,11 +93,13 @@ namespace U5Designs
 			playerProjectiles.Add(parseProjectileFile("banana_projectile.dat"));
 			//add other projectiles here
 
-			ps.player = new Player(parse_Sprite_File("player_sprite.dat"), playerProjectiles);
+			//Player
+			ps.player = new Player(parse_Sprite_File("player_sprite.dat"), playerProjectiles, ps);
 			ps.player.marker = parse_Sprite_File("marker_sprite.dat");
 			ps.physList.Add(ps.player);
 			ps.renderList.Add(ps.player);
 
+			//HUD Stamina Bar
 			ps.staminaBack = parse_Sprite_File("stamina_back.dat");
 			ps.staminaBar = parse_Sprite_File("stamina_bar.dat");
 			ps.staminaFrame = parse_Sprite_File("stamina_frame.dat");
@@ -135,8 +149,12 @@ namespace U5Designs
 
 		public static ProjectileProperties parseProjectileFile(String path) {
 			Assembly assembly = Assembly.GetExecutingAssembly();
+			Stream fstream = assembly.GetManifestResourceStream("U5Designs.Resources.Data.Projectiles." + path);
+			XmlReaderSettings settings = new XmlReaderSettings();
+			settings.IgnoreComments = true;
+			XmlReader reader = XmlReader.Create(fstream, settings);
 			XmlDocument doc = new XmlDocument();
-			doc.Load(assembly.GetManifestResourceStream("U5Designs.Resources.Data.Projectiles." + path));
+			doc.Load(reader);
 
 			Vector3 scale = parseVector3(doc.GetElementsByTagName("scale")[0]);
 			Vector3 pbox = parseVector3(doc.GetElementsByTagName("pbox")[0]);
@@ -149,6 +167,7 @@ namespace U5Designs
 			SpriteSheet ss = parse_Sprite_File(doc.GetElementsByTagName("sprite")[0].InnerText);
 
 			XmlNodeList duration = doc.GetElementsByTagName("duration");
+			fstream.Close();
 			if(duration.Count == 0) {
 				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, 0, speed, grav, ss);
 			} else {
@@ -158,11 +177,13 @@ namespace U5Designs
 
 		public static SpriteSheet parse_Sprite_File(string path) {
 			Assembly assembly = Assembly.GetExecutingAssembly();
-			Stream fstream;
+			Stream fstream = assembly.GetManifestResourceStream("U5Designs.Resources.Data.Sprites." + path);
+			XmlReaderSettings settings = new XmlReaderSettings();
+			settings.IgnoreComments = true;
+			XmlReader reader = XmlReader.Create(fstream, settings);
 			XmlDocument doc = new XmlDocument();
+			doc.Load(reader);
 
-			fstream = assembly.GetManifestResourceStream("U5Designs.Resources.Data.Sprites." + path);
-			doc.Load(fstream);
 			XmlNodeList _c_start_list = doc.GetElementsByTagName("c_starts");
 			int[] cycleStarts = new int[_c_start_list.Count];
 			for(int i = 0; i < _c_start_list.Count; i++) {
@@ -195,13 +216,16 @@ namespace U5Designs
 				return new SpriteSheet(bmps, cycleStarts, cycleLengths, _width, _height, _hasAlpha, _fps);
 			}
 		}
+
         public static Obstacle parse_single_3d_obstacle(string path) {
             Assembly assembly = Assembly.GetExecutingAssembly();
-            Stream fstream;
             string _o_path = "U5Designs.Resources.Data.Obstacles." + path;
-            fstream = assembly.GetManifestResourceStream(_o_path);
-            XmlDocument doc = new XmlDocument();
-            doc.Load(fstream);
+            Stream fstream = assembly.GetManifestResourceStream(_o_path);
+            XmlReaderSettings settings = new XmlReaderSettings();
+			settings.IgnoreComments = true;
+			XmlReader reader = XmlReader.Create(fstream, settings);
+			XmlDocument doc = new XmlDocument();
+			doc.Load(reader);
 
             Vector3 scale = parseVector3(doc.GetElementsByTagName("scale")[0]);
             Vector3 pbox = parseVector3(doc.GetElementsByTagName("pbox")[0]);
@@ -215,6 +239,7 @@ namespace U5Designs
             // Check to see if the current Obstacle is 2D or 3D and handle accordingly
             XmlNodeList _type = doc.GetElementsByTagName("is2d");
             if (Convert.ToBoolean(_type.Item(0).InnerText)) {
+				fstream.Close();
                 Console.Out.WriteLine("ERROR: obstacle +" + _o_path + "is not a 3d object, it must be 3d");
                 return null;
             }
@@ -236,17 +261,18 @@ namespace U5Designs
 		 * for the current level being loaded.  It will parse the XML .dat files, create an Obstacle object, and add it
 		 * to a List<> which will be returned. 
 		 * */
-		public static List<Obstacle> parse_Obstacle_File(XmlNodeList OList) {
+		public static List<Obstacle> parse_Obstacle_Files(XmlNodeList OList) {
 			List<Obstacle> _o = new List<Obstacle>();
 			Assembly assembly = Assembly.GetExecutingAssembly();
-			Stream fstream;
-			XmlDocument doc;
+			XmlReaderSettings settings = new XmlReaderSettings();
+			settings.IgnoreComments = true;
 
 			for(int i = 0; i < OList.Count; i++) {
-				doc = new XmlDocument();
+				XmlDocument doc = new XmlDocument();
 				string _o_path = "U5Designs.Resources.Data.Obstacles." + OList[i].FirstChild.InnerText;
-				fstream = assembly.GetManifestResourceStream(_o_path);
-				doc.Load(fstream);
+				Stream fstream = assembly.GetManifestResourceStream(_o_path);
+				XmlReader reader = XmlReader.Create(fstream, settings);
+				doc.Load(reader);
 
 				Vector3 scale = parseVector3(doc.GetElementsByTagName("scale")[0]);
 				Vector3 pbox = parseVector3(doc.GetElementsByTagName("pbox")[0]);
@@ -289,6 +315,7 @@ namespace U5Designs
 						_o.Add(new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, bb, ss));
 					}
 				} else {
+					fstream.Close();
 					XmlNodeList _m = doc.GetElementsByTagName("mesh");
 					ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
 
@@ -311,25 +338,26 @@ namespace U5Designs
 		 * for the current level being loaded.  It will parse the XML .dat files, create an Enemy object, and add it
 		 * to a List<> which will be returned. 
 		 * */
-		public static List<Enemy> parse_Enemy_File(XmlNodeList EList) {
+		public static List<Enemy> parse_Enemy_Files(XmlNodeList EList) {
 			// Instantiate the list
 			List<Enemy> _e = new List<Enemy>();
 			Assembly assembly = Assembly.GetExecutingAssembly();
-			Stream fstream;
-			XmlDocument doc;
+			XmlReaderSettings settings = new XmlReaderSettings();
+			settings.IgnoreComments = true;
 
 			// Loop over the string list containing all the Enemy.dat files associated with the current Level being loaded.
 			// For every Enemy.dat file parse the file, and create an Enemy, then add it to the List.  When you're done with 
 			// the list of Enemies to parse, return the List<Enemy>
 			for(int i = 0; i < EList.Count; i++) {
-				doc = new XmlDocument();
+				string _e_path = "U5Designs.Resources.Data.Enemies." + EList[i].FirstChild.InnerText;
+				Stream fstream = assembly.GetManifestResourceStream(_e_path);
+				XmlDocument doc = new XmlDocument();
+				XmlReader reader = XmlReader.Create(fstream, settings);
+				doc.Load(reader);
+
 				bool draw_2d, draw_3d;
 				int _health, _damage, _AI;
 				float _speed;
-
-				string _e_path = "U5Designs.Resources.Data.Enemies." + EList[i].FirstChild.InnerText;
-				fstream = assembly.GetManifestResourceStream(_e_path);
-				doc.Load(fstream);
 
 				Vector3 scale = parseVector3(doc.GetElementsByTagName("scale")[0]);
 				Vector3 pbox = parseVector3(doc.GetElementsByTagName("pbox")[0]);
@@ -432,14 +460,15 @@ namespace U5Designs
 			// Instantiate the list
 			List<Decoration> _d = new List<Decoration>();
 			Assembly assembly = Assembly.GetExecutingAssembly();
-			Stream fstream;
-			XmlDocument doc;
+			XmlReaderSettings settings = new XmlReaderSettings();
+			settings.IgnoreComments = true;
 
 			for(int i = 0; i < DList.Count; i++) {
-				doc = new XmlDocument();
 				string _d_path = "U5Designs.Resources.Data.Decorations." + DList[i].FirstChild.InnerText;
-				fstream = assembly.GetManifestResourceStream(_d_path);
-				doc.Load(fstream);
+				Stream fstream = assembly.GetManifestResourceStream(_d_path);
+				XmlDocument doc = new XmlDocument();
+				XmlReader reader = XmlReader.Create(fstream, settings);
+				doc.Load(reader);
 
 				Vector3 scale = parseVector3(doc.GetElementsByTagName("scale")[0]);
 
@@ -491,6 +520,14 @@ namespace U5Designs
 				fstream.Close();
 			}
 			return _d;
+		}
+
+		private static ZookeeperAI parseZookeeperBoss() {
+			//TODO: I was going to implement this, but I decided to wait and see if
+			//      things get changed with the Boss structure, since right now the
+			//      Boss class is very special-cased and probably needs to be refactored
+			//      for use with other bosses.  Leaving this stub as a reminder, though.
+			return null;
 		}
 	}
 }
