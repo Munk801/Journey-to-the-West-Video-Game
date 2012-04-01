@@ -11,12 +11,12 @@ namespace U5Designs {
 		public bool existsIn2d, existsIn3d, gravity;
 		public int damage;
 		public float speed;
-		public double duration;
+		public double staminaCost, duration;
 		public SpriteSheet sprite;
 
 
 		public ProjectileProperties(Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int damage,
-										float speed, bool gravity, SpriteSheet sprite, double duration = -1.0) {
+										float speed, bool gravity, SpriteSheet sprite, double staminaCost = 0.0, double duration = -1.0) {
 			this.scale = scale;
 			this.pbox = pbox;
 			this.cbox = cbox;
@@ -25,6 +25,7 @@ namespace U5Designs {
 			this.damage = damage;
 			this.speed = speed;
 			this.gravity = gravity;
+			this.staminaCost = staminaCost;
 			this.duration = duration;
 			this.sprite = sprite;
 		}

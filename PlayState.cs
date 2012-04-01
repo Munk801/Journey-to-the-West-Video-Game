@@ -73,7 +73,7 @@ namespace U5Designs
                 ((Enemy)aio).player = player;
             }
 
-            //TODO: initlize the boss in loadlevel
+            //TODO: initialize the boss in loadlevel
             bossAI = new ZookeeperAI(player, this);
             bossMode = false;
 
@@ -193,7 +193,7 @@ namespace U5Designs
             //handle death and despawning for everything else
 			for(int i=combatList.Count-1; i>=0; i--) {
 				CombatObject co = combatList[i];
-                if (co.type == 1) { //enemy
+                if (co.type == (int)CombatType.enemy) {
 					if(co.health <= 0) {
 						objList.Remove((GameObject)co);
 						physList.Remove((PhysicsObject)co);
@@ -202,7 +202,9 @@ namespace U5Designs
 						aiList.Remove((AIObject)co);
 						combatList.Remove(co);
                     }
-                } else if (co.type == 2 || co.type == 4) {//projectile
+				} else if(co.type == (int)CombatType.projectile ||
+						  co.type == (int)CombatType.squish ||
+						  co.type == (int)CombatType.grenade) {
 					if(co.health <= 0 || co.ScreenRegion == GameObject.OFF_SCREEN) {
 						objList.Remove((GameObject)co);
 						physList.Remove((PhysicsObject)co);
@@ -388,13 +390,12 @@ namespace U5Designs
 			}
 
 			//TODO: This if/else block is a hack!
+			//      Implement a flag that controls whether to switch these or not
 			if(enable3d) {
-				//player.cycleNumber = 1;
 				foreach(AIObject o in aiList) {
 					((RenderObject)o).cycleNumber = 1;
 				}
 			} else { //2d
-				//player.cycleNumber = 0;
 				foreach(AIObject o in aiList) {
 					((RenderObject)o).cycleNumber = 0;
 				}

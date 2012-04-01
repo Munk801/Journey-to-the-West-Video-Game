@@ -91,7 +91,7 @@ namespace U5Designs
 
 			List<ProjectileProperties> playerProjectiles = new List<ProjectileProperties>();
 			playerProjectiles.Add(parseProjectileFile("banana_projectile.dat"));
-			//add other projectiles here
+			playerProjectiles.Add(parseProjectileFile("coconut_grenade_projectile.dat"));
 
 			//Player
 			ps.player = new Player(parse_Sprite_File("player_sprite.dat"), playerProjectiles, ps);
@@ -161,17 +161,26 @@ namespace U5Designs
 			Vector3 cbox = parseVector3(doc.GetElementsByTagName("cbox")[0]);
 			bool draw2 = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
 			bool draw3 = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
-			//int damage = Convert.ToInt32(doc.GetElementsByTagName("damage")[0].InnerText);
+			int damage = Convert.ToInt32(doc.GetElementsByTagName("damage")[0].InnerText);
 			float speed = Convert.ToSingle(doc.GetElementsByTagName("speed")[0].InnerText);
 			bool grav = Convert.ToBoolean(doc.GetElementsByTagName("gravity")[0].InnerText);
 			SpriteSheet ss = parse_Sprite_File(doc.GetElementsByTagName("sprite")[0].InnerText);
-
+			
+			XmlNodeList staminaCost = doc.GetElementsByTagName("staminaCost");
 			XmlNodeList duration = doc.GetElementsByTagName("duration");
 			fstream.Close();
-			if(duration.Count == 0) {
-				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, 0, speed, grav, ss);
-			} else {
-				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, 0, speed, grav, ss, Convert.ToDouble(duration[0].InnerText));
+
+			bool hasStamina = staminaCost.Count != 0;
+			bool hasDuration = duration.Count != 0;
+
+			if(!hasStamina && !hasDuration) {
+				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss);
+			} else if(!hasDuration) {
+				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss, Convert.ToDouble(staminaCost[0].InnerText));
+			} else if(!hasStamina) {
+				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss, 0.0, Convert.ToDouble(duration[0].InnerText));
+			} else { //has both
+				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss, Convert.ToDouble(staminaCost[0].InnerText), Convert.ToDouble(duration[0].InnerText));
 			}
 		}
 
@@ -391,7 +400,6 @@ namespace U5Designs
 					// Create the Enemies
 					for(int j = 1; j < EList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(EList[i].ChildNodes[j]);
-						//TODO: SETH: change the last 'ss' in this enemy declaration to be the projectile sprite!!!!!!!
 						_e.Add(new Enemy(loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss));
 					}
 				} else {
@@ -400,7 +408,6 @@ namespace U5Designs
 					// Create the Enemies
 					for(int j = 1; j < EList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(EList[i].ChildNodes[j]);
-						//TODO: SETH: change the last 'ss' in this enemy declaration to be the projectile sprite!!!!!!!
 						_e.Add(new Enemy(loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, p));
 					}
 				}
@@ -523,10 +530,7 @@ namespace U5Designs
 		}
 
 		private static ZookeeperAI parseZookeeperBoss() {
-			//TODO: I was going to implement this, but I decided to wait and see if
-			//      things get changed with the Boss structure, since right now the
-			//      Boss class is very special-cased and probably needs to be refactored
-			//      for use with other bosses.  Leaving this stub as a reminder, though.
+			//TODO: Implement me if needed (or leave things in constructor, TBD)
 			return null;
 		}
 	}

@@ -4,6 +4,8 @@
 	<cbox x="3.5" y="3.5" z="3.5" />
 	<draw2>true</draw2>
 	<draw3>true</draw3>
+  <damage>1</damage>
+  <staminaCost>0.40</staminaCost>
 	<speed>150.0</speed>
 	<gravity>false</gravity>
   <duration>0.50</duration>

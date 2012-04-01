@@ -30,7 +30,6 @@ namespace U5Designs
         internal Assembly assembly;
 
         /// <summary>Creates a 1280x720 window.</summary>
-        //TODO: Change this to a dynamic screen resolution
         public GameEngine() : base(1280, 720, GraphicsMode.Default, "Journey to the East") {
             VSync = VSyncMode.On;
         }

@@ -13,8 +13,9 @@ using OpenTK.Input;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace U5Designs
-{
+namespace U5Designs {
+	public enum PlayerAnim { stand2d=0, stand3d=1, walk2d=2, walk3d=3, spin2d=4, spin3d=5 };
+
     public class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
 		private const int fallDamage = 1;
@@ -30,7 +31,7 @@ namespace U5Designs
 		public Vector3 velocity;
 		private Vector3 accel;
 		public double stamina, maxStamina;
-        internal bool Invincible, HasControl;
+        internal bool Invincible, HasControl, isMobile;
         private Vector3 lastPosOnGround; // used for falling off detection
         public PlayState ps;
 
@@ -55,7 +56,7 @@ namespace U5Designs
         public double spinSize; // the distance from the center of the player the spin attack extends
         public int spinDamage;
 
-		private bool spaceDown;
+		private bool spaceDown, eDown;
         
         // SOUND FILES
         AudioFile jumpSound, bananaSound, hurtSound;
@@ -83,13 +84,17 @@ namespace U5Designs
 			_existsIn2d = true;
 			_existsIn3d = true;
 			onGround = true;
-            //combat things
 
+            //combat things
             _damage = 1;
             spinDamage = 2;
             _health = 7;
 			stamina = 5.0;
 			maxStamina = 5.0;
+
+			spaceDown = false;
+			eDown = false;
+			isMobile = true;
 
             Invincible = false;
             HasControl = true;
@@ -126,29 +131,20 @@ namespace U5Designs
 				stamina = Math.Min(stamina + time, maxStamina);
 			}
 
-			if(spinning) {
-				stamina = Math.Max(stamina - 5.0 * time, 0.0);
-				if(stamina <= 0.0) {
-					spinning = false;
-					_speed = 75;
-					if(velocity.X == 0) {
-						_cycleNum = (enable3d ? 1 : 0);
-					} else {
-						_cycleNum = (enable3d ? 3 : 2);
-					}
-				}
-			}
-
 			//Update spinTimer even if not spinning, because it's also the timeout before you can spin again
 			if(spinTimer > 0.0) {
 				spinTimer -= time;
-				if(spinTimer <= 0.0 && spinning) {
+			}
+
+			if(spinning) {
+				stamina = Math.Max(stamina - 5.0 * time, 0.0);
+				if(stamina <= 0.0 || spinTimer <= 0.0) {
 					spinning = false;
 					_speed = 75;
 					if(velocity.X == 0) {
-						_cycleNum = (enable3d ? 1 : 0);
+						_cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
 					} else {
-						_cycleNum = (enable3d ? 3 : 2);
+						_cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
 					}
 				}
 			}
@@ -193,45 +189,63 @@ namespace U5Designs
 		/// </summary>
 		/// <param name="keyboard">Contains the current keypresses</param>
 		private void handleKeyboardInput(KeyboardDevice keyboard) {
-			if(enable3d) {
-				Vector2 newVel = new Vector2(0);
-				if(keyboard[Key.W]) { newVel.X++; }
-				if(keyboard[Key.S]) { newVel.X--; }
-				if(keyboard[Key.A]) { newVel.Y--; }
-				if(keyboard[Key.D]) { newVel.Y++; }
+			if(isMobile) {
+				if(enable3d) {
+					Vector2 newVel = new Vector2(0);
+					if(keyboard[Key.W]) { newVel.X++; }
+					if(keyboard[Key.S]) { newVel.X--; }
+					if(keyboard[Key.A]) { newVel.Y--; }
+					if(keyboard[Key.D]) { newVel.Y++; }
 
-				newVel.NormalizeFast();
-				if(viewSwitchJumpTimer > 0.0 && (newVel.X != 0 || newVel.Y != 0)) {
-					viewSwitchJumpTimer = Math.Min(viewSwitchJumpTimer, 0.025);
+					newVel.NormalizeFast();
+					if(viewSwitchJumpTimer > 0.0 && (newVel.X != 0 || newVel.Y != 0)) {
+						viewSwitchJumpTimer = Math.Min(viewSwitchJumpTimer, 0.025);
+					}
+
+					velocity.X = newVel.X * speed;
+					velocity.Z = newVel.Y * speed;
+
+					_animDirection = (velocity.X >= 0 ? 1 : -1);
+					if(!spinning) {
+						_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
+					}
+				} else {
+					if(keyboard[Key.A] == keyboard[Key.D]) {
+						velocity.X = 0f;
+					} else if(keyboard[Key.D]) {
+						velocity.X = _speed;
+					} else { //a
+						velocity.X = -_speed;
+					}
+
+					_animDirection = (velocity.X >= 0 ? 1 : -1);
+					if(!spinning) {
+						_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand2d : PlayerAnim.walk2d);
+					}
 				}
 
-				velocity.X = newVel.X * speed;
-				velocity.Z = newVel.Y * speed;
-
-				_animDirection = (velocity.X >= 0 ? 1 : -1);
-				if(!spinning) {
-					_cycleNum = (velocity.X == 0 ? 1 : 3);
-				}
-			} else {
-				if(keyboard[Key.A] == keyboard[Key.D]) {
-					velocity.X = 0f;
-				} else if(keyboard[Key.D]) {
-					velocity.X = _speed;
-				} else { //a
-					velocity.X = -_speed;
+				//Cloud
+				//TODO: Implement animation etc, possibly change which key triggers this
+				if(keyboard[Key.C]) {
+					velocity.Y = _speed;
+					fallTimer = 0.0;
 				}
 
-				_animDirection = (velocity.X >= 0 ? 1 : -1);
-				if(!spinning) {
-					_cycleNum = (velocity.X == 0 ? 0 : 2);
+				//Jump
+				if(keyboard[Key.Space] && !spaceDown) {
+					if(onGround) {
+						accelerate(Vector3.UnitY * jumpspeed);
+						onGround = false;
+						viewSwitchJumpTimer = 0.0;
+						//jumpSound.Play();
+					}
+					spaceDown = true;
+				} else if(!keyboard[Key.Space]) {
+					spaceDown = false;
 				}
-			}
-
-			//Cloud
-			//TODO: Implement animation etc, possibly change which key triggers this
-			if(keyboard[Key.C]) {
-				velocity.Y = _speed;
-				fallTimer = 0.0;
+			} else { //not mobile - grenade selected
+				velocity.X = 0.0f;
+				velocity.Z = 0.0f;
 			}
 
 			//TMP PHYSICS TEST BUTTON suicide button
@@ -239,19 +253,24 @@ namespace U5Designs
 				_health = 0;
 			}
 
-			//Jump
-			if(keyboard[Key.Space] && !spaceDown) {
-				if(onGround) {
-					accelerate(Vector3.UnitY * jumpspeed);
-					onGround = false;
-					viewSwitchJumpTimer = 0.0;
-					//jumpSound.Play();
+			//Toggle Grenade
+			if(keyboard[Key.E] && !eDown) {
+				if(curProjectile.gravity) { //Turn grenades off
+					curProjectile = projectiles[0];
+					isMobile = true;
+					markerList.Clear();
+				} else { //Turn grenades on
+					curProjectile = projectiles[1];
+					velocity.X = 0.0f;
+					velocity.Z = 0.0f;
+					isMobile = false;
+					_cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
 				}
-				spaceDown = true;
-			} else if(!keyboard[Key.Space]) {
-				spaceDown = false;
+				eDown = true;
+			} else if(!keyboard[Key.E]) {
+				eDown = false;
 			}
-
+			
 			//Secret skip to boss
 			if(keyboard[Key.BackSlash] && keyboard[Key.Number1] && keyboard[Key.Number5]) {
 				playstate.enterBossMode();
@@ -270,26 +289,36 @@ namespace U5Designs
         /// <param name="playstate">a pointer to play state, for accessing the obj lists in playstate</param>
         private void handleMouseInput()
         {
-            if (playstate.eng.ThisMouse.LeftPressed() && stamina >= 0.40 && projectileTimer <= 0.0) {
-				spawnProjectile(calcProjDir());
+            if (playstate.eng.ThisMouse.LeftPressed()) {
 
-				if(curProjectile.gravity) {
-					velocity.X = 0.0f;
-					velocity.Z = 0.0f;
+				if(stamina >= curProjectile.staminaCost && projectileTimer <= 0.0) {
+					spawnProjectile(calcProjDir());
+
+					stamina -= curProjectile.staminaCost;
+					projectileTimer = 0.25;
+
+					bananaSound.Play();
 				}
+				//TODO: If the player was out of stamina, flash the stamina bar to let them know what happened
 
-				stamina -= 0.40;
-				projectileTimer = 0.25;
+				//Note: do this whether we actually launched a grenade or not, because if we didn't, it's
+				//      probably because of stamina, and the player may not have time to switch back or to
+				//      wait for stamina to refill.
+				if(curProjectile.gravity) {
+					//Automatically switch back to normal projectile
+					curProjectile = projectiles[0];
+					isMobile = true;
+					markerList.Clear();
 
-				bananaSound.Play();
+					projectileTimer = 0.25;
+				}
             }
 
-            if (playstate.eng.ThisMouse.RightPressed() && spinTimer <= 0.0 && stamina > 0.0) {
-                //TODO: implement stamina constraints on right click/spin attack
+            if (isMobile && playstate.eng.ThisMouse.RightPressed() && spinTimer <= 0.0 && stamina > 0.0) {
                 spinning = true;
 				spinTimer = 0.5;
 				_speed = 125;
-				_cycleNum = (enable3d ? 5 : 4);
+				_cycleNum = (int)(enable3d ? PlayerAnim.spin3d : PlayerAnim.spin2d);
             }
         }
 
@@ -331,7 +360,8 @@ namespace U5Designs
 				Vector3 pos = new Vector3(_location);
 
 				for(int i = 0; i < 40; i++) {
-					projDir.Y -= 20.0f;
+					projDir.Y -= (float)gravity / 20.0f;
+					//projDir.Y -= 20.0f;
 					pos += (projDir / 20.0f);
 					markerList.Add(new Decoration(pos, new Vector3(5, 5, 5), true, true, Billboarding.Yes, marker));
 				}
@@ -538,11 +568,7 @@ namespace U5Designs
 				if(endspin) {
 					spinning = false;
 					_speed = 75;
-					if(velocity.X == 0) {
-						_cycleNum = (enable3d ? 1 : 0);
-					} else {
-						_cycleNum = (enable3d ? 3 : 2);
-					}
+					_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
 				}
 
 				Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
@@ -770,11 +796,7 @@ namespace U5Designs
 				if(endspin) {
 					spinning = false;
 					_speed = 75;
-					if(velocity.X == 0) {
-						_cycleNum = (enable3d ? 1 : 0);
-					} else {
-						_cycleNum = (enable3d ? 3 : 2);
-					}
+					_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
 				}
 
 				Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);

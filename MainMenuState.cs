@@ -262,8 +262,6 @@ namespace U5Designs
             }
             _old_state = _new_state;
 
-            //TODO: Change these keys to their final mappings when determined
-
             if (eng.Keyboard[Key.Q])
             {
                 eng.Exit();
