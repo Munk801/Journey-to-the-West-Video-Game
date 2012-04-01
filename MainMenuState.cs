@@ -53,39 +53,36 @@ namespace U5Designs
             mouse = eng.Mouse;
             // Load all the textures
             eng.StateTextureManager.RenderSetup();
-            Assembly audAssembly = Assembly.GetExecutingAssembly();
-            eng.StateTextureManager.LoadTexture("menu", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            eng.StateTextureManager.LoadTexture("menu", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
             menu = eng.StateTextureManager.GetTexture("menu");
-            eng.StateTextureManager.LoadTexture("arrow", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.arrow.png"));
+            eng.StateTextureManager.LoadTexture("arrow", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.arrow.png"));
             arrow = eng.StateTextureManager.GetTexture("arrow");
-            eng.StateTextureManager.LoadTexture("load", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel.png"));
+            eng.StateTextureManager.LoadTexture("load", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel.png"));
             load_nopress = eng.StateTextureManager.GetTexture("load");
-            eng.StateTextureManager.LoadTexture("loadpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel_hover.png"));
+            eng.StateTextureManager.LoadTexture("loadpress", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel_hover.png"));
             load_press = eng.StateTextureManager.GetTexture("loadpress");
-            eng.StateTextureManager.LoadTexture("quit", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_exit.png"));
+            eng.StateTextureManager.LoadTexture("quit", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_exit.png"));
             quit_nopress = eng.StateTextureManager.GetTexture("quit");
-            eng.StateTextureManager.LoadTexture("quitpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_exit_hover.png"));
+            eng.StateTextureManager.LoadTexture("quitpress", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_exit_hover.png"));
             quit_press = eng.StateTextureManager.GetTexture("quitpress");
-            eng.StateTextureManager.LoadTexture("play", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play.png"));
+            eng.StateTextureManager.LoadTexture("play", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play.png"));
             play_nopress = eng.StateTextureManager.GetTexture("play");
-            eng.StateTextureManager.LoadTexture("playpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play_hover.png"));
+            eng.StateTextureManager.LoadTexture("playpress", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play_hover.png"));
             play_press = eng.StateTextureManager.GetTexture("playpress");
             eng.StateTextureManager.LoadTexture("ld", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_leveldesign.png"));
             ld_nopress = eng.StateTextureManager.GetTexture("ld");
             eng.StateTextureManager.LoadTexture("ldpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_leveldesign_hover.png"));
             ld_press = eng.StateTextureManager.GetTexture("ldpress");
 
-            testFile = new AudioFile(audAssembly.GetManifestResourceStream("U5Designs.Resources.Sound.Retribution.ogg"));
-
+			musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.Retribution.ogg"));
+			musicFile.Play();
 
             // Setup saved game data 
             SavedGameDataSetup();
 
             // Display available saved game states
             DisplayAvailableSaves();
-
-            // Plays the audio file.  Should be in a data file later
-            testFile.Play();
 
             // Clear the color to work with the SplashScreen so it doesn't white out
             GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -207,7 +204,7 @@ namespace U5Designs
                         // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
                         PlayState ps = new PlayState(this, eng, 0);
 
-                        testFile.Stop();
+                        musicFile.Stop();
 
                         // Otherwise pass the level index from the saved game
                         //PlayState ps = new PlayState(saved_level_index);
@@ -226,7 +223,7 @@ namespace U5Designs
                     else
                     {
                         // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
-                        testFile.Stop();
+                        musicFile.Stop();
 
                         // Otherwise pass the level index from the saved game
                         PlayState ps = new PlayState(this, eng, saved_level_index);
@@ -282,8 +279,6 @@ namespace U5Designs
             }
             _old_state = _new_state;
 
-            //TODO: Change these keys to their final mappings when determined
-
             if (eng.Keyboard[Key.Q])
             {
                 eng.Exit();
@@ -300,7 +295,7 @@ namespace U5Designs
                     // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
                     PlayState ps = new PlayState(this, eng, 0);
 
-                    testFile.Stop();
+                    musicFile.Stop();
 
                     // Otherwise pass the level index from the saved game
                     //PlayState ps = new PlayState(saved_level_index);
@@ -318,7 +313,7 @@ namespace U5Designs
                     else
                     {
                         // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
-                        testFile.Stop();
+                        musicFile.Stop();
 
                         // Otherwise pass the level index from the saved game
                         PlayState ps = new PlayState(this, eng, saved_level_index);

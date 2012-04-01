@@ -13,11 +13,14 @@ using OpenTK.Input;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace U5Designs
-{
+namespace U5Designs {
+	public enum PlayerAnim { stand2d=0, stand3d=1, walk2d=2, walk3d=3, spin2d=4, spin3d=5 };
+
     public class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
 		private const int fallDamage = 1;
+
+		private PlayState playstate; //Keep a reference since we'll need this regularly
 
         //Knockback physics constants:
         private Vector3 kbspeed;
@@ -28,7 +31,7 @@ namespace U5Designs
 		public Vector3 velocity;
 		private Vector3 accel;
 		public double stamina, maxStamina;
-        internal bool Invincible, HasControl;
+        internal bool Invincible, HasControl, isMobile;
         private Vector3 lastPosOnGround; // used for falling off detection
         public PlayState ps;
 
@@ -53,15 +56,16 @@ namespace U5Designs
         public double spinSize; // the distance from the center of the player the spin attack extends
         public int spinDamage;
 
-		private bool spaceDown;
+		private bool spaceDown, eDown;
         
         // SOUND FILES
         AudioFile jumpSound, bananaSound, hurtSound;
 
-        public Player(SpriteSheet sprite, List<ProjectileProperties> projectiles) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
+        public Player(SpriteSheet sprite, List<ProjectileProperties> projectiles, PlayState ps) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
         {
             p_state = new PlayerState("TEST player");
             //p_state.setSpeed(130);
+			this.playstate = ps;
 			_speed = 75;
 			_location = new Vector3(25, 12.5f, 50);
             _scale = new Vector3(16.25f, 25f, 16.25f);
@@ -80,13 +84,17 @@ namespace U5Designs
 			_existsIn2d = true;
 			_existsIn3d = true;
 			onGround = true;
-            //combat things
 
+            //combat things
             _damage = 1;
             spinDamage = 2;
             _health = 7;
 			stamina = 5.0;
 			maxStamina = 5.0;
+
+			spaceDown = false;
+			eDown = false;
+			isMobile = true;
 
             Invincible = false;
             HasControl = true;
@@ -103,32 +111,11 @@ namespace U5Designs
             curProjectile.damage = _damage;
 			markerList = new List<Decoration>();
 
-			Assembly assembly_new = Assembly.GetExecutingAssembly();
-			jumpSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.jump_sound.ogg"));
-			bananaSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
-			hurtSound = new AudioFile(assembly_new.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			jumpSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.jump_sound.ogg"));
+			bananaSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
+			hurtSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
         }
-
-		/// <summary>
-		/// Adds indicators to show where the players projectile is going to go
-		/// Used for gravity based projectiles (specifically the grenade)
-		/// </summary>
-		/// <param name="ps">Pointer to the current PlayState, used to calculate directions</param>
-		public void addMarkers(PlayState ps) {
-			if(curProjectile.gravity) {
-				markerList.Clear();
-
-				Vector3 projDir = calcProjDir(ps) * curProjectile.speed;
-				//projDir -= new Vector3(velocity.X, 0.0f, velocity.Z);
-				Vector3 pos = new Vector3(_location);
-
-				for(int i = 0; i < 40; i++) {
-					projDir.Y -= 20.0f;
-					pos += (projDir / 20.0f);
-					markerList.Add(new Decoration(pos, new Vector3(5, 5, 5), true, true, Billboarding.Yes, marker));
-				}
-			}
-		}
 
         /// <summary>
         ///  Updates the player specific state. Gets called every update frame
@@ -136,8 +123,7 @@ namespace U5Designs
         /// <param name="enable3d"> true if we are in 3d view</param>
         /// <param name="keyboard"> the keyboard object, for handling input</param>
         /// <param name="time">time elapsed since last update</param>
-        /// <param name="playstate">a pointer to play state, for accessing the obj lists in playstate</param>
-        internal void updateState(bool enable3d, KeyboardDevice keyboard, double time, PlayState playstate) {
+        internal void updateState(bool enable3d, KeyboardDevice keyboard, double time) {
 			this.enable3d = enable3d;
 
 			//Update timers
@@ -145,29 +131,20 @@ namespace U5Designs
 				stamina = Math.Min(stamina + time, maxStamina);
 			}
 
-			if(spinning) {
-				stamina = Math.Max(stamina - 5.0 * time, 0.0);
-				if(stamina <= 0.0) {
-					spinning = false;
-					_speed = 75;
-					if(velocity.X == 0) {
-						_cycleNum = (enable3d ? 1 : 0);
-					} else {
-						_cycleNum = (enable3d ? 3 : 2);
-					}
-				}
-			}
-
 			//Update spinTimer even if not spinning, because it's also the timeout before you can spin again
 			if(spinTimer > 0.0) {
 				spinTimer -= time;
-				if(spinTimer <= 0.0 && spinning) {
+			}
+
+			if(spinning) {
+				stamina = Math.Max(stamina - 5.0 * time, 0.0);
+				if(stamina <= 0.0 || spinTimer <= 0.0) {
 					spinning = false;
 					_speed = 75;
 					if(velocity.X == 0) {
-						_cycleNum = (enable3d ? 1 : 0);
+						_cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
 					} else {
-						_cycleNum = (enable3d ? 3 : 2);
+						_cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
 					}
 				}
 			}
@@ -193,9 +170,26 @@ namespace U5Designs
 			if(viewSwitchJumpTimer > 0.0) {
 				viewSwitchJumpTimer -= time;
 			}
+
+			//If the grenade is selected, draw parabola
+			if(curProjectile.gravity) {
+				addMarkers();
+			}
 			
             if (HasControl) {
-				//Keyboard
+				handleKeyboardInput(keyboard);
+
+				//Keep this last
+				handleMouseInput();
+            }
+        }
+
+		/// <summary>
+		/// Handles all keyboard input from the player
+		/// </summary>
+		/// <param name="keyboard">Contains the current keypresses</param>
+		private void handleKeyboardInput(KeyboardDevice keyboard) {
+			if(isMobile) {
 				if(enable3d) {
 					Vector2 newVel = new Vector2(0);
 					if(keyboard[Key.W]) { newVel.X++; }
@@ -208,58 +202,173 @@ namespace U5Designs
 						viewSwitchJumpTimer = Math.Min(viewSwitchJumpTimer, 0.025);
 					}
 
-					velocity.X = newVel.X*speed;
-					velocity.Z = newVel.Y*speed;
+					velocity.X = newVel.X * speed;
+					velocity.Z = newVel.Y * speed;
 
 					_animDirection = (velocity.X >= 0 ? 1 : -1);
 					if(!spinning) {
-						_cycleNum = (velocity.X == 0 ? 1 : 3);
+						_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
 					}
-                } else {
-                    if (keyboard[Key.A] == keyboard[Key.D]) {
-                        velocity.X = 0f;
-                    } else if(keyboard[Key.D]) {
-                        velocity.X = _speed;
+				} else {
+					if(keyboard[Key.A] == keyboard[Key.D]) {
+						velocity.X = 0f;
+					} else if(keyboard[Key.D]) {
+						velocity.X = _speed;
 					} else { //a
 						velocity.X = -_speed;
 					}
 
 					_animDirection = (velocity.X >= 0 ? 1 : -1);
 					if(!spinning) {
-						_cycleNum = (velocity.X == 0 ? 0 : 2);
+						_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand2d : PlayerAnim.walk2d);
 					}
-                }
+				}
 
-                //TMP PHYSICS TEST BUTTON float button
+				//Cloud
+				//TODO: Implement animation etc, possibly change which key triggers this
 				if(keyboard[Key.C]) {
 					velocity.Y = _speed;
 					fallTimer = 0.0;
 				}
 
-				//TMP PHYSICS TEST BUTTON suicide button
-				if(keyboard[Key.X]) {
-					_health = 0;
-				}
-
-                if (keyboard[Key.Space] && !spaceDown) {
+				//Jump
+				if(keyboard[Key.Space] && !spaceDown) {
 					if(onGround) {
 						accelerate(Vector3.UnitY * jumpspeed);
 						onGround = false;
 						viewSwitchJumpTimer = 0.0;
 						//jumpSound.Play();
 					}
-                    spaceDown = true;
-                }
-                else if (!keyboard[Key.Space]) {
-                    spaceDown = false;
-                }
+					spaceDown = true;
+				} else if(!keyboard[Key.Space]) {
+					spaceDown = false;
+				}
+			} else { //not mobile - grenade selected
+				velocity.X = 0.0f;
+				velocity.Z = 0.0f;
+			}
 
-				//Keep this last
-				handleMouseInput(playstate);
+			//TMP PHYSICS TEST BUTTON suicide button
+			if(keyboard[Key.X]) {
+				_health = 0;
+			}
+
+			//Toggle Grenade
+			if(keyboard[Key.E] && !eDown) {
+				if(curProjectile.gravity) { //Turn grenades off
+					curProjectile = projectiles[0];
+					isMobile = true;
+					markerList.Clear();
+				} else { //Turn grenades on
+					curProjectile = projectiles[1];
+					velocity.X = 0.0f;
+					velocity.Z = 0.0f;
+					isMobile = false;
+					_cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
+				}
+				eDown = true;
+			} else if(!keyboard[Key.E]) {
+				eDown = false;
+			}
+			
+			//Secret skip to boss
+			if(keyboard[Key.BackSlash] && keyboard[Key.Number1] && keyboard[Key.Number5]) {
+				playstate.enterBossMode();
+				//floor at 125 + 12.5 player pbox
+				_location = new Vector3(playstate.bossAreaCenter) + Vector3.UnitY * (_pbox.Y + 0.1f);
+
+				//The following should maybe be moved to a function in Camera
+				playstate.camera.eye.Y = _location.Y + (enable3d ? 24.0f : 31.25f);
+				playstate.camera.lookat.Y = _location.Y + (enable3d ? 20.5f : 31.25f);
+			}
+		}
+		
+        /// <summary>
+        /// Provides all the mouse input for the player.  Will currently check for a left click and shoot a projectile in the direction
+        /// </summary>
+        /// <param name="playstate">a pointer to play state, for accessing the obj lists in playstate</param>
+        private void handleMouseInput()
+        {
+            if (playstate.eng.ThisMouse.LeftPressed()) {
+
+				if(stamina >= curProjectile.staminaCost && projectileTimer <= 0.0) {
+					spawnProjectile(calcProjDir());
+
+					stamina -= curProjectile.staminaCost;
+					projectileTimer = 0.25;
+
+					bananaSound.Play();
+				}
+				//TODO: If the player was out of stamina, flash the stamina bar to let them know what happened
+
+				//Note: do this whether we actually launched a grenade or not, because if we didn't, it's
+				//      probably because of stamina, and the player may not have time to switch back or to
+				//      wait for stamina to refill.
+				if(curProjectile.gravity) {
+					//Automatically switch back to normal projectile
+					curProjectile = projectiles[0];
+					isMobile = true;
+					markerList.Clear();
+
+					projectileTimer = 0.25;
+				}
+            }
+
+            if (isMobile && playstate.eng.ThisMouse.RightPressed() && spinTimer <= 0.0 && stamina > 0.0) {
+                spinning = true;
+				spinTimer = 0.5;
+				_speed = 125;
+				_cycleNum = (int)(enable3d ? PlayerAnim.spin3d : PlayerAnim.spin2d);
             }
         }
 
-		private Vector3 calcProjDir(PlayState playstate) {
+        /// <summary>
+        /// Spawns the players projectile in the param direction
+        /// </summary>
+        /// <param name="playstate">a pointer to play state, for accessing the obj lists in playstate</param>
+        /// <param name="direction">The direction to fire the projectile in</param>
+        private void spawnProjectile(Vector3 direction) {
+            Vector3 projlocation = new Vector3(location);
+
+            //break the rendering tie between player and projectile, or else they flicker
+			if(!enable3d) {
+				projlocation.Z += 0.001f;
+			}
+            
+			Projectile shot = new Projectile(projlocation, direction, true, curProjectile, playstate.player); // spawn the actual projectile		
+			//shot.accelerate(new Vector3(velocity.X, 0.0f, velocity.Z)); //account for player's current velocity
+
+            // add projectile to appropriate lists
+            playstate.objList.Add(shot);
+            playstate.renderList.Add(shot);
+            playstate.colisionList.Add(shot);
+            playstate.physList.Add(shot);
+            playstate.combatList.Add(shot);
+        }
+
+		/// <summary>
+		/// Adds indicators to show where the players projectile is going to go
+		/// Used for gravity based projectiles (specifically the grenade)
+		/// </summary>
+		/// <param name="ps">Pointer to the current PlayState, used to calculate directions</param>
+		public void addMarkers() {
+			if(curProjectile.gravity) {
+				markerList.Clear();
+
+				Vector3 projDir = calcProjDir() * curProjectile.speed;
+				//projDir -= new Vector3(velocity.X, 0.0f, velocity.Z);
+				Vector3 pos = new Vector3(_location);
+
+				for(int i = 0; i < 40; i++) {
+					projDir.Y -= (float)gravity / 20.0f;
+					//projDir.Y -= 20.0f;
+					pos += (projDir / 20.0f);
+					markerList.Add(new Decoration(pos, new Vector3(5, 5, 5), true, true, Billboarding.Yes, marker));
+				}
+			}
+		}
+
+		private Vector3 calcProjDir() {
 			// Grab Mouse coord.  Since Y goes down, just subtract from height to get correct orientation
 			Vector3d mousecoord = new Vector3d((double)playstate.eng.Mouse.X, (double)(playstate.eng.Height - playstate.eng.Mouse.Y), 1.0);
 			Vector3d mouseWorld;
@@ -355,58 +464,6 @@ namespace U5Designs
 			}
 			return projDir;
 		}
-		
-        /// <summary>
-        /// Provides all the mouse input for the player.  Will currently check for a left click and shoot a projectile in the direction
-        /// </summary>
-        /// <param name="playstate">a pointer to play state, for accessing the obj lists in playstate</param>
-        private void handleMouseInput(PlayState playstate)
-        {
-            if (playstate.eng.ThisMouse.LeftPressed() && stamina >= 0.40 && projectileTimer <= 0.0) {
-				Vector3 projDir = calcProjDir(playstate);
-
-				bananaSound.Play();
-				spawnProjectile(playstate, projDir);
-
-				velocity.X = 0.0f;
-				velocity.Z = 0.0f;
-
-				stamina -= 0.40;
-				projectileTimer = 0.25;
-            }
-
-            if (playstate.eng.ThisMouse.RightPressed() && spinTimer <= 0.0 && stamina > 0.0) {
-                //TODO: impliment stamina constraints on right click/spin attack
-                spinning = true;
-				spinTimer = 0.5;
-				_speed = 125;
-				_cycleNum = (enable3d ? 5 : 4);
-            }
-        }
-
-        /// <summary>
-        /// Spawns the players projectile in the param direction
-        /// </summary>
-        /// <param name="playstate">a pointer to play state, for accessing the obj lists in playstate</param>
-        /// <param name="direction">The direction to fire the projectile in</param>
-        private void spawnProjectile(PlayState playstate, Vector3 direction) {
-            Vector3 projlocation = new Vector3(location);
-
-            //break the rendering tie between player and projectile, or else they flicker
-			if(!enable3d) {
-				projlocation.Z += 0.001f;
-			}
-            
-			Projectile shot = new Projectile(projlocation, direction, true, curProjectile, playstate.player); // spawn the actual projectile		
-			//shot.accelerate(new Vector3(velocity.X, 0.0f, velocity.Z)); //account for player's current velocity
-
-            // add projectile to appropriate lists
-            playstate.objList.Add(shot);
-            playstate.renderList.Add(shot);
-            playstate.colisionList.Add(shot);
-            playstate.physList.Add(shot);
-            playstate.combatList.Add(shot);
-        }
 
         /// <summary>
         /// Starts the timer and anamation to squish the player if he got squished in the zookeeper encounter
@@ -511,11 +568,7 @@ namespace U5Designs
 				if(endspin) {
 					spinning = false;
 					_speed = 75;
-					if(velocity.X == 0) {
-						_cycleNum = (enable3d ? 1 : 0);
-					} else {
-						_cycleNum = (enable3d ? 3 : 2);
-					}
+					_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
 				}
 
 				Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
@@ -554,7 +607,7 @@ namespace U5Designs
 									fallTimer = 0.0;
 									onGround = true;
 									collidedWithGround = true;
-									if(VectorUtil.overGround3d(this, physList)) {
+									if(VectorUtil.overGround3dStrict(this, physList)) {
 										lastPosOnGround = new Vector3(_location);
 									}
 									cam.moveToYPos(_location.Y);
@@ -675,7 +728,7 @@ namespace U5Designs
 				PhysicsObject collidingObj = null;
 				float collidingT = 1.0f / 0.0f; //pos infinity
 				int collidingAxis = -1;
-                bool endspin = false; // flag to end spinn
+                bool endspin = false; // flag to end spin
 
                 foreach (PhysicsObject obj in physList) {
                     //if we are spinning, do a simple non-physics collision test against combat objects
@@ -743,11 +796,7 @@ namespace U5Designs
 				if(endspin) {
 					spinning = false;
 					_speed = 75;
-					if(velocity.X == 0) {
-						_cycleNum = (enable3d ? 1 : 0);
-					} else {
-						_cycleNum = (enable3d ? 3 : 2);
-					}
+					_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
 				}
 
 				Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
@@ -787,7 +836,7 @@ namespace U5Designs
 									collidedWithGround = true;
 
 									//Using 3D instead of 2D is intentional here - don't save position if switching views could make you fall
-									if(VectorUtil.overGround3d(this, physList)) {
+									if(VectorUtil.overGround3dStrict(this, physList)) {
 										lastPosOnGround = new Vector3(_location);
 									}
 									cam.moveToYPos(_location.Y);
@@ -936,7 +985,8 @@ namespace U5Designs
 
         private Vector3 _scale;
         public Vector3 scale {
-            get { return _scale; }
+			get { return _scale; }
+			set { _scale = value; }
         }
 
         private Vector3 _pbox;

@@ -21,6 +21,8 @@ namespace U5Designs {
      * */
     class Projectile : GameObject, RenderObject, CombatObject, PhysicsObject {
 
+		private const double friction = 2000.0;
+
         //physics vars
         internal Vector3 velocity;
         internal Vector3 accel;
@@ -43,15 +45,21 @@ namespace U5Designs {
 			_damage = p.damage;
 			_speed = p.speed;
 			_sprite = p.sprite;
-            _type = 2;
 			doesGravity = p.gravity;
             this.player = player;
 			this.duration = p.duration;
 			liveTime = 0.0;
 
+			if(p.gravity) {
+				_type = (int)CombatType.grenade;
+				_hascbox = false; //Has normal pbox collisions until detonation
+			} else {
+				_type = (int)CombatType.projectile;
+				_hascbox = true;
+			}
+
 			_alive = true;
 			_health = 1; // health 1 = active, health 0 = despawning, waiting for cleanup in PlayState
-			_hascbox = true;
 			_mesh = null;
 			_texture = null;
 			_frameNum = 0;
@@ -60,8 +68,8 @@ namespace U5Designs {
 			accel = new Vector3(0, 0, 0);
 			_animDirection = 1;
 		}
- 
 
+		[Obsolete("Version with ProjectileProperties should be used in most or all cases")]
         public Projectile(Vector3 location, Vector3 direction, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, bool in3d,
 							int damage, float speed, bool gravity, bool PlayerSpawned, SpriteSheet sprite) : base() {
 			_location = location;
@@ -74,11 +82,17 @@ namespace U5Designs {
             _health = 1; // health 1 = active, health 0 = despawning, waiting for cleanup in PlayState
             _damage = damage;
             _speed = speed;
-            _alive = true;
-            _type = 2;
-			_hascbox = true;
+			_alive = true;
 			duration = -1.0;
 			liveTime = 0.0;
+
+			if(gravity) {
+				_type = (int)CombatType.grenade;
+				_hascbox = false; //Has normal pbox collisions until detonation
+			} else {
+				_type = (int)CombatType.projectile;
+				_hascbox = true;
+			}
 
 			_mesh = null;
 			_texture = null;
@@ -104,6 +118,16 @@ namespace U5Designs {
 			if(duration != -1.0) {
 				liveTime += time;
 				if(liveTime >= duration) {
+					if(type == (int)CombatType.grenade) {
+						foreach(PhysicsObject po in physList) {
+							if(po.hascbox && ((CombatObject)po).type == (int)CombatType.enemy) {
+								if(VectorUtil.dist(_location, po.location) < 75.0f) { //TODO: Tweak this value (grenade range)
+									((CombatObject)po).health -= damage;
+								}
+							}
+						}
+						//TODO: Explode animation
+					}
 					health = 0;
 					return;
 				}
@@ -129,7 +153,7 @@ namespace U5Designs {
                     // don't do collision physics to yourself, or on things you already hit this frame
 					if(obj.collidesIn3d && obj != this && !alreadyCollidedList.Contains(obj)) {
                         Vector3 mybox, objbox;
-                        if (obj.hascbox) {
+                        if (this.hascbox && obj.hascbox) {
                             mybox = _cbox;
                             objbox = ((CombatObject)obj).cbox;
                         }
@@ -167,13 +191,69 @@ namespace U5Designs {
                 }
                 else {
                     alreadyCollidedList.Add(collidingObj);
-                    if (!collidingObj.hascbox) { //if this is a normal physics collision
+					if(!this.hascbox) { //grenade collision, bounce
+						switch(collidingAxis) {
+							case 0: //x
+								if(_location.X < collidingObj.location.X) {
+									_location.X = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
+								} else {
+									_location.X = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
+								}
+								if(velocity.X != 0) { //should always be true, but just in case...
+									double deltaTime = (location.X - startLoc.X) / velocity.X;
+									_location.Y += (float)(velocity.Y * deltaTime);
+									_location.Z += (float)(velocity.Z * deltaTime);
+									time -= deltaTime;
+								}
+								velocity.X *= -0.6f; //bounce
+								_animDirection = -_animDirection;
+								break;
+							case 1: //y
+								if(_location.Y < collidingObj.location.Y) {
+									_location.Y = collidingObj.location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.0001f;
+								} else {
+									_location.Y = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
+								}
+								if(velocity.Y != 0) { //should always be true, but just in case...
+									double deltaTime = (location.Y - startLoc.Y) / velocity.Y;
+									_location.X += (float)(velocity.X * deltaTime);
+									_location.Z += (float)(velocity.Z * deltaTime);
+									time -= deltaTime;
+								}
+								
+								velocity.Y *= -0.6f; //bounce
+								if(_location.Y > collidingObj.location.Y) {
+									//Simulate friction for rolling
+									velocity.X = (velocity.X >= 0 ? velocity.X - (float)(friction * time) : velocity.X + (float)(friction * time));
+									velocity.Z = (velocity.Z >= 0 ? velocity.Z - (float)(friction * time) : velocity.Z + (float)(friction * time));
+									if(velocity.Y < 25.0f) {
+										velocity.Y = 0.0f; //stop bounces when they get too small
+									}
+								}
+								break;
+							case 2: //z
+								if(_location.Z < collidingObj.location.Z) {
+									_location.Z = collidingObj.location.Z - (pbox.Z + collidingObj.pbox.Z) - 0.0001f;
+								} else {
+									_location.Z = collidingObj.location.Z + pbox.Z + collidingObj.pbox.Z + 0.0001f;
+								}
+								if(velocity.Z != 0) { //should always be true, but just in case...
+									double deltaTime = (location.Z - startLoc.Z) / velocity.Z;
+									_location.X += (float)(velocity.X * deltaTime);
+									_location.Y += (float)(velocity.Y * deltaTime);
+									time -= deltaTime;
+								}
+								velocity.Z *= -0.6f; //bounce
+								_animDirection = -_animDirection;
+								break;
+						}
+					} else if(!collidingObj.hascbox) { //normal projectile colliding with normal physics object
                         health = 0;
                     }
                     else { //this is a combat collision
                         //time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
-                        if (((CombatObject)collidingObj).type == 0) { //hit the player
-                            if (type != 4) {
+                        if (((CombatObject)collidingObj).type == (int)CombatType.player) {
+                            if (type != (int)CombatType.squish) {
                                 time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
@@ -190,7 +270,7 @@ namespace U5Designs {
                                 health = 0;
                             }
                         }
-                        if (((CombatObject)collidingObj).type == 1 || ((CombatObject)collidingObj).type == 3) { //hit an enemy or a boss
+                        if (((CombatObject)collidingObj).type == (int)CombatType.enemy || ((CombatObject)collidingObj).type == (int)CombatType.boss) {
                             if (playerspawned) {
                                 time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
@@ -212,10 +292,20 @@ namespace U5Designs {
 			if(duration != -1.0) {
 				liveTime += time;
 				if(liveTime >= duration) {
+					if(type == (int)CombatType.grenade) {
+						foreach(PhysicsObject po in physList) {
+							if(po.hascbox && ((CombatObject)po).type == (int)CombatType.enemy) {
+								if(VectorUtil.dist(_location, po.location) < 75.0f) { //TODO: Tweak this value (grenade range)
+									((CombatObject)po).health -= damage;
+								}
+							}
+						}
+						//TODO: Explode animation
+					}
 					health = 0;
+					return;
 				}
 			}
-
 
 			//Do gravity
             if (doesGravity) {
@@ -240,7 +330,7 @@ namespace U5Designs {
                     // don't do collision physics to yourself, or on things you already hit this frame
 					if(obj.collidesIn2d && obj != this && !alreadyCollidedList.Contains(obj)) {
                         Vector3 mybox, objbox;
-                        if (obj.hascbox) {
+                        if (this.hascbox && obj.hascbox) {
                             mybox = _cbox;
                             objbox = ((CombatObject)obj).cbox;
                         }
@@ -277,8 +367,50 @@ namespace U5Designs {
                     time = 0.0;
                 }
                 else {
-                    alreadyCollidedList.Add(collidingObj);
-                    if (!collidingObj.hascbox) { //if this is a normal physics collision
+					alreadyCollidedList.Add(collidingObj);
+					if(!this.hascbox) { //grenade collision, bounce
+						switch(collidingAxis) {
+							case 0: //x
+								if(_location.X < collidingObj.location.X) {
+									_location.X = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
+								} else {
+									_location.X = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
+								}
+								if(velocity.X != 0) { //should always be true, but just in case...
+									double deltaTime = (location.X - startLoc.X) / velocity.X;
+									_location.Y += (float)(velocity.Y * deltaTime);
+									_location.Z += (float)(velocity.Z * deltaTime);
+									time -= deltaTime;
+								}
+								velocity.X *= -0.6f; //bounce
+								_animDirection = -_animDirection;
+								break;
+							case 1: //y
+								if(_location.Y < collidingObj.location.Y) {
+									_location.Y = collidingObj.location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.0001f;
+								} else {
+									_location.Y = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
+								}
+								if(velocity.Y != 0) { //should always be true, but just in case...
+									double deltaTime = (location.Y - startLoc.Y) / velocity.Y;
+									_location.X += (float)(velocity.X * deltaTime);
+									_location.Z += (float)(velocity.Z * deltaTime);
+									time -= deltaTime;
+								}
+								
+								velocity.Y *= -0.6f; //bounce
+								if(_location.Y > collidingObj.location.Y) {
+									//Simulate friction for rolling
+									if(Math.Abs(velocity.X) >= 50.0f) {
+										velocity.X = (velocity.X >= 0 ? velocity.X - (float)(friction * time) : velocity.X + (float)(friction * time));
+									}
+									if(velocity.Y < 25.0f) {
+										velocity.Y = 0.0f; //stop bounces when they get too small
+									}
+								}
+								break;
+						}
+					} else if(!collidingObj.hascbox) { //normal projectile colliding with normal physics object
                         health = 0;
                     }
                     else { //this is a combat collision
@@ -286,7 +418,7 @@ namespace U5Designs {
                             if (!playerspawned) {
                                 if (type != 4) {
                                     time = 0.0;
-                                    ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
+                                    ((CombatObject)collidingObj).health -= this.damage;
                                     health = 0;
                                     player.knockback(false, this);
                                 }
@@ -379,7 +511,8 @@ namespace U5Designs {
         }
         private Vector3 _scale;
         public Vector3 scale {
-            get { return _scale; }
+			get { return _scale; }
+			set { _scale = value; }
         }
 
         private Vector3 _pbox;

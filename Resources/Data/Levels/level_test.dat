@@ -1,7 +1,12 @@
 <level>
+  <bossRegion x="4150" y ="150" z="50" r="150" />
   <endRegion x="5000" y="100" z="50" r="75" />
-	<audiofile>
+  <audiofile>
 		<file>Level1.ogg</file>
+	</audiofile>
+
+  <bossAreaCenter x="4150" y="125" z="50" />
+  <bossAreaBounds x="100" y="200" z="100" />
 	</audiofile>
 	<backgroundlist>
 		<background>
@@ -94,33 +99,31 @@
 			<loc x="3700" y="25" z="50"/>
 			<loc x="3800" y="75" z="50"/>
 			<loc x="3900" y="75" z="50"/>
-      
-      
-			
-			<loc x="4100" y="75" z="0"/>
 
+
+      <!--Boss encounter area-->
+			<loc x="4100" y="75" z="0"/>
 			<loc x="4100" y="75" z="100"/>
 			<loc x="4200" y="75" z="0"/>
-
 			<loc x="4200" y="75" z="100"/>
 
 		</obstacle>
 		<obstacle>
-			<path>test_tree.dat</path>
-			<loc x="100" y="35" z="0"/>
-			<loc x="250" y="35" z="-99"/>
-			<loc x="350" y="35" z="-99"/>
-			<loc x="450" y="35" z="-99"/>
+			<path>tree.dat</path>
+			<loc x="100" y="37.9" z="0"/>
+			<loc x="250" y="37.9" z="-99"/>
+			<loc x="350" y="37.9" z="-99"/>
+			<loc x="450" y="37.9" z="-99"/>
 
-			<loc x="250" y="35" z="200"/>
-			<loc x="350" y="35" z="200"/>
-			<loc x="450" y="35" z="200"/>
+			<loc x="250" y="37.9" z="200"/>
+			<loc x="350" y="37.9" z="200"/>
+			<loc x="450" y="37.9" z="200"/>
 			
-			<loc x="3800" y="160" z="0"/>
-			<loc x="3900" y="160" z="0"/>
+			<loc x="3800" y="162.9" z="0"/>
+			<loc x="3900" y="162.9" z="0"/>
 			
-			<loc x="3800" y="160" z="100"/>
-			<loc x="3900" y="160" z="100"/>
+			<loc x="3800" y="162.9" z="100"/>
+			<loc x="3900" y="162.9" z="100"/>
       
 		</obstacle>
 		<obstacle>
@@ -128,9 +131,9 @@
 			<loc x="10" y="7.5" z="0"/>
 		</obstacle>
 		<obstacle>
-		  <path>test_tree_collides.dat</path>
-		  <loc x="350" y="35" z="49.8"/>
-		  <loc x="1800" y="60" z="-40"/>
+		  <path>tree_collides.dat</path>
+		  <loc x="350" y="37.9" z="49.8"/>
+		  <loc x="1800" y="62.9" z="-40"/>
 		</obstacle>
 	</obstaclelist>
 	<decorationlist>

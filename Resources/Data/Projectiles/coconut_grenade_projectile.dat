@@ -1,0 +1,13 @@
+﻿<projectile>
+	<scale x="10" y="10" z="10" />
+	<pbox x="5" y="5" z="5" />
+	<cbox x="4.5" y="4.5" z="4.5" />
+	<draw2>true</draw2>
+	<draw3>true</draw3>
+  <damage>5</damage>
+  <staminaCost>3.0</staminaCost>
+	<speed>250.0</speed>
+	<gravity>true</gravity>
+  <duration>1.5</duration>
+	<sprite>coconut_spin_sprite.dat</sprite>
+</projectile>

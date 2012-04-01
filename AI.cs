@@ -19,13 +19,22 @@ namespace U5Designs {
     }
 
 
-    /**************************************************************************************************************************************** 
+/**************************************************************************************************************************************** 
  * Ice cream kid
  * */
+	enum KidAnim {walk=0, stand=1};
+
     internal class Kidmoveto : Airoutine{
+
         public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
 			//update current animation
-			me.cycleNumber = (me.moving ? 0 : 1);
+			me.cycleNumber = (int)(me.moving ? KidAnim.walk : KidAnim.stand);
+
+			//Flip scale if necessary
+			//TODO: These are specific to 2D, add 3D case
+			if((me.velocity.X < 0 && me.scale.X < 0) || (me.velocity.X > 0 && me.scale.X > 0)) {
+				me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+			}
 
             me.attackspeed = 1; //delay between each projectile (hack initilization)
             if (!me.frozen) {
@@ -43,7 +52,7 @@ namespace U5Designs {
                     //Look ahead to see if we are at an edge
                     Vector3 origLoc = me.location;
                     me.location += me.velocity * 0.1f; //move a little bit in this direction (will undo later)
-                    if (!(enable3d ? VectorUtil.overGround3d(me, physList) : VectorUtil.overGround2d(me, physList))) {
+                    if (!(enable3d ? VectorUtil.overGround3dStrict(me, physList) : VectorUtil.overGround2d(me, physList))) {
                         if (enable3d) {
                             //If we're on edge, move along one axis to corner
                             Vector3 origVel = new Vector3(me.velocity);
@@ -51,11 +60,11 @@ namespace U5Designs {
                             //Check X first
                             me.velocity.X = 0.0f;
                             me.location = origLoc + me.velocity * 0.1f;
-                            if (!VectorUtil.overGround3d(me, physList)) {
+                            if (!VectorUtil.overGround3dStrict(me, physList)) {
                                 me.velocity.X = origVel.X;
                                 me.velocity.Z = 0.0f;
                                 me.location = origLoc + me.velocity * 0.1f;
-                                if (!VectorUtil.overGround3d(me, physList)) {
+                                if (!VectorUtil.overGround3dStrict(me, physList)) {
                                     //Now we're at corner
                                     me.velocity.X = 0.0f;
                                     me.velocity.Z = 0.0f;
@@ -83,7 +92,13 @@ namespace U5Designs {
     internal class KidThrowTime : Airoutine {
 		public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
 			//update current animation
-			me.cycleNumber = 1;
+			me.cycleNumber = (int)KidAnim.stand;
+
+			//Flip scale if necessary
+			//TODO: These are specific to 2D, add 3D case
+			if((me.location.X < playerposn.X && me.scale.X > 0) || (me.location.X > playerposn.X && me.scale.X < 0)) {
+				me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+			}
 
             if (!me.frozen) {
                 if (VectorUtil.dist(playerposn, me.location) <= 90) {
@@ -124,8 +139,19 @@ namespace U5Designs {
 /**************************************************************************************************************************************** 
  * BIRD
  * */
+	enum BirdAnim { fly = 0, attack = 1 };
+
     internal class Birdmoveto : Airoutine {
+
 		public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
+			me.cycleNumber = (int)BirdAnim.fly;
+
+			//Flip scale if necessary
+			//TODO: These are specific to 2D, add 3D case
+			if((me.velocity.X < 0 && me.scale.X < 0) || (me.velocity.X > 0 && me.scale.X > 0)) {
+				me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+			}
+
             me.attackspeed = 5; // not used in the same way as other attack speeds. This is used to time out the swoop if it gets stuck
             if (!me.frozen) {
                 if (dist2d(playerposn, me.location) > 60) {
@@ -145,6 +171,7 @@ namespace U5Designs {
                 }
             }
         }
+
         double dist2d(Vector3 v1, Vector3 v2) { // does a dist using only x and z
             Vector2 tmp = new Vector2(v1.X - v2.X, v1.Z - v2.Z);
             return Math.Sqrt((tmp.X * tmp.X) + (tmp.Y * tmp.Y));
@@ -155,6 +182,7 @@ namespace U5Designs {
     internal class BirdDive : Airoutine {
         bool diving, finished;
         Vector3 startingposn, startplayer, dir;
+
         public BirdDive(Vector3 start, Vector3 player) {
             startingposn = start;
             startplayer = player;
@@ -162,10 +190,19 @@ namespace U5Designs {
             finished = false;
             dir = VectorUtil.getdir(player, start);
         }
+
         public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
             if (!me.frozen) {
                 if (!finished) {
                     if (diving) {
+						me.cycleNumber = (int)BirdAnim.attack;
+
+						//Flip scale if necessary
+						//TODO: These are specific to 2D, add 3D case
+						if((me.velocity.X < 0 && me.scale.X < 0) || (me.velocity.X > 0 && me.scale.X > 0)) {
+							me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+						}
+
                         me.attacktimer = me.attacktimer + time;
                         // do a fake gravity to simulate diving down
                         me.accel.Y -= (float)(200 * time);
@@ -184,6 +221,14 @@ namespace U5Designs {
                         }
                     }
                     else {
+						me.cycleNumber = (int)BirdAnim.fly;
+
+						//Flip scale if necessary
+						//TODO: These are specific to 2D, add 3D case
+						if((me.velocity.X < 0 && me.scale.X < 0) || (me.velocity.X > 0 && me.scale.X > 0)) {
+							me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+						}
+
                         me.attacktimer = me.attacktimer + time;
                         // do a reverse gravity to simulate flying back up
                         me.accel.Y += (float)(200 * time);
@@ -212,55 +257,54 @@ namespace U5Designs {
     }
 
 
-    /**************************************************************************************************************************************** 
-* Ice cream kid
-* */
+/**************************************************************************************************************************************** 
+ * Ice cream kid
+ * */
     internal class Girlmoveto : Airoutine {
         public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
             me.attackspeed = 1; //delay between each projectile (hack initilization)
             if (!me.frozen) {
-                    Vector3 dir = VectorUtil.getdir(playerposn, me.location);
-                    dir.Y = 0.0f;
-                    if (!enable3d) {
-                        dir.Z = 0.0f;
-                    }
-                    dir.NormalizeFast();
-                    me.velocity.X = dir.X * me.speed;
-                    me.velocity.Z = dir.Z * me.speed;
-                    //Don't change y - out of our control
+                Vector3 dir = VectorUtil.getdir(playerposn, me.location);
+                dir.Y = 0.0f;
+                if (!enable3d) {
+                    dir.Z = 0.0f;
+                }
+                dir.NormalizeFast();
+                me.velocity.X = dir.X * me.speed;
+                me.velocity.Z = dir.Z * me.speed;
+                //Don't change y - out of our control
 
-                    //Look ahead to see if we are at an edge
-                    Vector3 origLoc = me.location;
-                    me.location += me.velocity * 0.1f; //move a little bit in this direction (will undo later)
-                    if (!(enable3d ? VectorUtil.overGround3d(me, physList) : VectorUtil.overGround2d(me, physList))) {
-                        if (enable3d) {
-                            //If we're on edge, move along one axis to corner
-                            Vector3 origVel = new Vector3(me.velocity);
+                //Look ahead to see if we are at an edge
+                Vector3 origLoc = me.location;
+                me.location += me.velocity * 0.1f; //move a little bit in this direction (will undo later)
+                if (!(enable3d ? VectorUtil.overGround3dStrict(me, physList) : VectorUtil.overGround2d(me, physList))) {
+                    if (enable3d) {
+                        //If we're on edge, move along one axis to corner
+                        Vector3 origVel = new Vector3(me.velocity);
 
-                            //Check X first
-                            me.velocity.X = 0.0f;
-                            me.location = origLoc + me.velocity * 0.1f;
-                            if (!VectorUtil.overGround3d(me, physList)) {
-                                me.velocity.X = origVel.X;
-                                me.velocity.Z = 0.0f;
-                                me.location = origLoc + me.velocity * 0.1f;
-                                if (!VectorUtil.overGround3d(me, physList)) {
-                                    //Now we're at corner
-                                    me.velocity.X = 0.0f;
-                                    me.velocity.Z = 0.0f;
-                                }
-                            }
-                            //Velocity now resulted in something over ground or is zero
-                        }
-                        else {
-                            //Only one option, so just stop
-                            me.velocity.X = 0.0f;
+                        //Check X first
+                        me.velocity.X = 0.0f;
+                        me.location = origLoc + me.velocity * 0.1f;
+                        if (!VectorUtil.overGround3dStrict(me, physList)) {
+                            me.velocity.X = origVel.X;
                             me.velocity.Z = 0.0f;
+                            me.location = origLoc + me.velocity * 0.1f;
+                            if (!VectorUtil.overGround3dStrict(me, physList)) {
+                                //Now we're at corner
+                                me.velocity.X = 0.0f;
+                                me.velocity.Z = 0.0f;
+                            }
                         }
+                        //Velocity now resulted in something over ground or is zero
                     }
-                    me.location = origLoc; //undo above
+                    else {
+                        //Only one option, so just stop
+                        me.velocity.X = 0.0f;
+                        me.velocity.Z = 0.0f;
+                    }
+                }
+                me.location = origLoc; //undo above
             }
         }
     }
-
 }
