@@ -56,7 +56,7 @@ namespace U5Designs
 			ps.bossAreaCenter = parseVector3(bossAreaCenter);
 			ps.bossAreaBounds = parseVector3(bossAreaBounds);
 			
-       XmlNode aud = _a_list[0];
+            XmlNode aud = _a_list[0];
             ps.levelMusic = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music." + aud.InnerText));
 			
 
