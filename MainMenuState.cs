@@ -30,7 +30,7 @@ namespace U5Designs
         protected Vector3 eye, lookat;
         Obstacle background;
         MouseDevice mouse;
-        AudioFile testFile;
+        AudioFile musicFile;
 
         // testing buttons
         //Obstacle play_button_npress, play_button_press, load_button_npress, load_button_press, quit_button_press, quit_button_npress;
@@ -70,9 +70,9 @@ namespace U5Designs
             play_nopress = eng.StateTextureManager.GetTexture("play");
             eng.StateTextureManager.LoadTexture("playpress", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play_hover.png"));
             play_press = eng.StateTextureManager.GetTexture("playpress");
-            eng.StateTextureManager.LoadTexture("ld", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_leveldesign.png"));
+            eng.StateTextureManager.LoadTexture("ld", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_leveldesign.png"));
             ld_nopress = eng.StateTextureManager.GetTexture("ld");
-            eng.StateTextureManager.LoadTexture("ldpress", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_leveldesign_hover.png"));
+            eng.StateTextureManager.LoadTexture("ldpress", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_leveldesign_hover.png"));
             ld_press = eng.StateTextureManager.GetTexture("ldpress");
 
 			musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.Retribution.ogg"));
@@ -336,10 +336,10 @@ namespace U5Designs
                     else
                     {
                         // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
-                        testFile.Stop();
+                        musicFile.Stop();
 
                         // Otherwise pass the level index from the saved game
-                        LevelDesignerState ps = new LevelDesignerState(this, eng, saved_level_index);
+                        PlayState ps = new PlayState(this, eng, saved_level_index);
                         eng.ChangeState(ps);
                         eng.GameInProgress = true;
                     }

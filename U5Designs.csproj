@@ -52,6 +52,7 @@
     <Compile Include="AI.cs" />
     <Compile Include="AIObject.cs" />
     <Compile Include="Background.cs" />
+    <Compile Include="LevelSelect.cs" />
     <Compile Include="ZookeeperAI.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Decoration.cs" />
@@ -92,6 +93,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Data\Sprites\test_floor_sprite.dat" />
     <EmbeddedResource Include="Resources\test.sav" />
+    <EmbeddedResource Include="Resources\Textures\coconut_spin.png" />
     <EmbeddedResource Include="Resources\Textures\u5_logo.png" />
   </ItemGroup>
   <ItemGroup>
@@ -312,9 +314,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Projectiles\invisible_projectile.dat" />
   </ItemGroup>
-   <ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Resources\Music\Level1.ogg" />
-   </ItemGroup>
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Geometry\box_all_faces_same.obj" />
   </ItemGroup>
@@ -335,9 +337,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Sprites\coconut_spin_sprite.dat" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Textures\coconut_spin.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

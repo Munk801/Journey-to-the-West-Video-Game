@@ -163,7 +163,7 @@ namespace U5Designs
             //First deal with hardware input
             DealWithInput();
 
-
+            // Loop music when necessary
             if (levelMusic.CurrentSource.FileHasEnded)
             {
                 levelMusic.CurrentSource.FileHasEnded = false;
@@ -323,8 +323,8 @@ namespace U5Designs
 
 			//Draw HUD
 			float dec = (float)player.health / MaxHealth;
-            bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 650, scaleX: 0.5f, scaleY: 0.6f);
-			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 300, 650, scaleX: 0.5f, scaleY: 0.6f, decrementX: dec);
+            bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 670, scaleX: 0.5f, scaleY: 0.5f);
+			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 300, 670, scaleX: 0.5f, scaleY: 0.5f, decrementX: dec);
 
 			drawStaminaBar();
 

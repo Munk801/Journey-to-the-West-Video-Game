@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>U5Designs</RootNamespace>
-    <AssemblyName>U5Designs</AssemblyName>
+    <AssemblyName>JourneyToTheEast</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -110,20 +110,10 @@
     <EmbeddedResource Include="Resources\Textures\PauseTextures\p4.png" />
     <EmbeddedResource Include="Resources\Textures\game_over_text.png" />
     <EmbeddedResource Include="Resources\Textures\city_ground.png" />
-    <EmbeddedResource Include="Resources\Textures\ice_cream.png" />
     <EmbeddedResource Include="Resources\Textures\boy_sprite.png" />
     <EmbeddedResource Include="Resources\Textures\girl_sprite.png" />
     <EmbeddedResource Include="Resources\Textures\zoo_keeper_sprite.png" />
     <EmbeddedResource Include="Resources\Textures\banana.png" />
-    <EmbeddedResource Include="Resources\Textures\test_flying_sprite.png" />
-    <EmbeddedResource Include="Resources\Textures\load_button_no_press.png" />
-    <EmbeddedResource Include="Resources\Textures\load_button_press.png" />
-    <EmbeddedResource Include="Resources\Textures\play_button_no_press.png" />
-    <EmbeddedResource Include="Resources\Textures\play_button_press.png" />
-    <EmbeddedResource Include="Resources\Textures\quit_button_no_press.png" />
-    <EmbeddedResource Include="Resources\Textures\quit_button_press.png" />
-    <EmbeddedResource Include="Resources\Textures\testbg.png" />
-    <EmbeddedResource Include="Resources\Textures\test.png" />
     <EmbeddedResource Include="Resources\Textures\test_sprite.png" />
   </ItemGroup>
   <ItemGroup>
@@ -157,7 +147,7 @@
     <EmbeddedResource Include="Resources\Data\Sprites\test_player.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Sprites\test_flying_sprite.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\hawk_sprite.dat" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Sprites\test_player_sprite.dat" />
@@ -169,7 +159,7 @@
     <EmbeddedResource Include="Resources\Data\Sprites\player_banana_sprite.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Obstacles\test_tree.dat">
+    <EmbeddedResource Include="Resources\Data\Obstacles\tree.dat">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
@@ -196,10 +186,10 @@
     <EmbeddedResource Include="Resources\Data\Decorations\test_tree.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Sprites\test_tree_sprite.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\tree_sprite.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Obstacles\test_tree_collides.dat" />
+    <EmbeddedResource Include="Resources\Data\Obstacles\tree_collides.dat" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Textures\ZooMiddleBackground.png" />
@@ -310,13 +300,10 @@
     <EmbeddedResource Include="Resources\Textures\btn_leveldesign.png" />
     <EmbeddedResource Include="Resources\Textures\btn_leveldesign_hover.png" />
   </ItemGroup>
-    <ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Resources\Textures\hawk_flight_03.png" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-    <EmbeddedResource Include="Resources\Music\Level1.ogg" />
-=======
     <EmbeddedResource Include="Resources\Textures\hawk_attack.png" />
   </ItemGroup>
   <ItemGroup>
@@ -324,7 +311,34 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Projectiles\invisible_projectile.dat" />
->>>>>>> 3a33d88df8b90632c8bd5e43c371aada3c393ea4
+  </ItemGroup>
+  <ItemGroup>
+<<<<<<< HEAD
+    <EmbeddedResource Include="Resources\Music\Level1.ogg" />
+=======
+    <EmbeddedResource Include="Resources\Geometry\box_all_faces_same.obj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\ice_cream.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\crate.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\invisible_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\invisible.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Projectiles\coconut_grenade_projectile.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\coconut_spin_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\coconut_spin.png" />
+>>>>>>> d030d9c8c263c15d316c6c4b198a344ad4e3361e
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

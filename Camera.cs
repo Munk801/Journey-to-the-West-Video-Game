@@ -18,7 +18,7 @@ namespace U5Designs
         private Matrix4d model;
 		private Player player;
 		private PlayState playstate;
-        private LevelDesignerState LevelDesignState;
+        //private LevelDesignerState LevelDesignState;
 		private Vector3 bossAreaCenter, bossAreaBounds;
 
 		public double timer;
@@ -53,21 +53,21 @@ namespace U5Designs
 			Set2DCamera();
         }
 
-        public Camera(int width, int height, float pLocX, float pLocY, float pLocZ, LevelDesignerState ls, int[] viewport)
-        {
-            Position = new Vector3();
-            End = new Vector3();
-            Width = width;
-            Height = height;
-            this.viewport = viewport;
-            fov = (float)(Math.PI / 5);
-            playerYPos = pLocY;
-            movingInY = false;
-            trackingPlayer = false;
-            switchedBillboards = true;
-            Set2DCamera();
-            this.LevelDesignState = ls;
-        }
+        //public Camera(int width, int height, float pLocX, float pLocY, float pLocZ, LevelDesignerState ls, int[] viewport)
+        //{
+        //    Position = new Vector3();
+        //    End = new Vector3();
+        //    Width = width;
+        //    Height = height;
+        //    this.viewport = viewport;
+        //    fov = (float)(Math.PI / 5);
+        //    playerYPos = pLocY;
+        //    movingInY = false;
+        //    trackingPlayer = false;
+        //    switchedBillboards = true;
+        //    Set2DCamera();
+        //    this.LevelDesignState = ls;
+        //}
 
 		public void setViewport(int[] viewport) {
 			this.viewport = viewport;

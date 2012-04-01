@@ -3,11 +3,9 @@
   <endRegion x="5000" y="100" z="50" r="75" />
   <audiofile>
 		<file>Level1.ogg</file>
-	</audiofile>
-
+  </audiofile>
   <bossAreaCenter x="4150" y="125" z="50" />
   <bossAreaBounds x="100" y="200" z="100" />
-	</audiofile>
 	<backgroundlist>
 		<background>
 			<scale x="350" y="135" z="1"/>
