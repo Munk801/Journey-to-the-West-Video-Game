@@ -310,7 +310,7 @@
     <EmbeddedResource Include="Resources\Textures\btn_leveldesign.png" />
     <EmbeddedResource Include="Resources\Textures\btn_leveldesign_hover.png" />
   </ItemGroup>
-    <ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Resources\Textures\hawk_flight_03.png" />
   </ItemGroup>
   <ItemGroup>
@@ -321,6 +321,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Projectiles\invisible_projectile.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Music\Level1.ogg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
