@@ -8,13 +8,17 @@ using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
 using Engine;
 using OpenTK.Input;
-
+using LevelDesignerTool;
 // XML parser
 using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Drawing;
+using System.Threading;
+using System.Windows.Markup;
+using System.IO;
+
 
 namespace U5Designs
 {
@@ -54,11 +58,11 @@ namespace U5Designs
 
         // Our current selected object for movement
         internal Obstacle SelectedObject = null;
+        MainWindow window;
 
         // Changes ortho projection
         double orthoWidth = 192;
         double orthoHeight = 108;
-
         /// <summary>
         /// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
         /// </summary>
@@ -124,8 +128,42 @@ namespace U5Designs
             GL.AttachShader(shaderProgram, frag);
             GL.LinkProgram(shaderProgram);
             GL.UseProgram(shaderProgram);
-            //levelMusic.Stop();
+            //Thread t = new Thread(new ThreadStart(CreateLevelDesignForm));
+            //t.ApartmentState = ApartmentState.STA;
+            //t.Start();
+
+            StartDesignerThread();
         }
+
+        private void OpenWindow()
+        {
+            var app = new System.Windows.Application();
+            window = new LevelDesignerTool.MainWindow();
+            app.Run(window);
+        }
+
+        private void StartDesignerThread()
+        {
+            var thread = new Thread(() =>
+                {
+                    OpenWindow();
+                });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.IsBackground = false;
+            thread.Start();
+        }
+
+        // IF WE DECIDE TO GO THE WINDOWS FORM ROUTE
+        //[STAThread]
+        //private void CreateLevelDesignForm()
+        //{
+        //        Application.EnableVisualStyles();
+        //        Application.SetCompatibleTextRenderingDefault(false);
+        //        LevelDesignerForm LDForm = new LevelDesignerForm();
+
+        //        Application.Run(LDForm);
+        //}
+
 
         /// <summary>
         /// Refreshes graphics when this state becomes active again after being frozen.
