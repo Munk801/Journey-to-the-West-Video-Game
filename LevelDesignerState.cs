@@ -14,6 +14,7 @@ using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Drawing;
 
 namespace U5Designs
 {
@@ -47,14 +48,14 @@ namespace U5Designs
         internal bool enable3d; //true when being viewed in 3d
         int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
         private bool nowBillboarding; //true when billboarding objects should rotate into 3d view
-        Texture Healthbar, bHealth;
-        int MaxHealth;
-        public SpriteSheet staminaBar, staminaBack, staminaFrame;
+        //Texture Healthbar, bHealth;
+        //int MaxHealth;
+        //public SpriteSheet staminaBar, staminaBack, staminaFrame;
 
         bool tabDown;
-        public bool clickdown = false;
+        new public bool clickdown = false;
 
-
+        internal Obstacle SelectedObject = null;
         /// <summary>
         /// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
         /// </summary>
@@ -77,20 +78,12 @@ namespace U5Designs
             aiList = base.aiList;
             combatList = base.combatList;
             backgroundList = base.backgroundList;
-            levelMusic = base.levelMusic;
-            staminaBack = base.staminaBack;
-            staminaBar = base.staminaBar;
-            staminaFrame = base.staminaFrame;
-
+            base.levelMusic.Stop();
             //Every AI object needs a pointer to the player, initlize this here
             foreach (AIObject aio in aiList)
             {
                 ((Enemy)aio).player = player;
             }
-
-            //TODO: initialize the boss in loadlevel
-            bossAI = new ZookeeperAI(player, this);
-            bossMode = false;
 
             //deal with states
             menustate = prvstate;
@@ -98,23 +91,11 @@ namespace U5Designs
             pms = new PauseMenuState(engine);
             enable3d = false;
             tabDown = false;
-            //test.Play();
             //initlize camera
             camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player, this,
                                     new int[] { eng.ClientRectangle.X, eng.ClientRectangle.Y, eng.ClientRectangle.Width, eng.ClientRectangle.Height });
             player.cam = camera;
             nowBillboarding = false;
-
-            // Add healthbar texture to texture manager
-            Assembly audAssembly = Assembly.GetExecutingAssembly();
-            eng.StateTextureManager.LoadTexture("Healthbar", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_top.png"));
-            Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
-            eng.StateTextureManager.LoadTexture("bHealth", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_bottom.png"));
-            bHealth = eng.StateTextureManager.GetTexture("bHealth");
-            MaxHealth = player.health;
-            Assembly musicAssembly = Assembly.GetExecutingAssembly();
-            //levelMusic = new AudioFile(musicAssembly.GetManifestResourceStream("U5Designs.Resources.Sound.Level1.ogg"));
-
 
             //Thanks to OpenTK samples for part of this shader code
             //Initialize Shader
@@ -140,8 +121,7 @@ namespace U5Designs
             GL.AttachShader(shaderProgram, frag);
             GL.LinkProgram(shaderProgram);
             GL.UseProgram(shaderProgram);
-            levelMusic.ReplayFile();
-
+            //levelMusic.Stop();
         }
 
         /// <summary>
@@ -157,6 +137,7 @@ namespace U5Designs
             GL.ShadeModel(ShadingModel.Smooth);
             GL.ClearColor(0.26667f, 0.86667f, 1.0f, 1.0f);
 
+            // TO DO: MAKE ORTHOGRAPHIC VIEW FURTHER BACK
             if (enable3d)
             {
                 camera.Set3DCamera();
@@ -184,109 +165,13 @@ namespace U5Designs
         {
             //First deal with hardware input
             DealWithInput();
-
-            //// Loop music when necessary
-            //if (levelMusic.CurrentSource.FileHasEnded)
-            //{
-            //    levelMusic.CurrentSource.FileHasEnded = false;
-            //    levelMusic.ReplayFile();
-            //}
-            ////Next check if the player is dead. If he is, game over man
-            //if (player.health <= 0)
-            //{
-            //    GameOverState GGbro = new GameOverState(menustate, eng);
-            //    levelMusic.Stop();
-            //    eng.ChangeState(GGbro);
-            //}
-
-            ////See if we need to trigger an event (like the end of the level or a boss)
-            //if (!bossMode && bossRegion.contains(player.location))
-            //{
-            //    //Entered boss area - make changes to camera, etc
-            //    enterBossMode();
-            //}
-            //if (endRegion.contains(player.location))
-            //{
-            //    //Finished level
-            //    eng.ChangeState(new MainMenuState(eng)); //Later we should go to the next level when applicable
-            //}
-
-            ////do boss dies stuff, transition to next level?
-            //if (bossMode && (bossAI.gethealth() <= 0))
-            //{
-            //    bossAI.killBoss(this);
-            //    //transition to next level? or state? or w/e
-            //}
-
-            ////Determine which screen region everything is in
-            //foreach (GameObject go in objList)
-            //{
-            //    float dist = VectorUtil.dist(go.location, player.location);
-            //    if (dist < 400.0)
-            //    {
-            //        go.screenRegion = GameObject.ON_SCREEN;
-            //    }
-            //    else if (dist > 500.0)
-            //    {
-            //        go.screenRegion = GameObject.OFF_SCREEN;
-            //    }
-            //    //If between the two distances, then leave as is
-            //}
-
-            ////handle death and despawning for everything else
-            //for (int i = combatList.Count - 1; i >= 0; i--)
-            //{
-            //    CombatObject co = combatList[i];
-            //    if (co.type == (int)CombatType.enemy)
-            //    {
-            //        if (co.health <= 0)
-            //        {
-            //            objList.Remove((GameObject)co);
-            //            physList.Remove((PhysicsObject)co);
-            //            colisionList.Remove((PhysicsObject)co);
-            //            renderList.Remove((RenderObject)co);
-            //            aiList.Remove((AIObject)co);
-            //            combatList.Remove(co);
-            //        }
-            //    }
-            //    else if (co.type == (int)CombatType.projectile ||
-            //            co.type == (int)CombatType.squish ||
-            //            co.type == (int)CombatType.grenade)
-            //    {
-            //        if (co.health <= 0 || co.ScreenRegion == GameObject.OFF_SCREEN)
-            //        {
-            //            objList.Remove((GameObject)co);
-            //            physList.Remove((PhysicsObject)co);
-            //            colisionList.Remove((PhysicsObject)co);
-            //            renderList.Remove((RenderObject)co);
-            //            combatList.Remove(co);
-            //        }
-            //    }
-            //}
+            HandleMouseInput();
 
             //If the camera is transitioning, everything else is paused
             if (!camera.isInTransition)
             {
                 //Deal with everyone's acceleration, run AI on enemies
-                player.updateState(enable3d, eng.Keyboard, e.Time);
-                if (!bossMode)
-                {
-                    foreach (AIObject aio in aiList)
-                    {
-                        if (aio.ScreenRegion == GameObject.ON_SCREEN)
-                        {
-                            if (aienabled)
-                            {
-                                aio.aiUpdate(e.Time, this, player.location, enable3d, physList);
-                            }
-                        }
-                    }
-                }
-                else
-                { //if we are in boss mode then route control to the bosses code instead of the enemy updates
-                    //update the boss
-                    bossAI.update(e.Time, this, player.location, enable3d);
-                }
+                player.updateState(enable3d, eng.Keyboard, e.Time, true);
 
                 //Now that everyone's had a chance to accelerate, actually
                 //translate that into velocity and position
@@ -342,13 +227,6 @@ namespace U5Designs
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            // UNCOMMENT THIS AND LINE AFTER DRAW TO ADD MOTION BLUR
-            //if (isInTransition)
-            //{
-            //    GL.Accum(AccumOp.Return, 0.95f);
-            //    GL.Clear(ClearBufferMask.AccumBufferBit);
-            //}
-
             camera.SetModelView();
 
             foreach (RenderObject obj in renderList)
@@ -382,67 +260,14 @@ namespace U5Designs
                 m.frameNumber = m.sprite.draw(nowBillboarding, m.billboards, m.cycleNumber, m.frameNumber + m.animDirection * e.Time);
             }
 
-            //Draw HUD
-            float dec = (float)player.health / MaxHealth;
-            bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 670, scaleX: 0.5f, scaleY: 0.5f);
-            Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 300, 670, scaleX: 0.5f, scaleY: 0.5f, decrementX: dec);
-
-            drawStaminaBar();
-
-            // UNCOMMENT TO ADD MOTION BLUR
-            //if (isInTransition)
-            //{
-            //    GL.Accum(AccumOp.Accum, 0.9f);
-            //}
         }
 
-        public void drawStaminaBar()
-        {
-            GL.Disable(EnableCap.DepthTest);
-
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Replace);
-
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.PushMatrix();
-            GL.LoadIdentity();
-            GL.Ortho(0, 1280, 0, 720, 0, 1);
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.PushMatrix();
-            GL.LoadIdentity();
-
-            GL.PushMatrix();
-            GL.Translate(1000, 675, 0);
-            GL.Scale(512, 25, 0);
-            staminaBack.draw(false, Billboarding.Lock2d);
-
-            GL.PushMatrix();
-            double scale = player.stamina / player.maxStamina;
-            GL.Translate(744.0 + 256.0 * scale, 675, 0);
-            GL.Scale(512.0 * scale, 25, 0);
-
-            staminaBar.draw(false, Billboarding.Lock2d);
-
-            GL.PushMatrix();
-            GL.Translate(1000, 675, 0);
-            GL.Scale(512, 25, 0);
-            staminaFrame.draw(false, Billboarding.Lock2d);
-
-            GL.PopMatrix();
-            GL.Enable(EnableCap.DepthTest);
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.PopMatrix();
-            GL.MatrixMode(MatrixMode.Modelview);
-        }
 
         /// <summary>
         /// Switches the sprites and bounding boxes of anything that billboards
         /// Called by camera at appropriate time
         /// </summary>
-        public void doBillboards()
+        new public void doBillboards()
         {
             if (enable3d)
             {
@@ -536,14 +361,141 @@ namespace U5Designs
                     tabDown = false;
                 }
             }
+
+            if (eng.Keyboard[Key.Up])
+            {
+                MoveObjects(SelectedObject, new Vector3(0.0f, 1.0f, 0.0f));
+            }
+            if (eng.Keyboard[Key.Down])
+            {
+                MoveObjects(SelectedObject, new Vector3(0.0f, -1.0f, 0.0f));
+            }
+            if (eng.Keyboard[Key.Left])
+            {
+                MoveObjects(SelectedObject, new Vector3(-1.0f, 0.0f, 0.0f));
+            }
+            if (eng.Keyboard[Key.Right])
+            {
+                MoveObjects(SelectedObject, new Vector3(1.0f, 0.0f, 0.0f));
+            }
         }
 
+        private void MoveObjects(Obstacle o, Vector3 newLoc)
+        {
+            if (o == null) return;
+            int index = objList.FindIndex(p => p.location == o.location);
+            objList[index].location += newLoc;
+            
+        }
+
+        private void RemoveItemFromAllLists(Obstacle objToRemove)
+        {
+            if (objToRemove != null)
+            {
+                objList.Remove(objToRemove);
+                physList.Remove(objToRemove);
+                renderList.Remove(objToRemove);
+            }
+        }
+
+        private void AddItemsToAllLists(Obstacle objToAdd)
+        {
+            if (objToAdd != null)
+            {
+                objList.Add(objToAdd);
+                physList.Add(objToAdd);
+                renderList.Add(objToAdd);
+            }
+        }
+        private void HandleMouseInput()
+        {
+            // ADDING OBJECTS TO THE LIST
+            if (eng.ThisMouse.LeftPressed() && !clickdown)
+            {
+                clickdown = true;
+                // Pull the projection and model view matrix from the camera.   
+                Matrix4d project = this.camera.GetProjectionMatrix();
+                Matrix4d model = this.camera.GetModelViewMatrix();
+                Vector3d mousecoord = new Vector3d((double)this.eng.Mouse.X, (double)(this.eng.Height - this.eng.Mouse.Y), 1.0);
+                // Unproject the coordinates to convert from mouse to world coordinates
+                Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, this.camera.getViewport());
+
+                foreach (GameObject obj in objList)
+                {
+                    if (obj is Obstacle)
+                    {
+                        if (eng.ThisMouse.inObjectRegion((Obstacle)obj, mouseWorld))
+                        {
+                            SelectedObject = (Obstacle)obj;
+                            Console.WriteLine("Selected Object");
+                            return;
+                        }
+                    }
+                }
+                Console.WriteLine("X: " + eng.ThisMouse.Mouse.X);
+                Console.WriteLine("Y: " + eng.ThisMouse.Mouse.Y);
+                string path = "test_obstacle.dat";
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                string _o_path = "U5Designs.Resources.Data.Obstacles." + path;
+
+                // if 2D = false there is a mesh...otherwise there isn't
+                ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + "box.obj"));
+
+                //XmlNodeList _b = doc.GetElementsByTagName("bmp");
+                MeshTexture _tex = new MeshTexture(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + "city_ground.png")));
+
+
+                Vector3 loc = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, 50.0f);
+
+                //Vector3 loc = new Vector3(eng.ThisMouse.Mouse.X, eng.ThisMouse.Mouse.Y, 0);
+
+                bool _draw2 = true;
+                bool _draw3 = true;
+                Vector3 scale = new Vector3(50, 50, 50);
+                Vector3 pbox = new Vector3(50, 50, 50);
+                bool _collides2d = true;
+                bool _collides3d = true;
+                Obstacle o = new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, _mesh, _tex);
+                objList.Add(o);
+                physList.Add(o);
+                renderList.Add(o);
+            }
+            else if (eng.ThisMouse.RightPressed())
+            {
+                // Pull the projection and model view matrix from the camera.   
+                Matrix4d project = this.camera.GetProjectionMatrix();
+                Matrix4d model = this.camera.GetModelViewMatrix();
+                Vector3d mousecoord = new Vector3d((double)this.eng.Mouse.X, (double)(this.eng.Height - this.eng.Mouse.Y), 1.0);
+                // Unproject the coordinates to convert from mouse to world coordinates
+                Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, this.camera.getViewport());
+                Obstacle objToRemove = null;
+                foreach (GameObject obj in objList)
+                {
+                    if (obj is Obstacle)
+                    {
+                        if (eng.ThisMouse.inObjectRegion((Obstacle)obj, mouseWorld))
+                        {
+                            objToRemove = (Obstacle)obj;
+                            break;
+                        }
+                    }
+                }
+                if (objToRemove != null)
+                {
+                    objList.Remove(objToRemove);
+                    physList.Remove(objToRemove);
+                    renderList.Remove(objToRemove);
+                }
+            }
+            else clickdown = false;
+
+        }
 
         /// <summary>
         /// Change the current level being played to the parameter
         /// </summary>
         /// <param name="l">Level to be changed to</param>
-        public void changeCurrentLevel(int l)
+        new public void changeCurrentLevel(int l)
         {
             current_level = l;
         }

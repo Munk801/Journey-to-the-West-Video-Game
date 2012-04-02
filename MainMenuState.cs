@@ -93,11 +93,11 @@ namespace U5Designs
 
             _old_state = OpenTK.Input.Keyboard.GetState(); // Get the current state of the keyboard           
 
-            arX = -150.0f;
+            arX = -200.0f;
             b1Y = 0.0f;
-            b2Y = -100.0f;
-            b3Y = -200.0f;
-            b4Y = -250.0f;
+            b2Y = -50.0f;
+            b3Y = -100.0f;
+            b4Y = -150.0f;
 
             // TEST //
             enterdown = false;

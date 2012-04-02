@@ -204,7 +204,7 @@ namespace Engine {
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 			GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Replace);
-
+            //if (cycleNumber == -1) cycleNumber = 1;
 			int frameNum = (int)(frameTime * framesPerSecond);
 			if(frameNum >= tex[cycleNumber].Length) {
 				frameTime %= tex[cycleNumber].Length / framesPerSecond;

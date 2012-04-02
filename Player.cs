@@ -184,6 +184,87 @@ namespace U5Designs {
             }
         }
 
+        /// <summary>
+        ///  FOR LEVEL DESIGNER ONLY
+        /// </summary>
+        /// <param name="enable3d"> true if we are in 3d view</param>
+        /// <param name="keyboard"> the keyboard object, for handling input</param>
+        /// <param name="time">time elapsed since last update</param>
+        internal void updateState(bool enable3d, KeyboardDevice keyboard, double time, bool leveldesign =true)
+        {
+            this.enable3d = enable3d;
+
+            //Update timers
+            if (stamina < maxStamina)
+            {
+                stamina = Math.Min(stamina + time, maxStamina);
+            }
+
+            //Update spinTimer even if not spinning, because it's also the timeout before you can spin again
+            if (spinTimer > 0.0)
+            {
+                spinTimer -= time;
+            }
+
+            if (spinning)
+            {
+                stamina = Math.Max(stamina - 5.0 * time, 0.0);
+                if (stamina <= 0.0 || spinTimer <= 0.0)
+                {
+                    spinning = false;
+                    _speed = 75;
+                    if (velocity.X == 0)
+                    {
+                        _cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
+                    }
+                    else
+                    {
+                        _cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
+                    }
+                }
+            }
+
+            if (projectileTimer > 0.0)
+            {
+                projectileTimer -= time;
+            }
+
+            if (Invincible)
+                Invincibletimer = Invincibletimer - time;
+            if (Invincibletimer <= 0)
+            { // invincible is gone
+                Invincibletimer = 0;
+                Invincible = false;
+            }
+
+            if (!HasControl && NoControlTimer > 0.0)
+                NoControlTimer = NoControlTimer - time;
+            if (NoControlTimer <= 0.0)
+            {
+                NoControlTimer = 0.0;
+                HasControl = true;
+            }
+
+            if (viewSwitchJumpTimer > 0.0)
+            {
+                viewSwitchJumpTimer -= time;
+            }
+
+            //If the grenade is selected, draw parabola
+            if (curProjectile.gravity)
+            {
+                addMarkers();
+            }
+
+            if (HasControl)
+            {
+                handleKeyboardInput(keyboard);
+
+                //Keep this last
+                //handleMouseInput();
+            }
+        }
+
 		/// <summary>
 		/// Handles all keyboard input from the player
 		/// </summary>

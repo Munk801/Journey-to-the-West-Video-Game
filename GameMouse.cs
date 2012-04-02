@@ -5,6 +5,7 @@ using System.Text;
 using Engine;
 using OpenTK;
 using OpenTK.Input;
+using System.Drawing;
 
 namespace U5Designs
 {
@@ -21,6 +22,18 @@ namespace U5Designs
             Window = eng;
         }
 
+        // TO DO: MAKE AN INOBJECTREGION METHOD THAT WILL DETECT WHETHER MOUSE IS IN OBJECT
+        internal bool inObjectRegion(Obstacle obj, Vector3d mouseCoord)
+        {
+            Rectangle r = new Rectangle((int)obj.location.X - 50, (int)obj.location.Y - 50, 100, 100);
+            if (r.Contains((int)mouseCoord.X, (int)mouseCoord.Y))
+            {
+                Console.WriteLine("You are inside an object");
+                return true;
+            }
+            else return false;
+        }
+
         public bool inButtonRegion(Texture texture)
         {
             if (Mouse.X - Window.Width / 2 > texture.XLoc && Mouse.X - Window.Width / 2 < texture.XLoc + texture.Width
@@ -29,6 +42,14 @@ namespace U5Designs
                 return true;
             }
             else return false;
+        }
+
+        public bool LeftClicked()
+        {
+            if (this.LeftPressed() && !CurrentLCState)
+                CurrentLCState = true;
+            else CurrentLCState = false;
+            return CurrentLCState;
         }
 
         public bool LeftPressed()
