@@ -48,14 +48,17 @@ namespace U5Designs
         internal bool enable3d; //true when being viewed in 3d
         int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
         private bool nowBillboarding; //true when billboarding objects should rotate into 3d view
-        //Texture Healthbar, bHealth;
-        //int MaxHealth;
-        //public SpriteSheet staminaBar, staminaBack, staminaFrame;
 
         bool tabDown;
         new public bool clickdown = false;
 
+        // Our current selected object for movement
         internal Obstacle SelectedObject = null;
+
+        // Changes ortho projection
+        double orthoWidth = 192;
+        double orthoHeight = 108;
+
         /// <summary>
         /// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
         /// </summary>
@@ -70,7 +73,7 @@ namespace U5Designs
             // undo this when done testing ObjList = LoadLevel.Load(current_level);
             //LoadLevel.Load(0, this);
             player = base.player;
-
+            player.inLevelDesignMode = true;
             objList = base.objList;
             renderList = base.renderList;
             colisionList = base.colisionList;
@@ -163,6 +166,7 @@ namespace U5Designs
         /// <param name="e">FrameEventArgs from OpenTK's update</param>
         public override void Update(FrameEventArgs e)
         {
+            player.cam.trackingPlayer = false;
             //First deal with hardware input
             DealWithInput();
             HandleMouseInput();
@@ -320,15 +324,25 @@ namespace U5Designs
         /// </summary>
         private void DealWithInput()
         {
+            if (eng.Keyboard[Key.W])
+            {
+                orthoWidth = Math.Max(192, orthoWidth - orthoWidth* 0.01);
+                orthoHeight = Math.Max(108, orthoHeight - orthoHeight * 0.01);
+                camera.Set2DCamera(orthoWidth, orthoHeight);
+            }
+            if (eng.Keyboard[Key.S])
+            {
+                orthoWidth = Math.Min(1920, orthoWidth + orthoWidth * 0.01);
+                orthoHeight = Math.Min(1080, orthoHeight + orthoHeight * 0.01);
+                camera.Set2DCamera(orthoWidth, orthoHeight);
+            }
+
             // Testing the Level Design feature of re-loading LoadLevel after changing coords for a given game object
             if (eng.Keyboard[Key.F5])
             {
-                PlayState pst = new PlayState(this.menustate, eng, 0);
-
-                //eng.PushState(pst);
-                // test
-                levelMusic.Stop();
-                eng.ChangeState(pst);
+                LevelDesignerState lds = new LevelDesignerState(this.menustate, eng, 0);
+                
+                eng.ChangeState(lds);
 
                 //LoadLevel.Load(0, pst);
             }
@@ -336,7 +350,6 @@ namespace U5Designs
             if (eng.Keyboard[Key.Escape] || eng.Keyboard[Key.Tilde])
             {
                 //eng.PushState(menustate);
-                levelMusic.Stop();
                 eng.PushState(pms);
             }
 
@@ -384,6 +397,7 @@ namespace U5Designs
         {
             if (o == null) return;
             int index = objList.FindIndex(p => p.location == o.location);
+            if (index == -1) return;
             objList[index].location += newLoc;
             
         }

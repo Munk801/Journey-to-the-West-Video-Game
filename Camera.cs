@@ -28,7 +28,7 @@ namespace U5Designs
 		public bool isInTransition;
 		private bool switchedBillboards; //tracks if we have triggered the billboarding switch yet
 		private bool movingInY; //true when slowly shifting to player's y position (when player is on ground)
-		private bool trackingPlayer; //true when tracking player's exact y position (when player is in freefall below screen)
+		public bool trackingPlayer; //true when tracking player's exact y position (when player is in freefall below screen)
 		private float playerYPos; //the player's y position the last time they were not in midair
 		private bool bossMode;
 
@@ -57,14 +57,14 @@ namespace U5Designs
 			this.viewport = viewport;
 		}
 
-        public void Set2DCamera() {
+        public void Set2DCamera(double width=192, double height=108) {
 			in3d = false;
-            SetOrthographic();
+            SetOrthographic(width, height);
 			lookat = new Vector3(37.5f, 31.25f, 0.0f);
 			lookat.X += player.location.X;
 			lookat.Y += playerYPos;
 			lookat.Z = player.location.Z;
-			eye = new Vector3(37.5f, 31.25f, 500f);
+			eye = new Vector3(37.5f, 31.25f, 500.0f);
 			eye.X += player.location.X;
 			eye.Y += playerYPos;
 			eye.Z += player.location.Z;
@@ -97,9 +97,9 @@ namespace U5Designs
 			return this.viewport;
 		}
 
-        private void SetOrthographic() {
+        private void SetOrthographic(double width = 192, double height = 108) {
             GL.MatrixMode(MatrixMode.Projection);
-            Matrix4d Projection = Matrix4d.CreateOrthographic(192, 108, 1.0f, 6400.0f);
+            Matrix4d Projection = Matrix4d.CreateOrthographic(width, height, 1.0f, 6400.0f);
             this.projection = Projection;
 			GL.LoadMatrix(ref projection);
         }

@@ -57,6 +57,8 @@ namespace U5Designs {
         public int spinDamage;
 
 		private bool spaceDown, eDown;
+
+        public bool inLevelDesignMode = false; // THIS IS ONLY USED FOR LEVEL DESIGNER
         
         // SOUND FILES
         AudioFile jumpSound, bananaSound, hurtSound;
@@ -764,19 +766,32 @@ namespace U5Designs {
 				}
 			}
 
-			//Now that everything is done, move the camera if we're below the bottom of the screen
-			if(fallTimer > 0.0 || !cam.playerIsAboveScreenBottom()) {
-				fallTimer += origTime;
-				cam.trackPlayer();
-			}
+            if (!inLevelDesignMode) // ADDING A SWITCH FOR LEVEL DESIGN FEATURES
+            {
+                //Now that everything is done, move the camera if we're below the bottom of the screen
+                if (fallTimer > 0.0 || !cam.playerIsAboveScreenBottom())
+                {
+                    fallTimer += origTime;
+                    cam.trackPlayer();
+                }
 
-			if(fallTimer > 1.5) {
-				_health -= fallDamage;
-				_location = lastPosOnGround;
-				velocity = Vector3.Zero;
-				Invincible = true;
-				Invincibletimer = 2.0;
-			}
+            }
+            if (inLevelDesignMode)
+            {
+                if (fallTimer > 0.0 || !cam.playerIsAboveScreenBottom())
+                {
+                    fallTimer += origTime;
+                }
+            }
+
+                if (fallTimer > 1.5)
+                {
+                    _health -= fallDamage;
+                    _location = lastPosOnGround;
+                    velocity = Vector3.Zero;
+                    Invincible = true;
+                    Invincibletimer = 2.0;
+                }
 		}
 
         /// <summary>
@@ -980,19 +995,31 @@ namespace U5Designs {
 				}
 			}
 
-			//Now that everything is done, move the camera if we're below the bottom of the screen
-			if(fallTimer > 0.0 || !cam.playerIsAboveScreenBottom()) {
-				fallTimer += origTime;
-				cam.trackPlayer();
-			}
+            if (!inLevelDesignMode) // ADDED A SWITCH TO LEVEL DESIGN MODE
+            {
+                //Now that everything is done, move the camera if we're below the bottom of the screen
+                if (fallTimer > 0.0 || !cam.playerIsAboveScreenBottom())
+                {
+                    fallTimer += origTime;
+                    cam.trackPlayer();
+                }
 
-			if(fallTimer > 1.5) {
-				_health -= fallDamage;
-				_location = lastPosOnGround;
-				velocity = Vector3.Zero;
-				Invincible = true;
-				Invincibletimer = 2.0;
-			}
+            }
+            if (inLevelDesignMode)
+            {
+                if (fallTimer > 0.0 || !cam.playerIsAboveScreenBottom())
+                {
+                    fallTimer += origTime;
+                }
+            }
+                if (fallTimer > 1.5)
+                {
+                    _health -= fallDamage;
+                    _location = lastPosOnGround;
+                    velocity = Vector3.Zero;
+                    Invincible = true;
+                    Invincibletimer = 2.0;
+                }
 		}
 
         /// <summary>
