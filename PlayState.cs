@@ -126,7 +126,7 @@ namespace U5Designs
             GL.AttachShader(shaderProgram, frag);
             GL.LinkProgram(shaderProgram);
             GL.UseProgram(shaderProgram);
-             levelMusic.ReplayFile();
+          
 
         }
 
@@ -134,6 +134,7 @@ namespace U5Designs
         /// Refreshes graphics when this state becomes active again after being frozen.
         /// </summary>
 		public override void MakeActive() {
+            levelMusic.ReplayFile();
 			GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Emission, new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 
 			GL.Enable(EnableCap.Blend);
