@@ -23,15 +23,19 @@ namespace U5Designs
         }
 
         // TO DO: MAKE AN INOBJECTREGION METHOD THAT WILL DETECT WHETHER MOUSE IS IN OBJECT
-        internal bool inObjectRegion(Obstacle obj, Vector3d mouseCoord)
+        internal bool inObjectRegion(Obstacle obj, Vector3d mouseCoord, bool enable3D)
         {
             Rectangle r = new Rectangle((int)obj.location.X - 50, (int)obj.location.Y - 50, 100, 100);
-            if (r.Contains((int)mouseCoord.X, (int)mouseCoord.Y))
+            if (!enable3D)
             {
-                Console.WriteLine("You are inside an object");
-                return true;
+                if (r.Contains((int)mouseCoord.X, (int)mouseCoord.Y))
+                {
+                    Console.WriteLine("You are inside an object");
+                    return true;
+                }
+                else return false;
             }
-            else return false;
+            return false;
         }
 
         public bool inButtonRegion(Texture texture)
@@ -47,7 +51,14 @@ namespace U5Designs
         public bool LeftClicked()
         {
             if (this.LeftPressed() && !CurrentLCState)
+            {
                 CurrentLCState = true;
+                //Console.WriteLine("LEFT MOUSE PRESSED");
+                if (!this.LeftPressed())
+                {
+                    CurrentLCState = false;
+                }
+            }
             else CurrentLCState = false;
             return CurrentLCState;
         }

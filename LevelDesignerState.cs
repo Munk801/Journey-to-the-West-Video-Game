@@ -58,11 +58,23 @@ namespace U5Designs
 
         // Our current selected object for movement
         internal Obstacle SelectedObject = null;
+        System.Windows.Application app;
         MainWindow window;
-
+        
+        bool windowInit;
         // Changes ortho projection
         double orthoWidth = 192;
         double orthoHeight = 108;
+        List<string> ObstaclesList;
+        int itemIter;
+        int itemCount;
+        bool leftBDown = false;
+        bool rightBDown = false;
+        struct ObjectToLoad
+        {
+            string path;
+
+        };
         /// <summary>
         /// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
         /// </summary>
@@ -73,9 +85,7 @@ namespace U5Designs
             : base(prvstate, engine, lvl)
         {
             //TODO: pass this the right file to load from
-
             // undo this when done testing ObjList = LoadLevel.Load(current_level);
-            //LoadLevel.Load(0, this);
             player = base.player;
             player.inLevelDesignMode = true;
             objList = base.objList;
@@ -131,17 +141,28 @@ namespace U5Designs
             //Thread t = new Thread(new ThreadStart(CreateLevelDesignForm));
             //t.ApartmentState = ApartmentState.STA;
             //t.Start();
-
+            ObstaclesList = GetObstaclesFromDir();
+            itemIter = 3;
+            itemCount = ObstaclesList.Count;
             StartDesignerThread();
         }
 
+        /// <summary>
+        /// Opens the secondary tool menu which will be useful for user to choose items
+        /// </summary>
         private void OpenWindow()
         {
-            var app = new System.Windows.Application();
-            window = new LevelDesignerTool.MainWindow();
-            app.Run(window);
+            if (System.Windows.Application.Current == null)
+            {
+                app = new System.Windows.Application();
+                window = new LevelDesignerTool.MainWindow();
+                app.Run(window);
+            }
         }
 
+        /// <summary>
+        /// Thread for secondary window
+        /// </summary>
         private void StartDesignerThread()
         {
             var thread = new Thread(() =>
@@ -362,24 +383,30 @@ namespace U5Designs
         /// </summary>
         private void DealWithInput()
         {
-            if (eng.Keyboard[Key.W])
+            if (!enable3d)
             {
-                orthoWidth = Math.Max(192, orthoWidth - orthoWidth* 0.01);
-                orthoHeight = Math.Max(108, orthoHeight - orthoHeight * 0.01);
-                camera.Set2DCamera(orthoWidth, orthoHeight);
-            }
-            if (eng.Keyboard[Key.S])
-            {
-                orthoWidth = Math.Min(1920, orthoWidth + orthoWidth * 0.01);
-                orthoHeight = Math.Min(1080, orthoHeight + orthoHeight * 0.01);
-                camera.Set2DCamera(orthoWidth, orthoHeight);
-            }
 
+                if (eng.Keyboard[Key.W])
+                {
+                    orthoWidth = Math.Max(192, orthoWidth - orthoWidth * 0.01);
+                    orthoHeight = Math.Max(108, orthoHeight - orthoHeight * 0.01);
+                    camera.Set2DCamera(orthoWidth, orthoHeight);
+                }
+                if (eng.Keyboard[Key.S])
+                {
+                    orthoWidth = Math.Min(1920, orthoWidth + orthoWidth * 0.01);
+                    orthoHeight = Math.Min(1080, orthoHeight + orthoHeight * 0.01);
+                    camera.Set2DCamera(orthoWidth, orthoHeight);
+                }
+            }
             // Testing the Level Design feature of re-loading LoadLevel after changing coords for a given game object
             if (eng.Keyboard[Key.F5])
             {
                 LevelDesignerState lds = new LevelDesignerState(this.menustate, eng, 0);
-                
+                if (!window.IsActive)
+                {
+                    window.Show();
+                }
                 eng.ChangeState(lds);
 
                 //LoadLevel.Load(0, pst);
@@ -412,22 +439,80 @@ namespace U5Designs
                     tabDown = false;
                 }
             }
+            if (!enable3d)
+            {
+                if (eng.Keyboard[Key.Up])
+                {
+                    MoveObjects(SelectedObject, new Vector3(0.0f, 1.0f, 0.0f));
+                }
+                if (eng.Keyboard[Key.Down])
+                {
+                    MoveObjects(SelectedObject, new Vector3(0.0f, -1.0f, 0.0f));
+                }
+                if (eng.Keyboard[Key.Left])
+                {
+                    MoveObjects(SelectedObject, new Vector3(-1.0f, 0.0f, 0.0f));
+                }
+                if (eng.Keyboard[Key.Right])
+                {
+                    MoveObjects(SelectedObject, new Vector3(1.0f, 0.0f, 0.0f));
+                }
+                if (!eng.Keyboard[Key.BracketLeft])
+                {
+                    leftBDown = false;
+                }
+                if (!eng.Keyboard[Key.BracketRight])
+                {
+                    rightBDown = false;
+                }
+                // Moving between obstacles
+                if (eng.Keyboard[Key.BracketLeft] && !leftBDown)
+                {
+                    leftBDown = true;
+                    if (itemIter - 1 < 0)
+                        itemIter = itemCount -1;
+                    else itemIter--;
+                    
+                    Console.WriteLine("Using {0}", ObstaclesList[itemIter]);
+                }
+                if (eng.Keyboard[Key.BracketRight] && !rightBDown)
+                {
+                    rightBDown = true;
+                    if (itemIter + 1 > itemCount-1)
+                        itemIter = 0;
+                    else itemIter++;
+                    
 
-            if (eng.Keyboard[Key.Up])
-            {
-                MoveObjects(SelectedObject, new Vector3(0.0f, 1.0f, 0.0f));
+                    Console.WriteLine("Using {0}", ObstaclesList[itemIter]);
+                }
             }
-            if (eng.Keyboard[Key.Down])
+                // CONTROLS FOR 3D
+            else
             {
-                MoveObjects(SelectedObject, new Vector3(0.0f, -1.0f, 0.0f));
-            }
-            if (eng.Keyboard[Key.Left])
-            {
-                MoveObjects(SelectedObject, new Vector3(-1.0f, 0.0f, 0.0f));
-            }
-            if (eng.Keyboard[Key.Right])
-            {
-                MoveObjects(SelectedObject, new Vector3(1.0f, 0.0f, 0.0f));
+                if (eng.Keyboard[Key.Up] && !eng.Keyboard[Key.ControlLeft])
+                {
+                    MoveObjects(SelectedObject, new Vector3(1.0f, 0.0f, 0.0f));
+                }
+                if (eng.Keyboard[Key.Down] && !eng.Keyboard[Key.ControlLeft])
+                {
+                    MoveObjects(SelectedObject, new Vector3(-1.0f, 0.0f, 0.0f));
+                }
+                if (eng.Keyboard[Key.Left])
+                {
+                    MoveObjects(SelectedObject, new Vector3(0.0f, 0.0f, -1.0f));
+                }
+                if (eng.Keyboard[Key.Right])
+                {
+                    MoveObjects(SelectedObject, new Vector3(0.0f, 0.0f, 1.0f));
+                }
+                if (eng.Keyboard[Key.Up] && eng.Keyboard[Key.ControlLeft])
+                {
+                    MoveObjects(SelectedObject, new Vector3(0.0f, 1.0f, 0.0f));
+                }
+                if (eng.Keyboard[Key.Down] && eng.Keyboard[Key.ControlLeft])
+                {
+                    MoveObjects(SelectedObject, new Vector3(0.0f, -1.0f, 0.0f));
+                }
             }
         }
 
@@ -461,8 +546,12 @@ namespace U5Designs
         }
         private void HandleMouseInput()
         {
+            if (!eng.ThisMouse.LeftPressed())
+            {
+                clickdown = false;
+            }
             // ADDING OBJECTS TO THE LIST
-            if (eng.ThisMouse.LeftPressed() && !clickdown)
+            if (eng.ThisMouse.LeftPressed() && !clickdown && !enable3d)
             {
                 clickdown = true;
                 // Pull the projection and model view matrix from the camera.   
@@ -476,7 +565,7 @@ namespace U5Designs
                 {
                     if (obj is Obstacle)
                     {
-                        if (eng.ThisMouse.inObjectRegion((Obstacle)obj, mouseWorld))
+                        if (eng.ThisMouse.inObjectRegion((Obstacle)obj, mouseWorld, enable3d))
                         {
                             SelectedObject = (Obstacle)obj;
                             Console.WriteLine("Selected Object");
@@ -484,33 +573,47 @@ namespace U5Designs
                         }
                     }
                 }
-                Console.WriteLine("X: " + eng.ThisMouse.Mouse.X);
-                Console.WriteLine("Y: " + eng.ThisMouse.Mouse.Y);
-                string path = "test_obstacle.dat";
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                string _o_path = "U5Designs.Resources.Data.Obstacles." + path;
-
-                // if 2D = false there is a mesh...otherwise there isn't
-                ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + "box.obj"));
-
-                //XmlNodeList _b = doc.GetElementsByTagName("bmp");
-                MeshTexture _tex = new MeshTexture(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + "city_ground.png")));
-
 
                 Vector3 loc = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, 50.0f);
 
-                //Vector3 loc = new Vector3(eng.ThisMouse.Mouse.X, eng.ThisMouse.Mouse.Y, 0);
+                Obstacle o = ParseObstacle(ObstaclesList[itemIter], loc);
+                if (o == null)
+                {
+                    Decoration dec = ParseDecoration(ObstaclesList[itemIter], loc);
+                    objList.Add(dec);
+                    renderList.Add(dec);
+                }
+                else
+                {
+                    objList.Add(o);
+                    physList.Add(o);
+                    renderList.Add(o);
+                    clickdown = false;
+                }
+            }
+            else if (eng.ThisMouse.LeftPressed() && !clickdown && enable3d)
+            {
+                // TO DO: ALLOW SELECTION AND OF OBJECTS IN 3D
+                clickdown = true;
+                // Pull the projection and model view matrix from the camera.   
+                Matrix4d project = this.camera.GetProjectionMatrix();
+                Matrix4d model = this.camera.GetModelViewMatrix();
+                float[] t = new float[1];
+                GL.ReadPixels(this.eng.Mouse.X, this.eng.Height - this.eng.Mouse.Y, 1, 1, PixelFormat.DepthComponent, PixelType.Float, t);
+                Vector3d mousecoord = new Vector3d((double)this.eng.Mouse.X, (double)(this.eng.Height - this.eng.Mouse.Y), 1.0);
+                // Unproject the coordinates to convert from mouse to world coordinates
+                // Unproject the coordinates to convert from mouse to world coordinates
+                mousecoord.Z = 0.0;
+                Vector3d near = GameMouse.UnProject(mousecoord, model, project, this.camera.getViewport());
+                mousecoord.Z = 1.0;
+                Vector3d far = GameMouse.UnProject(mousecoord, model, project, this.camera.getViewport());
 
-                bool _draw2 = true;
-                bool _draw3 = true;
-                Vector3 scale = new Vector3(50, 50, 50);
-                Vector3 pbox = new Vector3(50, 50, 50);
-                bool _collides2d = true;
-                bool _collides3d = true;
-                Obstacle o = new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, _mesh, _tex);
-                objList.Add(o);
-                physList.Add(o);
-                renderList.Add(o);
+                //Interpolate to find coordinates just in front of player
+                double tA = (player.location.X + (100.0f * t[0]) - near.X) / (far.X - near.X);
+                Vector3d mouseWorld = new Vector3d(player.location.X + (100.0 * (1 - t[0])), near.Y + (far.Y - near.Y) * tA, near.Z + (far.Z - near.Z) * tA);
+                Console.WriteLine("{0} \t {1} \t {2}", mouseWorld.X, mouseWorld.Y, mouseWorld.Z);
+                // Console.WriteLine(t[0]);
+                clickdown = false;
             }
             else if (eng.ThisMouse.RightPressed())
             {
@@ -525,7 +628,7 @@ namespace U5Designs
                 {
                     if (obj is Obstacle)
                     {
-                        if (eng.ThisMouse.inObjectRegion((Obstacle)obj, mouseWorld))
+                        if (eng.ThisMouse.inObjectRegion((Obstacle)obj, mouseWorld, enable3d))
                         {
                             objToRemove = (Obstacle)obj;
                             break;
@@ -539,7 +642,6 @@ namespace U5Designs
                     renderList.Remove(objToRemove);
                 }
             }
-            else clickdown = false;
 
         }
 
@@ -550,6 +652,151 @@ namespace U5Designs
         new public void changeCurrentLevel(int l)
         {
             current_level = l;
+        }
+
+        public List<string> GetObstaclesFromDir()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string _o_path ="U5Designs.Resources.Data.Obstacles.obstacles.txt";
+            Stream fstream = assembly.GetManifestResourceStream(_o_path);
+            StreamReader r = new StreamReader(fstream);
+            List<string> obstacleList = new List<string>();
+            string obs = r.ReadLine();
+            while( obs != null)
+            {
+                obstacleList.Add(obs);
+                obs = r.ReadLine();
+            }
+            return obstacleList;
+        }
+
+        private Decoration ParseDecoration(string path, Vector3 loc)
+        {
+            Decoration dec = null;
+            // Instantiate the list
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.IgnoreComments = true;
+
+            string _d_path = "U5Designs.Resources.Data.Decorations." + path;
+            Stream fstream = assembly.GetManifestResourceStream(_d_path);
+            XmlDocument doc = new XmlDocument();
+            XmlReader reader = XmlReader.Create(fstream, settings);
+            doc.Load(reader);
+
+            Vector3 scale = LoadLevel.parseVector3(doc.GetElementsByTagName("scale")[0]);
+
+            bool _draw2 = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
+            bool _draw3 = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
+
+
+            // Check to see if the current Obstacle is 2D or 3D and handle accordingly
+            if (Convert.ToBoolean(doc.GetElementsByTagName("is2d")[0].InnerText))
+            {
+                // Create the SpriteSheet 
+                SpriteSheet ss = LoadLevel.parse_Sprite_File(doc.GetElementsByTagName("sprite")[0].InnerText);
+
+                Billboarding bb = Billboarding.Yes;  //Have to put something here for it to compile
+                switch (doc.GetElementsByTagName("billboards")[0].InnerText)
+                {
+                    case "yes":
+                    case "Yes":
+                        bb = Billboarding.Yes;
+                        break;
+                    case "lock2d":
+                    case "Lock2d":
+                        bb = Billboarding.Lock2d;
+                        break;
+                    case "lock3d":
+                    case "Lock3d":
+                        bb = Billboarding.Lock3d;
+                        break;
+                    default:
+                        Console.WriteLine("Bad obstacle file: " + path);
+                        Environment.Exit(1);
+                        break;
+                }
+                dec = new Decoration(loc, scale, _draw2, _draw3, bb, ss);
+            }
+            else
+            {
+                XmlNodeList _m = doc.GetElementsByTagName("mesh");
+                ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
+
+                XmlNodeList _b = doc.GetElementsByTagName("bmp");
+                MeshTexture _bmp = new MeshTexture(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + _b.Item(0).InnerText)));
+                dec = new Decoration(loc, scale, _draw2, _draw3, _mesh, _bmp);
+            }
+            fstream.Close();
+            return dec;
+        }
+
+
+        private Obstacle ParseObstacle(string path, Vector3 loc)
+        {
+            Obstacle o = null;
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.IgnoreComments = true;
+            XmlDocument doc = new XmlDocument();
+            string _o_path = "U5Designs.Resources.Data.Obstacles." + path;
+            Stream fstream = assembly.GetManifestResourceStream(_o_path);
+            XmlReader reader = XmlReader.Create(fstream, settings);
+            doc.Load(reader);
+
+            Vector3 scale = LoadLevel.parseVector3(doc.GetElementsByTagName("scale")[0]);
+            Vector3 pbox = LoadLevel.parseVector3(doc.GetElementsByTagName("pbox")[0]);
+
+            bool _draw2 = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
+            bool _draw3 = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
+
+            bool _collides2d = Convert.ToBoolean(doc.GetElementsByTagName("collidesIn2d")[0].InnerText);
+            bool _collides3d = Convert.ToBoolean(doc.GetElementsByTagName("collidesIn3d")[0].InnerText);
+
+            // Check to see if the current Obstacle is 2D or 3D and handle accordingly
+            XmlNodeList _type = doc.GetElementsByTagName("is2d");
+            if (Convert.ToBoolean(_type.Item(0).InnerText))
+            {
+                String ss_path = doc.GetElementsByTagName("sprite")[0].InnerText;
+                fstream.Close();
+                SpriteSheet ss = LoadLevel.parse_Sprite_File(ss_path);
+
+                Billboarding bb = Billboarding.Yes;  //Have to put something here for it to compile
+                switch (doc.GetElementsByTagName("billboards")[0].InnerText)
+                {
+                    case "yes":
+                    case "Yes":
+                        bb = Billboarding.Yes;
+                        break;
+                    case "lock2d":
+                    case "Lock2d":
+                        bb = Billboarding.Lock2d;
+                        break;
+                    case "lock3d":
+                    case "Lock3d":
+                        bb = Billboarding.Lock3d;
+                        break;
+                    default:
+                        Console.WriteLine("Bad obstacle file: " + path);
+                        Environment.Exit(1);
+                        break;
+                }
+                o = new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, bb, ss);
+            }
+            else
+            {
+                fstream.Close();
+                XmlNodeList _m = doc.GetElementsByTagName("mesh");
+                ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
+
+                XmlNodeList _b = doc.GetElementsByTagName("bmp");
+                MeshTexture _tex = new MeshTexture(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + _b.Item(0).InnerText)));
+
+                o = new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, _mesh, _tex);
+                fstream.Close();
+            }
+
+            return o;
         }
     }
 }

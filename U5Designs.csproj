@@ -353,6 +353,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Sprites\coconut_spin_sprite.dat" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Obstacles\obstacles.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
