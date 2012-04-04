@@ -355,7 +355,7 @@ namespace U5Designs {
 			}
 			
 			//Secret skip to boss
-			if(keyboard[Key.BackSlash] && keyboard[Key.Number1] && keyboard[Key.Number5]) {
+			if(keyboard[Key.Period] && keyboard[Key.Comma]) {
 				playstate.enterBossMode();
 				//floor at 125 + 12.5 player pbox
 				_location = new Vector3(playstate.bossAreaCenter) + Vector3.UnitY * (_pbox.Y + 0.1f);
@@ -598,7 +598,7 @@ namespace U5Designs {
                         double zdist = Math.Abs(obj.location.Z - location.Z);
                         double ydist = Math.Abs(obj.location.Y - location.Y);
                         if ((xdist < (enemyZone + spinSize)) && (zdist < (enemyZone + spinSize)) && ydist < ((CombatObject)obj).cbox.Y + cbox.Y) {
-                            if (((CombatObject)obj).type == 1 || ((CombatObject)obj).type ==3) {// obj is an enemy or boss, hurt it
+                            if (((CombatObject)obj).type == 1) {// obj is an enemy
                                 ((CombatObject)obj).health = ((CombatObject)obj).health - spinDamage;
                                 HasControl = false;
                                 NoControlTimer = 0.5;
@@ -611,6 +611,12 @@ namespace U5Designs {
                                     //despawn the projectile
                                     ((CombatObject)obj).health = 0;
                                 }
+                            }
+                            else if (((CombatObject)obj).type ==3){ // obj is zookeeper
+                                ((Boss)obj).dodamage(spinDamage);
+                                HasControl = false;
+                                NoControlTimer = 0.5;
+                                knockback(true, obj);
                             }
                             endspin = true;
                         }
@@ -839,7 +845,7 @@ namespace U5Designs {
                         double ydist = Math.Abs(obj.location.Y - location.Y);
                         if ((xdist < (enemyZone + spinSize)) && ydist < ((CombatObject)obj).cbox.Y + cbox.Y) {
 
-                            if (((CombatObject)obj).type == 1 ||((CombatObject)obj).type == 3) {// obj is an enemy or boss, hurt it
+                            if (((CombatObject)obj).type == 1) {// obj is an enemy or boss, hurt it
 								((CombatObject)obj).health = ((CombatObject)obj).health - spinDamage;
                                 HasControl = false;
                                 NoControlTimer = 0.5;
@@ -852,6 +858,12 @@ namespace U5Designs {
                                     //despawn the projectile
                                     ((CombatObject)obj).health = 0;
                                 }
+                            }
+                            else if (((CombatObject)obj).type == 3) { // obj is zookeeper
+                                ((Boss)obj).dodamage(spinDamage);
+                                HasControl = false;
+                                NoControlTimer = 0.5;
+                                knockback(false, obj);
                             }
                             endspin = true;
                         }

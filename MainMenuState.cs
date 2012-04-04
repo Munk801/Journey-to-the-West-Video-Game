@@ -30,7 +30,7 @@ namespace U5Designs
         protected Vector3 eye, lookat;
         Obstacle background;
         MouseDevice mouse;
-        AudioFile musicFile;
+        public AudioFile musicFile;
 
         // testing buttons
         //Obstacle play_button_npress, play_button_press, load_button_npress, load_button_press, quit_button_press, quit_button_npress;

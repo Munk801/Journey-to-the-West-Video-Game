@@ -146,7 +146,7 @@ namespace U5Designs {
             idle = true;
 
             //combat stuff
-            _health = 10;
+            _health = 5;
             _damage = 1;
             _speed = 1;
             _alive = true;
@@ -181,14 +181,27 @@ namespace U5Designs {
             _location = location + new Vector3(0, (mybox.pbox.Y *2) + pbox.Y, 0); //boss sprite
             minHeight = 125;
             preHeight = 210;
+
+            invincible = false;
+            invintimer = 0;
         }
 
-        double downtimer, pretimer;
+        double downtimer, pretimer, invintimer;
+        double invintime = 1.5;
         double downtime = 3;
         double pretime = 1.5;
-        public bool falling, rising, prefalling, idle; // true when currently doing an animation
+        public bool falling, rising, prefalling, idle, invincible; // true when currently doing an animation
 
         public void update(double time, PlayState playstate, Vector3 playerposn, bool enable3d) {
+            if (invincible) {
+                invintimer = invintimer + time;
+                if (invintimer >= invintime) {
+                    invintimer = 0;
+                    invincible = false;
+                }
+            }
+
+
             if (prefalling) {
                 if ((mybox.location.Y - mybox.pbox.Y) <= preHeight) {
                     setPosition(new Vector3(mybox.location.X, preHeight, mybox.location.Z));
@@ -238,6 +251,14 @@ namespace U5Designs {
                 else {
                     velocity = new Vector3(0, 80, 0);
                 }
+            }
+        }
+
+        public void dodamage(int hit) {
+            if (!invincible) {
+                health = health - 1;
+                //TODO: play pain anamation or w/e
+                downtimer = downtime - 0.2;// make him come up after .2 seconds
             }
         }
 

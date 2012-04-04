@@ -22,6 +22,7 @@ namespace U5Designs
     {
         //debug
         bool aienabled = true;
+        bool musicenabled = false;
 
 		internal GameEngine eng;
 		MainMenuState menustate;
@@ -134,7 +135,8 @@ namespace U5Designs
         /// Refreshes graphics when this state becomes active again after being frozen.
         /// </summary>
 		public override void MakeActive() {
-            levelMusic.ReplayFile();
+            if (musicenabled)
+                levelMusic.ReplayFile();
 			GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Emission, new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 
 			GL.Enable(EnableCap.Blend);
@@ -164,11 +166,12 @@ namespace U5Designs
             //First deal with hardware input
             DealWithInput();
 
-            // Loop music when necessary
-            if (levelMusic.CurrentSource.FileHasEnded)
-            {
-                levelMusic.CurrentSource.FileHasEnded = false;
-                levelMusic.ReplayFile();
+            if (musicenabled) {
+                // Loop music when necessary
+                if (levelMusic.CurrentSource.FileHasEnded) {
+                    levelMusic.CurrentSource.FileHasEnded = false;
+                    levelMusic.ReplayFile();
+                }
             }
             //Next check if the player is dead. If he is, game over man
             if (player.health <= 0) {

@@ -270,12 +270,17 @@ namespace U5Designs {
                                 health = 0;
                             }
                         }
-                        if (((CombatObject)collidingObj).type == (int)CombatType.enemy || ((CombatObject)collidingObj).type == (int)CombatType.boss) {
+                        if (((CombatObject)collidingObj).type == (int)CombatType.enemy) {
                             if (playerspawned) {
                                 time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
                             }
+                        }
+                        if (((CombatObject)collidingObj).type == 3) { // obj is zookeeper
+                            ((Boss)collidingObj).dodamage(damage);
+                            time = 0.0;
+                            health = 0;
                         }
                     }
                 }
@@ -434,12 +439,17 @@ namespace U5Designs {
                                 }
                             }
                         }
-                        if (((CombatObject)collidingObj).type == 1 || ((CombatObject)collidingObj).type == 3) { //hit an enemy or boss
+                        if (((CombatObject)collidingObj).type == 1) { //hit an enemy or boss
                             if (playerspawned) {
                                 time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
                             }
+                        }
+                        if (((CombatObject)collidingObj).type == 3) { // obj is zookeeper
+                            ((Boss)collidingObj).dodamage(damage);
+                            time = 0.0;
+                            health = 0;
                         }
                     }
                 }
