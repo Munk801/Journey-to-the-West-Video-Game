@@ -32,8 +32,8 @@ namespace U5Designs
 			 * This next section of code will read in a level file and create an array of Enemy files to be parsed.
 			 * */
 			Assembly assembly = Assembly.GetExecutingAssembly();
-			string file = "U5Designs.Resources.Data.Levels.level_test.dat";
-			Stream fstream = assembly.GetManifestResourceStream(file);
+            string file = "U5Designs.Resources.Data.Levels.level_" + level_to_load.ToString() + ".dat";
+            Stream fstream = assembly.GetManifestResourceStream(file);
 			XmlDocument doc = new XmlDocument();
 			XmlReaderSettings settings = new XmlReaderSettings();
 			settings.IgnoreComments = true;
@@ -455,7 +455,7 @@ namespace U5Designs
 					}
 				}
 				foreach(Vector3 loc in locs) {
-					_b.Add(new Background(loc, scale, parse_Sprite_File(spritePath), speed));
+					_b.Add(new Background(loc, scale, parse_Sprite_File(spritePath), speed, spritePath));
 				}
 			}
 

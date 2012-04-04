@@ -137,7 +137,7 @@
     <Folder Include="Resources\lib\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Levels\level_test.dat">
+    <EmbeddedResource Include="Resources\Data\Levels\level_0.dat">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

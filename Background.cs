@@ -18,12 +18,21 @@ namespace U5Designs
 			get { return speed; }
 			set { speed = value; }
 		}
+
+        // Added by Seth for Level Designer because we need access to the sprite path string for the level XML file
+        private String _sprite_path;
+        public String Path
+        {
+            get { return _sprite_path; }
+        }
+
 		private int texID;
 
-        public Background(Vector3 location, Vector3 scale, SpriteSheet sprite, float speed)
+        public Background(Vector3 location, Vector3 scale, SpriteSheet sprite, float speed, String sp)
 					: base(location, scale, true, true, Billboarding.Lock2d, sprite) {
 			this.speed = speed;
 			texID = GL.GenTexture();
+            this._sprite_path = sp;
 		}
 
         public void UpdatePositionX(float deltax) {

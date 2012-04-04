@@ -75,6 +75,28 @@ namespace U5Designs
             string path;
 
         };
+
+        /** These Dictionarys will map Vector3's to different game objects that will then be written out to a level file.  When the user adds
+         * a given object type into the level editor that object will be added to the appropriate Dictionary.  When the user deletes an object
+         * it will be removed from the appropriate list.**/
+        public struct BackGroundData
+        {
+            public Vector3 _scale;
+            public String _sprite_file;
+            public float _speed;
+            public Vector3 _location;
+        };
+        Dictionary<Vector3, int> _xml_obstacle_list;
+        Dictionary<Vector3, int> _xml_dec_list;
+        Dictionary<Vector3, int> _xml_enemy_list;
+        Dictionary<String, int> _xml_sound_list;
+        Dictionary<BackGroundData, int> _xml_bg_list;
+        Dictionary<Vector3, int> _xml_boss_area_list;
+        Dictionary<Vector3, int> _xml_boss_bounds_list;
+        Dictionary<Vector3, int> _xml_boss_center_list;
+        List<Vector3> _xml_end_region;
+
+
         /// <summary>
         /// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
         /// </summary>
@@ -142,6 +164,17 @@ namespace U5Designs
             //t.ApartmentState = ApartmentState.STA;
             //t.Start();
             ObstaclesList = GetObstaclesFromDir();
+
+            _xml_obstacle_list = new Dictionary<Vector3,int>();
+            _xml_dec_list = new Dictionary<Vector3,int>();
+            _xml_enemy_list = new Dictionary<Vector3,int>();
+            _xml_sound_list = new Dictionary<string,int>();
+            _xml_bg_list = new Dictionary<BackGroundData,int>();
+            _xml_boss_area_list = new Dictionary<Vector3,int>();
+            _xml_boss_bounds_list = new Dictionary<Vector3, int>();
+            _xml_boss_center_list = new Dictionary<Vector3, int>();
+            _xml_end_region = new List<Vector3>();
+
             itemIter = 3;
             itemCount = ObstaclesList.Count;
             StartDesignerThread();
@@ -582,6 +615,34 @@ namespace U5Designs
                     Decoration dec = ParseDecoration(ObstaclesList[itemIter], loc);
                     objList.Add(dec);
                     renderList.Add(dec);
+
+                    // Add decoration to decoration list
+                    _xml_dec_list.Add(dec.location, itemIter);
+
+                    /** TODO !!!! ***/
+                    // Need to parse Enemies, Sound files, boss regions, backgrounds
+
+                    /// PSEUDO-CODE
+                    // if ( boss region )
+                    //      _xml_boss_region.Add(Vector3, index)
+
+                    // if ( boss bounds )
+                    //      _xml_boss_bounds.Add(Vector3, index)
+
+                    // if ( boss center )
+                    //      _xml_boss_center.Add(Vector3, index)
+
+                    // if ( sound file )
+                    //      _xml_sound.Add(object, index)
+
+                    // if ( end region )
+                    //      _xml_end_region.Add(Vector3)
+
+                    // if ( enemy )
+                    //      _xml_enemy.Add(object, index)
+
+                    // if ( background )
+                    //      _xml_bg.Add(BackGroundData, index)  /// BackGroundData is a struct to hold the multiple data items needed to create a BG
                 }
                 else
                 {
@@ -589,6 +650,9 @@ namespace U5Designs
                     physList.Add(o);
                     renderList.Add(o);
                     clickdown = false;
+
+                    // Add to obstacle list
+                    _xml_obstacle_list.Add(o.location, itemIter);
                 }
             }
             else if (eng.ThisMouse.LeftPressed() && !clickdown && enable3d)
@@ -631,16 +695,46 @@ namespace U5Designs
                         if (eng.ThisMouse.inObjectRegion((Obstacle)obj, mouseWorld, enable3d))
                         {
                             objToRemove = (Obstacle)obj;
+                            _xml_obstacle_list.Remove(obj.location);
                             break;
                         }
                     }
+                    else if (obj is Enemy)
+                    {
+                        _xml_enemy_list.Remove(obj.location);
+                        break;
+                    }
+                    else if (obj is Background)
+                    {
+                        // Set temp BGD properties to the currently selected Background object and then search for a match in the Dictionary
+                        Background b = (Background)obj;
+                        BackGroundData bgd;
+                        bgd._location = obj.location;
+                        bgd._scale = b.scale;
+                        bgd._speed = b.Speed;
+                        bgd._sprite_file = b.Path;
+
+                        // ?? Not sure this works, hard to test at the moment so be aware this may be a broken hack...sorry coding blind on this one ...
+                        foreach (KeyValuePair<BackGroundData, int> pair in _xml_bg_list)
+                        {
+                            BackGroundData _b = pair.Key;
+                            if (_b._location == bgd._location && _b._scale == bgd._scale && _b._speed == bgd._speed && _b._sprite_file.CompareTo(bgd._sprite_file) == 0)
+                            {
+                                _xml_bg_list.Remove(_b);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    
                 }
                 if (objToRemove != null)
                 {
                     objList.Remove(objToRemove);
                     physList.Remove(objToRemove);
-                    renderList.Remove(objToRemove);
+                    renderList.Remove(objToRemove);                    
                 }
+                
             }
 
         }
@@ -797,6 +891,205 @@ namespace U5Designs
             }
 
             return o;
+        }
+
+        /**
+         * This method will take the various lists containing all the game elements that the user added and write them out in the correct format
+         * to create a valid level.dat file.  It requires a level Name and Index value.  Right now the level Name is not being used but in the future it may be
+         * 
+         * */
+        public void _write_level_file(String lName, int lIndex)
+        {
+            // File structure
+            /*
+             * <level>
+             *  <bossregion>
+             *  <endregion>
+             *  <audiofile>
+             *  <bossAreaCenter>
+             *  <bossAreaBounds>
+             *  <backgroundlist>
+             *      <background>
+             *  <enemylist>
+             *      <enemy>
+             *  <obstaclelist>
+             *      <obstacle>
+             *  <decorationlist>
+             *      <decoration>
+             * </level>
+             * 
+             * */            
+            string file = "level_" + lIndex.ToString() + ".dat";
+
+            using (XmlWriter writer = XmlWriter.Create(file))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("level");
+
+                if (_xml_boss_area_list.Count > 0)
+                {
+                    writer.WriteStartElement("bossRegion");
+                    foreach (KeyValuePair<Vector3, int> p1 in _xml_boss_area_list)
+                    {
+                        writer.WriteAttributeString("x", ((int)(p1.Key.X)).ToString());
+                        writer.WriteAttributeString("y", ((int)(p1.Key.Y)).ToString());
+                        writer.WriteAttributeString("z", ((int)(p1.Key.Z)).ToString());
+                    }
+                    writer.WriteEndElement();
+                }
+
+                if (_xml_end_region.Count > 0)
+                {                    
+                    foreach (Vector3 v in _xml_end_region)
+                    {
+                        writer.WriteStartElement("endRegion");
+                        writer.WriteAttributeString("x", ((int)(v.X)).ToString());
+                        writer.WriteAttributeString("y", ((int)(v.Y)).ToString());
+                        writer.WriteAttributeString("z", ((int)(v.Z)).ToString());
+                        writer.WriteEndElement();
+                    }                    
+                }
+
+                if (_xml_sound_list.Count > 0)
+                {
+                    writer.WriteStartElement("audiofile");
+                    foreach (KeyValuePair<String, int> p2 in _xml_sound_list)
+                    {
+                        writer.WriteStartElement("file");
+                        writer.WriteString(p2.Key);
+                        writer.WriteEndElement();
+                    }
+                    writer.WriteEndElement();
+                }
+
+                if (_xml_boss_area_list.Count > 0)
+                {
+                    foreach (KeyValuePair<Vector3, int> p3 in _xml_boss_area_list)
+                    {
+                        writer.WriteStartElement("bossAreaCenter");
+                        writer.WriteAttributeString("x", ((int)(p3.Key.X)).ToString());
+                        writer.WriteAttributeString("y", ((int)(p3.Key.Y)).ToString());
+                        writer.WriteAttributeString("z", ((int)(p3.Key.Z)).ToString());
+                        writer.WriteEndElement();
+                    }
+                }
+
+                if (_xml_boss_bounds_list.Count > 0)
+                {
+                    foreach (KeyValuePair<Vector3, int> p4 in _xml_boss_bounds_list)
+                    {
+                        writer.WriteStartElement("bossAreaBounds");
+                        writer.WriteAttributeString("x", ((int)(p4.Key.X)).ToString());
+                        writer.WriteAttributeString("y", ((int)(p4.Key.Y)).ToString());
+                        writer.WriteAttributeString("z", ((int)(p4.Key.Z)).ToString());
+                        writer.WriteEndElement();
+                    }
+                }
+
+                if (_xml_bg_list.Count > 0)
+                {
+                    writer.WriteStartElement("backgroundlist");
+                    foreach (KeyValuePair<BackGroundData, int> p5 in _xml_bg_list)
+                    {
+                        BackGroundData _tmp = p5.Key;
+                        writer.WriteStartElement("background");
+
+                        writer.WriteStartElement("scale");
+                        writer.WriteAttributeString("x", ((int)(_tmp._scale.X)).ToString());
+                        writer.WriteAttributeString("y", ((int)(_tmp._scale.Y)).ToString());
+                        writer.WriteAttributeString("z", ((int)(_tmp._scale.Z)).ToString());
+                        writer.WriteEndElement();
+
+                        writer.WriteStartElement("sprite");
+                        writer.WriteString(_tmp._sprite_file);
+                        writer.WriteEndElement();
+
+                        writer.WriteStartElement("speed");
+                        writer.WriteString(_tmp._speed.ToString());
+                        writer.WriteEndElement();
+
+                        // Keeping it simple I chose to not maintain a list of <loc> attributes in BackGroundData so the file can have multiple
+                        // <background> tags
+                        writer.WriteStartElement("loc");
+                        writer.WriteAttributeString("x", ((int)(_tmp._location.X)).ToString());
+                        writer.WriteAttributeString("y", ((int)(_tmp._location.Y)).ToString());
+                        writer.WriteAttributeString("z", ((int)(_tmp._location.Z)).ToString());
+                        writer.WriteEndElement();
+
+                        writer.WriteEndElement();
+                    }
+                    writer.WriteEndElement();
+                }
+
+                if (_xml_enemy_list.Count > 0)
+                {
+                    writer.WriteStartElement("enemylist");
+                    foreach (KeyValuePair<Vector3, int> p6 in _xml_enemy_list)
+                    {
+                        writer.WriteStartElement("enemy");
+
+                        writer.WriteStartElement("path");
+                        // TO DO !!!!!!!! writer.WriteString();  // need to use the index to look up which enemy .dat file to use
+                        writer.WriteEndElement();
+
+                        writer.WriteStartElement("loc");
+                        writer.WriteAttributeString("x", ((int)(p6.Key.X)).ToString());
+                        writer.WriteAttributeString("y", ((int)(p6.Key.Y)).ToString());
+                        writer.WriteAttributeString("z", ((int)(p6.Key.Z)).ToString());
+                        writer.WriteEndElement();
+
+                        writer.WriteEndElement();
+                    }
+                    writer.WriteEndElement();
+                }
+
+                if (_xml_obstacle_list.Count > 0)
+                {
+                    writer.WriteStartElement("obstaclelist");
+                    foreach (KeyValuePair<Vector3, int> p7 in _xml_obstacle_list)
+                    {
+                        writer.WriteStartElement("obstacle");
+
+                        writer.WriteStartElement("path");
+                        writer.WriteString(ObstaclesList[p7.Value]); // need to use the index to look up which obstacle .dat file to use
+                        writer.WriteEndElement();
+
+                        writer.WriteStartElement("loc");
+                        writer.WriteAttributeString("x", ((int)(p7.Key.X)).ToString());
+                        writer.WriteAttributeString("y", ((int)(p7.Key.Y)).ToString());
+                        writer.WriteAttributeString("z", ((int)(p7.Key.Z)).ToString());
+                        writer.WriteEndElement();
+
+                        writer.WriteEndElement();
+                    }
+                    writer.WriteEndElement();
+                }
+
+                if (_xml_dec_list.Count > 0)
+                {
+                    writer.WriteStartElement("decorationlist");
+                    foreach (KeyValuePair<Vector3, int> p8 in _xml_dec_list)
+                    {
+                        writer.WriteStartElement("decoration");
+
+                        writer.WriteStartElement("path");
+                        // TO DO !!!!!!!! writer.WriteString(); // need to use the index to look up which decoration .dat file to use
+                        writer.WriteEndElement();
+
+                        writer.WriteStartElement("loc");
+                        writer.WriteAttributeString("x", ((int)(p8.Key.X)).ToString());
+                        writer.WriteAttributeString("y", ((int)(p8.Key.Y)).ToString());
+                        writer.WriteAttributeString("z", ((int)(p8.Key.Z)).ToString());
+                        writer.WriteEndElement();
+
+                        writer.WriteEndElement();
+                    }
+                    writer.WriteEndElement();
+                }
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+            }
         }
     }
 }
