@@ -190,6 +190,7 @@ namespace U5Designs
             if (bossMode && (bossAI.gethealth() <= 0)) {
                 bossAI.killBoss(this);
                 //transition to next level? or state? or w/e
+                bossMode = false;
             }
 
 			//Determine which screen region everything is in
