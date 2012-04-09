@@ -92,6 +92,10 @@ namespace U5Designs {
 			get { return _animDirection; }
 		}
 
+		public bool hasTwoAnims {
+			get { return false; } //Change later if we want to add this functionality
+		}
+
 		public void doScaleTranslateAndTexture() {
 			GL.PushMatrix();
 			if(_is3dGeo) {

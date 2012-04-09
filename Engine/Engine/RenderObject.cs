@@ -44,6 +44,10 @@ namespace Engine {
 		//+1 when sprite animation should run forward, -1 when backward
 		int animDirection { get; }
 
+		//true if sprite has separate 2D and 3D animations for every cycle
+		//false if same animation should be reused in both 2D and 3D
+		bool hasTwoAnims { get; }
+
 		void doScaleTranslateAndTexture(); //pushes matrix, adds scale and translate to model view stack, and sets texture pointer
 	}
 }

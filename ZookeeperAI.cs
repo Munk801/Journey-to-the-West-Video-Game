@@ -348,6 +348,10 @@ namespace U5Designs {
 			get { return _animDirection; }
 		}
 
+		public bool hasTwoAnims {
+			get { return false; }
+		}
+
 		public int ScreenRegion {
 			get { return screenRegion; }
 		}

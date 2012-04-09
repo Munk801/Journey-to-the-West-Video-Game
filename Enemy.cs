@@ -665,6 +665,11 @@ namespace U5Designs
             get { return _animDirection; }
         }
 
+		public bool hasTwoAnims {
+			//Change to variable later if we add enemies with only 1 animation
+			get { return true; }
+		}
+
         public int ScreenRegion {
             get { return screenRegion; }
         }

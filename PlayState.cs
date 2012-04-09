@@ -389,7 +389,12 @@ namespace U5Designs
 			}
 
 			//Temporary hack until we get a setting added to everything that does this
-			player.cycleNumber += (enable3d ? +1 : -1);
+			//player.cycleNumber += (enable3d ? +1 : -1);
+			foreach(RenderObject o in renderList) {
+				if(o.hasTwoAnims) {
+					o.cycleNumber += (enable3d ? +1 : -1);
+				}
+			}
 
 			//Switch pboxes and cboxes for things that billboard
 			foreach(PhysicsObject p in physList) {

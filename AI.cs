@@ -22,18 +22,22 @@ namespace U5Designs {
 /**************************************************************************************************************************************** 
  * Ice cream kid
  * */
-	enum KidAnim {walk=0, stand=1};
+	enum KidAnim {walk2d=0, walk3d=1, stand2d=2, stand3d=3};
 
     internal class Kidmoveto : Airoutine{
 
-        public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
-			//update current animation
-			me.cycleNumber = (int)(me.moving ? KidAnim.walk : KidAnim.stand);
-
-			//Flip scale if necessary
-			//TODO: These are specific to 2D, add 3D case
-			if((me.velocity.X < 0 && me.scale.X < 0) || (me.velocity.X > 0 && me.scale.X > 0)) {
-				me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+		public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
+			//update current animation and flip scale if necessary
+			if(enable3d) {
+				me.cycleNumber = (int)(me.moving ? KidAnim.walk3d : KidAnim.stand3d);
+				if(me.scale.X < 0) {
+					me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+				}
+			} else { //2D
+				me.cycleNumber = (int)(me.moving ? KidAnim.walk2d : KidAnim.stand2d);
+				if((me.velocity.X < 0 && me.scale.X < 0) || (me.velocity.X > 0 && me.scale.X > 0)) {
+					me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+				}
 			}
 
             me.attackspeed = 1; //delay between each projectile (hack initilization)
@@ -92,12 +96,17 @@ namespace U5Designs {
     internal class KidThrowTime : Airoutine {
 		public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
 			//update current animation
-			me.cycleNumber = (int)KidAnim.stand;
+			me.cycleNumber = (int)(enable3d ? KidAnim.stand3d : KidAnim.stand2d);
 
 			//Flip scale if necessary
-			//TODO: These are specific to 2D, add 3D case
-			if((me.location.X < playerposn.X && me.scale.X > 0) || (me.location.X > playerposn.X && me.scale.X < 0)) {
-				me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+			if(!enable3d) {
+				if((me.location.X < playerposn.X && me.scale.X > 0) || (me.location.X > playerposn.X && me.scale.X < 0)) {
+					me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+				}
+			} else { // 3D
+				if(me.scale.X < 0) {
+					me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+				}
 			}
 
             if (!me.frozen) {
@@ -139,17 +148,22 @@ namespace U5Designs {
 /**************************************************************************************************************************************** 
  * BIRD
  * */
-	enum BirdAnim { fly = 0, attack = 1 };
+	enum BirdAnim { fly2d=0, fly3d=1, attack2d=2, attack3d=3 };
 
     internal class Birdmoveto : Airoutine {
 
 		public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
-			me.cycleNumber = (int)BirdAnim.fly;
+			me.cycleNumber = (int)(enable3d ? BirdAnim.fly3d : BirdAnim.fly2d);
 
 			//Flip scale if necessary
-			//TODO: These are specific to 2D, add 3D case
-			if((me.velocity.X < 0 && me.scale.X < 0) || (me.velocity.X > 0 && me.scale.X > 0)) {
-				me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+			if(enable3d) {
+				if(me.scale.X < 0) {
+					me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+				}
+			} else { //2D
+				if((me.velocity.X < 0 && me.scale.X < 0) || (me.velocity.X > 0 && me.scale.X > 0)) {
+					me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+				}
 			}
 
             me.attackspeed = 5; // not used in the same way as other attack speeds. This is used to time out the swoop if it gets stuck
@@ -195,7 +209,7 @@ namespace U5Designs {
             if (!me.frozen) {
                 if (!finished) {
                     if (diving) {
-						me.cycleNumber = (int)BirdAnim.attack;
+						me.cycleNumber = (int)(enable3d ? BirdAnim.attack3d : BirdAnim.attack2d);
 
 						//Flip scale if necessary
 						//TODO: These are specific to 2D, add 3D case
@@ -219,14 +233,18 @@ namespace U5Designs {
                             me.attacktimer = 0;
                             diving = false;
                         }
-                    }
-                    else {
-						me.cycleNumber = (int)BirdAnim.fly;
+                    } else {
+						me.cycleNumber = (int)(enable3d ? BirdAnim.fly3d : BirdAnim.fly2d);
 
 						//Flip scale if necessary
-						//TODO: These are specific to 2D, add 3D case
-						if((me.velocity.X < 0 && me.scale.X < 0) || (me.velocity.X > 0 && me.scale.X > 0)) {
-							me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+						if(enable3d) {
+							if(me.scale.X < 0) {
+								me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+							}
+						} else { //2D
+							if((me.velocity.X < 0 && me.scale.X < 0) || (me.velocity.X > 0 && me.scale.X > 0)) {
+								me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+							}
 						}
 
                         me.attacktimer = me.attacktimer + time;

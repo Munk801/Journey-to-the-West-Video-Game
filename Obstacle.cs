@@ -128,6 +128,10 @@ namespace U5Designs {
 			get { return _animDirection; }
 		}
 
+		public bool hasTwoAnims {
+			get { return false; } //Change later if we want to add this functionality
+		}
+
 		private int _frame3d; //Only used for frame number of 3d geometry obstacles
 		public int frame3d {
 			get { return _frame3d; }

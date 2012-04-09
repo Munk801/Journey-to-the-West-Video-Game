@@ -1,10 +1,16 @@
 <sprite>
 	<bmp>hawk_flight_03.png</bmp>
+  <bmp>Hawk_front_animation.png</bmp>
   <bmp>hawk_attack.png</bmp>
+  <bmp>Hawk_front_animation.png</bmp>
 	<c_starts>0</c_starts>
 	<c_starts>0</c_starts>
+  <c_starts>0</c_starts>
+  <c_starts>6</c_starts>
 	<c_lengths>6</c_lengths>
-	<c_lengths>1</c_lengths>
+  <c_lengths>6</c_lengths>
+  <c_lengths>1</c_lengths>
+  <c_lengths>1</c_lengths>
 	<t_width>384</t_width>
 	<t_height>256</t_height>
 	<hasAlpha>true</hasAlpha>
