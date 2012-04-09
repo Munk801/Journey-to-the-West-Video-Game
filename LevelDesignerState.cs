@@ -788,7 +788,7 @@ namespace U5Designs
             if (Convert.ToBoolean(doc.GetElementsByTagName("is2d")[0].InnerText))
             {
                 // Create the SpriteSheet 
-                SpriteSheet ss = LoadLevel.parse_Sprite_File(doc.GetElementsByTagName("sprite")[0].InnerText);
+                SpriteSheet ss = LoadLevel.parseSpriteFile(doc.GetElementsByTagName("sprite")[0].InnerText);
 
                 Billboarding bb = Billboarding.Yes;  //Have to put something here for it to compile
                 switch (doc.GetElementsByTagName("billboards")[0].InnerText)
@@ -818,7 +818,12 @@ namespace U5Designs
                 ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
 
                 XmlNodeList _b = doc.GetElementsByTagName("bmp");
-                MeshTexture _bmp = new MeshTexture(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + _b.Item(0).InnerText)));
+				List<Bitmap> texFrames = new List<Bitmap>();
+				foreach(XmlNode n in _b) {
+					texFrames.Add(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + n.InnerText)));
+				}
+                MeshTexture _bmp = new MeshTexture(texFrames);
+
                 dec = new Decoration(loc, scale, _draw2, _draw3, _mesh, _bmp);
             }
             fstream.Close();
@@ -853,7 +858,7 @@ namespace U5Designs
             {
                 String ss_path = doc.GetElementsByTagName("sprite")[0].InnerText;
                 fstream.Close();
-                SpriteSheet ss = LoadLevel.parse_Sprite_File(ss_path);
+                SpriteSheet ss = LoadLevel.parseSpriteFile(ss_path);
 
                 Billboarding bb = Billboarding.Yes;  //Have to put something here for it to compile
                 switch (doc.GetElementsByTagName("billboards")[0].InnerText)
@@ -884,7 +889,11 @@ namespace U5Designs
                 ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
 
                 XmlNodeList _b = doc.GetElementsByTagName("bmp");
-                MeshTexture _tex = new MeshTexture(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + _b.Item(0).InnerText)));
+				List<Bitmap> texFrames = new List<Bitmap>();
+				foreach(XmlNode n in _b) {
+					texFrames.Add(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + n.InnerText)));
+				}
+                MeshTexture _tex = new MeshTexture(texFrames);
 
                 o = new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, _mesh, _tex);
                 fstream.Close();

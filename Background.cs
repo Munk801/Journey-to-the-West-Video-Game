@@ -40,7 +40,7 @@ namespace U5Designs
         }
 
 		public void UpdatePositionY(float deltay) {
-			_location.Y += deltay * speed;
+			_location.Y += deltay;
 		}
     }
 }

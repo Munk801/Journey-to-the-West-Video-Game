@@ -7,3 +7,5 @@
 /Engine/Engine/obj
 /Engine/Engine/bin
 *.vsp
+/LevelDesignerTool/bin
+/LevelDesignerTool/obj

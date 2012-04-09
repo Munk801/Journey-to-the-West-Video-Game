@@ -223,16 +223,22 @@ namespace U5Designs
 		/// </summary>
 		private void bossUpdate() {
 			if(in3d) {
-				fov = (float)(Math.PI / 8);
+// 				fov = (float)(Math.PI / 8);
+//
+// 				eye.X = bossAreaCenter.X - 250.0f;
+// 				lookat.X = bossAreaCenter.X - 150.0f;
+// 
+// 				eye.Z = lookat.Z = player.location.Z;
 
-				eye.X = bossAreaCenter.X - 250.0f;
-				lookat.X = bossAreaCenter.X - 150.0f;
+				eye.X = player.location.X - 125.0f;
+				lookat.X = player.location.X - 25.0f;
 
-				eye.Z = lookat.Z = player.location.Z;
+				eye.Z = player.location.Z;
+				lookat.Z = player.location.Z;
 
 				//Clamp Z to boss area
-				eye.Z = lookat.Z = Math.Min(eye.Z, bossAreaCenter.Z + bossAreaBounds.Z - 96); //96 = half of viewport width
-				eye.Z = lookat.Z = Math.Max(eye.Z, bossAreaCenter.Z - bossAreaBounds.Z + 96);
+				eye.Z = lookat.Z = Math.Min(eye.Z, bossAreaCenter.Z + bossAreaBounds.Z - 72); //96 = half of viewport width
+				eye.Z = lookat.Z = Math.Max(eye.Z, bossAreaCenter.Z - bossAreaBounds.Z + 72);
 
 			} else { //2D
 				eye.X = lookat.X = player.location.X;

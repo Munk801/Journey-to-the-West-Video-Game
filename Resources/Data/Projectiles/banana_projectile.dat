@@ -1,5 +1,5 @@
 ﻿<projectile>
-	<scale x="9" y="9" z="9" />
+	<scale x="9" y="8.7" z="9" />
 	<pbox x="4" y="4" z="4" />
 	<cbox x="3.5" y="3.5" z="3.5" />
 	<draw2>true</draw2>

@@ -62,7 +62,7 @@ namespace U5Designs
 
 			//Various GameObjects
 
-			List<Enemy> _elist = parse_Enemy_Files(_e_list);
+			List<Enemy> _elist = parseEnemyFiles(_e_list);
 			foreach(Enemy e in _elist) {
 				ps.objList.Add(e);
 				ps.physList.Add(e);
@@ -72,21 +72,21 @@ namespace U5Designs
                 ps.combatList.Add(e);
 			}
 
-			List<Obstacle> _olist = parse_Obstacle_Files(_o_list);
+			List<Obstacle> _olist = parseObstacleFiles(_o_list);
 			foreach(Obstacle o in _olist) {
 				ps.objList.Add(o);
 				ps.physList.Add(o);
 				ps.renderList.Add(o);
 			}
 
-			List<Background> _blist = parse_Background_File(_b_list);
+			List<Background> _blist = parseBackgroundFile(_b_list);
 			foreach(Background b in _blist) {
 				ps.objList.Add(b);
 				ps.renderList.Add(b);
 				ps.backgroundList.Add(b);
 			}
 
-			List<Decoration> _dlist = parse_Decoration_File(_d_list);
+			List<Decoration> _dlist = parseDecorationFile(_d_list);
 			foreach(Decoration d in _dlist) {
 				ps.objList.Add(d);
 				ps.renderList.Add(d);
@@ -99,15 +99,15 @@ namespace U5Designs
 			playerProjectiles.Add(parseProjectileFile("coconut_grenade_projectile.dat"));
 
 			//Player
-			ps.player = new Player(parse_Sprite_File("player_sprite.dat"), playerProjectiles, ps);
-			ps.player.marker = parse_Sprite_File("marker_sprite.dat");
+			ps.player = new Player(parseSpriteFile("player_sprite.dat"), playerProjectiles, ps);
+			ps.player.marker = parseSpriteFile("marker_sprite.dat");
 			ps.physList.Add(ps.player);
 			ps.renderList.Add(ps.player);
 
 			//HUD Stamina Bar
-			ps.staminaBack = parse_Sprite_File("stamina_back.dat");
-			ps.staminaBar = parse_Sprite_File("stamina_bar.dat");
-			ps.staminaFrame = parse_Sprite_File("stamina_frame.dat");
+			ps.staminaBack = parseSpriteFile("stamina_back.dat");
+			ps.staminaBar = parseSpriteFile("stamina_bar.dat");
+			ps.staminaFrame = parseSpriteFile("stamina_frame.dat");
 		}
 
 		//Takes an XmlNode with attributes x, y, and z and turns it into a Vector3
@@ -169,7 +169,7 @@ namespace U5Designs
 			int damage = Convert.ToInt32(doc.GetElementsByTagName("damage")[0].InnerText);
 			float speed = Convert.ToSingle(doc.GetElementsByTagName("speed")[0].InnerText);
 			bool grav = Convert.ToBoolean(doc.GetElementsByTagName("gravity")[0].InnerText);
-			SpriteSheet ss = parse_Sprite_File(doc.GetElementsByTagName("sprite")[0].InnerText);
+			SpriteSheet ss = parseSpriteFile(doc.GetElementsByTagName("sprite")[0].InnerText);
 			
 			XmlNodeList staminaCost = doc.GetElementsByTagName("staminaCost");
 			XmlNodeList duration = doc.GetElementsByTagName("duration");
@@ -189,7 +189,7 @@ namespace U5Designs
 			}
 		}
 
-		public static SpriteSheet parse_Sprite_File(string path) {
+		public static SpriteSheet parseSpriteFile(string path) {
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			Stream fstream = assembly.GetManifestResourceStream("U5Designs.Resources.Data.Sprites." + path);
 			XmlReaderSettings settings = new XmlReaderSettings();
@@ -231,7 +231,7 @@ namespace U5Designs
 			}
 		}
 
-        public static Obstacle parse_single_3d_obstacle(string path) {
+        public static List<Obstacle> parseSingleObstacleFile(string path, List<Vector3> locs) {
             Assembly assembly = Assembly.GetExecutingAssembly();
             string _o_path = "U5Designs.Resources.Data.Obstacles." + path;
             Stream fstream = assembly.GetManifestResourceStream(_o_path);
@@ -262,11 +262,19 @@ namespace U5Designs
                 ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
 
                 XmlNodeList _b = doc.GetElementsByTagName("bmp");
-                MeshTexture _tex = new MeshTexture(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + _b.Item(0).InnerText)));
+				List<Bitmap> texFrames = new List<Bitmap>();
+				foreach(XmlNode n in _b) {
+					texFrames.Add(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + n.InnerText)));
+				}
+                MeshTexture _tex = new MeshTexture(texFrames);
 
                 fstream.Close();
-                Vector3 loc = new Vector3(0, 0, 0);
-                    return new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, _mesh, _tex);  
+
+				List<Obstacle> obstacles = new List<Obstacle>();
+				foreach(Vector3 loc in locs) {
+					obstacles.Add(new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, _mesh, _tex));
+				}
+				return obstacles;
             }
         }
 
@@ -275,7 +283,7 @@ namespace U5Designs
 		 * for the current level being loaded.  It will parse the XML .dat files, create an Obstacle object, and add it
 		 * to a List<> which will be returned. 
 		 * */
-		public static List<Obstacle> parse_Obstacle_Files(XmlNodeList OList) {
+		public static List<Obstacle> parseObstacleFiles(XmlNodeList OList) {
 			List<Obstacle> _o = new List<Obstacle>();
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			XmlReaderSettings settings = new XmlReaderSettings();
@@ -302,7 +310,7 @@ namespace U5Designs
 				if(Convert.ToBoolean(_type.Item(0).InnerText)) {
 					String ss_path = doc.GetElementsByTagName("sprite")[0].InnerText;
 					fstream.Close();
-					SpriteSheet ss = parse_Sprite_File(ss_path);
+					SpriteSheet ss = parseSpriteFile(ss_path);
 
 					Billboarding bb = Billboarding.Yes;  //Have to put something here for it to compile
 					switch(doc.GetElementsByTagName("billboards")[0].InnerText) {
@@ -334,7 +342,11 @@ namespace U5Designs
 					ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
 
 					XmlNodeList _b = doc.GetElementsByTagName("bmp");
-					MeshTexture _tex = new MeshTexture(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + _b.Item(0).InnerText)));
+					List<Bitmap> texFrames = new List<Bitmap>();
+					foreach(XmlNode n in _b) {
+						texFrames.Add(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + n.InnerText)));
+					}
+					MeshTexture _tex = new MeshTexture(texFrames);
 
 					for(int j = 1; j < OList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(OList[i].ChildNodes[j]);
@@ -352,7 +364,7 @@ namespace U5Designs
 		 * for the current level being loaded.  It will parse the XML .dat files, create an Enemy object, and add it
 		 * to a List<> which will be returned. 
 		 * */
-		public static List<Enemy> parse_Enemy_Files(XmlNodeList EList) {
+		public static List<Enemy> parseEnemyFiles(XmlNodeList EList) {
 			// Instantiate the list
 			List<Enemy> _e = new List<Enemy>();
 			Assembly assembly = Assembly.GetExecutingAssembly();
@@ -399,7 +411,7 @@ namespace U5Designs
 				fstream.Close();
 
 				// Create the SpriteSheet              
-				SpriteSheet ss = parse_Sprite_File(_sprite_path);
+				SpriteSheet ss = parseSpriteFile(_sprite_path);
 
 				if(_p.Count == 0) {
 					// Create the Enemies
@@ -428,7 +440,7 @@ namespace U5Designs
 		 * for the current level being loaded.  It will parse the XML .dat files, create a Background object, and add it
 		 * to a List<> which will be returned. 
 		 * */
-		public static List<Background> parse_Background_File(XmlNodeList BList) {
+		public static List<Background> parseBackgroundFile(XmlNodeList BList) {
 			// Instantiate the list
 			List<Background> _b = new List<Background>();
 
@@ -455,7 +467,7 @@ namespace U5Designs
 					}
 				}
 				foreach(Vector3 loc in locs) {
-					_b.Add(new Background(loc, scale, parse_Sprite_File(spritePath), speed, spritePath));
+					_b.Add(new Background(loc, scale, parseSpriteFile(spritePath), speed, spritePath));
 				}
 			}
 
@@ -468,7 +480,7 @@ namespace U5Designs
 		 * for the current level being loaded.  It will parse the XML .dat files, create a Decoration object, and add it
 		 * to a List<> which will be returned. 
 		 * */
-		public static List<Decoration> parse_Decoration_File(XmlNodeList DList) {
+		public static List<Decoration> parseDecorationFile(XmlNodeList DList) {
 			// Instantiate the list
 			List<Decoration> _d = new List<Decoration>();
 			Assembly assembly = Assembly.GetExecutingAssembly();
@@ -491,7 +503,7 @@ namespace U5Designs
 				// Check to see if the current Obstacle is 2D or 3D and handle accordingly
 				if(Convert.ToBoolean(doc.GetElementsByTagName("is2d")[0].InnerText)) {
 					// Create the SpriteSheet 
-					SpriteSheet ss = parse_Sprite_File(doc.GetElementsByTagName("sprite")[0].InnerText);
+					SpriteSheet ss = parseSpriteFile(doc.GetElementsByTagName("sprite")[0].InnerText);
 
 					Billboarding bb = Billboarding.Yes;  //Have to put something here for it to compile
 					switch(doc.GetElementsByTagName("billboards")[0].InnerText) {
@@ -522,7 +534,11 @@ namespace U5Designs
 					ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
 
 					XmlNodeList _b = doc.GetElementsByTagName("bmp");
-					MeshTexture _bmp = new MeshTexture(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + _b.Item(0).InnerText)));
+					List<Bitmap> texFrames = new List<Bitmap>();
+					foreach(XmlNode n in _b) {
+						texFrames.Add(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + n.InnerText)));
+					}
+					MeshTexture _bmp = new MeshTexture(texFrames);
 
 					for(int j = 1; j < DList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(DList[i].ChildNodes[j]);
@@ -532,11 +548,6 @@ namespace U5Designs
 				fstream.Close();
 			}
 			return _d;
-		}
-
-		private static ZookeeperAI parseZookeeperBoss() {
-			//TODO: Implement me if needed (or leave things in constructor, TBD)
-			return null;
 		}
 	}
 }

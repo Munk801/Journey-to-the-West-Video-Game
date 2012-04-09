@@ -1,0 +1,22 @@
+﻿<obstacle>
+	<is2d>false</is2d>
+	<scale x="25" y="25" z="25"/>
+	<pbox x="25" y="25" z="25"/>
+	<draw2>true</draw2>
+	<draw3>true</draw3>
+	<collidesIn2d>true</collidesIn2d>
+	<collidesIn3d>true</collidesIn3d>
+	<mesh>box_no_bottom.obj</mesh>
+	<bmp>dirt_texture00.png</bmp>
+  <bmp>dirt_texture01.png</bmp>
+  <bmp>dirt_texture02.png</bmp>
+  <bmp>dirt_texture03.png</bmp>
+  <bmp>dirt_texture04.png</bmp>
+  <bmp>dirt_texture05.png</bmp>
+  <bmp>dirt_texture06.png</bmp>
+  <bmp>dirt_texture07.png</bmp>
+  <bmp>dirt_texture08.png</bmp>
+  <bmp>dirt_texture09.png</bmp>
+  <bmp>dirt_texture10.png</bmp>
+  <bmp>dirt_texture11.png</bmp>
+</obstacle>

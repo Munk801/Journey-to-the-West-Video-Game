@@ -7,15 +7,60 @@
   <bossAreaCenter x="4150" y="125" z="50" />
   <bossAreaBounds x="100" y="200" z="100" />
 	<backgroundlist>
+    <background>
+      <scale x="6000" y="1200" z="1"/>
+      <sprite>zoo_sky_sprite.dat</sprite>
+      <loc x="2500" y="80" z="-250"/>
+    </background>
 		<background>
-			<scale x="350" y="135" z="1"/>
+      <scale x="250" y="96.43" z="1"/>
 			<sprite>zoo_side_background_sprite.dat</sprite>
 			<speed>0.75</speed>
-			<loc x="120" y="35" z="-200"/>
-			<loc x="470" y="35" z="-200"/>
-			<loc x="820" y="35" z="-200"/>
-			<loc x="1170" y="35" z="-200"/>
+      <loc x="75" y="20" z="-150"/>
+      <loc x="325" y="20" z="-150"/>
+      <loc x="575" y="20" z="-150"/>
+      <loc x="825" y="20" z="-150"/>
+      <loc x="1075" y="20" z="-150"/>
+      <loc x="1325" y="20" z="-150"/>
+      <loc x="1575" y="20" z="-150"/>
+      <loc x="1825" y="20" z="-150"/>
+      <loc x="2075" y="20" z="-150"/>
+      <loc x="2325" y="20" z="-150"/>
 		</background>
+    <background>
+      <scale x="75" y="57.86" z="1"/>
+      <sprite>city_side_background_sprite.dat</sprite>
+      <speed>0.9</speed>
+      <loc x="-20" y="30" z="-200"/>
+      <loc x="55" y="30" z="-200"/>
+      <loc x="130" y="30" z="-200"/>
+      <loc x="205" y="30" z="-200"/>
+      <loc x="280" y="30" z="-200"/>
+      <loc x="355" y="30" z="-200"/>
+      <loc x="430" y="30" z="-200"/>
+      <loc x="505" y="30" z="-200"/>
+      <loc x="580" y="30" z="-200"/>
+      <loc x="655" y="30" z="-200"/>
+      <loc x="730" y="30" z="-200"/>
+      <loc x="805" y="30" z="-200"/>
+      <loc x="880" y="30" z="-200"/>
+      <loc x="955" y="30" z="-200"/>
+      <loc x="1030" y="30" z="-200"/>
+      <loc x="1105" y="30" z="-200"/>
+      <loc x="1180" y="30" z="-200"/>
+      <loc x="1255" y="30" z="-200"/>
+      <loc x="1330" y="30" z="-200"/>
+      <loc x="1405" y="30" z="-200"/>
+      <loc x="1480" y="30" z="-200"/>
+      <loc x="1555" y="30" z="-200"/>
+      <loc x="1630" y="30" z="-200"/>
+      <loc x="1705" y="30" z="-200"/>
+      <loc x="1780" y="30" z="-200"/>
+      <loc x="1855" y="30" z="-200"/>
+      <loc x="1930" y="30" z="-200"/>
+      <loc x="2005" y="30" z="-200"/>
+      <loc x="2080" y="30" z="-200"/>
+    </background>
 	</backgroundlist>
 	<enemylist>
 		<enemy>
@@ -100,12 +145,28 @@
 
 
       <!--Boss encounter area-->
-			<loc x="4100" y="75" z="0"/>
+  <!--<loc x="4100" y="75" z="0"/>
 			<loc x="4100" y="75" z="100"/>
 			<loc x="4200" y="75" z="0"/>
-			<loc x="4200" y="75" z="100"/>
+			<loc x="4200" y="75" z="100"/>-->
 
 		</obstacle>
+    <obstacle>
+      <path>brick_wall_back.dat</path>
+      <loc x="4150" y="225" z="-50"/>
+    </obstacle>
+    <obstacle>
+      <path>brick_wall_front.dat</path>
+      <loc x="4150" y="225" z="150"/>
+    </obstacle>
+    <obstacle>
+      <path>brick_wall_left.dat</path>
+      <loc x="4050" y="225" z="50"/>
+    </obstacle>
+    <obstacle>
+      <path>brick_wall_right.dat</path>
+      <loc x="4250" y="225" z="50"/>
+    </obstacle>
 		<obstacle>
 			<path>tree.dat</path>
 			<loc x="100" y="37.9" z="0"/>
@@ -122,7 +183,6 @@
 			
 			<loc x="3800" y="162.9" z="100"/>
 			<loc x="3900" y="162.9" z="100"/>
-      
 		</obstacle>
 		<obstacle>
 			<path>zoo_sign.dat</path>
@@ -134,10 +194,12 @@
 		  <loc x="1800" y="62.9" z="-40"/>
 		</obstacle>
 	</obstaclelist>
-	<decorationlist>
+  <!--
+  <decorationlist>
 		<decoration>
 			<path>zoo_end_background.dat</path>
 			<loc x="6000" y="75" z="50"/>
 		</decoration>
 	</decorationlist>
+  -->
 </level>

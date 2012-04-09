@@ -1,0 +1,11 @@
+﻿<obstacle>
+	<is2d>true</is2d>
+    <scale x="200" y="200" z="200"/>
+    <pbox x="100" y="100" z="0"/>
+    <draw2>true</draw2>
+    <draw3>true</draw3>
+	<collidesIn2d>false</collidesIn2d>
+	<collidesIn3d>true</collidesIn3d>
+	<sprite>brick_wall_sprite.dat</sprite>
+	<billboards>lock2d</billboards>
+</obstacle>

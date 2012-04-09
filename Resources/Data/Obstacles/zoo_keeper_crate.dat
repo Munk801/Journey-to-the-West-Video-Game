@@ -1,7 +1,7 @@
 <obstacle>
 	<is2d>false</is2d>
 	<scale x="25" y="25" z="25"/>
-	<pbox x="25" y="25" z="25"/>
+	<pbox x="24.95" y="24.95" z="24.95"/>
 	<draw2>true</draw2>
 	<draw3>true</draw3>
 	<collidesIn2d>true</collidesIn2d>

@@ -356,6 +356,52 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Obstacles\obstacles.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Obstacles\zookeeper_boss_ground.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Geometry\box_no_bottom.obj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\dirt_texture00.png" />
+    <EmbeddedResource Include="Resources\Textures\dirt_texture01.png" />
+    <EmbeddedResource Include="Resources\Textures\dirt_texture02.png" />
+    <EmbeddedResource Include="Resources\Textures\dirt_texture03.png" />
+    <EmbeddedResource Include="Resources\Textures\dirt_texture04.png" />
+    <EmbeddedResource Include="Resources\Textures\dirt_texture05.png" />
+    <EmbeddedResource Include="Resources\Textures\dirt_texture06.png" />
+    <EmbeddedResource Include="Resources\Textures\dirt_texture07.png" />
+    <EmbeddedResource Include="Resources\Textures\dirt_texture08.png" />
+    <EmbeddedResource Include="Resources\Textures\dirt_texture09.png" />
+    <EmbeddedResource Include="Resources\Textures\dirt_texture10.png" />
+    <EmbeddedResource Include="Resources\Textures\dirt_texture11.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\brick_wall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\brick_wall_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Obstacles\brick_wall_back.dat" />
+    <EmbeddedResource Include="Resources\Data\Obstacles\brick_wall_right.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Obstacles\brick_wall_front.dat" />
+    <EmbeddedResource Include="Resources\Data\Obstacles\brick_wall_left.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\city_side_background_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\city_background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\zoo_sky_2D.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\zoo_sky_sprite.dat" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

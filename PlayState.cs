@@ -65,8 +65,6 @@ namespace U5Designs
         public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
 			//TODO: pass this the right file to load from
 
-            
-            
 			// undo this when done testing ObjList = LoadLevel.Load(current_level);
 			LoadLevel.Load(0, this);
             player.ps = this;
@@ -86,7 +84,7 @@ namespace U5Designs
             enable3d = false;
 			tabDown = false;
             //test.Play();
-            //initlize camera
+            //initialize camera
 			camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player, this, 
 									new int[] { eng.ClientRectangle.X, eng.ClientRectangle.Y, eng.ClientRectangle.Width, eng.ClientRectangle.Height });
 			player.cam = camera;
@@ -127,8 +125,6 @@ namespace U5Designs
             GL.AttachShader(shaderProgram, frag);
             GL.LinkProgram(shaderProgram);
             GL.UseProgram(shaderProgram);
-          
-
         }
 
         /// <summary>
@@ -304,7 +300,8 @@ namespace U5Designs
             camera.SetModelView();
 
 			foreach(RenderObject obj in renderList) {
-				if((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d) || camera.isInTransition) {
+				if((camera.isInTransition && obj.existsIn2d && obj.existsIn3d) ||
+				   (!camera.isInTransition && ((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d)))) {
 					if(obj.is3dGeo) {
 						obj.doScaleTranslateAndTexture();
 						obj.mesh.Render();
