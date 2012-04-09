@@ -1,0 +1,8 @@
+﻿<decoration>
+	<is2d>true</is2d>
+	<scale x="6000" y="1200" z="1"/>
+	<draw2>false</draw2>
+	<draw3>true</draw3>
+	<sprite>zoo_sky_sprite.dat</sprite>
+	<billboards>lock2d</billboards>
+</decoration>

@@ -405,6 +405,9 @@
     <EmbeddedResource Include="Resources\Textures\bully_front_walk.png" />
     <EmbeddedResource Include="Resources\Textures\Hawk_front_animation.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Decorations\zoo_sky_front.dat" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
