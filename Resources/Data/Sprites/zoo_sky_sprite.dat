@@ -1,5 +1,5 @@
 ﻿<sprite>
-	<bmp>zoo_sky_2D.png</bmp>
+	<bmp>zoo_sky_side.png</bmp>
 	<c_starts>0</c_starts>
 	<c_lengths>1</c_lengths>
 	<t_width>20</t_width>

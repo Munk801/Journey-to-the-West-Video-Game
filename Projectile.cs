@@ -190,8 +190,13 @@ namespace U5Designs {
                     time = 0.0;
                 }
                 else {
-                    alreadyCollidedList.Add(collidingObj);
+					alreadyCollidedList.Add(collidingObj);
 					if(!this.hascbox) { //grenade collision, bounce
+						if(collidingObj.hascbox && ((CombatObject)collidingObj).type == (int)CombatType.projectile) {
+							Console.WriteLine("No bounce!");
+							continue; //Grenades shouldn't bounce off of other projectiles
+						}
+						Console.WriteLine("Bounce!");
 						switch(collidingAxis) {
 							case 0: //x
 								if(_location.X < collidingObj.location.X) {
@@ -248,7 +253,10 @@ namespace U5Designs {
 								break;
 						}
 					} else if(!collidingObj.hascbox) { //normal projectile colliding with normal physics object
-                        health = 0;
+						if(!(collidingObj is Projectile && ((Projectile)collidingObj).type != (int)CombatType.grenade)) {
+							//As long as the physics object we collided with is not actually a grenade...
+							health = 0;
+						}
                     }
                     else { //this is a combat collision
                         //time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead

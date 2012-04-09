@@ -139,7 +139,7 @@ namespace U5Designs
 			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
 			GL.ShadeModel(ShadingModel.Smooth);
-			GL.ClearColor(0.26667f, 0.86667f, 1.0f, 1.0f);
+			GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 			if(enable3d) {
 				camera.Set3DCamera();
@@ -389,8 +389,7 @@ namespace U5Designs
 				nowBillboarding = false;
 			}
 
-			//Temporary hack until we get a setting added to everything that does this
-			//player.cycleNumber += (enable3d ? +1 : -1);
+			//Switch animation cycle for anything with separate 2D/3D animations
 			foreach(RenderObject o in renderList) {
 				if(o.hasTwoAnims) {
 					o.cycleNumber += (enable3d ? +1 : -1);
@@ -406,18 +405,6 @@ namespace U5Designs
 			foreach(CombatObject c in combatList) {
 				if(c.billboards == Billboarding.Yes) {
 					c.swapCBox();
-				}
-			}
-
-			//TODO: This if/else block is a hack!
-			//      Implement a flag that controls whether to switch these or not
-			if(enable3d) {
-				foreach(AIObject o in aiList) {
-					((RenderObject)o).cycleNumber = 1;
-				}
-			} else { //2d
-				foreach(AIObject o in aiList) {
-					((RenderObject)o).cycleNumber = 0;
 				}
 			}
 		}

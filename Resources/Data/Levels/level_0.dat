@@ -7,11 +7,6 @@
   <bossAreaCenter x="4150" y="125" z="50" />
   <bossAreaBounds x="100" y="200" z="100" />
 	<backgroundlist>
-    <background>
-      <scale x="6000" y="1200" z="1"/>
-      <sprite>zoo_sky_sprite.dat</sprite>
-      <loc x="2500" y="80" z="-250"/>
-    </background>
 		<background>
       <scale x="250" y="96.43" z="1"/>
 			<sprite>zoo_side_background_sprite.dat</sprite>
@@ -198,6 +193,18 @@
     <decoration>
       <path>zoo_sky_front.dat</path>
       <loc x="2500" y="80" z="350"/>
+    </decoration>
+    <decoration>
+      <path>zoo_sky_back.dat</path>
+      <loc x="2500" y="80" z="-250"/>
+    </decoration>
+    <decoration>
+      <path>zoo_sky_end.dat</path>
+      <loc x="5000" y="80" z="50"/>
+    </decoration>
+    <decoration>
+      <path>zoo_sky_top.dat</path>
+      <loc x="2500" y="600" z="50"/>
     </decoration>
   </decorationlist>
   <!--
