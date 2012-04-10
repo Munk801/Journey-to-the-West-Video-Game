@@ -132,7 +132,6 @@ namespace U5Designs
             GL.LoadMatrix(ref modelview);
             menu.Draw2DTexture();
 
-            // testing buttons
             switch (_cur_butn)
             {
                 case 0:
@@ -166,77 +165,58 @@ namespace U5Designs
             }
         }
 
+		internal void loadPlayState(int lvl) {
+			musicFile.Stop();
+
+			PlayState ps = new PlayState(eng, this);
+			LoadScreenState ls = new LoadScreenState(eng, ps, lvl);
+			eng.ChangeState(ls);
+		}
+
+		/// <summary>
+		/// Called by mouse or keyboard handlers when the user picked a button (by clicking or hitting enter)
+		/// </summary>
+		internal void handleButtonPress() {
+			switch(_cur_butn) {
+				case 0: //new game
+					loadPlayState(0);
+					break;
+				case 1: //load saved game
+					loadPlayState(saved_level_index);
+					break;
+				case 2: //quit
+					eng.Exit();
+					break;
+				case 3: //level designer
+					musicFile.Stop();
+					LevelDesignerState ls = new LevelDesignerState(eng, this, 0);
+					eng.ChangeState(ls);
+					eng.GameInProgress = true;
+					break;
+			}
+		}
+
         /// <summary>
         /// For mouse input on the main menu, allow the user to click on the buttons to select items
         /// </summary>
         private void MouseInput()
         {
-            if (eng.ThisMouse.inButtonRegion(play_press))
-            {
+            if (eng.ThisMouse.inButtonRegion(play_press)) {
                 _cur_butn = 0;
-            }
-
-            if (eng.ThisMouse.inButtonRegion(load_press))
-            {
+            } else if (eng.ThisMouse.inButtonRegion(load_press)) {
                 _cur_butn = 1;
-            }
-            if (eng.ThisMouse.inButtonRegion(quit_press))
-            {
+            } else if (eng.ThisMouse.inButtonRegion(quit_press)) {
                 _cur_butn = 2;
-            }
-            if (eng.ThisMouse.inButtonRegion(ld_press))
-            {
+            } else if (eng.ThisMouse.inButtonRegion(ld_press)) {
                 _cur_butn = 3;
             }
 
-            if (eng.ThisMouse.LeftPressed() && !clickdown)
-            {
-                clickdown = true;
-                if (_cur_butn == 0)
-                {
-                    //transition into PlayState
-                    if (eng.GameInProgress)
-                    {
-                        eng.PopState();
-                    }
-                    else
-                    {
-                        // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
-                        PlayState ps = new PlayState(this, eng, 0);
-
-                        musicFile.Stop();
-
-                        // Otherwise pass the level index from the saved game
-                        //PlayState ps = new PlayState(saved_level_index);
-                        eng.ChangeState(ps);
-                        eng.GameInProgress = true;
-                    }
-                }
-                if (_cur_butn == 1)
-                {
-                    // load saved game pressed
-                    //transition into PlayState
-                    if (eng.GameInProgress)
-                    {
-                        eng.PopState();
-                    }
-                    else
-                    {
-                        // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
-                        musicFile.Stop();
-
-                        // Otherwise pass the level index from the saved game
-                        PlayState ps = new PlayState(this, eng, saved_level_index);
-                        eng.ChangeState(ps);
-                        eng.GameInProgress = true;
-                    }
-                }
-                if (_cur_butn == 2)
-                {
-                    eng.Exit();
-                }
-            }
-            else clickdown = false;
+			if(eng.ThisMouse.LeftPressed() && !clickdown) {
+				clickdown = true;
+				handleButtonPress();
+			} else {
+				clickdown = false;
+			}
         }
 
         private void DealWithInput()
@@ -285,68 +265,12 @@ namespace U5Designs
             }
 
             //********************** enter
-            if (eng.Keyboard[Key.Enter] && !enterdown)
-            {
+            if (eng.Keyboard[Key.Enter] && !enterdown) {
                 enterdown = true;
-                if (_cur_butn == 0)
-                {
-                    //transition into PlayState
-
-                    // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
-                    PlayState ps = new PlayState(this, eng, 0);
-
-                    musicFile.Stop();
-
-                    // Otherwise pass the level index from the saved game
-                    //PlayState ps = new PlayState(saved_level_index);
-                    eng.ChangeState(ps);
-                    eng.GameInProgress = true;
-                }
-                if (_cur_butn == 1)
-                {
-                    // load saved game pressed
-                    //transition into PlayState
-                    if (eng.GameInProgress)
-                    {
-                        eng.PopState();
-                    }
-                    else
-                    {
-                        // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
-                        musicFile.Stop();
-
-                        // Otherwise pass the level index from the saved game
-                        PlayState ps = new PlayState(this, eng, saved_level_index);
-                        eng.ChangeState(ps);
-                        eng.GameInProgress = true;
-                    }
-                }
-                if (_cur_butn == 2)
-                {
-                    eng.Exit();
-                }
-                if (_cur_butn == 3)
-                {
-                    // load saved game pressed
-                    //transition into PlayState
-                    if (eng.GameInProgress)
-                    {
-                        eng.PopState();
-                    }
-                    else
-                    {
-                        // If you're NOT loading a saved game then pass 0 as the argument (default starter level index)
-                        musicFile.Stop();
-
-                        // Otherwise pass the level index from the saved game
-                        LevelDesignerState ls = new LevelDesignerState(this, eng, saved_level_index);
-                        eng.ChangeState(ls);
-                        eng.GameInProgress = true;
-                    }
-                }
-            }
-            else if (!eng.Keyboard[Key.Enter])
-                enterdown = false;
+				handleButtonPress();
+            } else if(!eng.Keyboard[Key.Enter]) {
+				enterdown = false;
+			}
         }
 
         /**

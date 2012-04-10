@@ -59,9 +59,10 @@ namespace U5Designs
 #if DEBUG
 			if(eng.Keyboard[Key.Enter]) {
 				MainMenuState mms = new MainMenuState(eng);
-				mms.musicFile.Stop();
-				eng.ChangeState(new PlayState(mms, eng, 0));
-				eng.GameInProgress = true;
+				mms.loadPlayState(0);
+// 				mms.musicFile.Stop();
+// 				eng.ChangeState(new PlayState(eng, mms));
+// 				eng.GameInProgress = true;
 			}
 #endif
 

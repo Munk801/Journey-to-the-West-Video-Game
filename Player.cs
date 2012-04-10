@@ -31,9 +31,9 @@ namespace U5Designs {
 		public Vector3 velocity;
 		private Vector3 accel;
 		public double stamina, maxStamina;
+		public int maxHealth;
         internal bool Invincible, HasControl, isMobile;
         private Vector3 lastPosOnGround; // used for falling off detection
-        public PlayState ps;
 
         //timers
         private double Invincibletimer, NoControlTimer, projectileTimer, spinTimer;
@@ -90,7 +90,7 @@ namespace U5Designs {
             //combat things
             _damage = 1;
             spinDamage = 2;
-            _health = 7;
+            maxHealth = _health = 7;
 			stamina = 5.0;
 			maxStamina = 5.0;
 
@@ -433,7 +433,6 @@ namespace U5Designs {
 		/// Adds indicators to show where the players projectile is going to go
 		/// Used for gravity based projectiles (specifically the grenade)
 		/// </summary>
-		/// <param name="ps">Pointer to the current PlayState, used to calculate directions</param>
 		public void addMarkers() {
 			if(curProjectile.gravity) {
 				markerList.Clear();

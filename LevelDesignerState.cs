@@ -25,36 +25,6 @@ namespace U5Designs
     /** Main State of the game that will be active while the player is Playing **/
     public class LevelDesignerState : PlayState
     {
-        //debug
-        bool aienabled = true;
-
-        internal GameEngine eng;
-        MainMenuState menustate;
-        PauseMenuState pms;
-        internal Player player;
-        internal ZookeeperAI bossAI;
-        public bool bossMode;
-        internal Camera camera;
-
-        //These are the lists of all objects in the game
-        internal List<GameObject> objList; //everything is in objList, and then also pointed to from the appropriate interface lists
-        internal List<RenderObject> renderList;
-        internal List<PhysicsObject> colisionList; // colision list = only things that are moving that need to detect colisions
-        internal List<PhysicsObject> physList; // physList is a list of everything that has a bounding box
-        internal List<AIObject> aiList;// aka list of enemies
-        internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
-        internal List<Background> backgroundList;
-        internal AudioFile levelMusic;
-
-        public SphereRegion bossRegion, endRegion;
-        public Vector3 bossAreaCenter, bossAreaBounds;
-
-        internal bool enable3d; //true when being viewed in 3d
-        int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
-        private bool nowBillboarding; //true when billboarding objects should rotate into 3d view
-
-        bool tabDown;
-        new public bool clickdown = false;
 
         // Our current selected object for movement
         internal Obstacle SelectedObject = null;
@@ -100,66 +70,32 @@ namespace U5Designs
         /// <summary>
         /// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
         /// </summary>
-        /// <param name="prvstate">The previous state(the menu that spawned this playstate)</param>
         /// <param name="engine">Pointer to the game engine</param>
         /// <param name="lvl">the level ID</param>
-        public LevelDesignerState(MainMenuState prvstate, GameEngine engine, int lvl)
-            : base(prvstate, engine, lvl)
+		public LevelDesignerState(GameEngine engine, MainMenuState menustate, int lvl)
+            : base(engine, menustate)
         {
-            //TODO: pass this the right file to load from
+			current_level = lvl;
+			LoadLevel.Load(lvl, this);
+
+			//Have to do this here for now because it requires the GraphicsContext
+			//HUD Health Bar
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			eng.StateTextureManager.LoadTexture("Healthbar", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_top.png"));
+			Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
+			eng.StateTextureManager.LoadTexture("bHealth", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_bottom.png"));
+			bHealth = eng.StateTextureManager.GetTexture("bHealth");
+
+			//initialize camera
+			camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player, this);
+			player.cam = camera;
+
+
+
             // undo this when done testing ObjList = LoadLevel.Load(current_level);
-            player = base.player;
             player.inLevelDesignMode = true;
-            objList = base.objList;
-            renderList = base.renderList;
-            colisionList = base.colisionList;
-            physList = base.physList;
-            aiList = base.aiList;
-            combatList = base.combatList;
-            backgroundList = base.backgroundList;
-            base.levelMusic.Stop();
-            //Every AI object needs a pointer to the player, initlize this here
-            foreach (AIObject aio in aiList)
-            {
-                ((Enemy)aio).player = player;
-            }
+            levelMusic.Stop();
 
-            //deal with states
-            menustate = prvstate;
-            eng = engine;
-            pms = new PauseMenuState(engine);
-            enable3d = false;
-            tabDown = false;
-            //initlize camera
-            camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player, this,
-                                    new int[] { eng.ClientRectangle.X, eng.ClientRectangle.Y, eng.ClientRectangle.Width, eng.ClientRectangle.Height });
-            player.cam = camera;
-            nowBillboarding = false;
-
-            //Thanks to OpenTK samples for part of this shader code
-            //Initialize Shader
-            int shaderProgram = GL.CreateProgram();
-            int frag = GL.CreateShader(ShaderType.FragmentShader);
-
-            // GLSL for fragment shader.
-            String fragSource = @"
-				uniform sampler2D tex;
-
-				void main( void )
-				{
-					vec4 col = texture2D(tex,gl_TexCoord[0].st);
-					if( col.a < 0.5) {
-						discard;
-					}
-					gl_FragColor = col;
-				}	
-			";
-
-            GL.ShaderSource(frag, fragSource);
-            GL.CompileShader(frag);
-            GL.AttachShader(shaderProgram, frag);
-            GL.LinkProgram(shaderProgram);
-            GL.UseProgram(shaderProgram);
             //Thread t = new Thread(new ThreadStart(CreateLevelDesignForm));
             //t.ApartmentState = ApartmentState.STA;
             //t.Start();
@@ -435,7 +371,7 @@ namespace U5Designs
             // Testing the Level Design feature of re-loading LoadLevel after changing coords for a given game object
             if (eng.Keyboard[Key.F5])
             {
-                LevelDesignerState lds = new LevelDesignerState(this.menustate, eng, 0);
+                LevelDesignerState lds = new LevelDesignerState(eng, menustate, current_level);
                 if (!window.IsActive)
                 {
                     window.Show();

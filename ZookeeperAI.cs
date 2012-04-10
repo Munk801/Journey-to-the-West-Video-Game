@@ -44,15 +44,6 @@ namespace U5Designs {
 			List<Obstacle> boxObstacles = LoadLevel.parseSingleObstacleFile("zoo_keeper_crate.dat", locs);
 			List<Obstacle> groundObstacles = LoadLevel.parseSingleObstacleFile("zookeeper_boss_ground.dat", locs);
 
-			//Cycle through all the ground textures once to get them in memory - prevent pop-in on first run
-			Obstacle aGround = groundObstacles[0];
-			for(int i = 0; i < 11; i++) {
-				aGround.frame3d = i;
-				aGround.doScaleTranslateAndTexture();
-				GL.PopMatrix();
-			}
-			aGround.frame3d = 0;
-
 			rng = new Random();
             //initialize arrays of crates + boss(FallingBox)
             boxes = new FallingBox[16];
@@ -77,7 +68,7 @@ namespace U5Designs {
 				ps.physList.Add(newcrate);
 				ps.colisionList.Add(newcrate);
 				ps.renderList.Add(newcrate);
-            }
+			}
         }
 
         double switchdelaytimer;

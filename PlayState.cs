@@ -21,12 +21,12 @@ namespace U5Designs
     public class PlayState : GameState
     {
         //debug
-        bool aienabled = true;
-        bool musicenabled = false;
+		internal bool aienabled;
+		internal bool musicenabled;
 
 		internal GameEngine eng;
-		MainMenuState menustate;
-		PauseMenuState pms;
+		internal MainMenuState menustate;
+		internal PauseMenuState pms;
 		internal Player player;
         internal ZookeeperAI bossAI;
         public bool bossMode;
@@ -46,86 +46,32 @@ namespace U5Designs
 		public Vector3 bossAreaCenter, bossAreaBounds;
 
 		internal bool enable3d; //true when being viewed in 3d
-        int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
-		private bool nowBillboarding; //true when billboarding objects should rotate into 3d view
-        Texture Healthbar, bHealth;
-		int MaxHealth;
+		internal int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
+		internal bool nowBillboarding; //true when billboarding objects should rotate into 3d view
+        public Texture Healthbar, bHealth;
 		public SpriteSheet staminaBar, staminaBack, staminaFrame;
-        
-		bool tabDown;
-		public bool clickdown = false;
 
+		internal bool tabDown;
+		public bool clickdown;
 
-        /// <summary>
-        /// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
-        /// </summary>
-        /// <param name="prvstate">The previous state(the menu that spawned this playstate)</param>
-        /// <param name="engine">Pointer to the game engine</param>
-        /// <param name="lvl">the level ID</param>
-        public PlayState(MainMenuState prvstate, GameEngine engine, int lvl) {
-			//TODO: pass this the right file to load from
+		/// <summary>
+		/// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
+		/// </summary>
+		/// <param name="engine">Pointer to the game engine</param>
+		public PlayState(GameEngine engine, MainMenuState menustate) {
+			eng = engine;
+			this.menustate = menustate;
 
-			// undo this when done testing ObjList = LoadLevel.Load(current_level);
-			LoadLevel.Load(0, this);
-            player.ps = this;
-            //Every AI object needs a pointer to the player, initlize this here
-            foreach (AIObject aio in aiList) {
-                ((Enemy)aio).player = player;
-            }
-
-            //TODO: initialize the boss in loadlevel
-            bossAI = new ZookeeperAI(player, this);
-            bossMode = false;
-
-            //deal with states
-            menustate = prvstate;
-            eng = engine;
-            pms = new PauseMenuState(engine);
-            enable3d = false;
+			bossMode = false;
+			enable3d = false;
 			tabDown = false;
-            //test.Play();
-            //initialize camera
-			camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player, this, 
-									new int[] { eng.ClientRectangle.X, eng.ClientRectangle.Y, eng.ClientRectangle.Width, eng.ClientRectangle.Height });
-			player.cam = camera;
+			clickdown = false;
 			nowBillboarding = false;
+			aienabled = true;
+			musicenabled = false;
 
-            // Add healthbar texture to texture manager
-            Assembly audAssembly = Assembly.GetExecutingAssembly();
-            eng.StateTextureManager.LoadTexture("Healthbar", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_top.png"));
-            Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
-            eng.StateTextureManager.LoadTexture("bHealth", audAssembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_bottom.png"));
-            bHealth = eng.StateTextureManager.GetTexture("bHealth");
-            MaxHealth = player.health;
-            Assembly musicAssembly = Assembly.GetExecutingAssembly();
-            //levelMusic = new AudioFile(musicAssembly.GetManifestResourceStream("U5Designs.Resources.Sound.Level1.ogg"));
-            
-
-			//Thanks to OpenTK samples for part of this shader code
-			//Initialize Shader
-            int shaderProgram = GL.CreateProgram();
-            int frag = GL.CreateShader(ShaderType.FragmentShader);
-
-            // GLSL for fragment shader.
-            String fragSource = @"
-				uniform sampler2D tex;
-
-				void main( void )
-				{
-					vec4 col = texture2D(tex,gl_TexCoord[0].st);
-					if( col.a < 0.5) {
-						discard;
-					}
-					gl_FragColor = col;
-				}	
-			";
-
-            GL.ShaderSource(frag, fragSource);
-            GL.CompileShader(frag);
-            GL.AttachShader(shaderProgram, frag);
-            GL.LinkProgram(shaderProgram);
-            GL.UseProgram(shaderProgram);
-        }
+			pms = new PauseMenuState(eng);
+		}
 
         /// <summary>
         /// Refreshes graphics when this state becomes active again after being frozen.
@@ -133,7 +79,6 @@ namespace U5Designs
 		public override void MakeActive() {
             if (musicenabled)
                 levelMusic.ReplayFile();
-			GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Emission, new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 
 			GL.Enable(EnableCap.Blend);
 			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
@@ -323,7 +268,7 @@ namespace U5Designs
 			}
 
 			//Draw HUD
-			float dec = (float)player.health / MaxHealth;
+			float dec = (float)player.health / player.maxHealth;
             bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 670, scaleX: 0.5f, scaleY: 0.5f);
 			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 300, 670, scaleX: 0.5f, scaleY: 0.5f, decrementX: dec);
 
@@ -409,26 +354,11 @@ namespace U5Designs
 		}
 
         /// <summary>
-        /// Deals with Hardware input relivant to the playstate
+        /// Deals with Hardware input relevant to the playstate
         /// </summary>
-        private void DealWithInput()
-        {
-            // Testing the Level Design feature of re-loading LoadLevel after changing coords for a given game object
-            if (eng.Keyboard[Key.F5])
-            {
-                PlayState pst = new PlayState(this.menustate, eng, 0);
-                
-                //eng.PushState(pst);
-                // test
-                levelMusic.Stop();
-                eng.ChangeState(pst);
-                
-                //LoadLevel.Load(0, pst);
-            }
+        private void DealWithInput() {
 
-            if (eng.Keyboard[Key.Escape] || eng.Keyboard[Key.Tilde])
-            {
-                //eng.PushState(menustate);
+            if (eng.Keyboard[Key.Escape] || eng.Keyboard[Key.Tilde]) {
                 levelMusic.Stop();
                 eng.PushState(pms);
             }

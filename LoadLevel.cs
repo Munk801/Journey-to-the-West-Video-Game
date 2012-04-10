@@ -16,8 +16,7 @@ using System.Text.RegularExpressions;
 
 using System.Collections.Generic;
 
-namespace U5Designs
-{
+namespace U5Designs {
 	class LoadLevel {
 		public static void Load(int level_to_load, PlayState ps) {
 			ps.objList = new List<GameObject>();
@@ -57,12 +56,22 @@ namespace U5Designs
 			ps.bossAreaBounds = parseVector3(bossAreaBounds);
 			
             XmlNode aud = _a_list[0];
-            ps.levelMusic = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music." + aud.InnerText));
+			ps.levelMusic = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music." + aud.InnerText));
+
+			//Player
+			List<ProjectileProperties> playerProjectiles = new List<ProjectileProperties>();
+			playerProjectiles.Add(parseProjectileFile("banana_projectile.dat"));
+			playerProjectiles.Add(parseProjectileFile("coconut_grenade_projectile.dat"));
+
+			ps.player = new Player(parseSpriteFile("player_sprite.dat"), playerProjectiles, ps);
+			ps.player.marker = parseSpriteFile("marker_sprite.dat");
+			ps.physList.Add(ps.player);
+			ps.renderList.Add(ps.player);
 			
 
 			//Various GameObjects
 
-			List<Enemy> _elist = parseEnemyFiles(_e_list);
+			List<Enemy> _elist = parseEnemyFiles(_e_list, ps.player);
 			foreach(Enemy e in _elist) {
 				ps.objList.Add(e);
 				ps.physList.Add(e);
@@ -90,19 +99,12 @@ namespace U5Designs
 			foreach(Decoration d in _dlist) {
 				ps.objList.Add(d);
 				ps.renderList.Add(d);
-			}          
+			}
+
+			//TODO: When we have more than one boss type, adjust this
+			ps.bossAI = new ZookeeperAI(ps.player, ps);
 
 			SpriteSheet.quad = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry.quad.obj"));
-
-			List<ProjectileProperties> playerProjectiles = new List<ProjectileProperties>();
-			playerProjectiles.Add(parseProjectileFile("banana_projectile.dat"));
-			playerProjectiles.Add(parseProjectileFile("coconut_grenade_projectile.dat"));
-
-			//Player
-			ps.player = new Player(parseSpriteFile("player_sprite.dat"), playerProjectiles, ps);
-			ps.player.marker = parseSpriteFile("marker_sprite.dat");
-			ps.physList.Add(ps.player);
-			ps.renderList.Add(ps.player);
 
 			//HUD Stamina Bar
 			ps.staminaBack = parseSpriteFile("stamina_back.dat");
@@ -364,7 +366,7 @@ namespace U5Designs
 		 * for the current level being loaded.  It will parse the XML .dat files, create an Enemy object, and add it
 		 * to a List<> which will be returned. 
 		 * */
-		public static List<Enemy> parseEnemyFiles(XmlNodeList EList) {
+		public static List<Enemy> parseEnemyFiles(XmlNodeList EList, Player player) {
 			// Instantiate the list
 			List<Enemy> _e = new List<Enemy>();
 			Assembly assembly = Assembly.GetExecutingAssembly();
@@ -417,7 +419,7 @@ namespace U5Designs
 					// Create the Enemies
 					for(int j = 1; j < EList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(EList[i].ChildNodes[j]);
-						_e.Add(new Enemy(loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss));
+						_e.Add(new Enemy(player, loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss));
 					}
 				} else {
 					ProjectileProperties p = parseProjectileFile(_p.Item(0).InnerText);
@@ -425,7 +427,7 @@ namespace U5Designs
 					// Create the Enemies
 					for(int j = 1; j < EList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(EList[i].ChildNodes[j]);
-						_e.Add(new Enemy(loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, p));
+						_e.Add(new Enemy(player, loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, p));
 					}
 				}
 			}

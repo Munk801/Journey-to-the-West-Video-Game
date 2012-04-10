@@ -61,7 +61,13 @@ namespace U5Designs
             StateTextureManager.LoadTexture("p1", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.PauseTextures.p1.png"));
             StateTextureManager.LoadTexture("p2", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.PauseTextures.p2.png"));
             StateTextureManager.LoadTexture("p3", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.PauseTextures.p3.png"));
-            StateTextureManager.LoadTexture("p4", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.PauseTextures.p4.png"));
+			StateTextureManager.LoadTexture("p4", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.PauseTextures.p4.png"));
+
+			// Load State
+			StateTextureManager.LoadTexture("load1", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.LoadingScreenTextures.load1.png"));
+			StateTextureManager.LoadTexture("load2", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.LoadingScreenTextures.load2.png"));
+			StateTextureManager.LoadTexture("load3", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.LoadingScreenTextures.load3.png"));
+			StateTextureManager.LoadTexture("load4", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.LoadingScreenTextures.load4.png"));
         
             ThisMouse = new GameMouse(this);
             states = new Stack<GameState>();
@@ -75,10 +81,33 @@ namespace U5Designs
 
             selectSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.select.ogg"));
 
-            // Set the screen resolution (Fullscreen / windowed)
-
             // Set the title bar of the window etc
 
+
+			//Initialize Shader
+			//Thanks to OpenTK samples for part of this shader code
+			int shaderProgram = GL.CreateProgram();
+			int frag = GL.CreateShader(ShaderType.FragmentShader);
+
+			// GLSL for fragment shader.
+			String fragSource = @"
+				uniform sampler2D tex;
+
+				void main( void )
+				{
+					vec4 col = texture2D(tex,gl_TexCoord[0].st);
+					if( col.a < 0.5) {
+						discard;
+					}
+					gl_FragColor = col;
+				}	
+			";
+
+			GL.ShaderSource(frag, fragSource);
+			GL.CompileShader(frag);
+			GL.AttachShader(shaderProgram, frag);
+			GL.LinkProgram(shaderProgram);
+			GL.UseProgram(shaderProgram);
         }
 
         /** These 3 methods are for State handling **/

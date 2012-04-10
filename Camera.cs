@@ -32,12 +32,12 @@ namespace U5Designs
 		private float playerYPos; //the player's y position the last time they were not in midair
 		private bool bossMode;
 
-		public Camera(int width, int height, Player p, PlayState ps, int[] viewport) {
+		public Camera(int width, int height, Player p, PlayState ps) {
 			this.width = width;
 			this.height = height;
 			player = p;
 			playstate = ps;
-			this.viewport = viewport;
+			this.viewport = new int[] { ps.eng.ClientRectangle.X, ps.eng.ClientRectangle.Y, ps.eng.ClientRectangle.Width, ps.eng.ClientRectangle.Height };
 
             eye = new Vector3();
             lookat = new Vector3();

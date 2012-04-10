@@ -40,6 +40,7 @@ namespace Engine {
 			texh = _texh;
 			hasAlpha = _hasAlpha;
 			framesPerSecond = _framesPerSecond;
+			texID = -1;
 
 			BitmapData bmp_data = texbmp.LockBits(new Rectangle(0, 0, texbmp.Width, texbmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 			tex = new byte[cycleStartNums.Length][][];
@@ -60,11 +61,11 @@ namespace Engine {
 			}
 			texbmp.UnlockBits(bmp_data);
 
-			texID = GL.GenTexture();
-			GL.BindTexture(TextureTarget.Texture2D, texID);
-			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[0][0]);
-			prevCycleNum = 0;
-			prevFrameNum = 0;
+/* 			texID = GL.GenTexture();*/
+// 			GL.BindTexture(TextureTarget.Texture2D, texID);
+// 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[0][0]);
+			prevCycleNum = -1;
+			prevFrameNum = -1;
 		}
 
 		//For this constructor, each cycle must be in its own Bitmap
@@ -73,6 +74,7 @@ namespace Engine {
 			texh = _texh;
 			hasAlpha = _hasAlpha;
 			framesPerSecond = _framesPerSecond;
+			texID = -1;
 
 			tex = new byte[cycleStartNums.Length][][];
 			for(int cycleNum = 0; cycleNum < cycleStartNums.Length; cycleNum++) {
@@ -93,11 +95,11 @@ namespace Engine {
 				texbmps[cycleNum].UnlockBits(bmp_data);
 			}
 
-			texID = GL.GenTexture();
-			GL.BindTexture(TextureTarget.Texture2D, texID);
-			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[0][0]);
-			prevCycleNum = 0;
-			prevFrameNum = 0;
+/* 			texID = GL.GenTexture();*/
+// 			GL.BindTexture(TextureTarget.Texture2D, texID);
+// 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[0][0]);
+			prevCycleNum = -1;
+			prevFrameNum = -1;
 		}
 
 
@@ -199,6 +201,10 @@ namespace Engine {
 		 *		  to bring it back into the expected range.
 		 */
 		public double draw(bool viewIs3d, Billboarding bb, int cycleNumber = 0, double frameTime = 0.0) {
+			if(texID == -1) {
+				texID = GL.GenTexture();
+			}
+
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);

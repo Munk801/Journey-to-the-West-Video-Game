@@ -64,6 +64,7 @@
       <DependentUpon>LevelDesignerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="LevelSelect.cs" />
+    <Compile Include="LoadScreenState.cs" />
     <Compile Include="ZookeeperAI.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Decoration.cs" />
@@ -420,6 +421,14 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Textures\zoo_sky_top.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load2.png" />
+    <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load3.png" />
+    <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load4.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
