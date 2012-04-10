@@ -82,17 +82,157 @@ namespace U5Designs {
 				while(index == currentBossIndex || !boxes[index].idle) {
 					index = rng.Next(0, 16);
 				}
-				//Do the swap
+				//Swap boss/box code
                 Vector3 temp = new Vector3(boxes[index].location.X, maxHeight, boxes[index].location.Z);
                 boxes[index].setPosition(new Vector3(bossobject.location.X, maxHeight, bossobject.location.Z));
                 bossobject.setPosition(temp);
-                bossobject.fall();
+                boxes[currentBossIndex] = boxes[index];
+                currentBossIndex = index;
+                boxes[index] = bossobject;
+                Console.WriteLine(currentBossIndex);
                 switchdelaytimer = 0;
+                //end swap code
+
+                if (gethealth() == 5) {
+                    //first stage, only drop the boss
+                    bossobject.fall();
+                }
+                if (gethealth() == 4) {
+                    // second stage, drop boss + either his row or column of boxes
+                    int rows = rng.Next(0, 2);
+                    Console.WriteLine("rows :" + rows);
+                    if (rows == 0) {
+                        //row
+                        for (int i = 0; i < 4; i++) {
+                            if (currentBossIndex == 0 + i) {
+                                boxes[4 + i].fall();
+                                boxes[8 + i].fall();
+                                boxes[12 + i].fall();
+                            }
+                            if (currentBossIndex == 4 + i) {
+                                boxes[0 + i].fall();
+                                boxes[8 + i].fall();
+                                boxes[12 + i].fall();
+                            }
+                            if (currentBossIndex == 8 + i) {
+                                boxes[0 + i].fall();
+                                boxes[4 + i].fall();
+                                boxes[12 + i].fall();
+                            }
+                            if (currentBossIndex == 12 + i) {
+                                boxes[0 + i].fall();
+                                boxes[4 + i].fall();
+                                boxes[8 + i].fall();
+                            }
+                        }
+                    }
+                    else {
+                        //column
+                        for (int i = 0; i < 4; i++) {
+                            if (currentBossIndex >= i * 4 && currentBossIndex <= (i * 4) + 3) {
+                                for (int k = 0; k < 4; k++) {
+                                    if ((i*4) + k != currentBossIndex)
+                                        boxes[(i*4) + k].fall();
+                                }
+                            }
+                        }
+                    }
+                    bossobject.fall();
+                }
+                if (gethealth() == 3) {
+                    //third, drop both his row and column
+                    //row
+                    for (int i = 0; i < 4; i++) {
+                        if (currentBossIndex == 0 + i) {
+                            boxes[4 + i].fall();
+                            boxes[8 + i].fall();
+                            boxes[12 + i].fall();
+                        }
+                        if (currentBossIndex == 4 + i) {
+                            boxes[0 + i].fall();
+                            boxes[8 + i].fall();
+                            boxes[12 + i].fall();
+                        }
+                        if (currentBossIndex == 8 + i) {
+                            boxes[0 + i].fall();
+                            boxes[4 + i].fall();
+                            boxes[12 + i].fall();
+                        }
+                        if (currentBossIndex == 12 + i) {
+                            boxes[0 + i].fall();
+                            boxes[4 + i].fall();
+                            boxes[8 + i].fall();
+                        }
+                    }
+                    //column
+                    for (int i = 0; i < 4; i++) {
+                        if (currentBossIndex >= i * 4 && currentBossIndex <= (i * 4) + 3) {
+                            for (int k = 0; k < 4; k++) {
+                                if ((i * 4) + k != currentBossIndex)
+                                    boxes[(i * 4) + k].fall();
+                            }
+                        }
+                    }
+                    bossobject.fall();
+                }
+                if (gethealth() == 2) {
+                    //specific pattern
+                    int pattern = rng.Next(0, 3);
+                    if (pattern == 0) { //checkers pattern
+                        if (currentBossIndex == 0 || currentBossIndex == 2 || currentBossIndex == 5 || currentBossIndex == 7 ||
+                            currentBossIndex == 8 || currentBossIndex == 10 || currentBossIndex == 13 || currentBossIndex == 15) {
+                            boxes[0].fall(); boxes[2].fall();
+                            boxes[5].fall(); boxes[7].fall();
+                            boxes[8].fall(); boxes[10].fall();
+                            boxes[13].fall(); boxes[15].fall();
+                        }
+                        else {
+                            boxes[1].fall(); boxes[3].fall();
+                            boxes[4].fall(); boxes[6].fall();
+                            boxes[9].fall(); boxes[11].fall();
+                            boxes[12].fall(); boxes[14].fall();
+                        }
+                        bossobject.fall();
+                    }
+                    if (pattern == 1) {// cross pattern
+                            boxes[0].fall(); boxes[12].fall();
+                            boxes[5].fall(); boxes[9].fall();
+                            boxes[6].fall(); boxes[10].fall();
+                            boxes[3].fall(); boxes[15].fall();
+                            bossobject.fall();
+                    }
+                    if (pattern == 2) {//box pattern
+                        boxes[0].fall(); boxes[1].fall();
+                        boxes[2].fall(); boxes[3].fall();
+                        boxes[4].fall(); boxes[7].fall();
+                        boxes[8].fall(); boxes[11].fall();
+                        boxes[12].fall(); boxes[13].fall();
+                        boxes[14].fall(); boxes[15].fall();
+                        bossobject.fall();
+                    }
+                }
+                if (gethealth() == 1) {
+                    //all but one box
+                    int stayup = rng.Next(0, 16);
+                    for (int i = 0; i < 16; i++) {
+                        if (i != stayup)
+                            boxes[i].fall();
+                    }
+                }
+
             } else if(bossobject.idle) {
 				switchdelaytimer = switchdelaytimer + time;
 			}
 
-            bossobject.update(time, playstate, playerposn, enable3d);// always pass control to update
+
+            for (int i = 0; i < 16; i++) {
+                if (i != currentBossIndex) {
+                    boxes[i].update(time, playstate, playerposn, enable3d);
+                }
+                else {
+                    bossobject.update(time, playstate, playerposn, enable3d);// always pass control to update
+                }
+            }
         }
 
         public int gethealth() {
@@ -395,7 +535,9 @@ namespace U5Designs {
             if (!invincible) {
                 health = health - 1;
                 //TODO: play pain animation or w/e
-                downtimer = downtime - 0.2;// make him come up after .2 seconds
+                //downtimer = downtime - 0.2;// make him come up after .2 seconds
+                invincible = true;
+                invintimer = 0;
             }
         }
 

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<level>
+	<obstaclelist>
+		<obstacle>
+			<path>test_obstacle.dat</path>
+			<loc x="151" y="-51" z="50" />
+		</obstacle>
+	</obstaclelist>
+</level>

@@ -65,6 +65,7 @@
     </Compile>
     <Compile Include="LevelSelect.cs" />
     <Compile Include="LoadScreenState.cs" />
+    <Compile Include="MyTextWriter.cs" />
     <Compile Include="ZookeeperAI.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Decoration.cs" />
@@ -421,6 +422,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Textures\zoo_sky_top.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Levels\level_13731.dat" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load1.png" />

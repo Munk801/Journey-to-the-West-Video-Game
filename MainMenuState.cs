@@ -189,7 +189,7 @@ namespace U5Designs
 					break;
 				case 3: //level designer
 					musicFile.Stop();
-					LevelDesignerState ls = new LevelDesignerState(eng, this, 0);
+					LevelDesignerState ls = new LevelDesignerState(eng, this, 13731);
 					eng.ChangeState(ls);
 					eng.GameInProgress = true;
 					break;
