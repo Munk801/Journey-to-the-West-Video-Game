@@ -552,6 +552,7 @@ namespace U5Designs {
         /// Starts the timer and anamation to squish the player if he got squished in the zookeeper encounter
         /// </summary>
         public void squish() {
+            //TODO: impliment, + impliment a timer so you cant get double squished in 2d
             health = health - 4;
         }
 
