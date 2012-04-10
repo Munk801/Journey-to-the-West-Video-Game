@@ -81,7 +81,13 @@ namespace U5Designs
 			current_level = lvl;
 			LoadLevel.Load(lvl, this);
 
-			//Have to do this here for now because it requires the GraphicsContext
+			//Have to load the next few things here for now because they require the GraphicsContext
+			foreach(RenderObject ro in renderList) {
+				if(ro.is3dGeo) {
+					ro.texture.init();
+				}
+			}
+
 			//HUD Health Bar
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			eng.StateTextureManager.LoadTexture("Healthbar", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_top.png"));
@@ -816,6 +822,7 @@ namespace U5Designs
 					texFrames.Add(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + n.InnerText)));
 				}
                 MeshTexture _bmp = new MeshTexture(texFrames);
+				_bmp.init();
 
                 dec = new Decoration(loc, scale, _draw2, _draw3, _mesh, _bmp);
             }
@@ -887,6 +894,7 @@ namespace U5Designs
 					texFrames.Add(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + n.InnerText)));
 				}
                 MeshTexture _tex = new MeshTexture(texFrames);
+				_tex.init();
 
                 o = new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, _mesh, _tex);
                 fstream.Close();
