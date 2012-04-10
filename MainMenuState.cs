@@ -339,7 +339,8 @@ namespace U5Designs
                         musicFile.Stop();
 
                         // Otherwise pass the level index from the saved game
-                        LevelDesignerState ls = new LevelDesignerState(this, eng, saved_level_index);
+                        int level = 13731;
+                        LevelDesignerState ls = new LevelDesignerState(this, eng, level);
                         eng.ChangeState(ls);
                         eng.GameInProgress = true;
                     }

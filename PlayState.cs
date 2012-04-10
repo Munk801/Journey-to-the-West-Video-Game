@@ -66,7 +66,7 @@ namespace U5Designs
 			//TODO: pass this the right file to load from
 
 			// undo this when done testing ObjList = LoadLevel.Load(current_level);
-			LoadLevel.Load(0, this);
+			LoadLevel.Load(lvl, this);
             player.ps = this;
             //Every AI object needs a pointer to the player, initlize this here
             foreach (AIObject aio in aiList) {

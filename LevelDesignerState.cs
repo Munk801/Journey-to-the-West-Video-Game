@@ -58,6 +58,7 @@ namespace U5Designs
 
         // Our current selected object for movement
         internal Obstacle SelectedObject = null;
+        
         System.Windows.Application app;
         MainWindow window;
         
@@ -86,7 +87,7 @@ namespace U5Designs
             public float _speed;
             public Vector3 _location;
         };
-        Dictionary<Vector3, int> _xml_obstacle_list;
+        Dictionary<int, List<Vector3>> _xml_obstacle_list;
         Dictionary<Vector3, int> _xml_dec_list;
         Dictionary<Vector3, int> _xml_enemy_list;
         Dictionary<String, int> _xml_sound_list;
@@ -96,7 +97,9 @@ namespace U5Designs
         Dictionary<Vector3, int> _xml_boss_center_list;
         List<Vector3> _xml_end_region;
 
+        MyTextWriter textWriter;
 
+        #region Constructor
         /// <summary>
         /// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
         /// </summary>
@@ -165,7 +168,15 @@ namespace U5Designs
             //t.Start();
             ObstaclesList = GetObstaclesFromDir();
 
-            _xml_obstacle_list = new Dictionary<Vector3,int>();
+            _xml_obstacle_list = new Dictionary<int, List<Vector3>>();
+            // Add everything from previous list into this list.  Problem is we have no idea what the object is.
+            //foreach (GameObject obj in objList)
+            //{
+            //    if (obj is Obstacle)
+            //    {
+            //    }
+            //}
+
             _xml_dec_list = new Dictionary<Vector3,int>();
             _xml_enemy_list = new Dictionary<Vector3,int>();
             _xml_sound_list = new Dictionary<string,int>();
@@ -178,8 +189,11 @@ namespace U5Designs
             itemIter = 3;
             itemCount = ObstaclesList.Count;
             StartDesignerThread();
+            textWriter = new MyTextWriter(eng.ClientSize, new Size(200, 200));
         }
+        #endregion
 
+        #region WPF Stuff
         /// <summary>
         /// Opens the secondary tool menu which will be useful for user to choose items
         /// </summary>
@@ -217,7 +231,7 @@ namespace U5Designs
 
         //        Application.Run(LDForm);
         //}
-
+        #endregion
 
         /// <summary>
         /// Refreshes graphics when this state becomes active again after being frozen.
@@ -231,7 +245,7 @@ namespace U5Designs
 
             GL.ShadeModel(ShadingModel.Smooth);
             GL.ClearColor(0.26667f, 0.86667f, 1.0f, 1.0f);
-
+            textWriter.AddLine("TEST", new PointF(30, 30), new SolidBrush(Color.Blue));
             // TO DO: MAKE ORTHOGRAPHIC VIEW FURTHER BACK
             if (enable3d)
             {
@@ -296,6 +310,7 @@ namespace U5Designs
             }
             //Update the camera whether we're transitioning or not
             camera.Update(e.Time);
+            //textWriter.UpdateText();
         }
 
         //Called by camera for parallaxing
@@ -320,9 +335,9 @@ namespace U5Designs
         public override void Draw(FrameEventArgs e)
         {
             //e = new FrameEventArgs(e.Time * 0.1);
-
+            
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
+           
             camera.SetModelView();
 
             foreach (RenderObject obj in renderList)
@@ -355,7 +370,7 @@ namespace U5Designs
                 m.doScaleTranslateAndTexture();
                 m.frameNumber = m.sprite.draw(nowBillboarding, m.billboards, m.cycleNumber, m.frameNumber + m.animDirection * e.Time);
             }
-
+            //textWriter.Draw();
         }
 
 
@@ -416,6 +431,12 @@ namespace U5Designs
         /// </summary>
         private void DealWithInput()
         {
+            // SAVE THE CURRENT LEVEL TO A NEW LEVEL
+            if (eng.Keyboard[Key.Period])
+            {
+                _write_level_file("TestLevelWrite", 99);
+            }
+
             if (!enable3d)
             {
 
@@ -519,7 +540,7 @@ namespace U5Designs
                     Console.WriteLine("Using {0}", ObstaclesList[itemIter]);
                 }
             }
-                // CONTROLS FOR 3D
+            #region 3D Move Controls
             else
             {
                 if (eng.Keyboard[Key.Up] && !eng.Keyboard[Key.ControlLeft])
@@ -547,35 +568,27 @@ namespace U5Designs
                     MoveObjects(SelectedObject, new Vector3(0.0f, -1.0f, 0.0f));
                 }
             }
+            #endregion
         }
 
         private void MoveObjects(Obstacle o, Vector3 newLoc)
         {
             if (o == null) return;
+            foreach (var key in _xml_obstacle_list.Keys)
+            {
+                int xmlIndex;
+                if ((xmlIndex = _xml_obstacle_list[key].FindIndex(q => q == o.location)) != -1)
+                {
+
+                    _xml_obstacle_list[key][xmlIndex] += newLoc;
+                }
+            }
             int index = objList.FindIndex(p => p.location == o.location);
             if (index == -1) return;
             objList[index].location += newLoc;
+            // Alter the dictionary location when we move objects
             
-        }
-
-        private void RemoveItemFromAllLists(Obstacle objToRemove)
-        {
-            if (objToRemove != null)
-            {
-                objList.Remove(objToRemove);
-                physList.Remove(objToRemove);
-                renderList.Remove(objToRemove);
-            }
-        }
-
-        private void AddItemsToAllLists(Obstacle objToAdd)
-        {
-            if (objToAdd != null)
-            {
-                objList.Add(objToAdd);
-                physList.Add(objToAdd);
-                renderList.Add(objToAdd);
-            }
+            
         }
         private void HandleMouseInput()
         {
@@ -652,7 +665,17 @@ namespace U5Designs
                     clickdown = false;
 
                     // Add to obstacle list
-                    _xml_obstacle_list.Add(o.location, itemIter);
+                    if (_xml_obstacle_list.ContainsKey(itemIter))
+                    {
+                        _xml_obstacle_list[itemIter].Add(o.location);
+                    }
+                    else
+                    {
+                        List<Vector3> locList = new List<Vector3>();
+                        locList.Add(o.location);
+                        _xml_obstacle_list.Add(itemIter, locList); 
+                    }
+
                 }
             }
             else if (eng.ThisMouse.LeftPressed() && !clickdown && enable3d)
@@ -665,7 +688,6 @@ namespace U5Designs
                 float[] t = new float[1];
                 GL.ReadPixels(this.eng.Mouse.X, this.eng.Height - this.eng.Mouse.Y, 1, 1, PixelFormat.DepthComponent, PixelType.Float, t);
                 Vector3d mousecoord = new Vector3d((double)this.eng.Mouse.X, (double)(this.eng.Height - this.eng.Mouse.Y), 1.0);
-                // Unproject the coordinates to convert from mouse to world coordinates
                 // Unproject the coordinates to convert from mouse to world coordinates
                 mousecoord.Z = 0.0;
                 Vector3d near = GameMouse.UnProject(mousecoord, model, project, this.camera.getViewport());
@@ -695,49 +717,76 @@ namespace U5Designs
                         if (eng.ThisMouse.inObjectRegion((Obstacle)obj, mouseWorld, enable3d))
                         {
                             objToRemove = (Obstacle)obj;
-                            _xml_obstacle_list.Remove(obj.location);
-                            break;
-                        }
-                    }
-                    else if (obj is Enemy)
-                    {
-                        _xml_enemy_list.Remove(obj.location);
-                        break;
-                    }
-                    else if (obj is Background)
-                    {
-                        // Set temp BGD properties to the currently selected Background object and then search for a match in the Dictionary
-                        Background b = (Background)obj;
-                        BackGroundData bgd;
-                        bgd._location = obj.location;
-                        bgd._scale = b.scale;
-                        bgd._speed = b.Speed;
-                        bgd._sprite_file = b.Path;
-
-                        // ?? Not sure this works, hard to test at the moment so be aware this may be a broken hack...sorry coding blind on this one ...
-                        foreach (KeyValuePair<BackGroundData, int> pair in _xml_bg_list)
-                        {
-                            BackGroundData _b = pair.Key;
-                            if (_b._location == bgd._location && _b._scale == bgd._scale && _b._speed == bgd._speed && _b._sprite_file.CompareTo(bgd._sprite_file) == 0)
+                            foreach (int key in _xml_obstacle_list.Keys)
                             {
-                                _xml_bg_list.Remove(_b);
-                                break;
+                                if(_xml_obstacle_list[key].Contains(objToRemove.location))
+                                {
+                                    _xml_obstacle_list[key].Remove(objToRemove.location);
+                                }
                             }
                         }
-                        break;
                     }
-                    
+                    //else if (obj is Enemy)
+                    //{
+                    //    _xml_enemy_list.Remove(obj.location);
+                    //    break;
+                    //}
+                    //else if (obj is Background)
+                    //{
+                    //    // Set temp BGD properties to the currently selected Background object and then search for a match in the Dictionary
+                    //    Background b = (Background)obj;
+                    //    BackGroundData bgd;
+                    //    bgd._location = obj.location;
+                    //    bgd._scale = b.scale;
+                    //    bgd._speed = b.Speed;
+                    //    bgd._sprite_file = b.Path;
+
+                    //    // ?? Not sure this works, hard to test at the moment so be aware this may be a broken hack...sorry coding blind on this one ...
+                    //    foreach (KeyValuePair<BackGroundData, int> pair in _xml_bg_list)
+                    //    {
+                    //        BackGroundData _b = pair.Key;
+                    //        if (_b._location == bgd._location && _b._scale == bgd._scale && _b._speed == bgd._speed && _b._sprite_file.CompareTo(bgd._sprite_file) == 0)
+                    //        {
+                    //            _xml_bg_list.Remove(_b);
+                    //            break;
+                    //        }
+                    //    }
+                    //    break;
+                    //}
+
                 }
                 if (objToRemove != null)
                 {
                     objList.Remove(objToRemove);
                     physList.Remove(objToRemove);
-                    renderList.Remove(objToRemove);                    
+                    renderList.Remove(objToRemove);
                 }
                 
             }
 
         }
+
+        #region Remove/Add Items to List
+        private void RemoveItemFromAllLists(Obstacle objToRemove)
+        {
+            if (objToRemove != null)
+            {
+                objList.Remove(objToRemove);
+                physList.Remove(objToRemove);
+                renderList.Remove(objToRemove);
+            }
+        }
+
+        private void AddItemsToAllLists(Obstacle objToAdd)
+        {
+            if (objToAdd != null)
+            {
+                objList.Add(objToAdd);
+                physList.Add(objToAdd);
+                renderList.Add(objToAdd);
+            }
+        }
+        #endregion
 
         /// <summary>
         /// Change the current level being played to the parameter
@@ -748,6 +797,13 @@ namespace U5Designs
             current_level = l;
         }
 
+        /*--------------------------------------------------------------------------------------------------------------
+         * 
+         *                                              LEVEL DESIGNER FILE METHODS
+         * 
+         * -------------------------------------------------------------------------------------------------------------
+         * */
+        #region Parse Level Files
         public List<string> GetObstaclesFromDir()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -763,6 +819,7 @@ namespace U5Designs
             }
             return obstacleList;
         }
+
 
         private Decoration ParseDecoration(string path, Vector3 loc)
         {
@@ -901,6 +958,7 @@ namespace U5Designs
 
             return o;
         }
+        #endregion
 
         /**
          * This method will take the various lists containing all the game elements that the user added and write them out in the correct format
@@ -930,7 +988,11 @@ namespace U5Designs
              * */            
             string file = "level_" + lIndex.ToString() + ".dat";
 
-            using (XmlWriter writer = XmlWriter.Create(file))
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = true;
+            settings.IndentChars = "\t";
+            //settings.NewLineOnAttributes = true;
+            using (XmlWriter writer = XmlWriter.Create(file, settings))
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("level");
@@ -1055,19 +1117,21 @@ namespace U5Designs
                 if (_xml_obstacle_list.Count > 0)
                 {
                     writer.WriteStartElement("obstaclelist");
-                    foreach (KeyValuePair<Vector3, int> p7 in _xml_obstacle_list)
+                    foreach (int key in _xml_obstacle_list.Keys)
                     {
                         writer.WriteStartElement("obstacle");
 
                         writer.WriteStartElement("path");
-                        writer.WriteString(ObstaclesList[p7.Value]); // need to use the index to look up which obstacle .dat file to use
+                        writer.WriteString(ObstaclesList[key]); // need to use the index to look up which obstacle .dat file to use
                         writer.WriteEndElement();
-
-                        writer.WriteStartElement("loc");
-                        writer.WriteAttributeString("x", ((int)(p7.Key.X)).ToString());
-                        writer.WriteAttributeString("y", ((int)(p7.Key.Y)).ToString());
-                        writer.WriteAttributeString("z", ((int)(p7.Key.Z)).ToString());
-                        writer.WriteEndElement();
+                        foreach (Vector3 loc in _xml_obstacle_list[key])
+                        {
+                            writer.WriteStartElement("loc");
+                            writer.WriteAttributeString("x", ((int)(loc.X)).ToString());
+                            writer.WriteAttributeString("y", ((int)(loc.Y)).ToString());
+                            writer.WriteAttributeString("z", ((int)(loc.Z)).ToString());
+                            writer.WriteEndElement();
+                        }
 
                         writer.WriteEndElement();
                     }
