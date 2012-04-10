@@ -985,8 +985,8 @@ namespace U5Designs
              *      <decoration>
              * </level>
              * 
-             * */            
-            string file = "level_" + lIndex.ToString() + ".dat";
+             * */
+            string file = "../../Resources/Data/Levels/level_" + lIndex.ToString() + ".dat";
 
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
