@@ -1,5 +1,5 @@
 <level>
-  <bossRegion x="4150" y ="150" z="50" r="150" />
+  <bossRegion x="4150" y ="150" z="50" r="90" />
   <endRegion x="5000" y="100" z="50" r="75" />
   <audiofile>
 		<file>Level1.ogg</file>
@@ -147,16 +147,16 @@
 
 		</obstacle>
     <obstacle>
+      <path>rope_bridge.dat</path>
+      <loc x="4000" y="123.5" z="50"/>
+    </obstacle>
+    <obstacle>
       <path>brick_wall_back.dat</path>
       <loc x="4150" y="225" z="-50"/>
     </obstacle>
     <obstacle>
       <path>brick_wall_front.dat</path>
       <loc x="4150" y="225" z="150"/>
-    </obstacle>
-    <obstacle>
-      <path>brick_wall_left.dat</path>
-      <loc x="4050" y="225" z="50"/>
     </obstacle>
     <obstacle>
       <path>brick_wall_right.dat</path>
@@ -189,6 +189,12 @@
 		  <loc x="1800" y="62.9" z="-40"/>
 		</obstacle>
 	</obstaclelist>
+  <bosslist>
+    <obstacle>
+      <path>brick_wall_left.dat</path>
+      <loc x="4050" y="225" z="50"/>
+    </obstacle>
+  </bosslist>
   <decorationlist>
     <decoration>
       <path>zoo_sky_front.dat</path>

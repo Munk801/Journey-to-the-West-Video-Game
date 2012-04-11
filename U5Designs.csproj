@@ -434,6 +434,13 @@
     <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load3.png" />
     <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load4.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Obstacles\rope_bridge.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\rope_bridge_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\rope_bridge.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

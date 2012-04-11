@@ -40,6 +40,7 @@ namespace U5Designs
 		internal List<AIObject> aiList;// aka list of enemies
 		internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
 		internal List<Background> backgroundList;
+		internal List<Obstacle> bossList; //contains obstacles necessary to box the player in during the boss encounter
         internal AudioFile levelMusic;
 
 		public SphereRegion bossRegion, endRegion;
@@ -225,6 +226,9 @@ namespace U5Designs
 		public void enterBossMode() {
 			bossMode = true;
 			camera.enterBossMode(bossAreaCenter, bossAreaBounds);
+			objList.AddRange(bossList);
+			renderList.AddRange(bossList);
+			physList.AddRange(bossList);
 		}
 
         /// <summary>
