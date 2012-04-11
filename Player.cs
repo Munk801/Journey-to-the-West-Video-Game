@@ -19,6 +19,7 @@ namespace U5Designs {
     public class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
 		private const int fallDamage = 1;
+        private int runSpeed = 125;
 
 		private PlayState playstate; //Keep a reference since we'll need this regularly
 
@@ -56,7 +57,7 @@ namespace U5Designs {
         public double spinSize; // the distance from the center of the player the spin attack extends
         public int spinDamage;
 
-		private bool spaceDown, eDown;
+		private bool spaceDown, eDown, pDown;
 
         public bool inLevelDesignMode = false; // THIS IS ONLY USED FOR LEVEL DESIGNER
         
@@ -68,7 +69,7 @@ namespace U5Designs {
             p_state = new PlayerState("TEST player");
             //p_state.setSpeed(130);
 			this.playstate = ps;
-			_speed = 125;
+            _speed = runSpeed;
 			_location = new Vector3(25, 12.5f, 50);
             _scale = new Vector3(16.25f, 25f, 16.25f);
             _pbox = new Vector3(5f, 12.5f, 5f);
@@ -96,6 +97,7 @@ namespace U5Designs {
 
 			spaceDown = false;
 			eDown = false;
+            pDown = false;
 			isMobile = true;
 
             Invincible = false;
@@ -139,18 +141,21 @@ namespace U5Designs {
 				spinTimer -= time;
 			}
 
-			if(spinning) {
-				stamina = Math.Max(stamina - 5.0 * time, 0.0);
-				if(stamina <= 0.0 || spinTimer <= 0.0) {
-					spinning = false;
-					_speed = 75;
-					if(velocity.X == 0) {
-						_cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
-					} else {
-						_cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
-					}
-				}
-			}
+            if (spinning) {
+                stamina = Math.Max(stamina - 5.0 * time, 0.0);
+                if (stamina <= 0.0 || spinTimer <= 0.0) {
+                    spinning = false;
+                    _speed = 75;
+                    if (velocity.X == 0) {
+                        _cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
+                    }
+                    else {
+                        _cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
+                    }
+                }
+            }
+            else
+                _speed = runSpeed;
 
 			if(projectileTimer > 0.0) {
 				projectileTimer -= time;
@@ -218,23 +223,21 @@ namespace U5Designs {
                 spinTimer -= time;
             }
 
-            if (spinning)
-            {
+            if (spinning) {
                 stamina = Math.Max(stamina - 5.0 * time, 0.0);
-                if (stamina <= 0.0 || spinTimer <= 0.0)
-                {
+                if (stamina <= 0.0 || spinTimer <= 0.0) {
                     spinning = false;
                     _speed = 75;
-                    if (velocity.X == 0)
-                    {
+                    if (velocity.X == 0) {
                         _cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
                     }
-                    else
-                    {
+                    else {
                         _cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
                     }
                 }
             }
+            else
+                _speed = runSpeed;
 
             if (projectileTimer > 0.0)
             {
@@ -324,6 +327,19 @@ namespace U5Designs {
 					velocity.Y = _speed;
 					fallTimer = 0.0;
 				}
+                //TMP PHYSICS TEST BUTTON suicide button
+                if (keyboard[Key.X]) {
+                    _health = 0;
+                }
+                if (keyboard[Key.P] && !pDown) {
+                    pDown = true;
+                    Console.WriteLine("Player position: (" + location.X + ", " + location.Y + ", " + location.Z + ")");
+                }
+                else if (!keyboard[Key.P])
+                    pDown = false;
+
+                if (keyboard[Key.BackSlash])
+                    _location = new Vector3(3779, 138, 43);
 #endif
 
 				//Jump
@@ -352,11 +368,6 @@ namespace U5Designs {
 				cam.moveToYPos(_location.Y);
 				lookDownTimer = -1.0;
 				isMobile = true;
-			}
-
-			//TMP PHYSICS TEST BUTTON suicide button
-			if(keyboard[Key.X]) {
-				_health = 0;
 			}
 
 			//Toggle Grenade
@@ -389,6 +400,7 @@ namespace U5Designs {
 
 				playstate.enterBossMode();
 			}
+
 		}
 		
         /// <summary>
@@ -425,7 +437,7 @@ namespace U5Designs {
             if (isMobile && playstate.eng.ThisMouse.RightPressed() && spinTimer <= 0.0 && stamina > 0.0) {
                 spinning = true;
 				spinTimer = 0.5;
-				_speed = 125;
+                _speed = runSpeed;
 				_cycleNum = (int)(enable3d ? PlayerAnim.spin3d : PlayerAnim.spin2d);
             }
         }
@@ -681,7 +693,7 @@ namespace U5Designs {
 
 				if(endspin) {
 					spinning = false;
-					_speed = 75;
+                    _speed = runSpeed;
 					_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
 				}
 
@@ -928,7 +940,7 @@ namespace U5Designs {
 
 				if(endspin) {
 					spinning = false;
-					_speed = 75;
+                    _speed = runSpeed;
 					_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
 				}
 

@@ -258,9 +258,33 @@ namespace U5Designs {
             // Check to see if the current Obstacle is 2D or 3D and handle accordingly
             XmlNodeList _type = doc.GetElementsByTagName("is2d");
             if (Convert.ToBoolean(_type.Item(0).InnerText)) {
-				fstream.Close();
-                Console.Out.WriteLine("ERROR: obstacle +" + _o_path + "is not a 3d object, it must be 3d");
-                return null;
+                String ss_path = doc.GetElementsByTagName("sprite")[0].InnerText;
+                fstream.Close();
+                SpriteSheet ss = parseSpriteFile(ss_path);
+
+                Billboarding bb = Billboarding.Yes;  //Have to put something here for it to compile
+                switch (doc.GetElementsByTagName("billboards")[0].InnerText) {
+                    case "yes":
+                    case "Yes":
+                        bb = Billboarding.Yes;
+                        break;
+                    case "lock2d":
+                    case "Lock2d":
+                        bb = Billboarding.Lock2d;
+                        break;
+                    case "lock3d":
+                    case "Lock3d":
+                        bb = Billboarding.Lock3d;
+                        break;
+                    default:
+                        Environment.Exit(1);
+                        break;
+                }
+                List<Obstacle> obstacles = new List<Obstacle>();
+                foreach (Vector3 loc in locs) {
+                    obstacles.Add(new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, bb, ss));
+                }
+                return obstacles;
             }
             else {
                 XmlNodeList _m = doc.GetElementsByTagName("mesh");

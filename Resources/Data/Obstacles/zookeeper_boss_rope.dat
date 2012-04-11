@@ -1,0 +1,11 @@
+<obstacle>
+	<is2d>true</is2d>
+	<scale x="2.11" y="133.33" z="2.11"/>
+	<pbox x="1" y="1" z="1"/>
+	<draw2>true</draw2>
+	<draw3>true</draw3>
+	<collidesIn2d>false</collidesIn2d>
+	<collidesIn3d>false</collidesIn3d>
+  <sprite>zoo_keeper_rope.dat</sprite>
+  <billboards>yes</billboards>
+</obstacle>
