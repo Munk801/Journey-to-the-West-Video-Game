@@ -134,6 +134,7 @@ namespace U5Designs
             //do boss dies stuff, transition to next level?
             if (bossMode && (bossAI.gethealth() <= 0)) {
                 bossAI.killBoss(this);
+				bossMode = false;
                 //transition to next level? or state? or w/e
             }
 

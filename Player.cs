@@ -68,7 +68,7 @@ namespace U5Designs {
             p_state = new PlayerState("TEST player");
             //p_state.setSpeed(130);
 			this.playstate = ps;
-			_speed = 75;
+			_speed = 125;
 			_location = new Vector3(25, 12.5f, 50);
             _scale = new Vector3(16.25f, 25f, 16.25f);
             _pbox = new Vector3(5f, 12.5f, 5f);
@@ -77,7 +77,7 @@ namespace U5Designs {
 			velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);
 			kbspeed = new Vector3(70, 100, 70);
-			jumpspeed = 230.0f;
+			jumpspeed = 250.0f;
 			_cycleNum = 0;
 			_frameNum = 0;
 			_sprite = sprite;
@@ -307,12 +307,14 @@ namespace U5Designs {
 					}
 				}
 
+#if DEBUG
 				//Cloud
 				//TODO: Implement animation etc, possibly change which key triggers this
 				if(keyboard[Key.C]) {
 					velocity.Y = _speed;
 					fallTimer = 0.0;
 				}
+#endif
 
 				//Jump
 				if(keyboard[Key.Space] && !spaceDown) {
