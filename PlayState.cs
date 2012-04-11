@@ -365,7 +365,7 @@ namespace U5Designs
             }
 
 			//********************** tab
-			if(!camera.isInTransition && player.onGround) {
+			if(!camera.isInTransition && player.onGround && player.lookDownTimer != -2.0) {
 				if(eng.Keyboard[Key.Tab] && !tabDown) {
 					enable3d = !enable3d;
 					tabDown = true;

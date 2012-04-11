@@ -37,7 +37,7 @@ namespace U5Designs {
 
         //timers
         private double Invincibletimer, NoControlTimer, projectileTimer, spinTimer;
-		public double fallTimer, viewSwitchJumpTimer;
+		public double fallTimer, viewSwitchJumpTimer, lookDownTimer;
 
         //projectile managment
 		List<ProjectileProperties> projectiles;
@@ -106,6 +106,7 @@ namespace U5Designs {
 			viewSwitchJumpTimer = 0.0;
 			projectileTimer = 0.0;
 			spinTimer = 0.0;
+			lookDownTimer = -1.0;
 			lastPosOnGround = new Vector3(_location);
 			_animDirection = 1;
 			this.projectiles = projectiles;
@@ -171,6 +172,15 @@ namespace U5Designs {
 
 			if(viewSwitchJumpTimer > 0.0) {
 				viewSwitchJumpTimer -= time;
+			}
+
+			if(lookDownTimer >= 0.0) {
+				lookDownTimer += time;
+				if(lookDownTimer >= 0.75) {
+					cam.moveToYPos(_location.Y - 50.0f);
+					lookDownTimer = -2.0;
+					isMobile = false;
+				}
 			}
 
 			//If the grenade is selected, draw parabola
@@ -333,6 +343,17 @@ namespace U5Designs {
 				velocity.Z = 0.0f;
 			}
 
+			//Look down
+			if(!enable3d && keyboard[Key.S]) {
+				if(lookDownTimer == -1.0) {
+					lookDownTimer = 0.0;
+				}
+			} else if(lookDownTimer != -1.0) {
+				cam.moveToYPos(_location.Y);
+				lookDownTimer = -1.0;
+				isMobile = true;
+			}
+
 			//TMP PHYSICS TEST BUTTON suicide button
 			if(keyboard[Key.X]) {
 				_health = 0;
@@ -358,13 +379,15 @@ namespace U5Designs {
 			
 			//Secret skip to boss
 			if(keyboard[Key.Period] && keyboard[Key.Comma]) {
-				playstate.enterBossMode();
 				//floor at 125 + 12.5 player pbox
 				_location = new Vector3(playstate.bossAreaCenter) + Vector3.UnitY * (_pbox.Y + 0.1f);
 
 				//The following should maybe be moved to a function in Camera
 				playstate.camera.eye.Y = _location.Y + (enable3d ? 24.0f : 31.25f);
 				playstate.camera.lookat.Y = _location.Y + (enable3d ? 20.5f : 31.25f);
+				cam.moveToYPos(_location.Y);
+
+				playstate.enterBossMode();
 			}
 		}
 		
@@ -550,10 +573,10 @@ namespace U5Designs {
 		}
 
         /// <summary>
-        /// Starts the timer and anamation to squish the player if he got squished in the zookeeper encounter
+        /// Starts the timer and animation to squish the player if he got squished in the zookeeper encounter
         /// </summary>
         public void squish() {
-            //TODO: impliment, + impliment a timer so you cant get double squished in 2d
+            //TODO: implement, + implement a timer so you cant get double squished in 2d
             health = health - 4;
         }
 
@@ -949,7 +972,9 @@ namespace U5Designs {
 									if(VectorUtil.overGround3dStrict(this, physList)) {
 										lastPosOnGround = new Vector3(_location);
 									}
-									cam.moveToYPos(_location.Y);
+									if(lookDownTimer != -2.0) {
+										cam.moveToYPos(_location.Y);
+									}
 								}
 								if(velocity.Y != 0) {//should always be true, but just in case...
 									double deltaTime = (location.Y - startLoc.Y) / velocity.Y;
