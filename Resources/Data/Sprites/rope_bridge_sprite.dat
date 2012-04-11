@@ -2,8 +2,8 @@
 	<bmp>rope_bridge.png</bmp>
 	<c_starts>0</c_starts>
 	<c_lengths>1</c_lengths>
-	<t_width>1200</t_width>
-	<t_height>27</t_height>
+	<t_width>2400</t_width>
+	<t_height>19</t_height>
 	<hasAlpha>true</hasAlpha>
 	<fps>1.0</fps>
 </sprite>

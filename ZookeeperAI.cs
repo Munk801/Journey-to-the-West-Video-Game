@@ -38,7 +38,7 @@ namespace U5Designs {
 			List<Vector3> locs = new List<Vector3>();
 			for( int i = 0; i < 4; i++){
                 for (int k = 0; k < 4; k++) {
-					locs.Add(new Vector3(4075 + (50 * i), maxHeight, (-25 + (50 * k))));
+					locs.Add(new Vector3(4175 + (50 * i), maxHeight, (-25 + (50 * k))));
 				}
 			}
 			List<Obstacle> boxObstacles = LoadLevel.parseSingleObstacleFile("zoo_keeper_crate.dat", locs);
