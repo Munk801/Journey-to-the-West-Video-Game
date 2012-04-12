@@ -19,8 +19,8 @@ namespace U5Designs {
     public class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
 		private const int fallDamage = 1;
-        private int runSpeed = 125;
-		private int spinSpeed = 175;
+        private const int runSpeed = 125;
+		private const int spinSpeed = 175;
 
 		private PlayState playstate; //Keep a reference since we'll need this regularly
 
@@ -39,7 +39,7 @@ namespace U5Designs {
 
         //timers
         private double NoControlTimer, projectileTimer, spinTimer;
-		public double Invincibletimer, fallTimer, viewSwitchJumpTimer, lookDownTimer;
+		public double Invincibletimer, fallTimer, viewSwitchJumpTimer, lookDownTimer, squishTimer;
 
         //projectile managment
 		List<ProjectileProperties> projectiles;
@@ -110,6 +110,7 @@ namespace U5Designs {
 			projectileTimer = 0.0;
 			spinTimer = 0.0;
 			lookDownTimer = -1.0;
+			squishTimer = -1.0;
 			lastPosOnGround = new Vector3(_location);
 			_animDirection = 1;
 			this.projectiles = projectiles;
@@ -189,6 +190,28 @@ namespace U5Designs {
 				}
 			}
 
+			if(squishTimer >= 0.0) {
+				squishTimer += time;
+				float oldPboxY = _pbox.Y;
+				if(squishTimer <= 0.125) {
+					_scale.Y = (float)(25.0 * (0.125 - squishTimer));
+					_pbox.Y = _scale.Y / 2.0f;
+					_location.Y -= oldPboxY - _pbox.Y;
+				} else if(squishTimer <= 3.125) {
+					_scale.Y = _pbox.Y = 0.0f;
+					_location.Y -= oldPboxY - _pbox.Y;
+				} else if(squishTimer <= 3.4375) {
+					_scale.Y = (float)(25.0 * (squishTimer - 3.125));
+					_pbox.Y = _scale.Y / 2.0f;
+					_location.Y += _pbox.Y - oldPboxY;
+				} else {
+					_scale.Y = 25.0f;
+					_pbox.Y = 12.5f;
+					_location.Y += _pbox.Y - oldPboxY;
+					squishTimer = -1.0;
+				}
+			}
+
 			//If the grenade is selected, draw parabola
 			if(curProjectile.gravity) {
 				addMarkers();
@@ -225,47 +248,43 @@ namespace U5Designs {
                 spinTimer -= time;
             }
 
-            if (spinning) {
-                stamina = Math.Max(stamina - 5.0 * time, 0.0);
-                if (stamina <= 0.0 || spinTimer <= 0.0) {
-                    spinning = false;
-                    _speed = runSpeed;
-                    if (velocity.X == 0) {
-                        _cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
-                    }
-                    else {
-                        _cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
-                    }
-                }
-            }
-            else
-                _speed = runSpeed;
+			if(spinning) {
+				stamina = Math.Max(stamina - 5.0 * time, 0.0);
+				if(stamina <= 0.0 || spinTimer <= 0.0) {
+					spinning = false;
+					_speed = runSpeed;
+					if(velocity.X == 0) {
+						_cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
+					} else {
+						_cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
+					}
+				}
+			} else {
+				_speed = runSpeed;
+			}
 
-            if (projectileTimer > 0.0)
-            {
+            if (projectileTimer > 0.0) {
                 projectileTimer -= time;
             }
 
             if (Invincible)
                 Invincibletimer = Invincibletimer - time;
-            if (Invincibletimer <= 0)
-            { // invincible is gone
+            if (Invincibletimer <= 0) {
+				// invincible is gone
                 Invincibletimer = 0;
                 Invincible = false;
             }
 
             if (!HasControl && NoControlTimer > 0.0)
                 NoControlTimer = NoControlTimer - time;
-            if (NoControlTimer <= 0.0)
-            {
+            if (NoControlTimer <= 0.0) {
                 NoControlTimer = 0.0;
                 HasControl = true;
             }
 
-            if (viewSwitchJumpTimer > 0.0)
-            {
+            if (viewSwitchJumpTimer > 0.0) {
                 viewSwitchJumpTimer -= time;
-            }
+			}
 
             //If the grenade is selected, draw parabola
             if (curProjectile.gravity)
@@ -592,8 +611,29 @@ namespace U5Designs {
         /// </summary>
         public void squish() {
             //TODO: implement, + implement a timer so you cant get double squished in 2d
-            health = health - 4;
+			if(squishTimer < 0.0) {
+				health = health - 3;
+				squishTimer = 0.0;
+			}
         }
+
+		/// <summary>
+		/// Helper method for physUpdate2d and 3d, updates current scale when squishing
+		/// </summary>
+		/// <param name="time"></param>
+		private void squishUpdate(double time) {
+			squishTimer += time;
+			if(squishTimer <= 0.125) {
+				_scale.Y = (float)(25.0 * (0.125 - squishTimer));
+			} else if(squishTimer <= 3.125) {
+				_scale.Y = 0.0f;
+			} else if(squishTimer <= 3.5) {
+				_scale.Y = (float)(25.0 * (squishTimer - 3.125));
+			} else {
+				_scale.Y = 25.0f;
+				squishTimer = -1.0;
+			}
+		}
 
         /// <summary>
         /// Does a physics update for the player if we are in 3d view

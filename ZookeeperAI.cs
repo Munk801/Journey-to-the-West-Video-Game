@@ -549,7 +549,6 @@ namespace U5Designs {
                 health = health - 1;
                 //TODO: play pain animation or w/e
                 invincible = true;
-/*                invintimer = 0;*/
             }
         }
 

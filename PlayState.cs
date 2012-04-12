@@ -105,6 +105,7 @@ namespace U5Designs
         /// </summary>
         /// <param name="e">FrameEventArgs from OpenTK's update</param>
         public override void Update(FrameEventArgs e) {
+			e = new FrameEventArgs(e.Time * 0.2);
             //First deal with hardware input
             DealWithInput();
 
@@ -235,8 +236,8 @@ namespace U5Designs
         /// The Draw update, happens every frame
         /// </summary>
         /// <param name="e">FrameEventArgs from OpenTK's update</param>
-        public override void Draw(FrameEventArgs e) {
-            //e = new FrameEventArgs(e.Time * 0.1);
+		public override void Draw(FrameEventArgs e) {
+			e = new FrameEventArgs(e.Time * 0.2);
 
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
