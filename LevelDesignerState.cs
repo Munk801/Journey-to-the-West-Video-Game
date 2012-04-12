@@ -27,7 +27,7 @@ namespace U5Designs
     {
 
         // Our current selected object for movement
-        internal Obstacle SelectedObject = null;
+        internal GameObject SelectedObject = null;
         
         System.Windows.Application app;
         MainWindow window;
@@ -37,16 +37,22 @@ namespace U5Designs
         double orthoWidth = 192;
         double orthoHeight = 108;
         List<string> ObstaclesList;
-        int itemIter;
-        int itemCount;
+        List<string> EnemiesList;
+        // Number of items and current item in the Obstacles List
+        int objectIter;
+        // Number of items and current item in the Enemies List
+
+
+        Dictionary<int, List<string>> ObjectList = new Dictionary<int,List<string>>();
+        int listKey = 0;
+
+        // Switches to control keyboard presses
         bool leftBDown = false;
         bool rightBDown = false;
-        struct ObjectToLoad
-        {
-            string path;
+        bool AllowSnapping = false;
+        bool MoveKeyDown = false;
 
-        };
-
+        float UnitsToMove = 1.0f;
         /** These Dictionarys will map Vector3's to different game objects that will then be written out to a level file.  When the user adds
          * a given object type into the level editor that object will be added to the appropriate Dictionary.  When the user deletes an object
          * it will be removed from the appropriate list.**/
@@ -58,8 +64,9 @@ namespace U5Designs
             public Vector3 _location;
         };
         Dictionary<int, List<Vector3>> _xml_obstacle_list;
+        Dictionary<int, List<Vector3>> _xml_enemy_list;
+
         Dictionary<Vector3, int> _xml_dec_list;
-        Dictionary<Vector3, int> _xml_enemy_list;
         Dictionary<String, int> _xml_sound_list;
         Dictionary<BackGroundData, int> _xml_bg_list;
         Dictionary<Vector3, int> _xml_boss_area_list;
@@ -108,7 +115,10 @@ namespace U5Designs
             //Thread t = new Thread(new ThreadStart(CreateLevelDesignForm));
             //t.ApartmentState = ApartmentState.STA;
             //t.Start();
-            ObstaclesList = GetObstaclesFromDir();
+            ObstaclesList = GetItemsFromDir("Obstacles.obstacles.txt");
+            EnemiesList = GetItemsFromDir("Enemies.enemies.txt");
+            ObjectList.Add(0, ObstaclesList);
+            ObjectList.Add(1, EnemiesList);
 
             _xml_obstacle_list = new Dictionary<int, List<Vector3>>();
             // Add everything from previous list into this list.  Problem is we have no idea what the object is.
@@ -120,7 +130,7 @@ namespace U5Designs
             //}
 
             _xml_dec_list = new Dictionary<Vector3,int>();
-            _xml_enemy_list = new Dictionary<Vector3,int>();
+            _xml_enemy_list = new Dictionary<int, List<Vector3>>();
             _xml_sound_list = new Dictionary<string,int>();
             _xml_bg_list = new Dictionary<BackGroundData,int>();
             _xml_boss_area_list = new Dictionary<Vector3,int>();
@@ -128,8 +138,6 @@ namespace U5Designs
             _xml_boss_center_list = new Dictionary<Vector3, int>();
             _xml_end_region = new List<Vector3>();
 
-            itemIter = 3;
-            itemCount = ObstaclesList.Count;
             StartDesignerThread();
             textWriter = new MyTextWriter(eng.ClientSize, new Size(200, 200));
         }
@@ -379,6 +387,27 @@ namespace U5Designs
                 _write_level_file("TestLevelWrite", 99);
             }
 
+            // Allow snapping for movement
+            if (eng.Keyboard[Key.BackSlash])
+            {
+                AllowSnapping = true;
+                UnitsToMove = 10.0f;
+                Console.WriteLine("Snapping is: {0}", AllowSnapping.ToString());
+            }
+
+            if (eng.Keyboard[Key.Semicolon])
+            {
+                int totalKeys = ObjectList.Keys.Count;
+                listKey += 1;
+                objectIter = 0;
+                if (listKey > totalKeys - 1)
+                {
+                    listKey = 0;
+                }
+                Console.WriteLine(" You are in {0}", listKey);
+            }
+
+            // If we are in 2D View, Allow user to zoom out and in with W and S
             if (!enable3d)
             {
 
@@ -435,23 +464,33 @@ namespace U5Designs
                     tabDown = false;
                 }
             }
+            // Allow movement of the selected objects
             if (!enable3d)
             {
-                if (eng.Keyboard[Key.Up])
+                if (eng.Keyboard[Key.Up] && !MoveKeyDown)
                 {
-                    MoveObjects(SelectedObject, new Vector3(0.0f, 1.0f, 0.0f));
+                    MoveKeyDown = true;
+                    MoveObjects(SelectedObject, new Vector3(0.0f, UnitsToMove, 0.0f));
                 }
-                if (eng.Keyboard[Key.Down])
+                if (eng.Keyboard[Key.Down] && !MoveKeyDown)
                 {
-                    MoveObjects(SelectedObject, new Vector3(0.0f, -1.0f, 0.0f));
+                    MoveKeyDown = true;
+                    MoveObjects(SelectedObject, new Vector3(0.0f, -UnitsToMove, 0.0f));
                 }
-                if (eng.Keyboard[Key.Left])
+                if (eng.Keyboard[Key.Left] && !MoveKeyDown)
                 {
-                    MoveObjects(SelectedObject, new Vector3(-1.0f, 0.0f, 0.0f));
+                    MoveKeyDown = true;
+                    MoveObjects(SelectedObject, new Vector3(-UnitsToMove, 0.0f, 0.0f));
                 }
-                if (eng.Keyboard[Key.Right])
+                if (eng.Keyboard[Key.Right] && !MoveKeyDown)
                 {
-                    MoveObjects(SelectedObject, new Vector3(1.0f, 0.0f, 0.0f));
+                    MoveKeyDown = true;
+                    MoveObjects(SelectedObject, new Vector3(UnitsToMove, 0.0f, 0.0f));
+                }
+
+                if (!eng.Keyboard[Key.Up] && !eng.Keyboard[Key.Down] && !eng.Keyboard[Key.Left] && !eng.Keyboard[Key.Right])
+                {
+                    MoveKeyDown = false;
                 }
                 if (!eng.Keyboard[Key.BracketLeft])
                 {
@@ -465,21 +504,21 @@ namespace U5Designs
                 if (eng.Keyboard[Key.BracketLeft] && !leftBDown)
                 {
                     leftBDown = true;
-                    if (itemIter - 1 < 0)
-                        itemIter = itemCount -1;
-                    else itemIter--;
+                    if (objectIter - 1 < 0)
+                        objectIter = ObjectList[listKey].Count - 1;
+                    else objectIter--;
                     
-                    Console.WriteLine("Using {0}", ObstaclesList[itemIter]);
+                    Console.WriteLine("Using {0}", ObjectList[listKey][objectIter]);
                 }
                 if (eng.Keyboard[Key.BracketRight] && !rightBDown)
                 {
                     rightBDown = true;
-                    if (itemIter + 1 > itemCount-1)
-                        itemIter = 0;
-                    else itemIter++;
+                    if (objectIter + 1 > ObjectList[listKey].Count -1)
+                        objectIter = 0;
+                    else objectIter++;
                     
 
-                    Console.WriteLine("Using {0}", ObstaclesList[itemIter]);
+                    Console.WriteLine("Using {0}", ObjectList[listKey][objectIter]);
                 }
             }
             #region 3D Move Controls
@@ -513,23 +552,42 @@ namespace U5Designs
             #endregion
         }
 
-        private void MoveObjects(Obstacle o, Vector3 newLoc)
+        private void MoveObjects( GameObject gameObj, Vector3 newLoc)
         {
-            if (o == null) return;
-            foreach (var key in _xml_obstacle_list.Keys)
-            {
-                int xmlIndex;
-                if ((xmlIndex = _xml_obstacle_list[key].FindIndex(q => q == o.location)) != -1)
-                {
+            if (gameObj == null) return;
 
-                    _xml_obstacle_list[key][xmlIndex] += newLoc;
+            if (gameObj is Obstacle)
+            {
+                foreach (var key in _xml_obstacle_list.Keys)
+                {
+                    int xmlIndex;
+                    if ((xmlIndex = _xml_obstacle_list[key].FindIndex(q => q == gameObj.location)) != -1)
+                    {
+
+                        _xml_obstacle_list[key][xmlIndex] += newLoc;
+                    }
                 }
+                int index = objList.FindIndex(p => p.location == gameObj.location);
+                if (index == -1) return;
+                objList[index].location += newLoc;
+                // Alter the dictionary location when we move objects
             }
-            int index = objList.FindIndex(p => p.location == o.location);
-            if (index == -1) return;
-            objList[index].location += newLoc;
-            // Alter the dictionary location when we move objects
-            
+            if (gameObj is Enemy)
+            {
+                foreach (var key in _xml_enemy_list.Keys)
+                {
+                    int xmlIndex;
+                    if ((xmlIndex = _xml_enemy_list[key].FindIndex(q => q == gameObj.location)) != -1)
+                    {
+
+                        _xml_enemy_list[key][xmlIndex] += newLoc;
+                    }
+                }
+                int index = objList.FindIndex(p => p.location == gameObj.location);
+                if (index == -1) return;
+                objList[index].location += newLoc;
+                // Alter the dictionary location when we move objects
+            }
             
         }
         private void HandleMouseInput()
@@ -551,11 +609,11 @@ namespace U5Designs
 
                 foreach (GameObject obj in objList)
                 {
-                    if (obj is Obstacle)
+                    if (obj is Obstacle || obj is Enemy)
                     {
-                        if (eng.ThisMouse.inObjectRegion((Obstacle)obj, mouseWorld, enable3d))
+                        if (eng.ThisMouse.inObjectRegion(obj, mouseWorld, enable3d))
                         {
-                            SelectedObject = (Obstacle)obj;
+                            SelectedObject = obj;
                             Console.WriteLine("Selected Object");
                             return;
                         }
@@ -563,61 +621,86 @@ namespace U5Designs
                 }
 
                 Vector3 loc = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, 50.0f);
-
-                Obstacle o = ParseObstacle(ObstaclesList[itemIter], loc);
-                if (o == null)
+                
+                // Handle adding enemies
+                if (listKey == 1)
                 {
-                    Decoration dec = ParseDecoration(ObstaclesList[itemIter], loc);
-                    objList.Add(dec);
-                    renderList.Add(dec);
-
-                    // Add decoration to decoration list
-                    _xml_dec_list.Add(dec.location, itemIter);
-
-                    /** TODO !!!! ***/
-                    // Need to parse Enemies, Sound files, boss regions, backgrounds
-
-                    /// PSEUDO-CODE
-                    // if ( boss region )
-                    //      _xml_boss_region.Add(Vector3, index)
-
-                    // if ( boss bounds )
-                    //      _xml_boss_bounds.Add(Vector3, index)
-
-                    // if ( boss center )
-                    //      _xml_boss_center.Add(Vector3, index)
-
-                    // if ( sound file )
-                    //      _xml_sound.Add(object, index)
-
-                    // if ( end region )
-                    //      _xml_end_region.Add(Vector3)
-
-                    // if ( enemy )
-                    //      _xml_enemy.Add(object, index)
-
-                    // if ( background )
-                    //      _xml_bg.Add(BackGroundData, index)  /// BackGroundData is a struct to hold the multiple data items needed to create a BG
-                }
-                else
-                {
-                    objList.Add(o);
-                    physList.Add(o);
-                    renderList.Add(o);
+                    Enemy e = parseEnemy(ObjectList[listKey][objectIter], loc, player);
+                    objList.Add(e);
+                    physList.Add(e);
+                    renderList.Add(e);
                     clickdown = false;
-
                     // Add to obstacle list
-                    if (_xml_obstacle_list.ContainsKey(itemIter))
+                    if (_xml_enemy_list.ContainsKey(objectIter))
                     {
-                        _xml_obstacle_list[itemIter].Add(o.location);
+                        _xml_enemy_list[objectIter].Add(e.location);
                     }
                     else
                     {
                         List<Vector3> locList = new List<Vector3>();
-                        locList.Add(o.location);
-                        _xml_obstacle_list.Add(itemIter, locList); 
+                        locList.Add(e.location);
+                        _xml_enemy_list.Add(objectIter, locList);
                     }
+                }
 
+
+                else
+                {
+                    Obstacle o = ParseObstacle(ObjectList[listKey][objectIter], loc);
+                    if (o == null)
+                    {
+                        Decoration dec = ParseDecoration(ObjectList[listKey][objectIter], loc);
+                        objList.Add(dec);
+                        renderList.Add(dec);
+
+                        // Add decoration to decoration list
+                        _xml_dec_list.Add(dec.location, objectIter);
+
+                        /** TODO !!!! ***/
+                        // Need to parse Enemies, Sound files, boss regions, backgrounds
+
+                        /// PSEUDO-CODE
+                        // if ( boss region )
+                        //      _xml_boss_region.Add(Vector3, index)
+
+                        // if ( boss bounds )
+                        //      _xml_boss_bounds.Add(Vector3, index)
+
+                        // if ( boss center )
+                        //      _xml_boss_center.Add(Vector3, index)
+
+                        // if ( sound file )
+                        //      _xml_sound.Add(object, index)
+
+                        // if ( end region )
+                        //      _xml_end_region.Add(Vector3)
+
+                        // if ( enemy )
+                        //      _xml_enemy.Add(object, index)
+
+                        // if ( background )
+                        //      _xml_bg.Add(BackGroundData, index)  /// BackGroundData is a struct to hold the multiple data items needed to create a BG
+                    }
+                    else
+                    {
+                        objList.Add(o);
+                        physList.Add(o);
+                        renderList.Add(o);
+                        clickdown = false;
+
+                        // Add to obstacle list
+                        if (_xml_obstacle_list.ContainsKey(objectIter))
+                        {
+                            _xml_obstacle_list[objectIter].Add(o.location);
+                        }
+                        else
+                        {
+                            List<Vector3> locList = new List<Vector3>();
+                            locList.Add(o.location);
+                            _xml_obstacle_list.Add(objectIter, locList);
+                        }
+
+                    }
                 }
             }
             else if (eng.ThisMouse.LeftPressed() && !clickdown && enable3d)
@@ -651,12 +734,12 @@ namespace U5Designs
                 Vector3d mousecoord = new Vector3d((double)this.eng.Mouse.X, (double)(this.eng.Height - this.eng.Mouse.Y), 1.0);
                 // Unproject the coordinates to convert from mouse to world coordinates
                 Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, this.camera.getViewport());
-                Obstacle objToRemove = null;
+                GameObject objToRemove = null;
                 foreach (GameObject obj in objList)
                 {
                     if (obj is Obstacle)
                     {
-                        if (eng.ThisMouse.inObjectRegion((Obstacle)obj, mouseWorld, enable3d))
+                        if (eng.ThisMouse.inObjectRegion(obj, mouseWorld, enable3d))
                         {
                             objToRemove = (Obstacle)obj;
                             foreach (int key in _xml_obstacle_list.Keys)
@@ -664,6 +747,22 @@ namespace U5Designs
                                 if(_xml_obstacle_list[key].Contains(objToRemove.location))
                                 {
                                     _xml_obstacle_list[key].Remove(objToRemove.location);
+                                }
+                            }
+                        }
+                    }
+
+                    // Remove object if it is an enemy
+                    if (obj is Enemy)
+                    {
+                        if (eng.ThisMouse.inObjectRegion(obj, mouseWorld, enable3d))
+                        {
+                            objToRemove = obj;
+                            foreach (int key in _xml_enemy_list.Keys)
+                            {
+                                if (_xml_enemy_list[key].Contains(objToRemove.location))
+                                {
+                                    _xml_enemy_list[key].Remove(objToRemove.location);
                                 }
                             }
                         }
@@ -700,8 +799,8 @@ namespace U5Designs
                 if (objToRemove != null)
                 {
                     objList.Remove(objToRemove);
-                    physList.Remove(objToRemove);
-                    renderList.Remove(objToRemove);
+                    physList.Remove((PhysicsObject)objToRemove);
+                    renderList.Remove((RenderObject)objToRemove);
                 }
                 
             }
@@ -746,10 +845,10 @@ namespace U5Designs
          * -------------------------------------------------------------------------------------------------------------
          * */
         #region Parse Level Files
-        public List<string> GetObstaclesFromDir()
+        public List<string> GetItemsFromDir(string filename)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
-            string _o_path ="U5Designs.Resources.Data.Obstacles.obstacles.txt";
+            string _o_path ="U5Designs.Resources.Data." + filename;
             Stream fstream = assembly.GetManifestResourceStream(_o_path);
             StreamReader r = new StreamReader(fstream);
             List<string> obstacleList = new List<string>();
@@ -904,6 +1003,64 @@ namespace U5Designs
         }
         #endregion
 
+        #region Enemy Parsing
+        private Enemy parseEnemy(string path, Vector3 location, Player player)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.IgnoreComments = true;
+
+                string _e_path = "U5Designs.Resources.Data.Enemies." + path;
+                Stream fstream = assembly.GetManifestResourceStream(_e_path);
+                XmlDocument doc = new XmlDocument();
+                XmlReader reader = XmlReader.Create(fstream, settings);
+                doc.Load(reader);
+
+                bool draw_2d, draw_3d;
+                int _health, _damage, _AI;
+                float _speed;
+
+                Vector3 scale = LoadLevel.parseVector3(doc.GetElementsByTagName("scale")[0]);
+                Vector3 pbox = LoadLevel.parseVector3(doc.GetElementsByTagName("pbox")[0]);
+                Vector3 cbox = LoadLevel.parseVector3(doc.GetElementsByTagName("cbox")[0]);
+
+                draw_2d = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
+                draw_3d = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
+
+                XmlNodeList _h = doc.GetElementsByTagName("health");
+                _health = Convert.ToInt32(_h.Item(0).InnerText);
+                XmlNodeList _d = doc.GetElementsByTagName("damage");
+                _damage = Convert.ToInt32(_d.Item(0).InnerText);
+                XmlNodeList _s = doc.GetElementsByTagName("speed");
+                _speed = Convert.ToSingle(_s.Item(0).InnerText);
+                XmlNodeList _ai = doc.GetElementsByTagName("AI");
+                _AI = Convert.ToInt32(_ai.Item(0).InnerText);
+                XmlNodeList _sp = doc.GetElementsByTagName("sprite");
+                string _sprite_path = _sp.Item(0).InnerText;
+
+                // Projectile stuff
+                XmlNodeList _p = doc.GetElementsByTagName("proj");
+
+
+                // Pause now and parse the Sprite.dat to create the necessary Sprite that is associated with the current Enemy object
+                fstream.Close();
+
+                // Create the SpriteSheet              
+                SpriteSheet ss = LoadLevel.parseSpriteFile(_sprite_path);
+
+                if (_p.Count == 0)
+                {
+                    return new Enemy(player, location, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss);
+                }
+                else
+                {
+                    ProjectileProperties p = LoadLevel.parseProjectileFile(_p.Item(0).InnerText);
+
+                    return new Enemy(player, location, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, p);
+                }
+        }
+        #endregion
+
         /**
          * This method will take the various lists containing all the game elements that the user added and write them out in the correct format
          * to create a valid level.dat file.  It requires a level Name and Index value.  Right now the level Name is not being used but in the future it may be
@@ -1039,19 +1196,21 @@ namespace U5Designs
                 if (_xml_enemy_list.Count > 0)
                 {
                     writer.WriteStartElement("enemylist");
-                    foreach (KeyValuePair<Vector3, int> p6 in _xml_enemy_list)
+                    foreach (int key in _xml_enemy_list.Keys)
                     {
                         writer.WriteStartElement("enemy");
 
                         writer.WriteStartElement("path");
-                        // TO DO !!!!!!!! writer.WriteString();  // need to use the index to look up which enemy .dat file to use
+                        writer.WriteString(EnemiesList[key]); // need to use the index to look up which obstacle .dat file to use
                         writer.WriteEndElement();
-
-                        writer.WriteStartElement("loc");
-                        writer.WriteAttributeString("x", ((int)(p6.Key.X)).ToString());
-                        writer.WriteAttributeString("y", ((int)(p6.Key.Y)).ToString());
-                        writer.WriteAttributeString("z", ((int)(p6.Key.Z)).ToString());
-                        writer.WriteEndElement();
+                        foreach (Vector3 loc in _xml_enemy_list[key])
+                        {
+                            writer.WriteStartElement("loc");
+                            writer.WriteAttributeString("x", ((int)(loc.X)).ToString());
+                            writer.WriteAttributeString("y", ((int)(loc.Y)).ToString());
+                            writer.WriteAttributeString("z", ((int)(loc.Z)).ToString());
+                            writer.WriteEndElement();
+                        }
 
                         writer.WriteEndElement();
                     }

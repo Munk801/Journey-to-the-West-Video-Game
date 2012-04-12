@@ -23,7 +23,7 @@ namespace U5Designs
         }
 
         // TO DO: MAKE AN INOBJECTREGION METHOD THAT WILL DETECT WHETHER MOUSE IS IN OBJECT
-        internal bool inObjectRegion(Obstacle obj, Vector3d mouseCoord, bool enable3D)
+        internal bool inObjectRegion(GameObject obj, Vector3d mouseCoord, bool enable3D)
         {
             Rectangle r = new Rectangle((int)obj.location.X - 50, (int)obj.location.Y - 50, 100, 100);
             if (!enable3D)

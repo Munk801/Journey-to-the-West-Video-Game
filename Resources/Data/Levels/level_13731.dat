@@ -60,7 +60,8 @@
 	<enemylist>
 		<enemy>
 			<path>Boy.dat</path>
-      <loc x="200" y="17.5" z="50"/>		
+      <loc x="200" y="17.5" z="50"/>
+	  <loc x="388" y="23" z="50" />	  
 		</enemy>
 		<enemy>
 			<path>Bird.dat</path>
@@ -75,8 +76,9 @@
 		<obstacle>			
 			<path>test_obstacle.dat</path>
 			<loc x="50" y="-50" z="50"/>
-			<loc x="7" y="175" z="50" />
-			<loc x="247" y="-52" z="50" />
+			<loc x="156" y="-48" z="50" />
+			<loc x="255" y="-48" z="50" />
+			<loc x="355" y="-49" z="50" />
       <!--Boss encounter area-->
   <!--<loc x="4100" y="75" z="0"/>
 			<loc x="4100" y="75" z="100"/>

@@ -434,6 +434,9 @@
     <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load3.png" />
     <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load4.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Enemies\enemies.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
