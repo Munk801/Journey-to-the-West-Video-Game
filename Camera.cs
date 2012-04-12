@@ -106,7 +106,7 @@ namespace U5Designs
 
         private void SetPerspective() {
             GL.MatrixMode(MatrixMode.Projection);
-            Matrix4d projection = Matrix4d.CreatePerspectiveFieldOfView(fov, width / (float)height, 1.0f, 6400.0f);
+            Matrix4d projection = Matrix4d.CreatePerspectiveFieldOfView(fov, width / (float)height, 1.0f, 12800.0f);
             this.projection = projection;
             GL.LoadMatrix(ref projection);
         }

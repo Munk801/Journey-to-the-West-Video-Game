@@ -77,7 +77,7 @@
 		</enemy>
 	</enemylist>
 	<obstaclelist>
-		<obstacle>			
+		<obstacle>
 			<path>test_obstacle.dat</path>
 			<loc x="50" y="-50" z="50"/>
 			<loc x="150" y="-50" z="50"/>
@@ -152,15 +152,15 @@
     </obstacle>
     <obstacle>
       <path>brick_wall_back.dat</path>
-      <loc x="4250" y="225" z="-50"/>
+      <loc x="4250" y="275" z="-50"/>
     </obstacle>
     <obstacle>
       <path>brick_wall_front.dat</path>
-      <loc x="4250" y="225" z="150"/>
+      <loc x="4250" y="275" z="150"/>
     </obstacle>
     <obstacle>
       <path>brick_wall_right.dat</path>
-      <loc x="4350" y="225" z="50"/>
+      <loc x="4350" y="275" z="50"/>
     </obstacle>
 		<obstacle>
 			<path>tree.dat</path>
@@ -192,25 +192,25 @@
   <bosslist>
     <obstacle>
       <path>brick_wall_left.dat</path>
-      <loc x="4150" y="225" z="50"/>
+      <loc x="4150" y="275" z="50"/>
     </obstacle>
   </bosslist>
   <decorationlist>
     <decoration>
       <path>zoo_sky_front.dat</path>
-      <loc x="2500" y="80" z="350"/>
+      <loc x="5500" y="80" z="350"/>
     </decoration>
     <decoration>
       <path>zoo_sky_back.dat</path>
-      <loc x="2500" y="80" z="-250"/>
+      <loc x="5500" y="80" z="-250"/>
     </decoration>
     <decoration>
       <path>zoo_sky_end.dat</path>
-      <loc x="5000" y="80" z="50"/>
+      <loc x="11000" y="80" z="50"/>
     </decoration>
     <decoration>
       <path>zoo_sky_top.dat</path>
-      <loc x="2500" y="600" z="50"/>
+      <loc x="5500" y="600" z="50"/>
     </decoration>
   </decorationlist>
   <!--

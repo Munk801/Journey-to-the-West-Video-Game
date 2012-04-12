@@ -250,7 +250,7 @@ namespace U5Designs
             camera.SetModelView();
 
 			foreach(RenderObject obj in renderList) {
-				if((camera.isInTransition && obj.existsIn2d && obj.existsIn3d) ||
+				if((camera.isInTransition && ((!nowBillboarding && obj.existsIn2d) || (nowBillboarding && obj.existsIn3d))) ||
 				   (!camera.isInTransition && ((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d)))) {
 					if(obj.is3dGeo) {
 						obj.doScaleTranslateAndTexture();
