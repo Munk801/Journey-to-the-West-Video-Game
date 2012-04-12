@@ -10,4 +10,5 @@
 	<AI>3</AI>
 	<sprite>girl_sprite.dat</sprite>
 	<proj>ice_cream_projectile.dat</proj>
+  <death>enemy_death.dat</death>
 </enemy>

@@ -483,7 +483,7 @@ namespace U5Designs {
             // add projectile to appropriate lists
             playstate.objList.Add(shot);
             playstate.renderList.Add(shot);
-            playstate.colisionList.Add(shot);
+            playstate.collisionList.Add(shot);
             playstate.physList.Add(shot);
             playstate.combatList.Add(shot);
         }

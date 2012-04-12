@@ -30,7 +30,7 @@ namespace Engine {
 
 		private byte[][][] tex; //tex[cycleNumber][frameNumber][y*w + x]
 		private int texw, texh;
-		private double framesPerSecond;
+		public double framesPerSecond;
 		private int texID;
 		private int prevCycleNum, prevFrameNum;
 		public bool hasAlpha;
@@ -102,6 +102,13 @@ namespace Engine {
 			prevFrameNum = -1;
 		}
 
+		/// <summary>
+		/// Returns the number of frames in the first animation cycle
+		/// Used by effects to determine when animation is over
+		/// </summary>
+		public int frameCount {
+			get { return tex[0].Length; }
+		}
 
         public void CORasterSaveToBMP(byte[] rasterPixels, uint rasterWidth, uint rasterHeight, String path)
         {

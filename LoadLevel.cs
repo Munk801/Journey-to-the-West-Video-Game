@@ -24,7 +24,7 @@ namespace U5Designs {
 			ps.aiList = new List<AIObject>();
 			ps.combatList = new List<CombatObject>();
 			ps.physList = new List<PhysicsObject>();
-			ps.colisionList = new List<PhysicsObject>();
+			ps.collisionList = new List<PhysicsObject>();
 			ps.backgroundList = new List<Background>();
             
 			/**
@@ -72,11 +72,11 @@ namespace U5Designs {
 
 			//Various GameObjects
 
-			List<Enemy> _elist = parseEnemyFiles(_e_list, ps.player);
+			List<Enemy> _elist = parseEnemyFiles(_e_list, ps.player, ps);
 			foreach(Enemy e in _elist) {
 				ps.objList.Add(e);
 				ps.physList.Add(e);
-				ps.colisionList.Add(e);
+				ps.collisionList.Add(e);
 				ps.renderList.Add(e);
 				ps.aiList.Add(e);
                 ps.combatList.Add(e);
@@ -393,7 +393,7 @@ namespace U5Designs {
 		 * for the current level being loaded.  It will parse the XML .dat files, create an Enemy object, and add it
 		 * to a List<> which will be returned. 
 		 * */
-		public static List<Enemy> parseEnemyFiles(XmlNodeList EList, Player player) {
+		public static List<Enemy> parseEnemyFiles(XmlNodeList EList, Player player, PlayState ps) {
 			// Instantiate the list
 			List<Enemy> _e = new List<Enemy>();
 			Assembly assembly = Assembly.GetExecutingAssembly();
@@ -410,51 +410,36 @@ namespace U5Designs {
 				XmlReader reader = XmlReader.Create(fstream, settings);
 				doc.Load(reader);
 
-				bool draw_2d, draw_3d;
-				int _health, _damage, _AI;
-				float _speed;
-
 				Vector3 scale = parseVector3(doc.GetElementsByTagName("scale")[0]);
 				Vector3 pbox = parseVector3(doc.GetElementsByTagName("pbox")[0]);
 				Vector3 cbox = parseVector3(doc.GetElementsByTagName("cbox")[0]);
-
-				draw_2d = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
-				draw_3d = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
-
-				XmlNodeList _h = doc.GetElementsByTagName("health");
-				_health = Convert.ToInt32(_h.Item(0).InnerText);
-				XmlNodeList _d = doc.GetElementsByTagName("damage");
-				_damage = Convert.ToInt32(_d.Item(0).InnerText);
-				XmlNodeList _s = doc.GetElementsByTagName("speed");
-				_speed = Convert.ToSingle(_s.Item(0).InnerText);
-				XmlNodeList _ai = doc.GetElementsByTagName("AI");
-				_AI = Convert.ToInt32(_ai.Item(0).InnerText);
-				XmlNodeList _sp = doc.GetElementsByTagName("sprite");
-				string _sprite_path = _sp.Item(0).InnerText;
-
-                // Projectile stuff
-                XmlNodeList _p = doc.GetElementsByTagName("proj");
-                
-
-				// Pause now and parse the Sprite.dat to create the necessary Sprite that is associated with the current Enemy object
+				bool draw_2d = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
+				bool draw_3d = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
+				int _health = Convert.ToInt32(doc.GetElementsByTagName("health")[0].InnerText);
+				int _damage = Convert.ToInt32(doc.GetElementsByTagName("damage")[0].InnerText);
+				float _speed = Convert.ToSingle(doc.GetElementsByTagName("speed")[0].InnerText);
+				int _AI = Convert.ToInt32(doc.GetElementsByTagName("AI")[0].InnerText);
+				string _sprite_path = doc.GetElementsByTagName("sprite")[0].InnerText;
+				string _death_path = doc.GetElementsByTagName("death")[0].InnerText;
+				XmlNodeList _proj = doc.GetElementsByTagName("proj");
 				fstream.Close();
 
-				// Create the SpriteSheet              
 				SpriteSheet ss = parseSpriteFile(_sprite_path);
+				Effect death = parseEffectFile(_death_path, ps);
 
-				if(_p.Count == 0) {
+				if(_proj.Count == 0) {
 					// Create the Enemies
 					for(int j = 1; j < EList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(EList[i].ChildNodes[j]);
-						_e.Add(new Enemy(player, loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss));
+						_e.Add(new Enemy(player, loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, death));
 					}
 				} else {
-					ProjectileProperties p = parseProjectileFile(_p.Item(0).InnerText);
+					ProjectileProperties proj = parseProjectileFile(_proj[0].InnerText);
 
 					// Create the Enemies
 					for(int j = 1; j < EList[i].ChildNodes.Count; j++) {
 						Vector3 loc = parseVector3(EList[i].ChildNodes[j]);
-						_e.Add(new Enemy(player, loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, p));
+						_e.Add(new Enemy(player, loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, death, proj));
 					}
 				}
 			}
@@ -577,6 +562,49 @@ namespace U5Designs {
 				fstream.Close();
 			}
 			return _d;
+		}
+
+
+		/**
+		 * This method parses a single Effect .dat file and returns the Effect
+		 * */
+		public static Effect parseEffectFile(string path, PlayState ps) {
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			Stream fstream = assembly.GetManifestResourceStream("U5Designs.Resources.Data.Effects." + path);
+			XmlReaderSettings settings = new XmlReaderSettings();
+			settings.IgnoreComments = true;
+			XmlReader reader = XmlReader.Create(fstream, settings);
+			XmlDocument doc = new XmlDocument();
+			doc.Load(reader);
+
+			Vector3 scale = parseVector3(doc.GetElementsByTagName("scale")[0]);
+			bool _draw2 = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
+			bool _draw3 = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
+			SpriteSheet ss = parseSpriteFile(doc.GetElementsByTagName("sprite")[0].InnerText);
+
+			Billboarding bb = Billboarding.Yes;  //Have to put something here for it to compile
+			switch(doc.GetElementsByTagName("billboards")[0].InnerText) {
+				case "yes":
+				case "Yes":
+					bb = Billboarding.Yes;
+					break;
+				case "lock2d":
+				case "Lock2d":
+					bb = Billboarding.Lock2d;
+					break;
+				case "lock3d":
+				case "Lock3d":
+					bb = Billboarding.Lock3d;
+					break;
+				default:
+					Console.WriteLine("Bad obstacle file: " + path);
+					Environment.Exit(1);
+					break;
+
+			}
+			fstream.Close();
+
+			return new Effect(ps, Vector3.Zero, scale, _draw2, _draw3, bb, ss);
 		}
 	}
 }

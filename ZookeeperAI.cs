@@ -68,7 +68,7 @@ namespace U5Designs {
 				boxes[i] = newcrate;
 				ps.objList.Add(newcrate);
 				ps.physList.Add(newcrate);
-			    ps.colisionList.Add(newcrate);
+			    ps.collisionList.Add(newcrate);
 				//ps.renderList.Add(newcrate);
 			}
         }
@@ -245,7 +245,7 @@ namespace U5Designs {
             //TODO: whatever happens when the boss dies
             ps.objList.Remove(bossobject);
             ps.physList.Remove(bossobject);
-            ps.colisionList.Remove(bossobject);
+            ps.collisionList.Remove(bossobject);
             ps.renderList.Remove(bossobject);
             ps.combatList.Remove(bossobject);
         }
@@ -345,7 +345,7 @@ namespace U5Designs {
 						// add projectile to appropriate lists
 						playstate.objList.Add(shot);
 						playstate.renderList.Add(shot);
-						playstate.colisionList.Add(shot);
+						playstate.collisionList.Add(shot);
 						playstate.physList.Add(shot);
 						playstate.combatList.Add(shot);
 					}

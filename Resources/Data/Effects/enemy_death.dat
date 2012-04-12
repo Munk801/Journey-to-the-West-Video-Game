@@ -1,0 +1,7 @@
+﻿<decoration>
+	<scale x="9" y="9" z="9"/>
+	<draw2>true</draw2>
+	<draw3>true</draw3>
+	<sprite>test_sprite.dat</sprite>
+	<billboards>yes</billboards>
+</decoration>

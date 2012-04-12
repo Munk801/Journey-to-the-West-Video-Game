@@ -133,7 +133,7 @@ namespace U5Designs {
                         //Projectile shot = new Projectile(projlocation, direction, new Vector3(12.5f, 12.5f, 12.5f), new Vector3(6.25f, 6.25f, 6.25f), new Vector3(6.25f, 6.25f, 6.25f), true, true, playstate.enable3d, me.damage, 150, false, false, me.projectileSprite);
                         playstate.objList.Add(shot);
                         playstate.renderList.Add(shot);
-                        playstate.colisionList.Add(shot);
+                        playstate.collisionList.Add(shot);
                         playstate.physList.Add(shot);
                         playstate.combatList.Add(shot);
                         me.attackdelayed = true;

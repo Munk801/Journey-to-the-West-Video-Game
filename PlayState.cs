@@ -35,12 +35,13 @@ namespace U5Designs
         //These are the lists of all objects in the game
         internal List<GameObject> objList; //everything is in objList, and then also pointed to from the appropriate interface lists
 		internal List<RenderObject> renderList;
-        internal List<PhysicsObject> colisionList; // colision list = only things that are moving that need to detect colisions
+        internal List<PhysicsObject> collisionList; // collision list = only things that are moving that need to detect collisions
 		internal List<PhysicsObject> physList; // physList is a list of everything that has a bounding box
 		internal List<AIObject> aiList;// aka list of enemies
 		internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
 		internal List<Background> backgroundList;
 		internal List<Obstacle> bossList; //contains obstacles necessary to box the player in during the boss encounter
+		internal List<Effect> effectsList; //effects which need to be updated to determine when to delete themselves
         internal AudioFile levelMusic;
 
 		public SphereRegion bossRegion, endRegion;
@@ -72,6 +73,7 @@ namespace U5Designs
 			musicenabled = false;
 
 			pms = new PauseMenuState(eng);
+			effectsList = new List<Effect>();
 		}
 
         /// <summary>
@@ -105,7 +107,6 @@ namespace U5Designs
         /// </summary>
         /// <param name="e">FrameEventArgs from OpenTK's update</param>
         public override void Update(FrameEventArgs e) {
-			e = new FrameEventArgs(e.Time * 0.2);
             //First deal with hardware input
             DealWithInput();
 
@@ -158,10 +159,15 @@ namespace U5Designs
 					if(co.health <= 0) {
 						objList.Remove((GameObject)co);
 						physList.Remove((PhysicsObject)co);
-						colisionList.Remove((PhysicsObject)co);
+						collisionList.Remove((PhysicsObject)co);
 						renderList.Remove((RenderObject)co);
 						aiList.Remove((AIObject)co);
 						combatList.Remove(co);
+
+						Effect death = new Effect(co.location, ((Enemy)co).deathAnim);
+						objList.Add(death);
+						renderList.Add(death);
+						effectsList.Add(death);
                     }
 				} else if(co.type == (int)CombatType.projectile ||
 						  co.type == (int)CombatType.squish ||
@@ -169,7 +175,7 @@ namespace U5Designs
 					if(co.health <= 0 || co.ScreenRegion == GameObject.OFF_SCREEN) {
 						objList.Remove((GameObject)co);
 						physList.Remove((PhysicsObject)co);
-						colisionList.Remove((PhysicsObject)co);
+						collisionList.Remove((PhysicsObject)co);
 						renderList.Remove((RenderObject)co);
 						combatList.Remove(co);
                     }
@@ -198,13 +204,13 @@ namespace U5Designs
 				//translate that into velocity and position
 				if(enable3d) {
                     player.physUpdate3d(e.Time, physList);
-					foreach(PhysicsObject po in colisionList) {
-                        po.physUpdate3d(e.Time, physList);
+					for(int i = collisionList.Count - 1; i >= 0; i--) {
+						collisionList[i].physUpdate3d(e.Time, physList);
 					}
 				} else {
-                    player.physUpdate2d(e.Time, physList);
-					foreach(PhysicsObject po in colisionList) {
-                        po.physUpdate2d(e.Time, physList);
+					player.physUpdate2d(e.Time, physList);
+					for(int i = collisionList.Count - 1; i >= 0; i--) {
+						collisionList[i].physUpdate2d(e.Time, physList);
 					}
 				}
 
@@ -237,8 +243,6 @@ namespace U5Designs
         /// </summary>
         /// <param name="e">FrameEventArgs from OpenTK's update</param>
 		public override void Draw(FrameEventArgs e) {
-			e = new FrameEventArgs(e.Time * 0.2);
-
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             // UNCOMMENT THIS AND LINE AFTER DRAW TO ADD MOTION BLUR
@@ -248,11 +252,15 @@ namespace U5Designs
             //    GL.Clear(ClearBufferMask.AccumBufferBit);
             //}
 
-            camera.SetModelView();
+			camera.SetModelView();
+
+			for(int i = effectsList.Count - 1; i >= 0; i--) {
+				effectsList[i].update(e.Time);
+			}
 
 			foreach(RenderObject obj in renderList) {
 				if((camera.isInTransition && ((!nowBillboarding && obj.existsIn2d) || (nowBillboarding && obj.existsIn3d))) ||
-				   (!camera.isInTransition && ((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d)))) {
+					(!camera.isInTransition && ((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d)))) {
 					if(obj.is3dGeo) {
 						obj.doScaleTranslateAndTexture();
 						obj.mesh.Render();

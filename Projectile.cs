@@ -15,7 +15,7 @@ namespace U5Designs {
      * projectiles belong on the following lists:
      * objList
      * renderList
-     * colisionList
+     * collisionList
      * physList
      * combatList
      * */

@@ -57,6 +57,7 @@
     <Compile Include="AI.cs" />
     <Compile Include="AIObject.cs" />
     <Compile Include="Background.cs" />
+    <Compile Include="Effect.cs" />
     <Compile Include="LevelDesignerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -455,6 +456,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Textures\girl_front_walk.png" />
     <EmbeddedResource Include="Resources\Textures\girl_side_walk.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Effects\enemy_death.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -9,4 +9,5 @@
 	<speed>60</speed>
 	<AI>2</AI>
 	<sprite>hawk_sprite.dat</sprite>
+  <death>enemy_death.dat</death>
 </enemy>

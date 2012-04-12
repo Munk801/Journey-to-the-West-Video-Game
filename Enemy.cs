@@ -42,8 +42,10 @@ namespace U5Designs
 
         public Player player;
 
+		public Effect deathAnim;
+
 		public Enemy(Player player, Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed,
-						int AItype, ObjMesh mesh, MeshTexture texture) : base() {
+						int AItype, ObjMesh mesh, MeshTexture texture, Effect death) : base() {
 			_location = location;
             _scale = scale;
             _pbox = pbox;
@@ -63,6 +65,7 @@ namespace U5Designs
             attackspeed = 1;
             attacktimer = 0;
 			this.player = player;
+			deathAnim = death;
             
 
 			_mesh = mesh;
@@ -85,7 +88,7 @@ namespace U5Designs
 
 
         public Enemy(Player player, Vector3 location, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed,
-						int AItype, SpriteSheet sprite, ProjectileProperties proj = null)
+						int AItype, SpriteSheet sprite, Effect death, ProjectileProperties proj = null)
         {
 			_location = location;
 			_scale = scale;
@@ -106,6 +109,7 @@ namespace U5Designs
             attackspeed = 1;
             attacktimer = 0;
 			this.player = player;
+			deathAnim = death;
 
 			_mesh = null;
 			_texture = null;

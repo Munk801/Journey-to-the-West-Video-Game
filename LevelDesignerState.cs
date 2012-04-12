@@ -238,7 +238,7 @@ namespace U5Designs
                 if (enable3d)
                 {
                     player.physUpdate3d(e.Time, physList);
-                    foreach (PhysicsObject po in colisionList)
+                    foreach (PhysicsObject po in collisionList)
                     {
                         po.physUpdate3d(e.Time, physList);
                     }
@@ -246,7 +246,7 @@ namespace U5Designs
                 else
                 {
                     player.physUpdate2d(e.Time, physList);
-                    foreach (PhysicsObject po in colisionList)
+                    foreach (PhysicsObject po in collisionList)
                     {
                         po.physUpdate2d(e.Time, physList);
                     }
@@ -1008,56 +1008,37 @@ namespace U5Designs
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             XmlReaderSettings settings = new XmlReaderSettings();
-            settings.IgnoreComments = true;
+			settings.IgnoreComments = true;
 
-                string _e_path = "U5Designs.Resources.Data.Enemies." + path;
-                Stream fstream = assembly.GetManifestResourceStream(_e_path);
-                XmlDocument doc = new XmlDocument();
-                XmlReader reader = XmlReader.Create(fstream, settings);
-                doc.Load(reader);
+			string _e_path = "U5Designs.Resources.Data.Enemies." + path;
+			Stream fstream = assembly.GetManifestResourceStream(_e_path);
+			XmlDocument doc = new XmlDocument();
+			XmlReader reader = XmlReader.Create(fstream, settings);
+			doc.Load(reader);
 
-                bool draw_2d, draw_3d;
-                int _health, _damage, _AI;
-                float _speed;
+			Vector3 scale = LoadLevel.parseVector3(doc.GetElementsByTagName("scale")[0]);
+			Vector3 pbox = LoadLevel.parseVector3(doc.GetElementsByTagName("pbox")[0]);
+			Vector3 cbox = LoadLevel.parseVector3(doc.GetElementsByTagName("cbox")[0]);
+			bool draw_2d = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
+			bool draw_3d = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
+			int _health = Convert.ToInt32(doc.GetElementsByTagName("health")[0].InnerText);
+			int _damage = Convert.ToInt32(doc.GetElementsByTagName("damage")[0].InnerText);
+			float _speed = Convert.ToSingle(doc.GetElementsByTagName("speed")[0].InnerText);
+			int _AI = Convert.ToInt32(doc.GetElementsByTagName("AI")[0].InnerText);
+			string _sprite_path = doc.GetElementsByTagName("sprite")[0].InnerText;
+			string _death_path = doc.GetElementsByTagName("death")[0].InnerText;
+			XmlNodeList _proj = doc.GetElementsByTagName("proj");
+			fstream.Close();
 
-                Vector3 scale = LoadLevel.parseVector3(doc.GetElementsByTagName("scale")[0]);
-                Vector3 pbox = LoadLevel.parseVector3(doc.GetElementsByTagName("pbox")[0]);
-                Vector3 cbox = LoadLevel.parseVector3(doc.GetElementsByTagName("cbox")[0]);
+			SpriteSheet ss = LoadLevel.parseSpriteFile(_sprite_path);
+			Effect death = LoadLevel.parseEffectFile(_death_path, this);
 
-                draw_2d = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
-                draw_3d = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
-
-                XmlNodeList _h = doc.GetElementsByTagName("health");
-                _health = Convert.ToInt32(_h.Item(0).InnerText);
-                XmlNodeList _d = doc.GetElementsByTagName("damage");
-                _damage = Convert.ToInt32(_d.Item(0).InnerText);
-                XmlNodeList _s = doc.GetElementsByTagName("speed");
-                _speed = Convert.ToSingle(_s.Item(0).InnerText);
-                XmlNodeList _ai = doc.GetElementsByTagName("AI");
-                _AI = Convert.ToInt32(_ai.Item(0).InnerText);
-                XmlNodeList _sp = doc.GetElementsByTagName("sprite");
-                string _sprite_path = _sp.Item(0).InnerText;
-
-                // Projectile stuff
-                XmlNodeList _p = doc.GetElementsByTagName("proj");
-
-
-                // Pause now and parse the Sprite.dat to create the necessary Sprite that is associated with the current Enemy object
-                fstream.Close();
-
-                // Create the SpriteSheet              
-                SpriteSheet ss = LoadLevel.parseSpriteFile(_sprite_path);
-
-                if (_p.Count == 0)
-                {
-                    return new Enemy(player, location, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss);
-                }
-                else
-                {
-                    ProjectileProperties p = LoadLevel.parseProjectileFile(_p.Item(0).InnerText);
-
-                    return new Enemy(player, location, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, p);
-                }
+			if(_proj.Count == 0) {
+				return new Enemy(player, location, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, death);
+			} else {
+				ProjectileProperties proj = LoadLevel.parseProjectileFile(_proj[0].InnerText);
+				return new Enemy(player, location, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, death, proj);
+			}
         }
         #endregion
 
