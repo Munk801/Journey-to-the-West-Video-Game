@@ -394,7 +394,7 @@ namespace U5Designs {
 			myGround.location = new Vector3(newposn.X, 100.0f, newposn.Z);
 		}
 
-		public void fall() {
+		public virtual void fall() {
 			if(idle) {
 				idle = false;
 				prefalling = true;
@@ -510,7 +510,10 @@ namespace U5Designs {
     }
 
 	//Boss, the crate he's standing on, and the ground under him
-    internal class Boss : FallingBox, CombatObject {
+	internal class Boss : FallingBox, CombatObject {
+
+		public bool invincible;
+
 		internal Boss(Player player, PlayState ps, Vector3 location, int maxheight, ProjectileProperties invisProj, Obstacle crate, Obstacle ground, Obstacle rope, SpriteSheet bossSprite)
             : base(player, ps, location, maxheight, invisProj, crate, ground, rope) {
 			pbox2d = true;
@@ -532,32 +535,21 @@ namespace U5Designs {
             _type = 3; //Type 3 means this is the boss
 
             invincible = false;
-            invintimer = 0;
         }
 
-        double invintimer;
-        double invintime = 1.5;
-        public bool invincible;
-
-        public override void update(double time, PlayState playstate, Vector3 playerposn, bool enable3d) {
-            if (invincible) {
-                invintimer = invintimer + time;
-                if (invintimer >= invintime) {
-                    invintimer = 0;
-                    invincible = false;
-                }
-            }
-
-			base.update(time, playstate, playerposn, enable3d);
-        }
+		public override void fall() {
+			if(idle) {
+				invincible = false;
+				base.fall();
+			}
+		}
 
         public void dodamage(int hit) {
             if (!invincible) {
                 health = health - 1;
                 //TODO: play pain animation or w/e
-                //downtimer = downtime - 0.2;// make him come up after .2 seconds
                 invincible = true;
-                invintimer = 0;
+/*                invintimer = 0;*/
             }
         }
 

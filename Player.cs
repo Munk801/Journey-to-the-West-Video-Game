@@ -20,6 +20,7 @@ namespace U5Designs {
     {
 		private const int fallDamage = 1;
         private int runSpeed = 125;
+		private int spinSpeed = 175;
 
 		private PlayState playstate; //Keep a reference since we'll need this regularly
 
@@ -227,7 +228,7 @@ namespace U5Designs {
                 stamina = Math.Max(stamina - 5.0 * time, 0.0);
                 if (stamina <= 0.0 || spinTimer <= 0.0) {
                     spinning = false;
-                    _speed = 75;
+                    _speed = runSpeed;
                     if (velocity.X == 0) {
                         _cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
                     }
@@ -437,7 +438,7 @@ namespace U5Designs {
             if (isMobile && playstate.eng.ThisMouse.RightPressed() && spinTimer <= 0.0 && stamina > 0.0) {
                 spinning = true;
 				spinTimer = 0.5;
-                _speed = runSpeed;
+                _speed = spinSpeed;
 				_cycleNum = (int)(enable3d ? PlayerAnim.spin3d : PlayerAnim.spin2d);
             }
         }
