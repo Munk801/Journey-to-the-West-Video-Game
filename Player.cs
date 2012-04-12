@@ -38,8 +38,8 @@ namespace U5Designs {
         private Vector3 lastPosOnGround; // used for falling off detection
 
         //timers
-        private double Invincibletimer, NoControlTimer, projectileTimer, spinTimer;
-		public double fallTimer, viewSwitchJumpTimer, lookDownTimer;
+        private double NoControlTimer, projectileTimer, spinTimer;
+		public double Invincibletimer, fallTimer, viewSwitchJumpTimer, lookDownTimer;
 
         //projectile managment
 		List<ProjectileProperties> projectiles;
@@ -202,7 +202,8 @@ namespace U5Designs {
             }
         }
 
-        /// <summary>
+		#region leveldesigner
+		/// <summary>
         ///  FOR LEVEL DESIGNER ONLY
         /// </summary>
         /// <param name="enable3d"> true if we are in 3d view</param>
@@ -280,6 +281,7 @@ namespace U5Designs {
                 //handleMouseInput();
             }
         }
+		#endregion
 
 		/// <summary>
 		/// Handles all keyboard input from the player

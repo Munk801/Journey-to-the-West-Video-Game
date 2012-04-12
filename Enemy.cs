@@ -289,25 +289,27 @@ namespace U5Designs
                             }
                         }
                         else { //this is a combat collision
-                            if (((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
-                                if (((Projectile)collidingObj).playerspawned) {
-                                    time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
-                                    _health = _health - ((CombatObject)collidingObj).damage;
-                                    //despawn the projectile
-                                    ((CombatObject)collidingObj).health = 0;
-                                }
-                            }
+                            switch(((CombatObject)collidingObj).type) {
+								case (int)CombatType.projectile: // obj is a projectile, despawn projectile do damage
+									if(((Projectile)collidingObj).playerspawned) {
+										time = 0.0;
+										_health = _health - ((CombatObject)collidingObj).damage;
+										//despawn the projectile
+										((CombatObject)collidingObj).health = 0;
+									}
+									break;
 
-                            //if the collidingObj is the player and the player is in some kill enemy state, hurt the enemy else hurt player and kb player
-                            if (((CombatObject)collidingObj).type == 0) {
-                                time = 0.0;
-                                player.health = player.health - _damage;
-                                player.Invincible = true;
-                                player.HasControl = false;
-                                frozen = true;
+								case (int)CombatType.player: //if the collidingObj is the player, do damage and knock the player back
+									time = 0.0;
+									player.health = player.health - _damage;
+									player.Invincible = true;
+									player.Invincibletimer = 1.0;
+									player.HasControl = false;
+									frozen = true;
 
-                                player.knockback(true, this);
-                            }
+									player.knockback(true, this);
+									break;
+							}
                         }
                     }
                 }
@@ -433,26 +435,27 @@ namespace U5Designs
                             }
                         }
                         else { //this is a combat collision
-                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead      
-                            if (((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
-                                if (((Projectile)collidingObj).playerspawned) {
-                                    time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
-                                    _health = _health - ((CombatObject)collidingObj).damage;
-                                    //despawn the projectile
-                                    ((CombatObject)collidingObj).health = 0;
-                                }
+							switch(((CombatObject)collidingObj).type) {
+								case (int)CombatType.projectile: // obj is a projectile, despawn projectile do damage
+									if(((Projectile)collidingObj).playerspawned) {
+										time = 0.0;
+										_health = _health - ((CombatObject)collidingObj).damage;
+										//despawn the projectile
+										((CombatObject)collidingObj).health = 0;
+									}
+									break;
 
-                            }
-                            //if the collidingObj is the player and the player is in some kill enemy state, hurt the enemy else hurt player and kb player
-                            if (((CombatObject)collidingObj).type == 0) {
-                                time = 0.0;
-                                player.health = player.health - _damage;
-                                player.Invincible = true;
-                                player.HasControl = false;
-                                frozen = true;
+								case (int)CombatType.player: //if the collidingObj is the player, do damage and knock the player back
+									time = 0.0;
+									player.health = player.health - _damage;
+									player.Invincible = true;
+									player.Invincibletimer = 1.0;
+									player.HasControl = false;
+									frozen = true;
 
-                                player.knockback(false, this);
-                            }
+									player.knockback(false, this);
+									break;
+							}
                         }
                     }
                 }
