@@ -129,7 +129,6 @@
     <EmbeddedResource Include="Resources\Textures\PauseTextures\p4.png" />
     <EmbeddedResource Include="Resources\Textures\game_over_text.png" />
     <EmbeddedResource Include="Resources\Textures\city_ground.png" />
-    <EmbeddedResource Include="Resources\Textures\girl_sprite.png" />
     <EmbeddedResource Include="Resources\Textures\zoo_keeper_sprite.png" />
     <EmbeddedResource Include="Resources\Textures\banana.png" />
     <EmbeddedResource Include="Resources\Textures\test_sprite.png" />
@@ -438,7 +437,7 @@
     <EmbeddedResource Include="Resources\Data\Obstacles\rope_bridge.dat" />
     <EmbeddedResource Include="Resources\Data\Sprites\rope_bridge_sprite.dat" />
   </ItemGroup>
-    <ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Enemies\enemies.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -452,6 +451,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Obstacles\zookeeper_boss_rope.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\girl_front_walk.png" />
+    <EmbeddedResource Include="Resources\Textures\girl_side_walk.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

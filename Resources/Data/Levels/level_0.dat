@@ -73,7 +73,7 @@
 		</enemy>
 		<enemy>
 		  <path>Girl.dat</path>
-		  <loc x="400" y="12.5" z="160"/>
+		  <loc x="400" y="17.5" z="160"/>
 		</enemy>
 	</enemylist>
 	<obstaclelist>
