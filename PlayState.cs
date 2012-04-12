@@ -274,8 +274,8 @@ namespace U5Designs
 
 			//Draw HUD
 			float dec = (float)player.health / player.maxHealth;
-            bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 670, scaleX: 0.5f, scaleY: 0.5f);
-			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 300, 670, scaleX: 0.5f, scaleY: 0.5f, decrementX: dec);
+            bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 675, scaleX: 0.5f, scaleY: 0.25f);
+			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 300, 675, scaleX: 0.5f, scaleY: 0.25f, decrementX: dec);
 
 			drawStaminaBar();
 
