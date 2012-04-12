@@ -1,0 +1,11 @@
+﻿<obstacle>
+	<is2d>true</is2d>
+  <scale x="266.67" y="2.11" z="1"/>
+	<pbox x="133.33" y="1.055" z="0"/>
+	<draw2>true</draw2>
+	<draw3>true</draw3>
+  <collidesIn2d>true</collidesIn2d>
+  <collidesIn3d>false</collidesIn3d>
+  <sprite>rope_bridge_sprite.dat</sprite>
+  <billboards>lock2d</billboards>
+</obstacle>

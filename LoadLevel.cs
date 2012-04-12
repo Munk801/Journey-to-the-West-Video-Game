@@ -44,9 +44,10 @@ namespace U5Designs {
 			XmlNode bossAreaBounds = doc.GetElementsByTagName("bossAreaBounds")[0];
 			XmlNodeList _b_list = doc.GetElementsByTagName("background");
 			XmlNodeList _e_list = doc.GetElementsByTagName("enemy");
-			XmlNodeList _o_list = doc.GetElementsByTagName("obstacle");
+			XmlNodeList _o_list = doc.GetElementsByTagName("obstaclelist")[0].ChildNodes;
 			XmlNodeList _d_list = doc.GetElementsByTagName("decoration");
             XmlNodeList _a_list = doc.GetElementsByTagName("audiofile");
+			XmlNodeList bossObstacleList = doc.GetElementsByTagName("bosslist")[0].ChildNodes;
 			fstream.Close();
 
 			//Regions and Boss Area
@@ -100,6 +101,8 @@ namespace U5Designs {
 				ps.objList.Add(d);
 				ps.renderList.Add(d);
 			}
+
+			ps.bossList = parseObstacleFiles(bossObstacleList);
 
 			//TODO: When we have more than one boss type, adjust this
 			ps.bossAI = new ZookeeperAI(ps.player, ps);
@@ -255,9 +258,33 @@ namespace U5Designs {
             // Check to see if the current Obstacle is 2D or 3D and handle accordingly
             XmlNodeList _type = doc.GetElementsByTagName("is2d");
             if (Convert.ToBoolean(_type.Item(0).InnerText)) {
-				fstream.Close();
-                Console.Out.WriteLine("ERROR: obstacle +" + _o_path + "is not a 3d object, it must be 3d");
-                return null;
+                String ss_path = doc.GetElementsByTagName("sprite")[0].InnerText;
+                fstream.Close();
+                SpriteSheet ss = parseSpriteFile(ss_path);
+
+                Billboarding bb = Billboarding.Yes;  //Have to put something here for it to compile
+                switch (doc.GetElementsByTagName("billboards")[0].InnerText) {
+                    case "yes":
+                    case "Yes":
+                        bb = Billboarding.Yes;
+                        break;
+                    case "lock2d":
+                    case "Lock2d":
+                        bb = Billboarding.Lock2d;
+                        break;
+                    case "lock3d":
+                    case "Lock3d":
+                        bb = Billboarding.Lock3d;
+                        break;
+                    default:
+                        Environment.Exit(1);
+                        break;
+                }
+                List<Obstacle> obstacles = new List<Obstacle>();
+                foreach (Vector3 loc in locs) {
+                    obstacles.Add(new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, bb, ss));
+                }
+                return obstacles;
             }
             else {
                 XmlNodeList _m = doc.GetElementsByTagName("mesh");

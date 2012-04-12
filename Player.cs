@@ -19,6 +19,7 @@ namespace U5Designs {
     public class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
 		private const int fallDamage = 1;
+        private int runSpeed = 125;
 
 		private PlayState playstate; //Keep a reference since we'll need this regularly
 
@@ -37,7 +38,7 @@ namespace U5Designs {
 
         //timers
         private double Invincibletimer, NoControlTimer, projectileTimer, spinTimer;
-		public double fallTimer, viewSwitchJumpTimer;
+		public double fallTimer, viewSwitchJumpTimer, lookDownTimer;
 
         //projectile managment
 		List<ProjectileProperties> projectiles;
@@ -56,7 +57,7 @@ namespace U5Designs {
         public double spinSize; // the distance from the center of the player the spin attack extends
         public int spinDamage;
 
-		private bool spaceDown, eDown;
+		private bool spaceDown, eDown, pDown;
 
         public bool inLevelDesignMode = false; // THIS IS ONLY USED FOR LEVEL DESIGNER
         
@@ -68,7 +69,7 @@ namespace U5Designs {
             p_state = new PlayerState("TEST player");
             //p_state.setSpeed(130);
 			this.playstate = ps;
-			_speed = 75;
+            _speed = runSpeed;
 			_location = new Vector3(25, 12.5f, 50);
             _scale = new Vector3(16.25f, 25f, 16.25f);
             _pbox = new Vector3(5f, 12.5f, 5f);
@@ -77,7 +78,7 @@ namespace U5Designs {
 			velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);
 			kbspeed = new Vector3(70, 100, 70);
-			jumpspeed = 230.0f;
+			jumpspeed = 250.0f;
 			_cycleNum = 0;
 			_frameNum = 0;
 			_sprite = sprite;
@@ -96,6 +97,7 @@ namespace U5Designs {
 
 			spaceDown = false;
 			eDown = false;
+            pDown = false;
 			isMobile = true;
 
             Invincible = false;
@@ -106,6 +108,7 @@ namespace U5Designs {
 			viewSwitchJumpTimer = 0.0;
 			projectileTimer = 0.0;
 			spinTimer = 0.0;
+			lookDownTimer = -1.0;
 			lastPosOnGround = new Vector3(_location);
 			_animDirection = 1;
 			this.projectiles = projectiles;
@@ -138,18 +141,21 @@ namespace U5Designs {
 				spinTimer -= time;
 			}
 
-			if(spinning) {
-				stamina = Math.Max(stamina - 5.0 * time, 0.0);
-				if(stamina <= 0.0 || spinTimer <= 0.0) {
-					spinning = false;
-					_speed = 75;
-					if(velocity.X == 0) {
-						_cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
-					} else {
-						_cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
-					}
-				}
-			}
+            if (spinning) {
+                stamina = Math.Max(stamina - 5.0 * time, 0.0);
+                if (stamina <= 0.0 || spinTimer <= 0.0) {
+                    spinning = false;
+                    _speed = 75;
+                    if (velocity.X == 0) {
+                        _cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
+                    }
+                    else {
+                        _cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
+                    }
+                }
+            }
+            else
+                _speed = runSpeed;
 
 			if(projectileTimer > 0.0) {
 				projectileTimer -= time;
@@ -171,6 +177,15 @@ namespace U5Designs {
 
 			if(viewSwitchJumpTimer > 0.0) {
 				viewSwitchJumpTimer -= time;
+			}
+
+			if(lookDownTimer >= 0.0) {
+				lookDownTimer += time;
+				if(lookDownTimer >= 0.75) {
+					cam.moveToYPos(_location.Y - 50.0f);
+					lookDownTimer = -2.0;
+					isMobile = false;
+				}
 			}
 
 			//If the grenade is selected, draw parabola
@@ -208,23 +223,21 @@ namespace U5Designs {
                 spinTimer -= time;
             }
 
-            if (spinning)
-            {
+            if (spinning) {
                 stamina = Math.Max(stamina - 5.0 * time, 0.0);
-                if (stamina <= 0.0 || spinTimer <= 0.0)
-                {
+                if (stamina <= 0.0 || spinTimer <= 0.0) {
                     spinning = false;
                     _speed = 75;
-                    if (velocity.X == 0)
-                    {
+                    if (velocity.X == 0) {
                         _cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
                     }
-                    else
-                    {
+                    else {
                         _cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
                     }
                 }
             }
+            else
+                _speed = runSpeed;
 
             if (projectileTimer > 0.0)
             {
@@ -307,12 +320,27 @@ namespace U5Designs {
 					}
 				}
 
+#if DEBUG
 				//Cloud
 				//TODO: Implement animation etc, possibly change which key triggers this
 				if(keyboard[Key.C]) {
 					velocity.Y = _speed;
 					fallTimer = 0.0;
 				}
+                //TMP PHYSICS TEST BUTTON suicide button
+                if (keyboard[Key.X]) {
+                    _health = 0;
+                }
+                if (keyboard[Key.P] && !pDown) {
+                    pDown = true;
+                    Console.WriteLine("Player position: (" + location.X + ", " + location.Y + ", " + location.Z + ")");
+                }
+                else if (!keyboard[Key.P])
+                    pDown = false;
+
+                if (keyboard[Key.BackSlash])
+                    _location = new Vector3(3779, 138, 43);
+#endif
 
 				//Jump
 				if(keyboard[Key.Space] && !spaceDown) {
@@ -331,9 +359,15 @@ namespace U5Designs {
 				velocity.Z = 0.0f;
 			}
 
-			//TMP PHYSICS TEST BUTTON suicide button
-			if(keyboard[Key.X]) {
-				_health = 0;
+			//Look down
+			if(!enable3d && keyboard[Key.S]) {
+				if(lookDownTimer == -1.0) {
+					lookDownTimer = 0.0;
+				}
+			} else if(lookDownTimer != -1.0) {
+				cam.moveToYPos(_location.Y);
+				lookDownTimer = -1.0;
+				isMobile = true;
 			}
 
 			//Toggle Grenade
@@ -356,14 +390,17 @@ namespace U5Designs {
 			
 			//Secret skip to boss
 			if(keyboard[Key.Period] && keyboard[Key.Comma]) {
-				playstate.enterBossMode();
 				//floor at 125 + 12.5 player pbox
 				_location = new Vector3(playstate.bossAreaCenter) + Vector3.UnitY * (_pbox.Y + 0.1f);
 
 				//The following should maybe be moved to a function in Camera
 				playstate.camera.eye.Y = _location.Y + (enable3d ? 24.0f : 31.25f);
 				playstate.camera.lookat.Y = _location.Y + (enable3d ? 20.5f : 31.25f);
+				cam.moveToYPos(_location.Y);
+
+				playstate.enterBossMode();
 			}
+
 		}
 		
         /// <summary>
@@ -400,7 +437,7 @@ namespace U5Designs {
             if (isMobile && playstate.eng.ThisMouse.RightPressed() && spinTimer <= 0.0 && stamina > 0.0) {
                 spinning = true;
 				spinTimer = 0.5;
-				_speed = 125;
+                _speed = runSpeed;
 				_cycleNum = (int)(enable3d ? PlayerAnim.spin3d : PlayerAnim.spin2d);
             }
         }
@@ -548,10 +585,10 @@ namespace U5Designs {
 		}
 
         /// <summary>
-        /// Starts the timer and anamation to squish the player if he got squished in the zookeeper encounter
+        /// Starts the timer and animation to squish the player if he got squished in the zookeeper encounter
         /// </summary>
         public void squish() {
-            //TODO: impliment, + impliment a timer so you cant get double squished in 2d
+            //TODO: implement, + implement a timer so you cant get double squished in 2d
             health = health - 4;
         }
 
@@ -656,7 +693,7 @@ namespace U5Designs {
 
 				if(endspin) {
 					spinning = false;
-					_speed = 75;
+                    _speed = runSpeed;
 					_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
 				}
 
@@ -903,7 +940,7 @@ namespace U5Designs {
 
 				if(endspin) {
 					spinning = false;
-					_speed = 75;
+                    _speed = runSpeed;
 					_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
 				}
 
@@ -947,7 +984,9 @@ namespace U5Designs {
 									if(VectorUtil.overGround3dStrict(this, physList)) {
 										lastPosOnGround = new Vector3(_location);
 									}
-									cam.moveToYPos(_location.Y);
+									if(lookDownTimer != -2.0) {
+										cam.moveToYPos(_location.Y);
+									}
 								}
 								if(velocity.Y != 0) {//should always be true, but just in case...
 									double deltaTime = (location.Y - startLoc.Y) / velocity.Y;

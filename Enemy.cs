@@ -25,6 +25,7 @@ namespace U5Designs
         //timers
         public bool frozen;
         private double freezetimer;
+        private double maxFreezeTime;
 
         //attack delay stuff
         internal int attackspeed;
@@ -57,6 +58,7 @@ namespace U5Designs
             _hascbox = true;
             _type = 1;
             frozen = false;
+            maxFreezeTime = 0.7;
             freezetimer = 0;
             attackspeed = 1;
             attacktimer = 0;
@@ -100,6 +102,7 @@ namespace U5Designs
             _type = 1; // type one means this is an enemy
             frozen = false;
             freezetimer = 0;
+            maxFreezeTime = 0.7;
             attackspeed = 1;
             attacktimer = 0;
 			this.player = player;
@@ -166,11 +169,12 @@ namespace U5Designs
         /// <param name="time">Time elapsed since last update</param>
         /// <param name="physList">a pointer to physList, the list of all physics objects</param>
         public void physUpdate3d(double time, List<PhysicsObject> physList) {
-            if (frozen)
+            if (frozen) {
                 freezetimer = freezetimer + time;
-            if (freezetimer > 0.7) {
-                frozen = false;
-                freezetimer = 0;
+                if (freezetimer > maxFreezeTime) {
+                    frozen = false;
+                    freezetimer = 0;
+                }
             }
             if (!frozen) {
 				//save location to determine later if we moved
@@ -323,11 +327,12 @@ namespace U5Designs
         /// <param name="time">Time elapsed since last update</param>
         /// <param name="physList">a pointer to physList, the list of all physics objects</param>
         public void physUpdate2d(double time, List<PhysicsObject> physList) {
-            if (frozen)
+            if (frozen) {
                 freezetimer = freezetimer + time;
-            if (freezetimer > 0.7) {
-                frozen = false;
-                freezetimer = 0;
+                if (freezetimer > maxFreezeTime) {
+                    frozen = false;
+                    freezetimer = 0;
+                }
             }
 			if(!frozen) {
 				//save location to determine later if we moved
@@ -438,7 +443,6 @@ namespace U5Designs
                                 }
 
                             }
-
                             //if the collidingObj is the player and the player is in some kill enemy state, hurt the enemy else hurt player and kb player
                             if (((CombatObject)collidingObj).type == 0) {
                                 time = 0.0;
@@ -478,6 +482,7 @@ namespace U5Designs
                 CurrentAI.Push(new Kidmoveto());
             if (AItype == 2) {
                 doesGravity = false;
+                maxFreezeTime = 0.1;
                 CurrentAI.Push(new Birdmoveto());
             }
             if (AItype == 3) {

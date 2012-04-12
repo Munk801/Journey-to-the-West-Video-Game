@@ -193,10 +193,8 @@ namespace U5Designs {
 					alreadyCollidedList.Add(collidingObj);
 					if(!this.hascbox) { //grenade collision, bounce
 						if(collidingObj.hascbox && ((CombatObject)collidingObj).type == (int)CombatType.projectile) {
-							Console.WriteLine("No bounce!");
 							continue; //Grenades shouldn't bounce off of other projectiles
 						}
-						Console.WriteLine("Bounce!");
 						switch(collidingAxis) {
 							case 0: //x
 								if(_location.X < collidingObj.location.X) {

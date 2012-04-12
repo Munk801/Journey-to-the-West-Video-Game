@@ -40,6 +40,7 @@ namespace U5Designs
 		internal List<AIObject> aiList;// aka list of enemies
 		internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
 		internal List<Background> backgroundList;
+		internal List<Obstacle> bossList; //contains obstacles necessary to box the player in during the boss encounter
         internal AudioFile levelMusic;
 
 		public SphereRegion bossRegion, endRegion;
@@ -134,6 +135,7 @@ namespace U5Designs
             //do boss dies stuff, transition to next level?
             if (bossMode && (bossAI.gethealth() <= 0)) {
                 bossAI.killBoss(this);
+				bossMode = false;
                 //transition to next level? or state? or w/e
             }
 
@@ -224,6 +226,9 @@ namespace U5Designs
 		public void enterBossMode() {
 			bossMode = true;
 			camera.enterBossMode(bossAreaCenter, bossAreaBounds);
+			objList.AddRange(bossList);
+			renderList.AddRange(bossList);
+			physList.AddRange(bossList);
 		}
 
         /// <summary>
@@ -364,7 +369,7 @@ namespace U5Designs
             }
 
 			//********************** tab
-			if(!camera.isInTransition && player.onGround) {
+			if(!camera.isInTransition && player.onGround && player.lookDownTimer != -2.0) {
 				if(eng.Keyboard[Key.Tab] && !tabDown) {
 					enable3d = !enable3d;
 					tabDown = true;

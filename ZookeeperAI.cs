@@ -28,7 +28,7 @@ namespace U5Designs {
         public ZookeeperAI(Player player, PlayState ps) {
 			//Load all resources required for all subclasses here so there is only one copy of each in memory
 			SpriteSheet zookeeperSprite = LoadLevel.parseSpriteFile("zoo_keeper_sprite.dat");
-			SpriteSheet ropeSprite = LoadLevel.parseSpriteFile("zoo_keeper_sprite.dat"); //TODO: Change to rope when available
+			SpriteSheet ropeSprite = LoadLevel.parseSpriteFile("zoo_keeper_rope.dat"); //TODO: Change to rope when available
 
 			ProjectileProperties invisProj = LoadLevel.parseProjectileFile("invisible_projectile.dat");
 			invisProj.cbox = new Vector3(24.8f, 0.1f, 24.8f);
@@ -38,11 +38,12 @@ namespace U5Designs {
 			List<Vector3> locs = new List<Vector3>();
 			for( int i = 0; i < 4; i++){
                 for (int k = 0; k < 4; k++) {
-					locs.Add(new Vector3(4075 + (50 * i), maxHeight, (-25 + (50 * k))));
+					locs.Add(new Vector3(4175 + (50 * i), maxHeight, (-25 + (50 * k))));
 				}
 			}
 			List<Obstacle> boxObstacles = LoadLevel.parseSingleObstacleFile("zoo_keeper_crate.dat", locs);
 			List<Obstacle> groundObstacles = LoadLevel.parseSingleObstacleFile("zookeeper_boss_ground.dat", locs);
+            List<Obstacle> ropeObstacles = LoadLevel.parseSingleObstacleFile("zookeeper_boss_rope.dat", locs);
 
 			rng = new Random();
             //initialize arrays of crates + boss(FallingBox)
@@ -58,16 +59,17 @@ namespace U5Designs {
 				Obstacle box = boxObstacles[i];
 				FallingBox newcrate;
 				if(i != currentBossIndex) {
-                    newcrate = new Crate(player, ps, new Vector3(box.location), maxHeight, ropeSprite, invisProj, box, groundObstacles[i]);
+                    newcrate = new Crate(player, ps, new Vector3(box.location), maxHeight, invisProj, box, groundObstacles[i], ropeObstacles[i]);
 				} else {
-					newcrate = bossobject = new Boss(player, ps, new Vector3(box.location), maxHeight, zookeeperSprite, invisProj, box, groundObstacles[i]);
+                    newcrate = bossobject = new Boss(player, ps, new Vector3(box.location), maxHeight, invisProj, box, groundObstacles[i], ropeObstacles[i], zookeeperSprite);
 					ps.combatList.Add(bossobject);
+                    ps.renderList.Add(bossobject);
 				}
 				boxes[i] = newcrate;
 				ps.objList.Add(newcrate);
 				ps.physList.Add(newcrate);
-				ps.colisionList.Add(newcrate);
-				ps.renderList.Add(newcrate);
+			    ps.colisionList.Add(newcrate);
+				//ps.renderList.Add(newcrate);
 			}
         }
 
@@ -252,7 +254,7 @@ namespace U5Designs {
     //the boss and the crates must both conform to this update
     internal abstract class FallingBox : GameObject, RenderObject, PhysicsObject {
 		public bool falling, rising, prefalling, idle; // true when currently doing an animation
-		protected Obstacle mybox, myGround;
+        protected Obstacle mybox, myGround, myRope;
 
 		//physics vars
 		internal Vector3 velocity;
@@ -264,7 +266,9 @@ namespace U5Designs {
 		//public Player player;
 		internal ProjectileProperties projectile;
 
-		internal FallingBox(Player player, PlayState ps, Vector3 location, int maxheight, SpriteSheet mySprite, ProjectileProperties invisProj, Obstacle crate, Obstacle ground)
+        internal float roapOffset = 50;
+
+		internal FallingBox(Player player, PlayState ps, Vector3 location, int maxheight, ProjectileProperties invisProj, Obstacle crate, Obstacle ground, Obstacle rope)
 			: base() {
             //physics stuff
             velocity = new Vector3(0, 0, 0);
@@ -279,9 +283,11 @@ namespace U5Designs {
             rising = false;
             prefalling = false;
             idle = true;
+            pbox2d = false;
+            pbox3d = false;
 
             //animation
-			_sprite = mySprite;
+			_sprite = null;
             _cycleNum = 0;
             _frameNum = 0;
             _animDirection = 1;
@@ -304,10 +310,15 @@ namespace U5Designs {
 			ps.physList.Add(myGround);
 			ps.renderList.Add(myGround);
 
+            myRope = rope;
+            ps.objList.Add(myRope);
+            ps.renderList.Add(myRope);
+
             //initialize everything's location based on the seed location
             mybox.canSquish = true;
             mybox.location = location + new Vector3(0, mybox.pbox.Y, 0);
-            _location = location + new Vector3(0, (mybox.pbox.Y *2) + pbox.Y, 0); //boss sprite
+            _location = location + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y, 0); 
+            myRope.location = location + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y + roapOffset, 0);//rope sprite
 			myGround.location = new Vector3(myGround.location.X, 100.0f, myGround.location.Z);
             minHeight = 125;
             preHeight = 210;
@@ -322,13 +333,13 @@ namespace U5Designs {
 			if(prefalling) {
 				if((mybox.location.Y - mybox.pbox.Y) <= preHeight) {
 					setPosition(new Vector3(mybox.location.X, preHeight, mybox.location.Z));
-					velocity = mybox.velocity = new Vector3(0, 0, 0);
+					velocity = mybox.velocity = myRope.velocity = new Vector3(0, 0, 0);
 					pretimer = pretimer + time;
 					if(pretimer >= pretime) {
 						pretimer = 0;
 						falling = true;
 						prefalling = false;
-						velocity = mybox.velocity = new Vector3(0, -200, 0);
+						velocity = mybox.velocity = myRope.velocity = new Vector3(0, -200, 0);
 						Projectile shot = new Projectile(new Vector3(mybox.location.X, preHeight - 0.12f, mybox.location.Z), new Vector3(0, -1, 0), false, projectile, playstate.player); // spawn the actual projectile		
 						shot.type = (int)CombatType.squish;
 						// add projectile to appropriate lists
@@ -343,14 +354,14 @@ namespace U5Designs {
 			if(falling) {
 				if(mybox.velocity.Y == 0.0f) { //Wait for physics to stop the crate
 					setPosition(new Vector3(mybox.location.X, minHeight, mybox.location.Z));
-					velocity = mybox.velocity = new Vector3(0, 0, 0);
+                    velocity = mybox.velocity = myRope.velocity = new Vector3(0, 0, 0);
 
 					downtimer = downtimer + time;
 					if(downtimer >= downtime) {
 						downtimer = 0;
 						falling = false;
 						rising = true;
-						velocity = mybox.velocity = new Vector3(0, 80, 0);
+                        velocity = mybox.velocity = myRope.velocity = new Vector3(0, 80, 0);
 						shadowtimer = 1.25;
 					}
 				}
@@ -358,7 +369,7 @@ namespace U5Designs {
 			if(rising) {
 				if(mybox.location.Y - mybox.pbox.Y >= maxHeight) {
 					setPosition(new Vector3(mybox.location.X, maxHeight, mybox.location.Z));
-					velocity = mybox.velocity = new Vector3(0, 0, 0);
+                    velocity = mybox.velocity = myRope.velocity = new Vector3(0, 0, 0);
 					rising = false;
 					idle = true;
 				}
@@ -376,8 +387,9 @@ namespace U5Designs {
 			}
 		}
 
-		public void setPosition(Vector3 newposn) {
-			_location = newposn + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y, 0); //boss sprite
+		public virtual void setPosition(Vector3 newposn) {
+            _location = newposn + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y, 0); //boss sprite(or nothing if crate)
+            myRope.location = newposn + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y + roapOffset, 0); //rope sprite
 			mybox.location = newposn + new Vector3(0, mybox.pbox.Y, 0);
 			myGround.location = new Vector3(newposn.X, 100.0f, newposn.Z);
 		}
@@ -393,12 +405,14 @@ namespace U5Designs {
 
 		public void physUpdate3d(double time, List<PhysicsObject> physList) {
 			mybox.physUpdate3d(time, physList);
-			_location.Y = mybox.location.Y + mybox.pbox.Y + pbox.Y;
+            myRope.physUpdate3d(time, physList);
+            _location.Y = mybox.location.Y + mybox.pbox.Y + pbox.Y;
 		}
 
 		public void physUpdate2d(double time, List<PhysicsObject> physList) {
 			mybox.physUpdate2d(time, physList);
-			_location.Y = mybox.location.Y + mybox.pbox.Y + pbox.Y;
+            myRope.physUpdate2d(time, physList);
+            _location.Y = mybox.location.Y + mybox.pbox.Y + pbox.Y;
 		}
 
 		/*  The following are helper methods + getter/setters */
@@ -426,7 +440,7 @@ namespace U5Designs {
 			get { return null; } //null for sprites
 		}
 
-		private SpriteSheet _sprite; //null for 3d objects
+		internal SpriteSheet _sprite; //null for 3d objects
 		public SpriteSheet sprite {
 			get { return _sprite; }
 		}
@@ -442,13 +456,13 @@ namespace U5Designs {
 			get { return _pbox; }
 		}
 
-		private int _cycleNum;
+		internal int _cycleNum;
 		public int cycleNumber {
 			get { return _cycleNum; }
 			set { _cycleNum = value; }
 		}
 
-		private double _frameNum; //index of the current animation frame
+		internal double _frameNum; //index of the current animation frame
 		public double frameNumber {
 			get { return _frameNum; }
 			set { _frameNum = value; }
@@ -474,7 +488,7 @@ namespace U5Designs {
 			accel += acceleration;
 		}
 
-		private int _animDirection;
+		internal int _animDirection;
 		public int animDirection {
 			get { return _animDirection; }
 		}
@@ -497,10 +511,16 @@ namespace U5Designs {
 
 	//Boss, the crate he's standing on, and the ground under him
     internal class Boss : FallingBox, CombatObject {
-		internal Boss(Player player, PlayState ps, Vector3 location, int maxheight, SpriteSheet bossSprite, ProjectileProperties invisProj, Obstacle crate, Obstacle ground)
-			: base(player, ps, location, maxheight, bossSprite, invisProj, crate, ground) {
+		internal Boss(Player player, PlayState ps, Vector3 location, int maxheight, ProjectileProperties invisProj, Obstacle crate, Obstacle ground, Obstacle rope, SpriteSheet bossSprite)
+            : base(player, ps, location, maxheight, invisProj, crate, ground, rope) {
 			pbox2d = true;
 			pbox3d = true;
+
+            //animation
+            _sprite = bossSprite;
+            _cycleNum = 0;
+            _frameNum = 0;
+            _animDirection = 1;
 
 			//combat stuff
 			_cbox = new Vector3(6, 6, 6);
@@ -542,7 +562,6 @@ namespace U5Designs {
         }
 
 		/*  The following are helper methods + getter/setters */
-
 		private Vector3 _cbox;
 		public Vector3 cbox {
 			get { return _cbox; }
@@ -587,8 +606,8 @@ namespace U5Designs {
 	//Crate without boss and the ground under it
 	internal class Crate : FallingBox {
 
-		internal Crate(Player player, PlayState ps, Vector3 location, int maxheight, SpriteSheet ropeSprite, ProjectileProperties invisProj, Obstacle crate, Obstacle ground)
-			: base(player, ps, location, maxheight, ropeSprite, invisProj, crate, ground) {
+		internal Crate(Player player, PlayState ps, Vector3 location, int maxheight, ProjectileProperties invisProj, Obstacle crate, Obstacle ground, Obstacle rope)
+			: base(player, ps, location, maxheight, invisProj, crate, ground, rope) {
 			//This is just the rope, so let the player pass through freely
 			pbox2d = false;
 			pbox3d = false;

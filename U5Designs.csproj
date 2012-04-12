@@ -435,7 +435,23 @@
     <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load4.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Obstacles\rope_bridge.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\rope_bridge_sprite.dat" />
+  </ItemGroup>
+    <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Enemies\enemies.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\rope_bridge.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\zoo_keeper_rope.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\zoo_keeper_rope.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Obstacles\zookeeper_boss_rope.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

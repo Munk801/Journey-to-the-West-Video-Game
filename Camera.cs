@@ -123,10 +123,12 @@ namespace U5Designs
 		/// </summary>
 		/// <param name="y">Player's y coordinate</param>
 		public void moveToYPos(float y) {
-			trackingPlayer = false;
-			if(y != playerYPos) {
-				movingInY = true;
-				playerYPos = y;
+			if(!bossMode) {
+				trackingPlayer = false;
+				if(y != playerYPos) {
+					movingInY = true;
+					playerYPos = y;
+				}
 			}
 		}
 

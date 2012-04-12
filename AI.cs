@@ -166,7 +166,7 @@ namespace U5Designs {
 				}
 			}
 
-            me.attackspeed = 5; // not used in the same way as other attack speeds. This is used to time out the swoop if it gets stuck
+            me.attackspeed = 1; // not used in the same way as other attack speeds. This is used to time out the swoop if it gets stuck
             if (!me.frozen) {
                 if (dist2d(playerposn, me.location) > 60) {
                     Vector3 dir = VectorUtil.getdir(playerposn, me.location);
@@ -219,7 +219,10 @@ namespace U5Designs {
 
                         me.attacktimer = me.attacktimer + time;
                         // do a fake gravity to simulate diving down
-                        me.accel.Y -= (float)(200 * time);
+                        if (startplayer.Y > startingposn.Y)
+                            me.accel.Y += (float)(200 * time);
+                        else
+                            me.accel.Y -= (float)(200 * time);
                         dir.Y = 0.0f;
                         if (!enable3d) {
                             dir.Z = 0.0f;
@@ -228,7 +231,7 @@ namespace U5Designs {
                         me.velocity.X = dir.X * (me.speed);
                         me.velocity.Z = dir.Z * (me.speed);
                         // if dove to lowest point, or to much time has passed(we got suck), stop diving
-                        if ((Math.Abs(me.location.Y - playerposn.Y) < 10) || me.attacktimer > me.attackspeed) {
+                        if ((Math.Abs(me.location.Y - startplayer.Y) < 10) || me.attacktimer > me.attackspeed) {
                             me.velocity.Y = 0;
                             me.attacktimer = 0;
                             diving = false;
@@ -249,7 +252,10 @@ namespace U5Designs {
 
                         me.attacktimer = me.attacktimer + time;
                         // do a reverse gravity to simulate flying back up
-                        me.accel.Y += (float)(200 * time);
+                        if (startplayer.Y > startingposn.Y)
+                            me.accel.Y -= (float)(200 * time);
+                        else
+                            me.accel.Y += (float)(200 * time);
                         dir.Y = 0.0f;
                         if (!enable3d) {
                             dir.Z = 0.0f;
@@ -258,8 +264,23 @@ namespace U5Designs {
                         me.velocity.X = dir.X * (me.speed);
                         me.velocity.Z = dir.Z * (me.speed);
                         //if back to original height, or to much time has passed(we got suck), just finish
-                        if ((me.location.Y >= startingposn.Y) || me.attacktimer > me.attackspeed)
-                            finished = true;
+                        if (startplayer.Y > startingposn.Y) {
+                            if ((me.location.Y <= startingposn.Y) || me.attacktimer > me.attackspeed) {
+                                finished = true;
+                                me.velocity.X = 0;
+                                me.velocity.Y = 0;
+                                me.velocity.Z = 0;
+                            }
+                        }
+                        else {
+                            if ((me.location.Y >= startingposn.Y) || me.attacktimer > me.attackspeed) {
+                                finished = true;
+                                me.velocity.X = 0;
+                                me.velocity.Y = 0;
+                                me.velocity.Z = 0;
+                            }
+                        }
+                        
                     }
                 }
                 else {
@@ -276,7 +297,7 @@ namespace U5Designs {
 
 
 /**************************************************************************************************************************************** 
- * Ice cream kid
+ * girl
  * */
     internal class Girlmoveto : Airoutine {
         public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
