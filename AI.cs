@@ -298,9 +298,24 @@ namespace U5Designs {
 /**************************************************************************************************************************************** 
  * girl
  * */
+	enum GirlAnim { walk2d = 0, walk3d = 1, stand2d = 2, stand3d = 3 };
+
     internal class Girlmoveto : Airoutine {
-        public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
-            me.attackspeed = 1; //delay between each projectile (hack initilization)
+		public void update(double time, PlayState playstate, Vector3 playerposn, Enemy me, bool enable3d, List<PhysicsObject> physList) {
+			//update current animation and flip scale if necessary
+			if(enable3d) {
+				me.cycleNumber = (int)(me.moving ? GirlAnim.walk3d : GirlAnim.stand3d);
+				if(me.scale.X < 0) {
+					me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+				}
+			} else { //2D
+				me.cycleNumber = (int)(me.moving ? GirlAnim.walk2d : GirlAnim.stand2d);
+				if((me.velocity.X < 0 && me.scale.X < 0) || (me.velocity.X > 0 && me.scale.X > 0)) {
+					me.scale = new Vector3(-me.scale.X, me.scale.Y, me.scale.Z);
+				}
+			}
+
+            me.attackspeed = 1; //delay between each projectile (hack initialization)
             if (!me.frozen) {
                 Vector3 dir = VectorUtil.getdir(playerposn, me.location);
                 dir.Y = 0.0f;
