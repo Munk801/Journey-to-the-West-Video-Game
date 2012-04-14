@@ -37,7 +37,7 @@ namespace U5Designs
         }
 
 		public void UpdatePositionY(float deltay) {
-			_location.Y += deltay;
+			_location.Y += deltay*0.85f;
 		}
     }
 }

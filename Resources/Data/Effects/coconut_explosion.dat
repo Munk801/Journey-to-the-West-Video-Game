@@ -1,0 +1,8 @@
+﻿<decoration>
+  <!--<scale x="14" y="14" z="14" />-->
+  <scale x="49" y="49" z="35" />
+	<draw2>true</draw2>
+	<draw3>true</draw3>
+	<sprite>coconut_explosion_sprite.dat</sprite>
+	<billboards>yes</billboards>
+</decoration>

@@ -13,10 +13,11 @@ namespace U5Designs {
 		public float speed;
 		public double staminaCost, duration;
 		public SpriteSheet sprite;
+		public Effect deathAnim;
 
 
 		public ProjectileProperties(Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int damage,
-										float speed, bool gravity, SpriteSheet sprite, double staminaCost = 0.0, double duration = -1.0) {
+										float speed, bool gravity, SpriteSheet sprite, Effect death = null, double staminaCost = 0.0, double duration = -1.0) {
 			this.scale = scale;
 			this.pbox = pbox;
 			this.cbox = cbox;
@@ -28,6 +29,7 @@ namespace U5Designs {
 			this.staminaCost = staminaCost;
 			this.duration = duration;
 			this.sprite = sprite;
+			this.deathAnim = death;
 		}
 	}
 }

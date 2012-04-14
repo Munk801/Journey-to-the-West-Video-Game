@@ -164,7 +164,7 @@ namespace U5Designs
 						aiList.Remove((AIObject)co);
 						combatList.Remove(co);
 
-						Effect death = new Effect(co.location, ((Enemy)co).deathAnim);
+						Effect death = new Effect(co.location, co.deathAnim);
 						objList.Add(death);
 						renderList.Add(death);
 						effectsList.Add(death);
@@ -178,6 +178,13 @@ namespace U5Designs
 						collisionList.Remove((PhysicsObject)co);
 						renderList.Remove((RenderObject)co);
 						combatList.Remove(co);
+
+						if(co.deathAnim != null) {
+							Effect death = new Effect(co.location, co.deathAnim);
+							objList.Add(death);
+							renderList.Add(death);
+							effectsList.Add(death);
+						}
                     }
                 }
             }

@@ -5,10 +5,12 @@ using System.Text;
 
 using OpenTK;
 
+using Engine;
+
 /*
  * Any object that has health or the ability to do damage.
  */
-namespace Engine {
+namespace U5Designs {
 	public enum CombatType { player=0, enemy=1, projectile=2, boss=3, squish=4, grenade=5 };
 
 	public interface CombatObject {
@@ -22,6 +24,7 @@ namespace Engine {
         float speed { get; set; }
 		bool alive { get; set; }
 		int ScreenRegion { get; }
+		Effect deathAnim { get; }
 
         /*
          * IMPORTANT!!! this variable determines the type of combat object for the sake of handling collision between objects

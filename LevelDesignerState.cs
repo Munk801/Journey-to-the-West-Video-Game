@@ -1036,7 +1036,7 @@ namespace U5Designs
 			if(_proj.Count == 0) {
 				return new Enemy(player, location, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, death);
 			} else {
-				ProjectileProperties proj = LoadLevel.parseProjectileFile(_proj[0].InnerText);
+				ProjectileProperties proj = LoadLevel.parseProjectileFile(_proj[0].InnerText, this);
 				return new Enemy(player, location, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, death, proj);
 			}
         }

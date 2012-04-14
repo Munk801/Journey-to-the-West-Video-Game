@@ -1,0 +1,9 @@
+﻿<sprite>
+	<bmp>coconut_explosion_b.png</bmp>
+	<c_starts>0</c_starts>
+	<c_lengths>5</c_lengths>
+	<t_width>826</t_width>
+	<t_height>826</t_height>
+	<hasAlpha>true</hasAlpha>
+	<fps>30.0</fps>
+</sprite>

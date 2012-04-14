@@ -30,7 +30,7 @@ namespace U5Designs {
 			SpriteSheet zookeeperSprite = LoadLevel.parseSpriteFile("zoo_keeper_sprite.dat");
 			SpriteSheet ropeSprite = LoadLevel.parseSpriteFile("zoo_keeper_rope.dat"); //TODO: Change to rope when available
 
-			ProjectileProperties invisProj = LoadLevel.parseProjectileFile("invisible_projectile.dat");
+			ProjectileProperties invisProj = LoadLevel.parseProjectileFile("invisible_projectile.dat", ps);
 			invisProj.cbox = new Vector3(24.8f, 0.1f, 24.8f);
 			invisProj.pbox = new Vector3(24.8f, 0.1f, 24.8f);
 			invisProj.speed = 200;
@@ -216,6 +216,9 @@ namespace U5Designs {
                 if (gethealth() == 1) {
                     //all but one box
                     int stayup = rng.Next(0, 16);
+					while(stayup == currentBossIndex) {
+						stayup = rng.Next(0, 16);
+					}
                     for (int i = 0; i < 16; i++) {
                         if (i != stayup)
                             boxes[i].fall();
@@ -591,6 +594,11 @@ namespace U5Designs {
 		private int _type;
 		public int type {
 			get { return _type; }
+		}
+
+		public Effect deathAnim {
+			//Change if we give him a death animation later
+			get { return null; }
 		}
     }
 

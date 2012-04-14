@@ -1277,6 +1277,11 @@ namespace U5Designs {
 			set { _alive = value; }
 		}
 
+		public Effect deathAnim {
+			//Change if we give him a death animation later
+			get { return null; }
+		}
+
         double dist2d(Vector3 v1, Vector3 v2) { // does a dist using only x and z
             Vector2 tmp = new Vector2(v1.X - v2.X, v1.Z - v2.Z);
             return Math.Sqrt((tmp.X * tmp.X) + (tmp.Y * tmp.Y));

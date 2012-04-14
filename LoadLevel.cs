@@ -61,8 +61,8 @@ namespace U5Designs {
 
 			//Player
 			List<ProjectileProperties> playerProjectiles = new List<ProjectileProperties>();
-			playerProjectiles.Add(parseProjectileFile("banana_projectile.dat"));
-			playerProjectiles.Add(parseProjectileFile("coconut_grenade_projectile.dat"));
+			playerProjectiles.Add(parseProjectileFile("banana_projectile.dat", ps));
+			playerProjectiles.Add(parseProjectileFile("coconut_grenade_projectile.dat", ps));
 
 			ps.player = new Player(parseSpriteFile("player_sprite.dat"), playerProjectiles, ps);
 			ps.player.marker = parseSpriteFile("marker_sprite.dat");
@@ -157,7 +157,7 @@ namespace U5Designs {
 			return new SphereRegion(v, r);
 		}
 
-		public static ProjectileProperties parseProjectileFile(String path) {
+		public static ProjectileProperties parseProjectileFile(String path, PlayState ps) {
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			Stream fstream = assembly.GetManifestResourceStream("U5Designs.Resources.Data.Projectiles." + path);
 			XmlReaderSettings settings = new XmlReaderSettings();
@@ -178,19 +178,25 @@ namespace U5Designs {
 			
 			XmlNodeList staminaCost = doc.GetElementsByTagName("staminaCost");
 			XmlNodeList duration = doc.GetElementsByTagName("duration");
+			XmlNodeList deathList = doc.GetElementsByTagName("death");
 			fstream.Close();
+
+			Effect deathAnim = null;
+			if(deathList.Count > 0) {
+				deathAnim = parseEffectFile(deathList[0].InnerText, ps);
+			}
 
 			bool hasStamina = staminaCost.Count != 0;
 			bool hasDuration = duration.Count != 0;
 
 			if(!hasStamina && !hasDuration) {
-				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss);
+				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss, deathAnim);
 			} else if(!hasDuration) {
-				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss, Convert.ToDouble(staminaCost[0].InnerText));
+				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss, deathAnim, Convert.ToDouble(staminaCost[0].InnerText));
 			} else if(!hasStamina) {
-				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss, 0.0, Convert.ToDouble(duration[0].InnerText));
+				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss, deathAnim, 0.0, Convert.ToDouble(duration[0].InnerText));
 			} else { //has both
-				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss, Convert.ToDouble(staminaCost[0].InnerText), Convert.ToDouble(duration[0].InnerText));
+				return new ProjectileProperties(scale, pbox, cbox, draw2, draw3, damage, speed, grav, ss, deathAnim, Convert.ToDouble(staminaCost[0].InnerText), Convert.ToDouble(duration[0].InnerText));
 			}
 		}
 
@@ -434,7 +440,7 @@ namespace U5Designs {
 						_e.Add(new Enemy(player, loc, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, death));
 					}
 				} else {
-					ProjectileProperties proj = parseProjectileFile(_proj[0].InnerText);
+					ProjectileProperties proj = parseProjectileFile(_proj[0].InnerText, ps);
 
 					// Create the Enemies
 					for(int j = 1; j < EList[i].ChildNodes.Count; j++) {

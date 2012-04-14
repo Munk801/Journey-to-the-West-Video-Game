@@ -57,6 +57,7 @@
     <Compile Include="AI.cs" />
     <Compile Include="AIObject.cs" />
     <Compile Include="Background.cs" />
+    <Compile Include="CombatObject.cs" />
     <Compile Include="Effect.cs" />
     <Compile Include="LevelDesignerForm.cs">
       <SubType>Form</SubType>
@@ -182,7 +183,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Enemies\Boy.dat" />
+    <EmbeddedResource Include="Resources\Data\Enemies\Boy.dat">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Data\Enemies\Girl.dat">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -459,6 +462,18 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Effects\enemy_death.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\coconut_explosion.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\coconut_explosion_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Effects\coconut_explosion.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\coconut_explosion_b.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
