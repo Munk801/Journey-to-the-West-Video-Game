@@ -137,7 +137,7 @@ namespace U5Designs {
 		public int frame3d {
 			get { return _frame3d; }
 			set {
-				Debug.Assert(_frame3d >= 0);
+				Debug.Assert(value >= 0);
 				_frame3d = value;
 			}
 		}
