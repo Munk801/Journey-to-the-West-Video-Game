@@ -207,9 +207,11 @@ namespace U5Designs
                 _cur_butn = 1;
             } else if (eng.ThisMouse.inButtonRegion(quit_press)) {
                 _cur_butn = 2;
-            } else if (eng.ThisMouse.inButtonRegion(ld_press)) {
-                _cur_butn = 3;
-            }
+			} else if(eng.ThisMouse.inButtonRegion(ld_press)) {
+				_cur_butn = 3;
+			} else {
+				return; //If they didn't actively click on something, don't use the selected button from the keyboard
+			}
 
 			if(eng.ThisMouse.LeftPressed() && !clickdown) {
 				clickdown = true;
@@ -270,6 +272,11 @@ namespace U5Designs
 				handleButtonPress();
             } else if(!eng.Keyboard[Key.Enter]) {
 				enterdown = false;
+			}
+
+			//Minus - Toggle fullscreen
+			if(eng.Keyboard[Key.Minus]) {
+				eng.toggleFullScreen();
 			}
         }
 

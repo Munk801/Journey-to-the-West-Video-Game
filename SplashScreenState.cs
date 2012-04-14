@@ -48,14 +48,12 @@ namespace U5Designs
         public override void Update(FrameEventArgs e)
         {
             timeTilMain += e.Time;
-            
-            //transition into PlayState
-            //if (eng.GameInProgress)
-            //{
-            //    eng.PopState();
 
+			//Minus - Toggle fullscreen
+			if(eng.Keyboard[Key.Minus]) {
+				eng.toggleFullScreen();
+			}
 
-            //}
 #if DEBUG
 			if(eng.Keyboard[Key.Enter]) {
 				MainMenuState mms = new MainMenuState(eng);

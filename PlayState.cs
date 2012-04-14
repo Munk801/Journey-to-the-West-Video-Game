@@ -400,6 +400,11 @@ namespace U5Designs
 					tabDown = false;
 				}
 			}
+
+			//Minus - Toggle fullscreen
+			if(eng.Keyboard[Key.Minus]) {
+				eng.toggleFullScreen();
+			}
         }
 
 

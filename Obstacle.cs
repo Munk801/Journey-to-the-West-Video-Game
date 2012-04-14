@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Diagnostics;
 
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -135,7 +136,10 @@ namespace U5Designs {
 		private int _frame3d; //Only used for frame number of 3d geometry obstacles
 		public int frame3d {
 			get { return _frame3d; }
-			set { _frame3d = value; }
+			set {
+				Debug.Assert(_frame3d >= 0);
+				_frame3d = value;
+			}
 		}
 
 		public void doScaleTranslateAndTexture() {

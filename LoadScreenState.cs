@@ -7,6 +7,7 @@ using System.Reflection;
 
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Input;
 
 using Engine;
 
@@ -65,6 +66,11 @@ namespace U5Designs {
 		}
 
 		public override void Update(FrameEventArgs e) {
+			//Minus - Toggle fullscreen
+			if(eng.Keyboard[Key.Minus]) {
+				eng.toggleFullScreen();
+			}
+
 			if(doneLoading) {
 				foreach(RenderObject ro in playstate.renderList) {
 					if(ro.is3dGeo) {

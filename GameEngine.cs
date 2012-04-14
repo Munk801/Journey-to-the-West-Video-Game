@@ -32,6 +32,8 @@ namespace U5Designs
         /// <summary>Creates a 1280x720 window.</summary>
         public GameEngine() : base(1280, 720, GraphicsMode.Default, "Journey to the East") {
             VSync = VSyncMode.On;
+			this.WindowState = WindowState.Fullscreen;
+			this.WindowBorder = WindowBorder.Hidden;
         }
 
         /// <summary>Load resources here. This gets called ONCE at the start of the entire process(not once a state)</summary>
@@ -173,20 +175,32 @@ namespace U5Designs
         /// <param name="e">Not used.</param>
         protected override void OnResize(EventArgs e)
         {
-            base.OnResize(e);
-			if(ClientRectangle.Width > 1280 || ClientRectangle.Height > 720) {
-				int xExtra = (ClientRectangle.Width - 1280) / 2;
-				int yExtra = (ClientRectangle.Height - 720) / 2;
-				GL.Viewport(ClientRectangle.X + xExtra, ClientRectangle.Y + yExtra, ClientRectangle.Width - (xExtra * 2), ClientRectangle.Height - (yExtra * 2));
-			} else {
-				GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
+			base.OnResize(e);
+
+			if(ClientRectangle.Width / (double)ClientRectangle.Height > 16.0 / 9.0) { //bars on sides
+				int width = (int)(ClientRectangle.Height * 16.0 / 9.0);
+				int xOffset = (ClientRectangle.Width - width) / 2;
+				GL.Viewport(ClientRectangle.X + xOffset, ClientRectangle.Y, width, ClientRectangle.Height);
+			} else { //letterbox
+				int height = (int)(ClientRectangle.Width * 9.0 / 16.0);
+				int yOffset = (ClientRectangle.Height - height) / 2;
+				GL.Viewport(ClientRectangle.X, ClientRectangle.Y + yOffset, ClientRectangle.Width, height);
 			}
-            //TODO: Something should happen here to handle this gracefully
+
 			if(states.Peek() is PlayState) {
 				((PlayState)states.Peek()).camera.setViewport(new int[] { ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height });
 			}
-
-			//states.Peek().updateView();
         }
+
+		public void toggleFullScreen() {
+			if(this.WindowState == WindowState.Fullscreen) {
+				this.WindowState = WindowState.Normal;
+				this.WindowBorder = WindowBorder.Resizable;
+				this.ClientSize = new System.Drawing.Size(1280, 720);
+			} else {
+				this.WindowState = WindowState.Fullscreen;
+				this.WindowBorder = WindowBorder.Hidden;
+			}
+		}
     }
 }
