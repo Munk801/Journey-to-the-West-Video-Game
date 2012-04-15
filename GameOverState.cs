@@ -22,6 +22,9 @@ namespace U5Designs {
         float xf, yf;
         Texture goBackground, arrow, mainmenu, menu_pressed, restart, restart_pressed, exit, exit_pressed;
 
+        double timer;
+        double timeTillNextState;
+
         public GameOverState(MainMenuState prvstate, GameEngine engine)
         {
             eng = engine;
@@ -55,6 +58,8 @@ namespace U5Designs {
             //restart_btn = eng.StateTextureManager.GetTexture("restart");
             
             //quit_btn = eng.StateTextureManager.GetTexture("quit_button");
+
+            timeTillNextState = 4;
         }
 
 		public override void MakeActive() {
@@ -72,6 +77,13 @@ namespace U5Designs {
         public override void Update(FrameEventArgs e)
         {
             DealWithInput();
+            timer = timer + e.Time;
+            if (timer > timeTillNextState) {
+                Console.WriteLine("Exiting Game overstate");
+                eng.GameInProgress = false;
+                menu.enterdown = true;
+                eng.ChangeState(menu);
+            }
         }
 
         public override void Draw(FrameEventArgs e)
@@ -93,7 +105,7 @@ namespace U5Designs {
         private void DealWithInput()
         {
             if (eng.Keyboard[Key.Enter]) {
-                // Exit Paused Menu state and return to playing
+                // Exit game over and return to menu
                 Console.WriteLine("Exiting Game overstate");
                 eng.GameInProgress = false;
                 menu.enterdown = true;
