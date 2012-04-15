@@ -24,14 +24,16 @@ namespace U5Designs
         
         protected Vector3 eye, lookat;
         Obstacle background;
+        MainMenuState menu;
 
         Texture _p1, _p2, _p3, _p4;
 		double curFrame;
+        bool escapedown;
 
-        public PauseMenuState(GameEngine engine)
+        public PauseMenuState(GameEngine engine, MainMenuState menustate)
         {
             eng = engine;
-
+            menu = menustate;
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
 
@@ -56,6 +58,9 @@ namespace U5Designs
 			GL.MatrixMode(MatrixMode.Projection);
 			Matrix4d projection = Matrix4d.CreateOrthographic(192, 108, 1.0f, 6400.0f);
 			GL.LoadMatrix(ref projection);
+            if (eng.Keyboard[Key.Escape]) {
+                escapedown = true;
+            }
 		}
 
         public override void Update(FrameEventArgs e)
@@ -92,9 +97,19 @@ namespace U5Designs
             {
                 // Exit Paused Menu state and return to playing				
 				eng.PopState();
-			} else if(eng.Keyboard[Key.Q]) {
+			} 
+            if(eng.Keyboard[Key.Q]) {
 				eng.Exit();
 			}
+
+            if (eng.Keyboard[Key.Escape] && !escapedown) {
+                eng.GameInProgress = false;
+                eng.PopState(); //nuke playstate
+                eng.ChangeState(menu);
+            }
+            else if (!eng.Keyboard[Key.Escape]) {
+                escapedown = false;
+            }
         }
 
         /**

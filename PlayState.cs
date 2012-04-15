@@ -72,7 +72,7 @@ namespace U5Designs
 			aienabled = true;
 			musicenabled = false;
 
-			pms = new PauseMenuState(eng);
+			pms = new PauseMenuState(eng, menustate);
 			effectsList = new List<Effect>();
 		}
 

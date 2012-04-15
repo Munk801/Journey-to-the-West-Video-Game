@@ -108,7 +108,6 @@ namespace U5Designs {
                 // Exit game over and return to menu
                 Console.WriteLine("Exiting Game overstate");
                 eng.GameInProgress = false;
-                menu.enterdown = true;
                 eng.ChangeState(menu);
             }
         }

@@ -804,10 +804,11 @@ namespace U5Designs {
         /// </summary>
         public void squish() {
             //TODO: implement, + implement a timer so you cant get double squished in 2d
-			if(squishTimer < 0.0) {
-				health = health - 3;
-				squishTimer = 0.0;
-			}
+            if (squishTimer < 0.0) {
+                health = health - 3;
+                squishTimer = 0.0;
+                isMobile = false;
+            }
         }
 
 		/// <summary>
@@ -825,6 +826,7 @@ namespace U5Designs {
 			} else {
 				_scale.Y = 25.0f;
 				squishTimer = -1.0;
+                isMobile = true;
 			}
 		}
 
