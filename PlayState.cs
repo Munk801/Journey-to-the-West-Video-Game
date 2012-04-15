@@ -82,8 +82,10 @@ namespace U5Designs
         /// </summary>
 		public override void MakeActive() {
             if (musicenabled)
+            {
                 levelMusic.ReplayFile();
-
+                //musicenabled = false;
+            }
 			GL.Enable(EnableCap.Blend);
 			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
@@ -383,7 +385,8 @@ namespace U5Designs
 
             if (eng.Keyboard[Key.Escape] || eng.Keyboard[Key.Tilde]) {
                 
-                levelMusic.Stop();
+                //levelMusic.Stop();
+                levelMusic.Pause();
                 eng.PushState(pms);
             }
 

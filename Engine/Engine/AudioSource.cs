@@ -181,6 +181,7 @@ namespace Engine
         public void PauseSource(VorbisFileInstance source)
         {
             // TO DO
+            AL.SourcePause(Source);
         }
 
         // UPDATE 

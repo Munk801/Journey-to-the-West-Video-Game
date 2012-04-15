@@ -186,6 +186,21 @@ namespace Engine
             }
         }
 
+        public void PauseFile(VorbisFileInstance audioFile)
+        {
+            foreach (AudioSource source in AudioSources)
+            {
+                try
+                {
+                    source.PauseSource(audioFile);
+                    return;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("issue with {0}", e);
+                }
+            }
+        }
         public void StopFile(VorbisFileInstance audioFile)
         {
             foreach(AudioSource source in AudioSources)

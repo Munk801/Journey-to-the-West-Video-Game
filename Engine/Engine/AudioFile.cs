@@ -53,6 +53,7 @@ namespace Engine
                 }
             }
 
+
             public void Play()
             {
                 lock (AudioManager.Manager)
@@ -61,11 +62,23 @@ namespace Engine
                 }
             }
 
+            public void Pause()
+            {
+                lock (AudioManager.Manager)
+                {
+                    AudioManager.Manager.PauseFile(sourceAudio.makeInstance());
+                    if (CurrentSource != null)
+                        CurrentSource.Dispose();
+                }
+            }
+
             public void Stop()
             {
                 lock (AudioManager.Manager)
                 {
                     AudioManager.Manager.StopFile(sourceAudio.makeInstance());
+                    if(CurrentSource != null)
+                    CurrentSource.Dispose();
                 }
             }
         }
