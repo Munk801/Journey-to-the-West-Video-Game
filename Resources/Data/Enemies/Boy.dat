@@ -6,7 +6,7 @@
 	<draw3>true</draw3>
 	<health>2</health>
 	<damage>1</damage>
-	<speed>50</speed>
+	<speed>60</speed>
 	<AI>1</AI>
 	<sprite>boy_sprite.dat</sprite>
 	<proj>ice_cream_projectile.dat</proj>

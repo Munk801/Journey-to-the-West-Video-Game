@@ -6,7 +6,7 @@
 	<draw3>true</draw3>
 	<health>1</health>
 	<damage>1</damage>
-	<speed>60</speed>
+	<speed>80</speed>
 	<AI>2</AI>
 	<sprite>hawk_sprite.dat</sprite>
   <death>enemy_death.dat</death>
