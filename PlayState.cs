@@ -70,7 +70,8 @@ namespace U5Designs
 			clickdown = false;
 			nowBillboarding = false;
 			aienabled = true;
-			musicenabled = false;
+			musicenabled = true;
+            
 
 			pms = new PauseMenuState(eng);
 			effectsList = new List<Effect>();
@@ -381,6 +382,7 @@ namespace U5Designs
         private void DealWithInput() {
 
             if (eng.Keyboard[Key.Escape] || eng.Keyboard[Key.Tilde]) {
+                
                 levelMusic.Stop();
                 eng.PushState(pms);
             }

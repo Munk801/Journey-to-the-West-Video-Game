@@ -48,7 +48,7 @@ namespace U5Designs
 
 		public override void MakeActive() {
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
+            
 			Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
 			GL.MatrixMode(MatrixMode.Modelview);
 			GL.LoadMatrix(ref modelview);

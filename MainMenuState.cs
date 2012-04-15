@@ -75,7 +75,7 @@ namespace U5Designs
             eng.StateTextureManager.LoadTexture("ldpress", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_leveldesign_hover.png"));
             ld_press = eng.StateTextureManager.GetTexture("ldpress");
 
-			musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.Retribution.ogg"));
+			musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music.Menu.ogg"));
 			musicFile.Play();
 
             // Setup saved game data 

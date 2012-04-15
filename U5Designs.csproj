@@ -334,9 +334,6 @@
     <EmbeddedResource Include="Resources\Data\Projectiles\invisible_projectile.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Music\Level1.ogg" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Geometry\box_all_faces_same.obj" />
   </ItemGroup>
   <ItemGroup>
@@ -483,6 +480,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Textures\marker3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Music\Level01.ogg" />
+    <EmbeddedResource Include="Resources\Music\Menu.ogg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
