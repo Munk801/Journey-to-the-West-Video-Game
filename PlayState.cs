@@ -50,7 +50,7 @@ namespace U5Designs
 		internal bool enable3d; //true when being viewed in 3d
 		internal int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
 		internal bool nowBillboarding; //true when billboarding objects should rotate into 3d view
-        public Texture Healthbar, bHealth;
+        public Texture Healthbar, bHealth, healthFrame;
 		public SpriteSheet staminaBar, staminaBack, staminaFrame;
 
 		internal bool tabDown;
@@ -290,8 +290,9 @@ namespace U5Designs
 
 			//Draw HUD
 			float dec = (float)player.health / player.maxHealth;
-            bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 300, 675, scaleX: 0.5f, scaleY: 0.25f);
-			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 300, 675, scaleX: 0.5f, scaleY: 0.25f, decrementX: dec);
+            bHealth.DrawHUDElement(bHealth.Width, bHealth.Height, 280, 675, scaleX: 0.499f, scaleY: 0.5f);
+			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 280, 675, scaleX: 0.499f, scaleY: 0.5f, decrementX: dec);
+			healthFrame.DrawHUDElement(healthFrame.Width, healthFrame.Height, 280, 675, scaleX: 0.499f, scaleY: 0.5f);
 
 			drawStaminaBar();
 

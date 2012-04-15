@@ -475,6 +475,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Textures\coconut_explosion_b.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load5.png" />
+    <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load6.png" />
+    <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load7.png" />
+    <EmbeddedResource Include="Resources\Textures\LoadingScreenTextures\load8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\marker3.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

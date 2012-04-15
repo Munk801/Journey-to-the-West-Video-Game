@@ -143,21 +143,20 @@ namespace U5Designs {
 				spinTimer -= time;
 			}
 
-            if (spinning) {
-                stamina = Math.Max(stamina - 5.0 * time, 0.0);
-                if (stamina <= 0.0 || spinTimer <= 0.0) {
-                    spinning = false;
-                    _speed = 75;
-                    if (velocity.X == 0) {
-                        _cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
-                    }
-                    else {
-                        _cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
-                    }
-                }
-            }
-            else
-                _speed = runSpeed;
+			if(spinning) {
+				stamina = Math.Max(stamina - 5.0 * time, 0.0);
+				if(stamina <= 0.0 || spinTimer <= 0.0) {
+					spinning = false;
+					_speed = 75;
+					if(velocity.X == 0) {
+						_cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
+					} else {
+						_cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
+					}
+				}
+			} else {
+				_speed = runSpeed;
+			}
 
 			if(projectileTimer > 0.0) {
 				projectileTimer -= time;
@@ -382,7 +381,7 @@ namespace U5Designs {
 			}
 
 			//Look down
-			if(!enable3d && keyboard[Key.S]) {
+			if(!enable3d && keyboard[Key.S] && !keyboard[Key.A] && !keyboard[Key.D]) {
 				if(lookDownTimer == -1.0) {
 					lookDownTimer = 0.0;
 				}
@@ -496,15 +495,209 @@ namespace U5Designs {
 			if(curProjectile.gravity) {
 				markerList.Clear();
 
-				Vector3 projDir = calcProjDir() * curProjectile.speed;
-				//projDir -= new Vector3(velocity.X, 0.0f, velocity.Z);
+				Vector3 vel = calcProjDir() * curProjectile.speed;
+				//vel -= new Vector3(velocity.X, 0.0f, velocity.Z);
 				Vector3 pos = new Vector3(_location);
 
-				for(int i = 0; i < 40; i++) {
-					projDir.Y -= (float)gravity / 20.0f;
-					//projDir.Y -= 20.0f;
-					pos += (projDir / 20.0f);
-					markerList.Add(new Decoration(pos, new Vector3(5, 5, 5), true, true, Billboarding.Yes, marker));
+// 				for(int i = 0; i < 40; i++) {
+// 					vel.Y -= (float)gravity / 20.0f;
+// 					//vel.Y -= 20.0f;
+// 					pos += (vel / 20.0f);
+// 					markerList.Add(new Decoration(pos, new Vector3(5, 5, 5), true, true, Billboarding.Yes, marker));
+				// 				}
+
+				if(enable3d) {
+					for(int i = 0; i < 10; i++) {
+						double time = 1 / 20.0;
+						vel.Y -= (float)(gravity * time);
+
+						//now check for collisions and move
+						List<PhysicsObject> alreadyCollidedList = new List<PhysicsObject>();
+
+						while(time > 0.0) {
+							PhysicsObject collidingObj = null;
+							float collidingT = 1.0f / 0.0f; //pos infinity
+							int collidingAxis = -1;
+
+							foreach(PhysicsObject obj in playstate.physList) {
+								// don't do collision physics to things you already hit this frame
+								if(obj.collidesIn3d && !alreadyCollidedList.Contains(obj)) {
+									//find possible ranges of values for which a collision may have occurred
+									Vector3 maxTvals = VectorUtil.div(obj.location + obj.pbox - pos + curProjectile.pbox, vel);
+									Vector3 minTvals = VectorUtil.div(obj.location - obj.pbox - pos - curProjectile.pbox, vel);
+									VectorUtil.sort(ref minTvals, ref maxTvals);
+
+									float minT = VectorUtil.maxVal(minTvals);
+									float maxT = VectorUtil.minVal(maxTvals);
+
+									// both axes? || forward? || within range?
+									if(minT > maxT || minT < 0.0f || minT > time) {
+										continue; //no intersection
+									}
+
+									//if we're here, there's a collision
+									//see if this collision is the first to occur
+									if(minT < collidingT) {
+										collidingT = minT;
+										collidingObj = obj;
+										collidingAxis = VectorUtil.maxIndex(minTvals.Xy);
+									}
+								}
+							}
+
+							if(collidingAxis == -1) { //no collision
+								pos += vel * (float)time;
+								time = 0.0;
+							} else {
+								alreadyCollidedList.Add(collidingObj);
+								Vector3 startLoc = new Vector3(pos);
+								switch(collidingAxis) {
+									case 0: //x
+										if(pos.X < collidingObj.location.X) {
+											pos.X = collidingObj.location.X - (curProjectile.pbox.X + collidingObj.pbox.X) - 0.0001f;
+										} else {
+											pos.X = collidingObj.location.X + curProjectile.pbox.X + collidingObj.pbox.X + 0.0001f;
+										}
+										if(vel.X != 0) { //should always be true, but just in case...
+											double deltaTime = (pos.X - startLoc.X) / vel.X;
+											pos.Y += (float)(vel.Y * deltaTime);
+											pos.Z += (float)(vel.Z * deltaTime);
+											time -= deltaTime;
+										}
+										vel.X *= -0.6f; //bounce
+										break;
+									case 1: //y
+										if(pos.Y < collidingObj.location.Y) {
+											pos.Y = collidingObj.location.Y - (curProjectile.pbox.Y + collidingObj.pbox.Y) - 0.0001f;
+										} else {
+											pos.Y = collidingObj.location.Y + curProjectile.pbox.Y + collidingObj.pbox.Y + 0.0001f;
+										}
+										if(vel.Y != 0) { //should always be true, but just in case...
+											double deltaTime = (pos.Y - startLoc.Y) / vel.Y;
+											pos.X += (float)(vel.X * deltaTime);
+											pos.Z += (float)(vel.Z * deltaTime);
+											time -= deltaTime;
+										}
+
+										vel.Y *= -0.6f; //bounce
+										if(pos.Y > collidingObj.location.Y) {
+											//Simulate friction for rolling
+											if(Math.Abs(vel.X) >= 50.0f) {
+												vel.X = (vel.X >= 0 ? vel.X - (float)(Projectile.friction * time) : vel.X + (float)(Projectile.friction * time));
+											}
+											if(vel.Y < 25.0f) {
+												vel.Y = 0.0f; //stop bounces when they get too small
+											}
+										}
+										break;
+									case 2: //z
+										if(pos.Z < collidingObj.location.Z) {
+											pos.Z = collidingObj.location.Z - (curProjectile.pbox.Z + collidingObj.pbox.Z) - 0.0001f;
+										} else {
+											pos.Z = collidingObj.location.Z + curProjectile.pbox.Z + collidingObj.pbox.Z + 0.0001f;
+										}
+										if(vel.Z != 0) { //should always be true, but just in case...
+											double deltaTime = (pos.Z - startLoc.Z) / vel.Z;
+											pos.X += (float)(vel.X * deltaTime);
+											pos.Y += (float)(vel.Y * deltaTime);
+											time -= deltaTime;
+										}
+										vel.Z *= -0.6f; //bounce
+										break;
+								}
+							}
+						}
+						markerList.Add(new Decoration(pos, new Vector3(2, 2, 2), true, true, Billboarding.Yes, marker));
+					}
+				} else { //2D
+					for(int i = 0; i < 10; i++) {
+						double time = 1 / 20.0;
+						vel.Y -= (float)(gravity * time);
+
+						//now check for collisions and move
+						List<PhysicsObject> alreadyCollidedList = new List<PhysicsObject>();
+
+						while(time > 0.0) {
+							PhysicsObject collidingObj = null;
+							float collidingT = 1.0f / 0.0f; //pos infinity
+							int collidingAxis = -1;
+
+							foreach(PhysicsObject obj in playstate.physList) {
+								// don't do collision physics to things you already hit this frame
+								if(obj.collidesIn2d && !alreadyCollidedList.Contains(obj)) {
+									//find possible ranges of values for which a collision may have occurred
+									Vector3 maxTvals = VectorUtil.div(obj.location + obj.pbox - pos + curProjectile.pbox, vel);
+									Vector3 minTvals = VectorUtil.div(obj.location - obj.pbox - pos - curProjectile.pbox, vel);
+									VectorUtil.sort(ref minTvals, ref maxTvals);
+
+									float minT = VectorUtil.maxVal(minTvals.Xy);
+									float maxT = VectorUtil.minVal(maxTvals.Xy);
+
+									// both axes? || forward? || within range?
+									if(minT > maxT || minT < 0.0f || minT > time) {
+										continue; //no intersection
+									}
+
+									//if we're here, there's a collision
+									//see if this collision is the first to occur
+									if(minT < collidingT) {
+										collidingT = minT;
+										collidingObj = obj;
+										collidingAxis = VectorUtil.maxIndex(minTvals.Xy);
+									}
+								}
+							}
+
+							if(collidingAxis == -1) { //no collision
+								pos += vel * (float)time;
+								time = 0.0;
+							} else {
+								alreadyCollidedList.Add(collidingObj);
+								Vector3 startLoc = new Vector3(pos);
+								switch(collidingAxis) {
+									case 0: //x
+										if(pos.X < collidingObj.location.X) {
+											pos.X = collidingObj.location.X - (curProjectile.pbox.X + collidingObj.pbox.X) - 0.0001f;
+										} else {
+											pos.X = collidingObj.location.X + curProjectile.pbox.X + collidingObj.pbox.X + 0.0001f;
+										}
+										if(vel.X != 0) { //should always be true, but just in case...
+											double deltaTime = (pos.X - startLoc.X) / vel.X;
+											pos.Y += (float)(vel.Y * deltaTime);
+											pos.Z += (float)(vel.Z * deltaTime);
+											time -= deltaTime;
+										}
+										vel.X *= -0.6f; //bounce
+										break;
+									case 1: //y
+										if(pos.Y < collidingObj.location.Y) {
+											pos.Y = collidingObj.location.Y - (curProjectile.pbox.Y + collidingObj.pbox.Y) - 0.0001f;
+										} else {
+											pos.Y = collidingObj.location.Y + curProjectile.pbox.Y + collidingObj.pbox.Y + 0.0001f;
+										}
+										if(vel.Y != 0) { //should always be true, but just in case...
+											double deltaTime = (pos.Y - startLoc.Y) / vel.Y;
+											pos.X += (float)(vel.X * deltaTime);
+											pos.Z += (float)(vel.Z * deltaTime);
+											time -= deltaTime;
+										}
+
+										vel.Y *= -0.6f; //bounce
+										if(pos.Y > collidingObj.location.Y) {
+											//Simulate friction for rolling
+											if(Math.Abs(vel.X) >= 50.0f) {
+												vel.X = (vel.X >= 0 ? vel.X - (float)(Projectile.friction * time) : vel.X + (float)(Projectile.friction * time));
+											}
+											if(vel.Y < 25.0f) {
+												vel.Y = 0.0f; //stop bounces when they get too small
+											}
+										}
+										break;
+								}
+							}
+						}
+						markerList.Add(new Decoration(pos, new Vector3(2, 2, 2), true, true, Billboarding.Yes, marker));
+					}
 				}
 			}
 		}
@@ -678,14 +871,13 @@ namespace U5Designs {
                         double zdist = Math.Abs(obj.location.Z - location.Z);
                         double ydist = Math.Abs(obj.location.Y - location.Y);
                         if ((xdist < (enemyZone + spinSize)) && (zdist < (enemyZone + spinSize)) && ydist < ((CombatObject)obj).cbox.Y + cbox.Y) {
-                            if (((CombatObject)obj).type == 1) {// obj is an enemy
+							if(((CombatObject)obj).type == (int)CombatType.enemy) {// obj is an enemy
                                 ((CombatObject)obj).health = ((CombatObject)obj).health - spinDamage;
                                 HasControl = false;
                                 NoControlTimer = 0.5;
                                 knockback(true, obj);
-                                if (((CombatObject)obj).type == 1)
-                                    ((Enemy)obj).frozen = true;
-                            } else if (((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
+								((Enemy)obj).frozen = true;
+                            } else if (((CombatObject)obj).type == (int)CombatType.projectile) { // obj is a projectile, despawn projectile do damage
                                 //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
                                 if (!((Projectile)obj).playerspawned) {
                                     //despawn the projectile
@@ -852,32 +1044,22 @@ namespace U5Designs {
 				}
 			}
 
-            if (!inLevelDesignMode) // ADDING A SWITCH FOR LEVEL DESIGN FEATURES
+            //Now that everything is done, move the camera if we're below the bottom of the screen
+            if (fallTimer > 0.0 || !cam.playerIsAboveScreenBottom())
             {
-                //Now that everything is done, move the camera if we're below the bottom of the screen
-                if (fallTimer > 0.0 || !cam.playerIsAboveScreenBottom())
-                {
-                    fallTimer += origTime;
-                    cam.trackPlayer();
-                }
-
-            }
-            if (inLevelDesignMode)
-            {
-                if (fallTimer > 0.0 || !cam.playerIsAboveScreenBottom())
-                {
-                    fallTimer += origTime;
-                }
+                fallTimer += origTime;
+				if(!inLevelDesignMode) {
+					cam.trackPlayer();
+				}
             }
 
-                if (fallTimer > 1.5)
-                {
-                    _health -= fallDamage;
-                    _location = lastPosOnGround;
-                    velocity = Vector3.Zero;
-                    Invincible = true;
-                    Invincibletimer = 2.0;
-                }
+			if(fallTimer > 1.5) {
+				_health -= fallDamage;
+				_location = lastPosOnGround;
+				velocity = Vector3.Zero;
+				Invincible = true;
+				Invincibletimer = 2.0;
+			}
 		}
 
         /// <summary>
@@ -885,15 +1067,15 @@ namespace U5Designs {
         /// </summary>
         /// <param name="time">Time elapsed since last update</param>
         /// <param name="physList">a pointer to physList, the list of all physics objects</param>
-        public void physUpdate2d(double time, List<PhysicsObject> physList) {
+		public void physUpdate2d(double time, List<PhysicsObject> physList) {
 			double origTime = time;
 			bool collidedWithGround = false;
-			
+
 			//first do gravity
 			if(viewSwitchJumpTimer <= 0.0) {
 				accel.Y -= (float)(gravity * time);
 			}
-			
+
 			//now deal with acceleration
 			velocity += accel;
 			accel.X = 0;
@@ -910,44 +1092,43 @@ namespace U5Designs {
 				PhysicsObject collidingObj = null;
 				float collidingT = 1.0f / 0.0f; //pos infinity
 				int collidingAxis = -1;
-                bool endspin = false; // flag to end spin
+				bool endspin = false; // flag to end spin
 
-                foreach (PhysicsObject obj in physList) {
-                    //if we are spinning, do a simple non-physics collision test against combat objects
-                    //If we hit a Combat obj, damage it, despwan it w/e, then flag the spin attack to end
-                    if (spinning && obj.collidesIn2d && obj.hascbox && obj != this && !alreadyCollidedList.Contains(obj)) {
-                        //note: we cant do collisions the 'good' way like below with a cbox or pbox
-                        // because we may start spinning with an enemy already inside of our box. Thus we must just simply check whether an enemy
-                        // is inside our 'zone'(location + spinSize in x and z)
-                        //Note: if we impliment an enemy with a not square cbox this may look... odd. until then, doing zones is very fast/easy
-                        double enemyZone = (((CombatObject)obj).cbox.X + ((CombatObject)obj).cbox.Z) / 2; // avg(in case z and x are not equal)
-                        double xdist = Math.Abs(obj.location.X - location.X);//only do x dist in 2d
-                        double ydist = Math.Abs(obj.location.Y - location.Y);
-                        if ((xdist < (enemyZone + spinSize)) && ydist < ((CombatObject)obj).cbox.Y + cbox.Y) {
+				foreach(PhysicsObject obj in physList) {
+					//if we are spinning, do a simple non-physics collision test against combat objects
+					//If we hit a Combat obj, damage it, despwan it w/e, then flag the spin attack to end
+					if(spinning && obj.collidesIn2d && obj.hascbox && obj != this && !alreadyCollidedList.Contains(obj)) {
+						//note: we cant do collisions the 'good' way like below with a cbox or pbox
+						// because we may start spinning with an enemy already inside of our box. Thus we must just simply check whether an enemy
+						// is inside our 'zone'(location + spinSize in x and z)
+						//Note: if we impliment an enemy with a not square cbox this may look... odd. until then, doing zones is very fast/easy
+						double enemyZone = (((CombatObject)obj).cbox.X + ((CombatObject)obj).cbox.Z) / 2; // avg(in case z and x are not equal)
+						double xdist = Math.Abs(obj.location.X - location.X);//only do x dist in 2d
+						double ydist = Math.Abs(obj.location.Y - location.Y);
+						if((xdist < (enemyZone + spinSize)) && ydist < ((CombatObject)obj).cbox.Y + cbox.Y) {
 
-                            if (((CombatObject)obj).type == 1) {// obj is an enemy or boss, hurt it
+							if(((CombatObject)obj).type == 1) {// obj is an enemy or boss, hurt it
 								((CombatObject)obj).health = ((CombatObject)obj).health - spinDamage;
-                                HasControl = false;
-                                NoControlTimer = 0.5;
-                                knockback(false, obj);
-                                if (((CombatObject)obj).type == 1)
-                                    ((Enemy)obj).frozen = true;
-                            } else if (((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
-                                //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
-                                if (!((Projectile)obj).playerspawned) {
-                                    //despawn the projectile
-                                    ((CombatObject)obj).health = 0;
-                                }
-                            }
-                            else if (((CombatObject)obj).type == 3) { // obj is zookeeper
-                                ((Boss)obj).dodamage(spinDamage);
-                                HasControl = false;
-                                NoControlTimer = 0.5;
-                                knockback(false, obj);
-                            }
-                            endspin = true;
-                        }
-                    }
+								HasControl = false;
+								NoControlTimer = 0.5;
+								knockback(false, obj);
+								if(((CombatObject)obj).type == 1)
+									((Enemy)obj).frozen = true;
+							} else if(((CombatObject)obj).type == 2) { // obj is a projectile, despawn projectile do damage
+								//if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
+								if(!((Projectile)obj).playerspawned) {
+									//despawn the projectile
+									((CombatObject)obj).health = 0;
+								}
+							} else if(((CombatObject)obj).type == 3) { // obj is zookeeper
+								((Boss)obj).dodamage(spinDamage);
+								HasControl = false;
+								NoControlTimer = 0.5;
+								knockback(false, obj);
+							}
+							endspin = true;
+						}
+					}
 					// don't do collision physics to yourself, or on things you already hit this frame
 					if(obj.collidesIn2d && obj != this && !alreadyCollidedList.Contains(obj)) {
 						Vector3 mybox, objbox;
@@ -983,7 +1164,7 @@ namespace U5Designs {
 
 				if(endspin) {
 					spinning = false;
-                    _speed = runSpeed;
+					_speed = runSpeed;
 					_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
 				}
 
@@ -1049,10 +1230,10 @@ namespace U5Designs {
 							HasControl = false;
 							NoControlTimer = 0.5;
 							((Enemy)collidingObj).frozen = true;
-                            knockback(false, collidingObj);
+							knockback(false, collidingObj);
 						}
 						if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
-                            //if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
+							//if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
 							if(!((Projectile)collidingObj).playerspawned) {
 								_health = _health - ((CombatObject)collidingObj).damage;
 								Invincible = true;
@@ -1060,60 +1241,50 @@ namespace U5Designs {
 								HasControl = false;
 								NoControlTimer = 0.5;
 								//despawn the projectile
-                                ((CombatObject)collidingObj).health = 0;
-                                knockback(false, collidingObj);
+								((CombatObject)collidingObj).health = 0;
+								knockback(false, collidingObj);
 							}
 						}
-                        if (((CombatObject)collidingObj).type == 3) {// obj is the boss, treat it basicially like an enemy
-                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
-                            _health = _health - ((CombatObject)collidingObj).damage;
-                            Invincible = true;
-                            Invincibletimer = 0.5;
-                            HasControl = false;
-                            NoControlTimer = 0.5;
-                            knockback(false, collidingObj);
-                        }
-                        if (((CombatObject)collidingObj).type == 4) {// obj is a special projectile that will squish the player(underside of a box)
-                            time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
-                            //despawn the projectile
-                            if (onGround)
-                                squish();
-                            else {
-                                squish();
-                                accelerate(((Projectile)collidingObj).velocity);
-                            }
-                            ((CombatObject)collidingObj).health = 0;
-                        }
-                        
+						if(((CombatObject)collidingObj).type == 3) {// obj is the boss, treat it basicially like an enemy
+							time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+							_health = _health - ((CombatObject)collidingObj).damage;
+							Invincible = true;
+							Invincibletimer = 0.5;
+							HasControl = false;
+							NoControlTimer = 0.5;
+							knockback(false, collidingObj);
+						}
+						if(((CombatObject)collidingObj).type == 4) {// obj is a special projectile that will squish the player(underside of a box)
+							time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
+							//despawn the projectile
+							if(onGround)
+								squish();
+							else {
+								squish();
+								accelerate(((Projectile)collidingObj).velocity);
+							}
+							((CombatObject)collidingObj).health = 0;
+						}
+
 					}
 				}
 			}
 
-            if (!inLevelDesignMode) // ADDED A SWITCH TO LEVEL DESIGN MODE
-            {
-                //Now that everything is done, move the camera if we're below the bottom of the screen
-                if (fallTimer > 0.0 || !cam.playerIsAboveScreenBottom())
-                {
-                    fallTimer += origTime;
-                    cam.trackPlayer();
-                }
+			//Now that everything is done, move the camera if we're below the bottom of the screen
+			if(fallTimer > 0.0 || !cam.playerIsAboveScreenBottom()) {
+				fallTimer += origTime;
+				if(!inLevelDesignMode) {
+					cam.trackPlayer();
+				}
+			}
 
-            }
-            if (inLevelDesignMode)
-            {
-                if (fallTimer > 0.0 || !cam.playerIsAboveScreenBottom())
-                {
-                    fallTimer += origTime;
-                }
-            }
-                if (fallTimer > 1.5)
-                {
-                    _health -= fallDamage;
-                    _location = lastPosOnGround;
-                    velocity = Vector3.Zero;
-                    Invincible = true;
-                    Invincibletimer = 2.0;
-                }
+			if(fallTimer > 1.5) {
+				_health -= fallDamage;
+				_location = lastPosOnGround;
+				velocity = Vector3.Zero;
+				Invincible = true;
+				Invincibletimer = 2.0;
+			}
 		}
 
         /// <summary>
@@ -1130,6 +1301,8 @@ namespace U5Designs {
                 location = new Vector3(collidingObj.location.X + (collidingObj.pbox.X * direction.X), collidingObj.location.Y + collidingObj.pbox.Y, collidingObj.location.Z + (collidingObj.pbox.Z * direction.Z));
                 velocity = new Vector3(0, 0, 0);
                 accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
+
+				_cycleNum = (int)PlayerAnim.stand3d; //TODO: Change to player damage animation
             } else {
                 Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, 0);
                 direction.Normalize();
@@ -1140,6 +1313,8 @@ namespace U5Designs {
                 deltax = location.X - origX;
                 velocity = new Vector3(0, 0, 0);
                 accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, 0);
+
+				_cycleNum = (int)PlayerAnim.stand2d; //TODO: Change to player damage animation
             }
         }
 

@@ -36,8 +36,8 @@ namespace U5Designs {
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
 
-			screens = new Texture[4];
-			for(int i = 0; i < 4; i++) {
+			screens = new Texture[8];
+			for(int i = 0; i < 8; i++) {
 				screens[i] = eng.StateTextureManager.GetTexture("load" + (i + 1));
 			}
 
@@ -54,14 +54,14 @@ namespace U5Designs {
 		}
 
 		public override void MakeActive() {
-			GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 			Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
 			GL.MatrixMode(MatrixMode.Modelview);
 			GL.LoadMatrix(ref modelview);
 
 			GL.MatrixMode(MatrixMode.Projection);
-			Matrix4d projection = Matrix4d.CreateOrthographic(192, 108, 1.0f, 6400.0f);
+			Matrix4d projection = Matrix4d.CreateOrthographic(1280, 720, 1.0f, 10.0f);
 			GL.LoadMatrix(ref projection);
 		}
 
@@ -85,6 +85,8 @@ namespace U5Designs {
 				playstate.Healthbar = playstate.eng.StateTextureManager.GetTexture("Healthbar");
 				playstate.eng.StateTextureManager.LoadTexture("bHealth", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_bottom.png"));
 				playstate.bHealth = playstate.eng.StateTextureManager.GetTexture("bHealth");
+				playstate.eng.StateTextureManager.LoadTexture("healthFrame", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.stamina_frame.png"));
+				playstate.healthFrame = playstate.eng.StateTextureManager.GetTexture("healthFrame");
 
 				//initialize camera
 				playstate.camera = new Camera(playstate.eng.ClientRectangle.Width, playstate.eng.ClientRectangle.Height, playstate.player, playstate);
@@ -99,8 +101,8 @@ namespace U5Designs {
         {
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
 
-			curFrame = (curFrame + e.Time * 2) % 4;
-			screens[(int)curFrame].Draw2DTexture(0, 0, 0.2f, 0.2f);
+			curFrame = (curFrame + e.Time * 20) % 8;
+			screens[(int)curFrame].Draw2DTexture(0, 0, 1.0f, 1.0f);
         }
 	}
 }

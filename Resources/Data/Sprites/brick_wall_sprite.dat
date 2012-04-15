@@ -2,8 +2,8 @@
 	<bmp>brick_wall.png</bmp>
 	<c_starts>0</c_starts>
 	<c_lengths>1</c_lengths>
-	<t_width>768</t_width>
-	<t_height>768</t_height>
+	<t_width>987</t_width>
+	<t_height>1481</t_height>
 	<hasAlpha>false</hasAlpha>
 	<fps>1.0</fps>
 </sprite>

@@ -66,10 +66,9 @@ namespace U5Designs
 			StateTextureManager.LoadTexture("p4", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.PauseTextures.p4.png"));
 
 			// Load State
-			StateTextureManager.LoadTexture("load1", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.LoadingScreenTextures.load1.png"));
-			StateTextureManager.LoadTexture("load2", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.LoadingScreenTextures.load2.png"));
-			StateTextureManager.LoadTexture("load3", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.LoadingScreenTextures.load3.png"));
-			StateTextureManager.LoadTexture("load4", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.LoadingScreenTextures.load4.png"));
+			for(int i = 1; i <= 8; i++) {
+				StateTextureManager.LoadTexture("load" + i, assembly.GetManifestResourceStream("U5Designs.Resources.Textures.LoadingScreenTextures.load" + i + ".png"));
+			}
         
             ThisMouse = new GameMouse(this);
             states = new Stack<GameState>();
@@ -119,7 +118,7 @@ namespace U5Designs
             // Cleanup the current state
             if (states.Count != 0)
             {
-                /*GameState st =*/ states.Pop();
+                states.Pop();
             }
             // Store new state
             states.Push(state);

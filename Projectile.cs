@@ -21,7 +21,7 @@ namespace U5Designs {
      * */
     class Projectile : GameObject, RenderObject, CombatObject, PhysicsObject {
 
-		private const double friction = 2000.0;
+		public const double friction = 2000.0;
 
         //physics vars
         internal Vector3 velocity;
@@ -69,45 +69,6 @@ namespace U5Designs {
 			accel = new Vector3(0, 0, 0);
 			_animDirection = 1;
 		}
-
-// 		[Obsolete("Version with ProjectileProperties should be used in most or all cases")]
-//         public Projectile(Vector3 location, Vector3 direction, Vector3 scale, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, bool in3d,
-// 							int damage, float speed, bool gravity, bool PlayerSpawned, SpriteSheet sprite) : base() {
-// 			_location = location;
-//             this.direction = direction;
-// 			_scale = scale;
-//             _pbox = pbox;
-//             _cbox = cbox;
-// 			_existsIn3d = existsIn3d;
-// 			_existsIn2d = existsIn2d;
-//             _health = 1; // health 1 = active, health 0 = despawning, waiting for cleanup in PlayState
-//             _damage = damage;
-//             _speed = speed;
-// 			_alive = true;
-// 			duration = -1.0;
-// 			liveTime = 0.0;
-// 
-// 			if(gravity) {
-// 				_type = (int)CombatType.grenade;
-// 				_hascbox = false; //Has normal pbox collisions until detonation
-// 			} else {
-// 				_type = (int)CombatType.projectile;
-// 				_hascbox = true;
-// 			}
-// 
-// 			_mesh = null;
-// 			_texture = null;
-// 			_sprite = sprite;
-// 			_frameNum = 0;
-//             playerspawned = PlayerSpawned;
-// 
-// 			velocity = direction * speed;
-// 			//if (!in3d)
-// 			//    velocity.Z = 0;
-//             accel = new Vector3(0, 0, 0);
-// 			doesGravity = gravity;
-// 			_animDirection = 1;
-// 		}
 
         /// <summary>
         /// Does a physics update for this projectile if we are in 3d view

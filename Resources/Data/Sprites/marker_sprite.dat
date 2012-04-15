@@ -1,5 +1,5 @@
 ﻿<sprite>
-	<bmp>marker.png</bmp>
+	<bmp>marker3.png</bmp>
 	<c_starts>0</c_starts>	
 	<c_lengths>1</c_lengths>	
 	<t_width>64</t_width>

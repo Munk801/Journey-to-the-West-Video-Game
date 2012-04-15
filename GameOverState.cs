@@ -76,14 +76,17 @@ namespace U5Designs {
 
         public override void Draw(FrameEventArgs e)
         {
-            GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+			GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
 
-           GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			//We shouldn't need to reset all this camera stuff here, but if we don't we're getting screwy bugs sometimes...
+			Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
+			GL.MatrixMode(MatrixMode.Modelview);
+			GL.LoadMatrix(ref modelview);
 
-            Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadMatrix(ref modelview);
+			GL.MatrixMode(MatrixMode.Projection);
+			Matrix4d projection = Matrix4d.CreateOrthographic(1280, 720, 1.0f, 6400.0f);
+			GL.LoadMatrix(ref projection);
+
             goBackground.Draw2DTexture();
         }
 
