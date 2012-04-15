@@ -3,14 +3,29 @@
 	<enemylist>
 		<enemy>
 			<path>Boy.dat</path>
-			<loc x="388" y="23" z="50" />
+			<loc x="1823" y="42" z="-7" />
+			<loc x="1975" y="-57" z="50" />
+			<loc x="3101" y="95" z="-39" />
+		</enemy>
+		<enemy>
+			<path>Bird.dat</path>
+			<loc x="709" y="71" z="50" />
+			<loc x="1680" y="62" z="50" />
+			<loc x="2114" y="-5" z="110" />
+			<loc x="2185" y="-9" z="-10" />
+			<loc x="2242" y="-10" z="50" />
+			<loc x="2304" y="-44" z="50" />
+			<loc x="2185" y="-10" z="85" />
+			<loc x="3418" y="-34" z="50" />
+		</enemy>
+		<enemy>
+			<path>Girl.dat</path>
+			<loc x="881" y="71" z="50" />
+			<loc x="1710" y="18" z="38" />
+			<loc x="2023" y="-56" z="50" />
+			<loc x="2638" y="43" z="50" />
+			<loc x="2709" y="45" z="-13" />
+			<loc x="2800" y="46" z="-69" />
 		</enemy>
 	</enemylist>
-	<obstaclelist>
-		<obstacle>
-			<path>test_obstacle.dat</path>
-			<loc x="255" y="-48" z="50" />
-			<loc x="355" y="-49" z="50" />
-		</obstacle>
-	</obstaclelist>
 </level>

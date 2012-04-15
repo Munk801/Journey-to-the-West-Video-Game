@@ -25,7 +25,6 @@ namespace U5Designs
     /** Main State of the game that will be active while the player is Playing **/
     public class LevelDesignerState : PlayState
     {
-
         // Our current selected object for movement
         internal GameObject SelectedObject = null;
         
@@ -85,6 +84,8 @@ namespace U5Designs
 		public LevelDesignerState(GameEngine engine, MainMenuState menustate, int lvl)
             : base(engine, menustate)
         {
+            eng.WindowState = WindowState.Normal;
+            eng.WindowBorder = WindowBorder.Fixed;
 			current_level = lvl;
 			LoadLevel.Load(lvl, this);
 
@@ -138,7 +139,7 @@ namespace U5Designs
             _xml_boss_center_list = new Dictionary<Vector3, int>();
             _xml_end_region = new List<Vector3>();
 
-            StartDesignerThread();
+            //StartDesignerThread();
             textWriter = new MyTextWriter(eng.ClientSize, new Size(200, 200));
         }
         #endregion
@@ -147,29 +148,29 @@ namespace U5Designs
         /// <summary>
         /// Opens the secondary tool menu which will be useful for user to choose items
         /// </summary>
-        private void OpenWindow()
-        {
-            if (System.Windows.Application.Current == null)
-            {
-                app = new System.Windows.Application();
-                window = new LevelDesignerTool.MainWindow();
-                app.Run(window);
-            }
-        }
+        //private void OpenWindow()
+        //{
+        //    if (System.Windows.Application.Current == null)
+        //    {
+        //        app = new System.Windows.Application();
+        //        window = new LevelDesignerTool.MainWindow();
+        //        app.Run(window);
+        //    }
+        //}
 
-        /// <summary>
-        /// Thread for secondary window
-        /// </summary>
-        private void StartDesignerThread()
-        {
-            var thread = new Thread(() =>
-                {
-                    OpenWindow();
-                });
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.IsBackground = false;
-            thread.Start();
-        }
+        ///// <summary>
+        ///// Thread for secondary window
+        ///// </summary>
+        //private void StartDesignerThread()
+        //{
+        //    var thread = new Thread(() =>
+        //        {
+        //            OpenWindow();
+        //        });
+        //    thread.SetApartmentState(ApartmentState.STA);
+        //    thread.IsBackground = false;
+        //    thread.Start();
+        //}
 
         // IF WE DECIDE TO GO THE WINDOWS FORM ROUTE
         //[STAThread]
