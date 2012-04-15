@@ -41,7 +41,7 @@ namespace U5Designs
         // New Buttons
         Texture menu, arrow, play_press, play_nopress, load_nopress, load_press, quit_nopress, quit_press, ld_nopress, ld_press;
         float arX, b1Y, b2Y, b3Y, b4Y;
-        public bool enterdown;
+        public bool enterdown, escapedown;
 
         public bool clickdown = false;
 
@@ -98,9 +98,9 @@ namespace U5Designs
             b2Y = -50.0f;
             b3Y = -100.0f;
             b4Y = -150.0f;
+            enterdown = false;
 
             // TEST //
-            enterdown = false;
             LoadSavedState(1);
 
         }
@@ -114,6 +114,11 @@ namespace U5Designs
             GL.MatrixMode(MatrixMode.Projection);
             Matrix4 projection = Matrix4.CreateOrthographic(1280, 720, 1.0f, 6400.0f);
             GL.LoadMatrix(ref projection);
+            if (eng.Keyboard[Key.Escape]) {
+                escapedown = true;
+            }
+            if (eng.Keyboard[Key.Enter])
+                enterdown = true;
         }
 
         public override void Update(FrameEventArgs e)
@@ -202,12 +207,16 @@ namespace U5Designs
         private void MouseInput()
         {
             if (eng.ThisMouse.inButtonRegion(play_press)) {
+                eng.selectSound.Play();
                 _cur_butn = 0;
             } else if (eng.ThisMouse.inButtonRegion(load_press)) {
+                eng.selectSound.Play();
                 _cur_butn = 1;
             } else if (eng.ThisMouse.inButtonRegion(quit_press)) {
+                eng.selectSound.Play();
                 _cur_butn = 2;
 			} else if(eng.ThisMouse.inButtonRegion(ld_press)) {
+                eng.selectSound.Play();
 				_cur_butn = 3;
 			} else {
 				return; //If they didn't actively click on something, don't use the selected button from the keyboard
@@ -261,9 +270,11 @@ namespace U5Designs
             }
             _old_state = _new_state;
 
-            if (eng.Keyboard[Key.Q])
-            {
+            if (eng.Keyboard[Key.Escape] && !escapedown){
                 eng.Exit();
+            }
+            else if (!eng.Keyboard[Key.Escape]) {
+                escapedown = false;
             }
 
             //********************** enter
