@@ -15,6 +15,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
+// QuickFont
+//using QuickFont;
+
 namespace U5Designs
 {
     /** Main State of the game that will be active while the player is Playing **/
@@ -54,7 +57,7 @@ namespace U5Designs
 		public SpriteSheet staminaBar, staminaBack, staminaFrame, crosshair;
 
 		internal bool tabDown;
-		public bool clickdown;
+		public bool clickdown;        
 
 		/// <summary>
 		/// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
@@ -80,7 +83,7 @@ namespace U5Designs
         /// <summary>
         /// Refreshes graphics when this state becomes active again after being frozen.
         /// </summary>
-		public override void MakeActive() {
+		public override void MakeActive() { 
             if (musicenabled)
             {
                 levelMusic.ReplayFile();
@@ -300,7 +303,7 @@ namespace U5Designs
             //if (isInTransition)
             //{
             //    GL.Accum(AccumOp.Accum, 0.9f);
-            //}
+            //}            
         }
 
 		public void drawStaminaBarAndCrosshair() {
