@@ -36,7 +36,6 @@ namespace U5Designs
             menu = menustate;
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
-
             _p1 = eng.StateTextureManager.GetTexture("p1");
             _p2 = eng.StateTextureManager.GetTexture("p2");
             _p3 = eng.StateTextureManager.GetTexture("p3");
@@ -50,13 +49,10 @@ namespace U5Designs
 
 		public override void MakeActive() {
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            
-			Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
-			GL.MatrixMode(MatrixMode.Modelview);
-			GL.LoadMatrix(ref modelview);
+
 
 			GL.MatrixMode(MatrixMode.Projection);
-			Matrix4d projection = Matrix4d.CreateOrthographic(192, 108, 1.0f, 6400.0f);
+			Matrix4d projection = Matrix4d.CreateOrthographic(1280, 720, 1.0f, 6400.0f);
 			GL.LoadMatrix(ref projection);
             if (eng.Keyboard[Key.Escape]) {
                 escapedown = true;
@@ -72,21 +68,25 @@ namespace U5Designs
         public override void Draw(FrameEventArgs e)
         {
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
+            Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadMatrix(ref modelview);
 			curFrame = (curFrame + e.Time * 2) % 4;
 
 			switch((int)curFrame) {
 				case 0:
-					_p1.Draw2DTexture(0, 0, 0.2f, 0.2f);
+					_p1.Draw2DTexture(0, 0);
 					break;
 				case 1:
-					_p2.Draw2DTexture(0, 0, 0.2f, 0.2f);
+					_p2.Draw2DTexture(0, 0);
 					break;
 				case 2:
-					_p3.Draw2DTexture(0, 0, 0.2f, 0.2f);
+					_p3.Draw2DTexture(0, 0);
 					break;
 				case 3:
-					_p4.Draw2DTexture(0, 0, 0.2f, 0.2f);
+					_p4.Draw2DTexture(0, 0);
 					break;
 			}             
         }

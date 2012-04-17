@@ -80,7 +80,7 @@ namespace U5Designs
 			clickdown = false;
 			nowBillboarding = false;
 			aienabled = true;
-			musicenabled = false;
+			musicenabled = true;
 
             nextLevelTimer = 0;
             waitingToSwitchLevels = false;           
