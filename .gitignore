@@ -9,3 +9,5 @@
 *.vsp
 /LevelDesignerTool/bin
 /LevelDesignerTool/obj
+/QuickFont/bin
+/QuickFont/obj
