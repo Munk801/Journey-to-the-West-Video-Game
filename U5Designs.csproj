@@ -36,6 +36,9 @@
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="QuickFont">
+      <HintPath>QuickFont\bin\Debug\QuickFont.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -66,6 +69,7 @@
       <DependentUpon>LevelDesignerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="LevelSelect.cs" />
+    <Compile Include="LoadGameState.cs" />
     <Compile Include="LoadScreenState.cs" />
     <Compile Include="MyTextWriter.cs" />
     <Compile Include="ZookeeperAI.cs" />
@@ -484,6 +488,18 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Music\Level01.ogg" />
     <EmbeddedResource Include="Resources\Music\Menu.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Fonts\Anonymous.ttf" />
+    <EmbeddedResource Include="Fonts\BURNSTOW.TTF" />
+    <EmbeddedResource Include="Fonts\Comfortaa-Regular.ttf" />
+    <EmbeddedResource Include="Fonts\HappySans.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Fonts\NASHVILL.TTF" />
+    <EmbeddedResource Include="Fonts\Rock.TTF" />
+    <Content Include="Fonts\ScrumBucket.ttf" />
+    <EmbeddedResource Include="Fonts\times.ttf" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
