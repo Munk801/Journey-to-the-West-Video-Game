@@ -42,6 +42,7 @@ namespace U5Designs {
 			XmlNode endRegion = doc.GetElementsByTagName("endRegion")[0];
 			XmlNode bossAreaCenter = doc.GetElementsByTagName("bossAreaCenter")[0];
 			XmlNode bossAreaBounds = doc.GetElementsByTagName("bossAreaBounds")[0];
+			XmlNode bossSpawn = doc.GetElementsByTagName("bossSpawn")[0];
 			XmlNodeList _b_list = doc.GetElementsByTagName("background");
 			XmlNodeList _e_list = doc.GetElementsByTagName("enemy");
 			XmlNodeList _o_list = doc.GetElementsByTagName("obstaclelist")[0].ChildNodes;
@@ -55,6 +56,7 @@ namespace U5Designs {
 			ps.endRegion = parseRegion(endRegion);
 			ps.bossAreaCenter = parseVector3(bossAreaCenter);
 			ps.bossAreaBounds = parseVector3(bossAreaBounds);
+			ps.bossSpawn = parseVector3(bossSpawn);
 			
             XmlNode aud = _a_list[0];
 			ps.levelMusic = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music." + aud.InnerText));

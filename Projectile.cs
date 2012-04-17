@@ -555,6 +555,10 @@ namespace U5Designs {
 			get { return _deathAnim; }
 		}
 
+		public bool drawWhenOffScreen {
+			get { return false; }
+		}
+
         public void doScaleTranslateAndTexture() {
             GL.PushMatrix();
             if (is3dGeo) {

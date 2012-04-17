@@ -208,6 +208,7 @@ namespace U5Designs {
 					_pbox.Y = 12.5f;
 					_location.Y += _pbox.Y - oldPboxY;
 					squishTimer = -1.0;
+					isMobile = true;
 				}
 			}
 
@@ -412,14 +413,14 @@ namespace U5Designs {
 			//Secret skip to boss
 			if(keyboard[Key.Period] && keyboard[Key.Comma]) {
 				//floor at 125 + 12.5 player pbox
-				_location = new Vector3(playstate.bossAreaCenter) + Vector3.UnitY * (_pbox.Y + 0.1f);
+				_location = new Vector3(playstate.bossSpawn) + Vector3.UnitY * (_pbox.Y + 0.1f);
 
 				//The following should maybe be moved to a function in Camera
 				playstate.camera.eye.Y = _location.Y + (enable3d ? 24.0f : 31.25f);
 				playstate.camera.lookat.Y = _location.Y + (enable3d ? 20.5f : 31.25f);
 				cam.moveToYPos(_location.Y);
 
-				playstate.enterBossMode();
+				//playstate.enterBossMode();
 			}
 
 		}
@@ -1416,6 +1417,10 @@ namespace U5Designs {
         public int ScreenRegion {
             get { return screenRegion; }
         }
+
+		public bool drawWhenOffScreen {
+			get { return true; }
+		}
 
         public void doScaleTranslateAndTexture() {
             GL.PushMatrix();

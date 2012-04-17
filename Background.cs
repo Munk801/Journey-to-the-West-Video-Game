@@ -13,6 +13,8 @@ namespace U5Designs
 {
     class Background : Decoration
     {
+		private Vector3 startLoc, theoretical;
+
 		private float speed;
         public float Speed {
 			get { return speed; }
@@ -30,6 +32,8 @@ namespace U5Designs
 					: base(location, scale, true, true, Billboarding.Lock2d, sprite) {
 			this.speed = speed;
             this._sprite_path = sp;
+			startLoc = new Vector3(_location);
+			theoretical = new Vector3(_location);
 		}
 
         public void UpdatePositionX(float deltax) {
@@ -37,7 +41,16 @@ namespace U5Designs
         }
 
 		public void UpdatePositionY(float deltay) {
-			_location.Y += deltay*0.85f;
+/*			_location.Y += deltay * 0.85f;*/
+			theoretical.Y += deltay * 0.85f;
+			float offset = theoretical.Y - startLoc.Y;
+			if(offset > 40.0f) {
+				_location.Y = startLoc.Y + 40.0f;
+			} else if(offset < -40.0f) {
+				_location.Y = startLoc.Y - 40.0f;
+			} else {
+				_location.Y = theoretical.Y;
+			}
 		}
     }
 }

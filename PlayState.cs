@@ -47,8 +47,9 @@ namespace U5Designs
 		internal List<Effect> effectsList; //effects which need to be updated to determine when to delete themselves
         internal AudioFile levelMusic;
 
-		public SphereRegion bossRegion, endRegion;
-		public Vector3 bossAreaCenter, bossAreaBounds;
+		public SphereRegion bossRegion, endRegion; //trigger regions for starting boss battle and ending level
+		public Vector3 bossAreaCenter, bossAreaBounds; //define extent of the boss encounter; used by camera
+		public Vector3 bossSpawn; //place to spawn the player before the boss battle
 
 		internal bool enable3d; //true when being viewed in 3d
 		internal int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
@@ -268,17 +269,19 @@ namespace U5Designs
 			}
 
 			foreach(RenderObject obj in renderList) {
-				if((camera.isInTransition && ((!nowBillboarding && obj.existsIn2d) || (nowBillboarding && obj.existsIn3d))) ||
-					(!camera.isInTransition && ((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d)))) {
-					if(obj.is3dGeo) {
-						obj.doScaleTranslateAndTexture();
-						obj.mesh.Render();
-					} else {
-						obj.doScaleTranslateAndTexture();
-						if(camera.isInTransition) { //Pause all animations in transition
-							obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+				if(obj.ScreenRegion == GameObject.ON_SCREEN || obj.drawWhenOffScreen) {
+					if((camera.isInTransition && ((!nowBillboarding && obj.existsIn2d) || (nowBillboarding && obj.existsIn3d))) ||
+						(!camera.isInTransition && ((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d)))) {
+						if(obj.is3dGeo) {
+							obj.doScaleTranslateAndTexture();
+							obj.mesh.Render();
 						} else {
-							obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+							obj.doScaleTranslateAndTexture();
+							if(camera.isInTransition) { //Pause all animations in transition
+								obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+							} else {
+								obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+							}
 						}
 					}
 				}
