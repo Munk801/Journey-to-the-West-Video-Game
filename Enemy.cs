@@ -698,6 +698,10 @@ namespace U5Designs
             get { return screenRegion; }
         }
 
+		public bool drawWhenOffScreen {
+			get { return false; }
+		}
+
         public void doScaleTranslateAndTexture() {
             GL.PushMatrix();
 

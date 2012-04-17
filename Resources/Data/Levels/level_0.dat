@@ -6,6 +6,7 @@
   </audiofile>
   <bossAreaCenter x="4250" y="125" z="50" />
   <bossAreaBounds x="100" y="200" z="100" />
+  <bossSpawn x="3850" y="125" z="50" />
 	<backgroundlist>
 		<background>
       <scale x="250" y="96.43" z="1"/>

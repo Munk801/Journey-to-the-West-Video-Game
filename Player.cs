@@ -73,8 +73,8 @@ namespace U5Designs {
 			this.playstate = ps;
             _speed = runSpeed;
 			_location = new Vector3(25, 12.5f, 50);
-            _scale = new Vector3(16.25f, 25f, 16.25f);
-            _pbox = new Vector3(5f, 12.5f, 5f);
+            _scale = new Vector3(25f, 25f, 25f);
+            _pbox = new Vector3(5f, 11.0f, 5f);
             _cbox = new Vector3(4f, 11.5f, 4f);
             spinSize = 12; //?? experiment with this, TODO: change it to match the sprites size
 			velocity = new Vector3(0, 0, 0);
@@ -210,13 +210,14 @@ namespace U5Designs {
 					_pbox.Y = 12.5f;
 					_location.Y += _pbox.Y - oldPboxY;
 					squishTimer = -1.0;
+					isMobile = true;
 				}
 			}
 
 			//If the grenade is selected, draw parabola
-			if(curProjectile.gravity) {
-				addMarkers();
-			}
+			//if(curProjectile.gravity) {
+				//addMarkers();
+			//}
 			
             if (HasControl) {
 				handleKeyboardInput(keyboard);
@@ -414,14 +415,14 @@ namespace U5Designs {
 			//Secret skip to boss
 			if(keyboard[Key.Period] && keyboard[Key.Comma]) {
 				//floor at 125 + 12.5 player pbox
-				_location = new Vector3(playstate.bossAreaCenter) + Vector3.UnitY * (_pbox.Y + 0.1f);
+				_location = new Vector3(playstate.bossSpawn) + Vector3.UnitY * (_pbox.Y + 0.1f);
 
 				//The following should maybe be moved to a function in Camera
 				playstate.camera.eye.Y = _location.Y + (enable3d ? 24.0f : 31.25f);
 				playstate.camera.lookat.Y = _location.Y + (enable3d ? 20.5f : 31.25f);
 				cam.moveToYPos(_location.Y);
 
-				playstate.enterBossMode();
+				//playstate.enterBossMode();
 			}
 
 		}
@@ -494,8 +495,8 @@ namespace U5Designs {
 		/// Used for gravity based projectiles (specifically the grenade)
 		/// </summary>
 		public void addMarkers() {
+			markerList.Clear();
 			if(curProjectile.gravity) {
-				markerList.Clear();
 
 				Vector3 vel = calcProjDir() * curProjectile.speed;
 				//vel -= new Vector3(velocity.X, 0.0f, velocity.Z);
@@ -698,16 +699,18 @@ namespace U5Designs {
 								}
 							}
 						}
-						markerList.Add(new Decoration(pos, new Vector3(2, 2, 2), true, true, Billboarding.Yes, marker));
+						markerList.Add(new Decoration(pos, new Vector3(2, 2, 2), true, true, (enable3d ? Billboarding.Lock3d : Billboarding.Lock2d), marker));
 					}
 				}
 			}
 		}
 
-		private Vector3 calcProjDir() {
-			// Grab Mouse coord.  Since Y goes down, just subtract from height to get correct orientation
+		private Vector3 getMouseWorldPos() {
 			Vector3d mousecoord = new Vector3d((double)playstate.eng.Mouse.X, (double)(playstate.eng.Height - playstate.eng.Mouse.Y), 1.0);
-			Vector3d mouseWorld;
+
+			// Pull the projection and model view matrix from the camera.   
+			Matrix4d project = playstate.camera.GetProjectionMatrix();
+			Matrix4d model = playstate.camera.GetModelViewMatrix();
 
 			if(enable3d) {
 				//mousecoord.X -= 400.0;
@@ -717,10 +720,6 @@ namespace U5Designs {
 				//GL.ReadPixels((int)mousecoord.X, (int)mousecoord.Y, 1, 1, OpenTK.Graphics.OpenGL.PixelFormat.DepthComponent, OpenTK.Graphics.OpenGL.PixelType.Float, z);
 				//mousecoord.Z = z[0];
 
-				// Pull the projection and model view matrix from the camera.   
-				Matrix4d project = playstate.camera.GetProjectionMatrix();
-				Matrix4d model = playstate.camera.GetModelViewMatrix();
-
 				// Unproject the coordinates to convert from mouse to world coordinates
 				mousecoord.Z = 0.0;
 				Vector3d near = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
@@ -729,23 +728,22 @@ namespace U5Designs {
 
 				//Interpolate to find coordinates just in front of player
 				double t = (_location.X + 100.0f - near.X) / (far.X - near.X);
-				mouseWorld = new Vector3d(_location.X + 100.0, near.Y + (far.Y - near.Y) * t, near.Z + (far.Z - near.Z) * t);
+				return new Vector3(_location.X + 100.0f, (float)(near.Y + (far.Y - near.Y) * t), (float)(near.Z + (far.Z - near.Z) * t));
 
 			} else {
-				// Pull the projection and model view matrix from the camera.   
-				Matrix4d project = playstate.camera.GetProjectionMatrix();
-				Matrix4d model = playstate.camera.GetModelViewMatrix();
-
 				// Unproject the coordinates to convert from mouse to world coordinates
-				mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
+				Vector3d mouseWorld = GameMouse.UnProject(mousecoord, model, project, playstate.camera.getViewport());
+				return new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
 			}
+		}
+
+		private Vector3 calcProjDir() {
+			Vector3 mouseWorld = getMouseWorldPos();
 
 			Vector3 projDir;
 			if(curProjectile.gravity) {
 				if(!playstate.enable3d) {
-					//Console.WriteLine(mouseWorld.Y.ToString());
-					projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, _location.Z);
-					projDir -= _location;
+					projDir = mouseWorld - _location;
 					projDir.X = Math.Abs(projDir.X); //do this to simplify equation - will undo at end
 				} else {
 					projDir = new Vector3((float)(Math.Sqrt(Math.Pow(mouseWorld.X - _location.X, 2) + Math.Pow(mouseWorld.Z - _location.Z, 2))),
@@ -791,8 +789,7 @@ namespace U5Designs {
 					}
 				}
 			} else { //projectile doesn't do gravity
-				projDir = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, (float)mouseWorld.Z);
-				projDir -= _location;
+				projDir = mouseWorld - _location;
 				if(!enable3d) {
 					projDir.Z = 0.0f;
 				}
@@ -1226,7 +1223,7 @@ namespace U5Designs {
 								break;
 						}
 					} else { //this is a combat collision
-						if(((CombatObject)collidingObj).type == 1) {// obj is an enemy, do damage, knock player back
+						if(((CombatObject)collidingObj).type == (int)CombatType.enemy) {// obj is an enemy, do damage, knock player back
 							time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
 							_health = _health - ((CombatObject)collidingObj).damage;
 							Invincible = true;
@@ -1236,7 +1233,7 @@ namespace U5Designs {
 							((Enemy)collidingObj).frozen = true;
 							knockback(false, collidingObj);
 						}
-						if(((CombatObject)collidingObj).type == 2) { // obj is a projectile, despawn projectile do damage
+						if(((CombatObject)collidingObj).type == (int)CombatType.projectile) { // obj is a projectile, despawn projectile do damage
 							//if projectile was not spawned by the player, deal with it. Ignore all player spawned projectiles
 							if(!((Projectile)collidingObj).playerspawned) {
 								_health = _health - ((CombatObject)collidingObj).damage;
@@ -1249,7 +1246,7 @@ namespace U5Designs {
 								knockback(false, collidingObj);
 							}
 						}
-						if(((CombatObject)collidingObj).type == 3) {// obj is the boss, treat it basicially like an enemy
+						if(((CombatObject)collidingObj).type == (int)CombatType.boss) {// obj is the boss, treat it basically like an enemy
 							time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
 							_health = _health - ((CombatObject)collidingObj).damage;
 							Invincible = true;
@@ -1258,7 +1255,7 @@ namespace U5Designs {
 							NoControlTimer = 0.5;
 							knockback(false, collidingObj);
 						}
-						if(((CombatObject)collidingObj).type == 4) {// obj is a special projectile that will squish the player(underside of a box)
+						if(((CombatObject)collidingObj).type == (int)CombatType.squish) {// obj is a special projectile that will squish the player(underside of a box)
 							time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
 							//despawn the projectile
 							if(onGround)
@@ -1422,6 +1419,10 @@ namespace U5Designs {
         public int ScreenRegion {
             get { return screenRegion; }
         }
+
+		public bool drawWhenOffScreen {
+			get { return true; }
+		}
 
         public void doScaleTranslateAndTexture() {
             GL.PushMatrix();

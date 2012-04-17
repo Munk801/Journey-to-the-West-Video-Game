@@ -15,6 +15,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
+// QuickFont
+//using QuickFont;
+
 namespace U5Designs
 {
     /** Main State of the game that will be active while the player is Playing **/
@@ -44,25 +47,32 @@ namespace U5Designs
 		internal List<Effect> effectsList; //effects which need to be updated to determine when to delete themselves
         internal AudioFile levelMusic;
 
-		public SphereRegion bossRegion, endRegion;
-		public Vector3 bossAreaCenter, bossAreaBounds;
+		public SphereRegion bossRegion, endRegion; //trigger regions for starting boss battle and ending level
+		public Vector3 bossAreaCenter, bossAreaBounds; //define extent of the boss encounter; used by camera
+		public Vector3 bossSpawn; //place to spawn the player before the boss battle
 
 		internal bool enable3d; //true when being viewed in 3d
 		internal int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
 		internal bool nowBillboarding; //true when billboarding objects should rotate into 3d view
         public Texture Healthbar, bHealth, healthFrame;
-		public SpriteSheet staminaBar, staminaBack, staminaFrame;
+		public SpriteSheet staminaBar, staminaBack, staminaFrame, crosshair;
+
+        //next level timer
+        private double nextLevelTimer;
+        private bool waitingToSwitchLevels;
+        public int levelID;
 
 		internal bool tabDown;
-		public bool clickdown;
+		public bool clickdown;        
 
 		/// <summary>
 		/// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
 		/// </summary>
 		/// <param name="engine">Pointer to the game engine</param>
-		public PlayState(GameEngine engine, MainMenuState menustate) {
+		public PlayState(GameEngine engine, MainMenuState menustate, int levelID) {
 			eng = engine;
 			this.menustate = menustate;
+            this.levelID = levelID;
 
 			bossMode = false;
 			enable3d = false;
@@ -70,8 +80,10 @@ namespace U5Designs
 			clickdown = false;
 			nowBillboarding = false;
 			aienabled = true;
-			musicenabled = true;
-            
+			musicenabled = false;
+
+            nextLevelTimer = 0;
+            waitingToSwitchLevels = false;           
 
 			pms = new PauseMenuState(eng, menustate);
 			effectsList = new List<Effect>();
@@ -80,7 +92,7 @@ namespace U5Designs
         /// <summary>
         /// Refreshes graphics when this state becomes active again after being frozen.
         /// </summary>
-		public override void MakeActive() {
+		public override void MakeActive() { 
             if (musicenabled)
             {
                 levelMusic.ReplayFile();
@@ -97,19 +109,14 @@ namespace U5Designs
 			} else {
 				camera.Set2DCamera();
 			}
-
-			if(player.curProjectile.gravity) {
-				eng.CursorVisible = false;
-			} else {
-				eng.CursorVisible = true; //TODO: When we have a crosshair, we'll change this
-			}
 		}
 
         /// <summary>
         /// Update, this gets called once every update frame
         /// </summary>
         /// <param name="e">FrameEventArgs from OpenTK's update</param>
-        public override void Update(FrameEventArgs e) {
+		public override void Update(FrameEventArgs e) {
+			//e = new FrameEventArgs(e.Time * 0.1);
             //First deal with hardware input
             DealWithInput();
 
@@ -141,7 +148,15 @@ namespace U5Designs
             if (bossMode && (bossAI.gethealth() <= 0)) {
                 bossAI.killBoss(this);
 				bossMode = false;
-                //transition to next level? or state? or w/e
+                //transition to next level
+                waitingToSwitchLevels = true;
+            }
+
+            if (waitingToSwitchLevels) {
+                nextLevelTimer = nextLevelTimer + e.Time;
+                if (nextLevelTimer > 3) {
+                    loadNextLevel();//loads the next level
+                }
             }
 
 			//Determine which screen region everything is in
@@ -248,11 +263,24 @@ namespace U5Designs
 			physList.AddRange(bossList);
 		}
 
+        private void loadNextLevel() {
+            //TODO: make sure everything that needs to die in this state is dead(music etc..) here before moving to next level.
+            if (musicenabled) {
+                levelMusic.Stop();
+            }
+            int nextlevelID = levelID + 1;
+            PlayState ps = new PlayState(eng, menustate, nextlevelID);
+            LoadScreenState ls = new LoadScreenState(eng, ps, nextlevelID);
+            eng.ChangeState(ls);
+
+        }
+
         /// <summary>
         /// The Draw update, happens every frame
         /// </summary>
         /// <param name="e">FrameEventArgs from OpenTK's update</param>
 		public override void Draw(FrameEventArgs e) {
+			//e = new FrameEventArgs(e.Time * 0.1);
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             // UNCOMMENT THIS AND LINE AFTER DRAW TO ADD MOTION BLUR
@@ -269,23 +297,26 @@ namespace U5Designs
 			}
 
 			foreach(RenderObject obj in renderList) {
-				if((camera.isInTransition && ((!nowBillboarding && obj.existsIn2d) || (nowBillboarding && obj.existsIn3d))) ||
-					(!camera.isInTransition && ((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d)))) {
-					if(obj.is3dGeo) {
-						obj.doScaleTranslateAndTexture();
-						obj.mesh.Render();
-					} else {
-						obj.doScaleTranslateAndTexture();
-						if(camera.isInTransition) { //Pause all animations in transition
-							obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+				if(obj.ScreenRegion == GameObject.ON_SCREEN || obj.drawWhenOffScreen) {
+					if((camera.isInTransition && ((!nowBillboarding && obj.existsIn2d) || (nowBillboarding && obj.existsIn3d))) ||
+						(!camera.isInTransition && ((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d)))) {
+						if(obj.is3dGeo) {
+							obj.doScaleTranslateAndTexture();
+							obj.mesh.Render();
 						} else {
-							obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+							obj.doScaleTranslateAndTexture();
+							if(camera.isInTransition) { //Pause all animations in transition
+								obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+							} else {
+								obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+							}
 						}
 					}
 				}
 			}
 
 			//Draw the parabola if grenade is active
+			player.addMarkers();
 			foreach(Decoration m in player.markerList) {
 				m.doScaleTranslateAndTexture();
 				m.frameNumber = m.sprite.draw(nowBillboarding, m.billboards, m.cycleNumber, m.frameNumber + m.animDirection * e.Time);
@@ -297,16 +328,16 @@ namespace U5Designs
 			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 280, 675, scaleX: 0.499f, scaleY: 0.5f, decrementX: dec);
 			healthFrame.DrawHUDElement(healthFrame.Width, healthFrame.Height, 280, 675, scaleX: 0.499f, scaleY: 0.5f);
 
-			drawStaminaBar();
+			drawStaminaBarAndCrosshair();
 
             // UNCOMMENT TO ADD MOTION BLUR
             //if (isInTransition)
             //{
             //    GL.Accum(AccumOp.Accum, 0.9f);
-            //}
+            //}            
         }
 
-		public void drawStaminaBar() {
+		public void drawStaminaBarAndCrosshair() {
 			GL.Disable(EnableCap.DepthTest);
 
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
@@ -332,13 +363,22 @@ namespace U5Designs
 			double scale = player.stamina / player.maxStamina;
 			GL.Translate(744.0 + 256.0 * scale, 675, 0);
 			GL.Scale(512.0 * scale, 25, 0);
-
 			staminaBar.draw(false, Billboarding.Lock2d);
 
 			GL.PushMatrix();
 			GL.Translate(1000, 675, 0);
 			GL.Scale(512, 25, 0);
 			staminaFrame.draw(false, Billboarding.Lock2d);
+
+			//Crosshair
+			if(!player.curProjectile.gravity) {
+				GL.PushMatrix();
+				double mx = (eng.Mouse.X - eng.xOffset) / (double)(eng.ClientRectangle.Width - 2 * eng.xOffset);
+				double my = ((eng.Height - eng.Mouse.Y) - eng.yOffset) / (double)(eng.ClientRectangle.Height - 2 * eng.yOffset);
+				GL.Translate(mx * 1280, my * 720, 0);
+				GL.Scale(25, 25, 0);
+				crosshair.draw(false, Billboarding.Lock2d);
+			}
 
 			GL.PopMatrix();
 			GL.Enable(EnableCap.DepthTest);
@@ -411,16 +451,6 @@ namespace U5Designs
 			if(eng.Keyboard[Key.Minus]) {
 				eng.toggleFullScreen();
 			}
-        }
-
-
-        /// <summary>
-        /// Change the current level being played to the parameter
-        /// </summary>
-        /// <param name="l">Level to be changed to</param>
-        public void changeCurrentLevel(int l)
-        {
-            current_level = l;
-        }      
+        }     
     }
 }

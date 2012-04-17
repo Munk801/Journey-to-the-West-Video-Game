@@ -96,6 +96,14 @@ namespace U5Designs {
 			get { return false; } //Change later if we want to add this functionality
 		}
 
+		public int ScreenRegion {
+			get { return screenRegion; }
+		}
+
+		public bool drawWhenOffScreen {
+			get { return true; }
+		}
+
 		public void doScaleTranslateAndTexture() {
 			GL.PushMatrix();
 			if(_is3dGeo) {

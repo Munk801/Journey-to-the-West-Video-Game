@@ -245,7 +245,7 @@ namespace U5Designs {
                                 health = 0;
                             }
                         }
-                        if (((CombatObject)collidingObj).type == 3) { // obj is zookeeper
+                        if (((CombatObject)collidingObj).type == (int)CombatType.boss) {
                             ((Boss)collidingObj).dodamage(damage);
                             time = 0.0;
                             health = 0;
@@ -553,6 +553,10 @@ namespace U5Designs {
 		private Effect _deathAnim;
 		public Effect deathAnim {
 			get { return _deathAnim; }
+		}
+
+		public bool drawWhenOffScreen {
+			get { return false; }
 		}
 
         public void doScaleTranslateAndTexture() {

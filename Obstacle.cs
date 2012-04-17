@@ -137,9 +137,21 @@ namespace U5Designs {
 		public int frame3d {
 			get { return _frame3d; }
 			set {
-				Debug.Assert(value >= 0);
-				_frame3d = value;
+				if(value >= 0) {
+					value = 0;
+					Console.WriteLine("Negative frame3d");
+				} else {
+					_frame3d = value;
+				}
 			}
+		}
+
+		public int ScreenRegion {
+			get { return screenRegion; }
+		}
+
+		public bool drawWhenOffScreen {
+			get { return true; }
 		}
 
 		public void doScaleTranslateAndTexture() {

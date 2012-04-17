@@ -22,7 +22,7 @@ namespace U5Designs
     public class MainMenuState : GameState
     {
         internal GameEngine eng;
-
+        
         // A container which will hold the list of available saved games
         Stack<XmlNodeList> savedGameStates;
         Stack<string> savedGameChoices;
@@ -173,7 +173,7 @@ namespace U5Designs
 		internal void loadPlayState(int lvl) {
 			musicFile.Stop();
 
-			PlayState ps = new PlayState(eng, this);
+			PlayState ps = new PlayState(eng, this, lvl);
 			LoadScreenState ls = new LoadScreenState(eng, ps, lvl);
 			eng.ChangeState(ls);
 		}
@@ -187,7 +187,9 @@ namespace U5Designs
 					loadPlayState(0);
 					break;
 				case 1: //load saved game
-					loadPlayState(saved_level_index);
+					//loadPlayState(saved_level_index);
+                    LoadGameState _L = new LoadGameState(eng, this);
+                    eng.ChangeState(_L);
 					break;
 				case 2: //quit
 					eng.Exit();

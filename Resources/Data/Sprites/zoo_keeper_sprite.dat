@@ -1,11 +1,13 @@
 <sprite>
-	<bmp>zoo_keeper_sprite.png</bmp>
+	<bmp>zookeeper.png</bmp>
 	<c_starts>0</c_starts>
-	<c_starts>4</c_starts>
-	<c_lengths>4</c_lengths>
-	<c_lengths>4</c_lengths>
-	<t_width>128</t_width>
-	<t_height>128</t_height>
+	<c_lengths>1</c_lengths>
+  <c_starts>1</c_starts>
+  <c_lengths>2</c_lengths>
+  <c_starts>2</c_starts>
+  <c_lengths>1</c_lengths>
+	<t_width>500</t_width>
+	<t_height>564</t_height>
 	<hasAlpha>true</hasAlpha>
-	<fps>4.0</fps>
+	<fps>1.0</fps>
 </sprite>

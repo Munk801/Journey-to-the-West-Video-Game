@@ -19,7 +19,11 @@ namespace Engine {
 		bool hascbox { get; }
 		bool existsIn3d { get; }
 		bool existsIn2d { get; }
+		int ScreenRegion { get; }
 		int getID();
+
+		//true if this thing should always draw; false if it should only draw when in ON_SCREEN region
+		bool drawWhenOffScreen { get; }
 
 		//null for sprites
 		ObjMesh mesh { get; }
