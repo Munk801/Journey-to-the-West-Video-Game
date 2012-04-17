@@ -485,6 +485,22 @@
     <EmbeddedResource Include="Resources\Music\Level01.ogg" />
     <EmbeddedResource Include="Resources\Music\Menu.ogg" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\crosshair.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\crosshair_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\monkey_spin.png" />
+    <EmbeddedResource Include="Resources\Textures\monkey_stand_back.png" />
+    <EmbeddedResource Include="Resources\Textures\monkey_stand_side.png" />
+    <EmbeddedResource Include="Resources\Textures\monkey_walk_back.png" />
+    <EmbeddedResource Include="Resources\Textures\monkey_walk_side.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\zookeeper.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

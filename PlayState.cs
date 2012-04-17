@@ -51,7 +51,7 @@ namespace U5Designs
 		internal int current_level = -1;// Member variable that will keep track of the current level being played.  This be used to load the correct data from the backends.
 		internal bool nowBillboarding; //true when billboarding objects should rotate into 3d view
         public Texture Healthbar, bHealth, healthFrame;
-		public SpriteSheet staminaBar, staminaBack, staminaFrame;
+		public SpriteSheet staminaBar, staminaBack, staminaFrame, crosshair;
 
 		internal bool tabDown;
 		public bool clickdown;
@@ -97,19 +97,14 @@ namespace U5Designs
 			} else {
 				camera.Set2DCamera();
 			}
-
-			if(player.curProjectile.gravity) {
-				eng.CursorVisible = false;
-			} else {
-				eng.CursorVisible = true; //TODO: When we have a crosshair, we'll change this
-			}
 		}
 
         /// <summary>
         /// Update, this gets called once every update frame
         /// </summary>
         /// <param name="e">FrameEventArgs from OpenTK's update</param>
-        public override void Update(FrameEventArgs e) {
+		public override void Update(FrameEventArgs e) {
+			//e = new FrameEventArgs(e.Time * 0.1);
             //First deal with hardware input
             DealWithInput();
 
@@ -253,6 +248,7 @@ namespace U5Designs
         /// </summary>
         /// <param name="e">FrameEventArgs from OpenTK's update</param>
 		public override void Draw(FrameEventArgs e) {
+			//e = new FrameEventArgs(e.Time * 0.1);
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             // UNCOMMENT THIS AND LINE AFTER DRAW TO ADD MOTION BLUR
@@ -286,6 +282,7 @@ namespace U5Designs
 			}
 
 			//Draw the parabola if grenade is active
+			player.addMarkers();
 			foreach(Decoration m in player.markerList) {
 				m.doScaleTranslateAndTexture();
 				m.frameNumber = m.sprite.draw(nowBillboarding, m.billboards, m.cycleNumber, m.frameNumber + m.animDirection * e.Time);
@@ -297,7 +294,7 @@ namespace U5Designs
 			Healthbar.DrawHUDElement(Healthbar.Width, Healthbar.Height, 280, 675, scaleX: 0.499f, scaleY: 0.5f, decrementX: dec);
 			healthFrame.DrawHUDElement(healthFrame.Width, healthFrame.Height, 280, 675, scaleX: 0.499f, scaleY: 0.5f);
 
-			drawStaminaBar();
+			drawStaminaBarAndCrosshair();
 
             // UNCOMMENT TO ADD MOTION BLUR
             //if (isInTransition)
@@ -306,7 +303,7 @@ namespace U5Designs
             //}
         }
 
-		public void drawStaminaBar() {
+		public void drawStaminaBarAndCrosshair() {
 			GL.Disable(EnableCap.DepthTest);
 
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
@@ -332,13 +329,22 @@ namespace U5Designs
 			double scale = player.stamina / player.maxStamina;
 			GL.Translate(744.0 + 256.0 * scale, 675, 0);
 			GL.Scale(512.0 * scale, 25, 0);
-
 			staminaBar.draw(false, Billboarding.Lock2d);
 
 			GL.PushMatrix();
 			GL.Translate(1000, 675, 0);
 			GL.Scale(512, 25, 0);
 			staminaFrame.draw(false, Billboarding.Lock2d);
+
+			//Crosshair
+			if(!player.curProjectile.gravity) {
+				GL.PushMatrix();
+				double mx = (eng.Mouse.X - eng.xOffset) / (double)(eng.ClientRectangle.Width - 2 * eng.xOffset);
+				double my = ((eng.Height - eng.Mouse.Y) - eng.yOffset) / (double)(eng.ClientRectangle.Height - 2 * eng.yOffset);
+				GL.Translate(mx * 1280, my * 720, 0);
+				GL.Scale(25, 25, 0);
+				crosshair.draw(false, Billboarding.Lock2d);
+			}
 
 			GL.PopMatrix();
 			GL.Enable(EnableCap.DepthTest);

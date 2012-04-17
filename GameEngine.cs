@@ -22,18 +22,24 @@ namespace U5Designs
          * will call the corresponding methods in the State class that is on the "stack" List<>
          * */
 
-        Stack<GameState> states;// This is the "Stack" of states with an LIFO structure mimicing an actual memory Stack
-        internal bool GameInProgress;// this bool tracks if a game is in progress, mostly for the menu state to know if its the first menu, or has been brought up ingame
+        Stack<GameState> states; // This is the "Stack" of states with an LIFO structure mimicking an actual memory Stack
+        internal bool GameInProgress; // this bool tracks if a game is in progress, mostly for the menu state to know if its the first menu, or has been brought up ingame
         internal TextureManager StateTextureManager;
         internal GameMouse ThisMouse;
         internal AudioFile selectSound;
         internal Assembly assembly;
+		internal int xOffset, yOffset; //Used for interpreting mouse coordinates when letterboxing
 
         /// <summary>Creates a 1280x720 window.</summary>
         public GameEngine() : base(1280, 720, GraphicsMode.Default, "Journey to the East") {
             VSync = VSyncMode.On;
 			this.WindowState = WindowState.Fullscreen;
 			this.WindowBorder = WindowBorder.Hidden;
+
+			this.CursorVisible = false;
+
+			xOffset = 0;
+			yOffset = 0;
         }
 
         /// <summary>Load resources here. This gets called ONCE at the start of the entire process(not once a state)</summary>
@@ -178,11 +184,13 @@ namespace U5Designs
 
 			if(ClientRectangle.Width / (double)ClientRectangle.Height > 16.0 / 9.0) { //bars on sides
 				int width = (int)(ClientRectangle.Height * 16.0 / 9.0);
-				int xOffset = (ClientRectangle.Width - width) / 2;
+				xOffset = (ClientRectangle.Width - width) / 2;
+				yOffset = 0;
 				GL.Viewport(ClientRectangle.X + xOffset, ClientRectangle.Y, width, ClientRectangle.Height);
 			} else { //letterbox
 				int height = (int)(ClientRectangle.Width * 9.0 / 16.0);
-				int yOffset = (ClientRectangle.Height - height) / 2;
+				yOffset = (ClientRectangle.Height - height) / 2;
+				xOffset = 0;
 				GL.Viewport(ClientRectangle.X, ClientRectangle.Y + yOffset, ClientRectangle.Width, height);
 			}
 

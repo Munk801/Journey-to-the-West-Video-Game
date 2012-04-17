@@ -68,7 +68,8 @@ namespace U5Designs {
 			ps.player.marker = parseSpriteFile("marker_sprite.dat");
 			ps.physList.Add(ps.player);
 			ps.renderList.Add(ps.player);
-			
+
+			ps.crosshair = parseSpriteFile("crosshair_sprite.dat");
 
 			//Various GameObjects
 

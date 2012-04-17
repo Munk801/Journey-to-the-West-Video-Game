@@ -206,27 +206,25 @@ namespace U5Designs
         /// </summary>
         private void MouseInput()
         {
-            if (eng.ThisMouse.inButtonRegion(play_press)) {
-                eng.selectSound.Play();
-                _cur_butn = 0;
-            } else if (eng.ThisMouse.inButtonRegion(load_press)) {
-                eng.selectSound.Play();
-                _cur_butn = 1;
-            } else if (eng.ThisMouse.inButtonRegion(quit_press)) {
-                eng.selectSound.Play();
-                _cur_butn = 2;
-			} else if(eng.ThisMouse.inButtonRegion(ld_press)) {
-                eng.selectSound.Play();
-				_cur_butn = 3;
-			} else {
-				return; //If they didn't actively click on something, don't use the selected button from the keyboard
-			}
+//             if (eng.ThisMouse.inButtonRegion(play_press)) {
+//                 eng.selectSound.Play();
+//                 _cur_butn = 0;
+//             } else if (eng.ThisMouse.inButtonRegion(load_press)) {
+//                 eng.selectSound.Play();
+//                 _cur_butn = 1;
+//             } else if (eng.ThisMouse.inButtonRegion(quit_press)) {
+//                 eng.selectSound.Play();
+//                 _cur_butn = 2;
+// 			} else if(eng.ThisMouse.inButtonRegion(ld_press)) {
+//                 eng.selectSound.Play();
+// 				_cur_butn = 3;
+// 			} else {
+// 				return; //If they didn't actively click on something, don't use the selected button from the keyboard
+// 			}
 
-			if(eng.ThisMouse.LeftPressed() && !clickdown) {
-				clickdown = true;
+			//Disable actually using the mouse to select, but treat mouse click like hitting enter
+			if(eng.ThisMouse.LeftPressed()) {
 				handleButtonPress();
-			} else {
-				clickdown = false;
 			}
         }
 

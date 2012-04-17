@@ -86,7 +86,7 @@ namespace U5Designs {
 				}
 				//Swap boss/box code
                 Vector3 temp = new Vector3(boxes[index].location.X, maxHeight, boxes[index].location.Z);
-                boxes[index].setPosition(new Vector3(bossobject.location.X, maxHeight, bossobject.location.Z));
+                boxes[index].setPosition(new Vector3(bossobject.centerLoc.X, maxHeight, bossobject.centerLoc.Z));
                 bossobject.setPosition(temp);
                 boxes[currentBossIndex] = boxes[index];
                 currentBossIndex = index;
@@ -94,6 +94,9 @@ namespace U5Designs {
                 Console.WriteLine(currentBossIndex);
                 switchdelaytimer = 0;
                 //end swap code
+
+				//Choose random facing for boss
+				bossobject.setFacing(rng.Next(2) == 1);
 
                 if (gethealth() == 5) {
                     //first stage, only drop the boss
@@ -264,12 +267,11 @@ namespace U5Designs {
 		internal Vector3 accel;
 		protected bool doesGravity; //true if gravity affects this object
 		protected int minHeight, maxHeight, preHeight;
-		protected bool pbox2d, pbox3d; //these control if normal physics happens
 
 		//public Player player;
 		internal ProjectileProperties projectile;
 
-        internal float roapOffset = 50;
+        internal float ropeOffset = 25;
 
 		internal FallingBox(Player player, PlayState ps, Vector3 location, int maxheight, ProjectileProperties invisProj, Obstacle crate, Obstacle ground, Obstacle rope)
 			: base() {
@@ -277,8 +279,8 @@ namespace U5Designs {
             velocity = new Vector3(0, 0, 0);
             accel = new Vector3(0, 0, 0);
             doesGravity = false;
-            _scale = new Vector3(12,12,12);
-            _pbox = new Vector3(6,6,6);
+            _scale = new Vector3(30.0f, 33.84f, 30.0f);
+            _pbox = new Vector3(15.0f, 16.92f, 0.0f);
             _existsIn3d = true;
             _existsIn2d = true;
             maxHeight = maxheight;
@@ -286,8 +288,6 @@ namespace U5Designs {
             rising = false;
             prefalling = false;
             idle = true;
-            pbox2d = false;
-            pbox3d = false;
 
             //animation
 			_sprite = null;
@@ -321,7 +321,7 @@ namespace U5Designs {
             mybox.canSquish = true;
             mybox.location = location + new Vector3(0, mybox.pbox.Y, 0);
             _location = location + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y, 0); 
-            myRope.location = location + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y + roapOffset, 0);//rope sprite
+            myRope.location = location + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y + ropeOffset, 0);//rope sprite
 			myGround.location = new Vector3(myGround.location.X, 100.0f, myGround.location.Z);
             minHeight = 125;
             preHeight = 210;
@@ -392,7 +392,7 @@ namespace U5Designs {
 
 		public virtual void setPosition(Vector3 newposn) {
             _location = newposn + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y, 0); //boss sprite(or nothing if crate)
-            myRope.location = newposn + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y + roapOffset, 0); //rope sprite
+            myRope.location = newposn + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y + ropeOffset, 0); //rope sprite
 			mybox.location = newposn + new Vector3(0, mybox.pbox.Y, 0);
 			myGround.location = new Vector3(newposn.X, 100.0f, newposn.Z);
 		}
@@ -471,16 +471,16 @@ namespace U5Designs {
 			set { _frameNum = value; }
 		}
 
-		public Billboarding billboards {
+		public virtual Billboarding billboards {
 			get { return Billboarding.Yes; }
 		}
 
-		public bool collidesIn3d {
-			get { return pbox3d; }
+		public virtual bool collidesIn3d {
+			get { return false; }
 		}
 
-		public bool collidesIn2d {
-			get { return pbox2d; }
+		public virtual bool collidesIn2d {
+			get { return false; }
 		}
 
 		public void reset() {
@@ -504,7 +504,7 @@ namespace U5Designs {
 			get { return screenRegion; }
 		}
 
-		public void doScaleTranslateAndTexture() {
+		public virtual void doScaleTranslateAndTexture() {
 			GL.PushMatrix();
 
 			GL.Translate(_location);
@@ -516,11 +516,11 @@ namespace U5Designs {
 	internal class Boss : FallingBox, CombatObject {
 
 		public bool invincible;
+		public Vector3 centerLoc;
+		private bool in3d;
 
 		internal Boss(Player player, PlayState ps, Vector3 location, int maxheight, ProjectileProperties invisProj, Obstacle crate, Obstacle ground, Obstacle rope, SpriteSheet bossSprite)
             : base(player, ps, location, maxheight, invisProj, crate, ground, rope) {
-			pbox2d = true;
-			pbox3d = true;
 
             //animation
             _sprite = bossSprite;
@@ -537,12 +537,36 @@ namespace U5Designs {
             _hascbox = true;
             _type = 3; //Type 3 means this is the boss
 
+			//Offset boss location
+			centerLoc = new Vector3(_location);
+			_location.X += 8.0f;
+			_location.Z -= 0.01f;
+			in3d = false;
+			bb = Billboarding.Lock2d;
+
             invincible = false;
         }
+
+		public override void setPosition(Vector3 newposn) {
+			centerLoc = newposn + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y, 0); //boss sprite(or nothing if crate)
+			myRope.location = newposn + new Vector3(0, (mybox.pbox.Y * 2) + pbox.Y + ropeOffset, 0); //rope sprite
+			mybox.location = newposn + new Vector3(0, mybox.pbox.Y, 0);
+			myGround.location = new Vector3(newposn.X, 100.0f, newposn.Z);
+
+			_location = new Vector3(centerLoc);
+			if(in3d) {
+				_location.Z += 8.0f;
+				_location.X += 0.01f; //break rendering tie
+			} else { //2D
+				_location.X += 8.0f;
+				_location.Z -= 0.01f; //break rendering tie
+			}
+		}
 
 		public override void fall() {
 			if(idle) {
 				invincible = false;
+				cycleNumber = 0;
 				base.fall();
 			}
 		}
@@ -550,10 +574,47 @@ namespace U5Designs {
         public void dodamage(int hit) {
             if (!invincible) {
                 health = health - 1;
-                //TODO: play pain animation or w/e
+				cycleNumber = 1;
                 invincible = true;
             }
         }
+
+		//Sets if boss should face for 2d or 3d view
+		public void setFacing(bool to3d) {
+			if(!in3d && to3d) { // 2D -> 3D
+				_location.Z = centerLoc.Z + 8.0f;
+				_location.X = centerLoc.X + 0.01f; //break rendering tie
+				bb = Billboarding.Lock3d;
+				in3d = true;
+			} else if(in3d && !to3d) { // 3D -> 2D
+				_location.X = centerLoc.X + 8.0f;
+				_location.Z -= 0.01f; //break rendering tie
+				bb = Billboarding.Lock2d;
+				in3d = false;
+			}
+		}
+
+		//Overrides
+		private Billboarding bb;
+		public override Billboarding billboards {
+			get { return bb; }
+		}
+
+		public override bool collidesIn3d {
+			get { return in3d; }
+		}
+
+		public override bool collidesIn2d {
+			get { return !in3d; }
+		}
+
+		public override void doScaleTranslateAndTexture() {
+			base.doScaleTranslateAndTexture();
+			if(frameNumber*_sprite.framesPerSecond >= 1.0) {
+				cycleNumber = 2;
+				frameNumber = 0;
+			}
+		}
 
 		/*  The following are helper methods + getter/setters */
 		private Vector3 _cbox;
@@ -607,9 +668,6 @@ namespace U5Designs {
 
 		internal Crate(Player player, PlayState ps, Vector3 location, int maxheight, ProjectileProperties invisProj, Obstacle crate, Obstacle ground, Obstacle rope)
 			: base(player, ps, location, maxheight, invisProj, crate, ground, rope) {
-			//This is just the rope, so let the player pass through freely
-			pbox2d = false;
-			pbox3d = false;
 		}
     }
 }

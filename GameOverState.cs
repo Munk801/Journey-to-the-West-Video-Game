@@ -191,6 +191,11 @@ namespace U5Designs {
 				enterdown = false;
 			}
 
+			//Don't allow using the mouse to select, but treat mouse click like hitting enter
+			if(eng.ThisMouse.LeftPressed()) {
+				handleButtonPress();
+			}
+
 			//Minus - Toggle fullscreen
 			if(eng.Keyboard[Key.Minus]) {
 				eng.toggleFullScreen();
@@ -217,6 +222,7 @@ namespace U5Designs {
                     break;
             }
         }
+
         internal void loadPlayState(int lvl)
         {
             PlayState ps = new PlayState(eng, menu);
