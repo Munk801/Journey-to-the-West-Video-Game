@@ -82,7 +82,7 @@ namespace U5Designs
         /// <param name="engine">Pointer to the game engine</param>
         /// <param name="lvl">the level ID</param>
 		public LevelDesignerState(GameEngine engine, MainMenuState menustate, int lvl)
-            : base(engine, menustate)
+            : base(engine, menustate, lvl)
         {
             eng.WindowState = WindowState.Normal;
             eng.WindowBorder = WindowBorder.Fixed;
@@ -830,14 +830,6 @@ namespace U5Designs
         }
         #endregion
 
-        /// <summary>
-        /// Change the current level being played to the parameter
-        /// </summary>
-        /// <param name="l">Level to be changed to</param>
-        new public void changeCurrentLevel(int l)
-        {
-            current_level = l;
-        }
 
         /*--------------------------------------------------------------------------------------------------------------
          * 

@@ -225,7 +225,7 @@ namespace U5Designs {
 
         internal void loadPlayState(int lvl)
         {
-            PlayState ps = new PlayState(eng, menu);
+            PlayState ps = new PlayState(eng, menu, lvl);
             LoadScreenState ls = new LoadScreenState(eng, ps, lvl);
             eng.ChangeState(ls);
         }

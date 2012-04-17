@@ -266,7 +266,7 @@ namespace U5Designs
         {
             musicFile.Stop();
 
-            PlayState ps = new PlayState(eng, _ms);
+            PlayState ps = new PlayState(eng, _ms, lvl);
             LoadScreenState ls = new LoadScreenState(eng, ps, lvl);
             eng.ChangeState(ls);
         }

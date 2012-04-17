@@ -57,6 +57,11 @@ namespace U5Designs
         public Texture Healthbar, bHealth, healthFrame;
 		public SpriteSheet staminaBar, staminaBack, staminaFrame, crosshair;
 
+        //next level timer
+        private double nextLevelTimer;
+        private bool waitingToSwitchLevels;
+        public int levelID;
+
 		internal bool tabDown;
 		public bool clickdown;        
 
@@ -64,9 +69,10 @@ namespace U5Designs
 		/// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
 		/// </summary>
 		/// <param name="engine">Pointer to the game engine</param>
-		public PlayState(GameEngine engine, MainMenuState menustate) {
+		public PlayState(GameEngine engine, MainMenuState menustate, int levelID) {
 			eng = engine;
 			this.menustate = menustate;
+            this.levelID = levelID;
 
 			bossMode = false;
 			enable3d = false;
@@ -74,8 +80,10 @@ namespace U5Designs
 			clickdown = false;
 			nowBillboarding = false;
 			aienabled = true;
-			musicenabled = true;
-            
+			musicenabled = false;
+
+            nextLevelTimer = 0;
+            waitingToSwitchLevels = false;           
 
 			pms = new PauseMenuState(eng, menustate);
 			effectsList = new List<Effect>();
@@ -140,7 +148,15 @@ namespace U5Designs
             if (bossMode && (bossAI.gethealth() <= 0)) {
                 bossAI.killBoss(this);
 				bossMode = false;
-                //transition to next level? or state? or w/e
+                //transition to next level
+                waitingToSwitchLevels = true;
+            }
+
+            if (waitingToSwitchLevels) {
+                nextLevelTimer = nextLevelTimer + e.Time;
+                if (nextLevelTimer > 3) {
+                    loadNextLevel();//loads the next level
+                }
             }
 
 			//Determine which screen region everything is in
@@ -246,6 +262,18 @@ namespace U5Designs
 			renderList.AddRange(bossList);
 			physList.AddRange(bossList);
 		}
+
+        private void loadNextLevel() {
+            //TODO: make sure everything that needs to die in this state is dead(music etc..) here before moving to next level.
+            if (musicenabled) {
+                levelMusic.Stop();
+            }
+            int nextlevelID = levelID + 1;
+            PlayState ps = new PlayState(eng, menustate, nextlevelID);
+            LoadScreenState ls = new LoadScreenState(eng, ps, nextlevelID);
+            eng.ChangeState(ls);
+
+        }
 
         /// <summary>
         /// The Draw update, happens every frame
@@ -423,16 +451,6 @@ namespace U5Designs
 			if(eng.Keyboard[Key.Minus]) {
 				eng.toggleFullScreen();
 			}
-        }
-
-
-        /// <summary>
-        /// Change the current level being played to the parameter
-        /// </summary>
-        /// <param name="l">Level to be changed to</param>
-        public void changeCurrentLevel(int l)
-        {
-            current_level = l;
-        }      
+        }     
     }
 }

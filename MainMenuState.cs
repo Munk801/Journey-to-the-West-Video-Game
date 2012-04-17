@@ -173,7 +173,7 @@ namespace U5Designs
 		internal void loadPlayState(int lvl) {
 			musicFile.Stop();
 
-			PlayState ps = new PlayState(eng, this);
+			PlayState ps = new PlayState(eng, this, lvl);
 			LoadScreenState ls = new LoadScreenState(eng, ps, lvl);
 			eng.ChangeState(ls);
 		}

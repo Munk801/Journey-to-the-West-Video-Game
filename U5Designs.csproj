@@ -517,6 +517,9 @@
     <Content Include="Fonts\ScrumBucket.ttf" />
     <EmbeddedResource Include="Fonts\times.ttf" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Levels\level_1.dat" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
