@@ -18,7 +18,8 @@ using System.Drawing;
 using System.Threading;
 using System.Windows.Markup;
 using System.IO;
-
+using KeyboardState = OpenTK.Input.KeyboardState;
+using Keyboard = OpenTK.Input.Keyboard;
 
 namespace U5Designs
 {
@@ -50,7 +51,7 @@ namespace U5Designs
         bool rightBDown = false;
         bool AllowSnapping = false;
         bool MoveKeyDown = false;
-
+        KeyboardState Old_Key_State;
         float UnitsToMove = 1.0f;
         /** These Dictionarys will map Vector3's to different game objects that will then be written out to a level file.  When the user adds
          * a given object type into the level editor that object will be added to the appropriate Dictionary.  When the user deletes an object
@@ -89,6 +90,7 @@ namespace U5Designs
 			current_level = lvl;
 			LoadLevel.Load(lvl, this);
 
+            Old_Key_State = Keyboard.GetState();
 			//Have to load the next few things here for now because they require the GraphicsContext
 			foreach(RenderObject ro in renderList) {
 				if(ro.is3dGeo) {
@@ -196,7 +198,6 @@ namespace U5Designs
 
             GL.ShadeModel(ShadingModel.Smooth);
             GL.ClearColor(0.26667f, 0.86667f, 1.0f, 1.0f);
-            textWriter.AddLine("TEST", new PointF(30, 30), new SolidBrush(Color.Blue));
             // TO DO: MAKE ORTHOGRAPHIC VIEW FURTHER BACK
             if (enable3d)
             {
@@ -382,21 +383,22 @@ namespace U5Designs
         /// </summary>
         private void DealWithInput()
         {
+            KeyboardState New_Key_State = Keyboard.GetState();
             // SAVE THE CURRENT LEVEL TO A NEW LEVEL
-            if (eng.Keyboard[Key.Period])
+            if (New_Key_State.IsKeyDown(Key.Period) && !Old_Key_State.IsKeyDown(Key.Period))
             {
                 _write_level_file("TestLevelWrite", 99);
+                Console.WriteLine("Level Written");
             }
 
             // Allow snapping for movement
-            if (eng.Keyboard[Key.BackSlash])
+            if (New_Key_State.IsKeyDown(Key.BackSlash) && !Old_Key_State.IsKeyDown(Key.BackSlash))
             {
-                AllowSnapping = true;
+                AllowSnapping = !AllowSnapping;
                 UnitsToMove = 10.0f;
                 Console.WriteLine("Snapping is: {0}", AllowSnapping.ToString());
             }
-
-            if (eng.Keyboard[Key.Semicolon])
+            if (New_Key_State.IsKeyDown(Key.Semicolon) && !Old_Key_State.IsKeyDown(Key.Semicolon))
             {
                 int totalKeys = ObjectList.Keys.Count;
                 listKey += 1;
@@ -412,13 +414,13 @@ namespace U5Designs
             if (!enable3d)
             {
 
-                if (eng.Keyboard[Key.W])
+                if (New_Key_State.IsKeyDown(Key.W))
                 {
                     orthoWidth = Math.Max(192, orthoWidth - orthoWidth * 0.01);
                     orthoHeight = Math.Max(108, orthoHeight - orthoHeight * 0.01);
                     camera.Set2DCamera(orthoWidth, orthoHeight);
                 }
-                if (eng.Keyboard[Key.S])
+                if (New_Key_State.IsKeyDown(Key.S))
                 {
                     orthoWidth = Math.Min(1920, orthoWidth + orthoWidth * 0.01);
                     orthoHeight = Math.Min(1080, orthoHeight + orthoHeight * 0.01);
@@ -468,52 +470,33 @@ namespace U5Designs
             // Allow movement of the selected objects
             if (!enable3d)
             {
-                if (eng.Keyboard[Key.Up] && !MoveKeyDown)
+                if (New_Key_State.IsKeyDown(Key.Up) && !Old_Key_State.IsKeyDown(Key.Up))
                 {
-                    MoveKeyDown = true;
                     MoveObjects(SelectedObject, new Vector3(0.0f, UnitsToMove, 0.0f));
                 }
-                if (eng.Keyboard[Key.Down] && !MoveKeyDown)
+                if (New_Key_State.IsKeyDown(Key.Down) && !Old_Key_State.IsKeyDown(Key.Down))
                 {
-                    MoveKeyDown = true;
                     MoveObjects(SelectedObject, new Vector3(0.0f, -UnitsToMove, 0.0f));
                 }
-                if (eng.Keyboard[Key.Left] && !MoveKeyDown)
+                if (New_Key_State.IsKeyDown(Key.Left) && !Old_Key_State.IsKeyDown(Key.Left))
                 {
-                    MoveKeyDown = true;
                     MoveObjects(SelectedObject, new Vector3(-UnitsToMove, 0.0f, 0.0f));
                 }
-                if (eng.Keyboard[Key.Right] && !MoveKeyDown)
+                if (New_Key_State.IsKeyDown(Key.Right) && !Old_Key_State.IsKeyDown(Key.Right))
                 {
-                    MoveKeyDown = true;
                     MoveObjects(SelectedObject, new Vector3(UnitsToMove, 0.0f, 0.0f));
                 }
-
-                if (!eng.Keyboard[Key.Up] && !eng.Keyboard[Key.Down] && !eng.Keyboard[Key.Left] && !eng.Keyboard[Key.Right])
-                {
-                    MoveKeyDown = false;
-                }
-                if (!eng.Keyboard[Key.BracketLeft])
-                {
-                    leftBDown = false;
-                }
-                if (!eng.Keyboard[Key.BracketRight])
-                {
-                    rightBDown = false;
-                }
                 // Moving between obstacles
-                if (eng.Keyboard[Key.BracketLeft] && !leftBDown)
+                if (New_Key_State.IsKeyDown(Key.BracketLeft) && !Old_Key_State.IsKeyDown(Key.BracketLeft))
                 {
-                    leftBDown = true;
                     if (objectIter - 1 < 0)
                         objectIter = ObjectList[listKey].Count - 1;
                     else objectIter--;
                     
                     Console.WriteLine("Using {0}", ObjectList[listKey][objectIter]);
                 }
-                if (eng.Keyboard[Key.BracketRight] && !rightBDown)
+                if (New_Key_State.IsKeyDown(Key.BracketRight) && !Old_Key_State.IsKeyDown(Key.BracketRight))
                 {
-                    rightBDown = true;
                     if (objectIter + 1 > ObjectList[listKey].Count -1)
                         objectIter = 0;
                     else objectIter++;
@@ -525,32 +508,35 @@ namespace U5Designs
             #region 3D Move Controls
             else
             {
-                if (eng.Keyboard[Key.Up] && !eng.Keyboard[Key.ControlLeft])
+                if (New_Key_State.IsKeyDown(Key.Up) && !Old_Key_State.IsKeyDown(Key.Up) && !eng.Keyboard[Key.ControlLeft])
                 {
                     MoveObjects(SelectedObject, new Vector3(1.0f, 0.0f, 0.0f));
                 }
-                if (eng.Keyboard[Key.Down] && !eng.Keyboard[Key.ControlLeft])
+                if (New_Key_State.IsKeyDown(Key.Down) && !Old_Key_State.IsKeyDown(Key.Down) && !eng.Keyboard[Key.ControlLeft])
                 {
                     MoveObjects(SelectedObject, new Vector3(-1.0f, 0.0f, 0.0f));
                 }
-                if (eng.Keyboard[Key.Left])
+                if (New_Key_State.IsKeyDown(Key.Left) && !Old_Key_State.IsKeyDown(Key.Left))
                 {
                     MoveObjects(SelectedObject, new Vector3(0.0f, 0.0f, -1.0f));
                 }
-                if (eng.Keyboard[Key.Right])
+                if (New_Key_State.IsKeyDown(Key.Right) && !Old_Key_State.IsKeyDown(Key.Right))
                 {
                     MoveObjects(SelectedObject, new Vector3(0.0f, 0.0f, 1.0f));
                 }
-                if (eng.Keyboard[Key.Up] && eng.Keyboard[Key.ControlLeft])
+                if (New_Key_State.IsKeyDown(Key.Up) && !Old_Key_State.IsKeyDown(Key.Up) && eng.Keyboard[Key.ControlLeft])
                 {
                     MoveObjects(SelectedObject, new Vector3(0.0f, 1.0f, 0.0f));
                 }
-                if (eng.Keyboard[Key.Down] && eng.Keyboard[Key.ControlLeft])
+                if (New_Key_State.IsKeyDown(Key.Down) && !Old_Key_State.IsKeyDown(Key.Down) && eng.Keyboard[Key.ControlLeft])
                 {
                     MoveObjects(SelectedObject, new Vector3(0.0f, -1.0f, 0.0f));
                 }
             }
             #endregion
+
+
+            Old_Key_State = New_Key_State;
         }
 
         private void MoveObjects( GameObject gameObj, Vector3 newLoc)

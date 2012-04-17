@@ -227,6 +227,7 @@ namespace U5Designs
                             //if we're here, there's a collision
                             //see if this collision is the first to occur
                             if (minT < collidingT) {
+                                
                                 collidingT = minT;
                                 collidingObj = obj;
                                 collidingAxis = VectorUtil.maxIndex(minTvals);
@@ -295,6 +296,7 @@ namespace U5Designs
 								case (int)CombatType.projectile: // obj is a projectile, despawn projectile do damage
 									if(((Projectile)collidingObj).playerspawned) {
 										time = 0.0;
+                                        player.HitSound.Play();
 										_health = _health - ((CombatObject)collidingObj).damage;
 										//despawn the projectile
 										((CombatObject)collidingObj).health = 0;
@@ -303,6 +305,7 @@ namespace U5Designs
 
 								case (int)CombatType.player: //if the collidingObj is the player, do damage and knock the player back
 									time = 0.0;
+                                    player.HurtSound.Play();
 									player.health = player.health - _damage;
 									player.Invincible = true;
 									player.Invincibletimer = 1.0;
@@ -390,6 +393,7 @@ namespace U5Designs
                             //if we're here, there's a collision
                             //see if this collision is the first to occur
                             if (minT < collidingT) {
+                                
                                 collidingT = minT;
                                 collidingObj = obj;
                                 collidingAxis = VectorUtil.maxIndex(minTvals.Xy);
@@ -441,6 +445,7 @@ namespace U5Designs
 								case (int)CombatType.projectile: // obj is a projectile, despawn projectile do damage
 									if(((Projectile)collidingObj).playerspawned) {
 										time = 0.0;
+                                        player.HitSound.Play();
 										_health = _health - ((CombatObject)collidingObj).damage;
 										//despawn the projectile
 										((CombatObject)collidingObj).health = 0;
@@ -449,6 +454,7 @@ namespace U5Designs
 
 								case (int)CombatType.player: //if the collidingObj is the player, do damage and knock the player back
 									time = 0.0;
+                                    player.HurtSound.Play();
 									player.health = player.health - _damage;
 									player.Invincible = true;
 									player.Invincibletimer = 1.0;

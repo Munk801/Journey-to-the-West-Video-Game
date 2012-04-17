@@ -155,8 +155,8 @@ namespace Engine
                 }
                 catch (Exception e)
                 {
-					Console.WriteLine("AudioManager threw exception!");
-                    Console.WriteLine(e.StackTrace);
+					//Console.WriteLine("AudioManager threw exception!");
+                    //Console.WriteLine(e.StackTrace);
                 }
             }
         }
@@ -231,6 +231,13 @@ namespace Engine
         public void DisposeResources()
         {
             // TO DO:  REMOVE AUDIO RESOURCES
+            foreach (AudioSource source in AudioSources)
+            {
+                if (source.FileHasEnded)
+                {
+                    source.Dispose();
+                }
+            }
         }
     }
 }

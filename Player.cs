@@ -63,7 +63,8 @@ namespace U5Designs {
         public bool inLevelDesignMode = false; // THIS IS ONLY USED FOR LEVEL DESIGNER
         
         // SOUND FILES
-        AudioFile jumpSound, bananaSound, hurtSound;
+        AudioFile jumpSound, bananaSound;
+        public AudioFile HitSound, HurtSound;
 
         public Player(SpriteSheet sprite, List<ProjectileProperties> projectiles, PlayState ps) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
         {
@@ -121,7 +122,8 @@ namespace U5Designs {
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			jumpSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.jump_sound.ogg"));
 			bananaSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
-			hurtSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
+			HurtSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
+            HitSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.hit.ogg"));
         }
 
         /// <summary>
