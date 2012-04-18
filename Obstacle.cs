@@ -137,7 +137,7 @@ namespace U5Designs {
 		public int frame3d {
 			get { return _frame3d; }
 			set {
-				if(value >= 0) {
+				if(value < 0) {
 					value = 0;
 					Console.WriteLine("Negative frame3d");
 				} else {

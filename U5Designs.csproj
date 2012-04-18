@@ -506,6 +506,10 @@
     <EmbeddedResource Include="Resources\Textures\zookeeper.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\monkey_arm_walk_back.png" />
+    <EmbeddedResource Include="Resources\Textures\monkey_arm_stand_back.png" />
+    <EmbeddedResource Include="Resources\Textures\monkey_arm_stand_side.png" />
+    <EmbeddedResource Include="Resources\Textures\monkey_arm_walk_side.png" />
     <EmbeddedResource Include="Fonts\Anonymous.ttf" />
     <EmbeddedResource Include="Fonts\BURNSTOW.TTF" />
     <EmbeddedResource Include="Fonts\Comfortaa-Regular.ttf" />
@@ -519,6 +523,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Levels\level_1.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\player_arm_sprite.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

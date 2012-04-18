@@ -24,6 +24,8 @@ namespace U5Designs {
 
 		private PlayState playstate; //Keep a reference since we'll need this regularly
 
+		private Decoration arms;
+
         //Knockback physics constants:
         private Vector3 kbspeed;
 		private float jumpspeed;
@@ -64,9 +66,9 @@ namespace U5Designs {
         
         // SOUND FILES
         AudioFile jumpSound, bananaSound;
-        public AudioFile HitSound, HurtSound;
+		public AudioFile HitSound, HurtSound;
 
-        public Player(SpriteSheet sprite, List<ProjectileProperties> projectiles, PlayState ps) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
+        public Player(SpriteSheet sprite, SpriteSheet arms, List<ProjectileProperties> projectiles, PlayState ps) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
         {
             p_state = new PlayerState("TEST player");
             //p_state.setSpeed(130);
@@ -89,6 +91,10 @@ namespace U5Designs {
 			_existsIn2d = true;
 			_existsIn3d = true;
 			onGround = true;
+
+			//arms
+			this.arms = new Decoration(_location + new Vector3(0.005f, 0.0f, 0.005f), _scale, true, true, Billboarding.Yes, arms);
+			ps.renderList.Add(this.arms);
 
             //combat things
             _damage = 1;
@@ -124,7 +130,36 @@ namespace U5Designs {
 			bananaSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
 			HurtSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
             HitSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.hit.ogg"));
-        }
+		}
+
+		private float locX {
+			get { return _location.X; }
+			set {
+				_location.X = value;
+				arms.locX = value + 0.005f;
+			}
+		}
+		private float locY {
+			get { return _location.Y; }
+			set {
+				_location.Y = value;
+				arms.locY = value;
+			}
+		}
+		private float locZ {
+			get { return _location.Z; }
+			set {
+				_location.Z = value;
+				arms.locZ = value + 0.005f;
+			}
+		}
+		public override Vector3 location {
+			get { return _location; }
+			set {
+				_location = value;
+				arms.location = value + new Vector3(0.005f, 0.0f, 0.005f);
+			}
+		}
 
         /// <summary>
         ///  Updates the player specific state. Gets called every update frame
@@ -151,9 +186,9 @@ namespace U5Designs {
 					spinning = false;
 					_speed = 75;
 					if(velocity.X == 0) {
-						_cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
+						cycleNumber = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
 					} else {
-						_cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
+						cycleNumber = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
 					}
 				}
 			} else {
@@ -197,18 +232,18 @@ namespace U5Designs {
 				if(squishTimer <= 0.125) {
 					_scale.Y = (float)(25.0 * (0.125 - squishTimer));
 					_pbox.Y = _scale.Y / 2.0f;
-					_location.Y -= oldPboxY - _pbox.Y;
+					locY -= oldPboxY - _pbox.Y;
 				} else if(squishTimer <= 3.125) {
 					_scale.Y = _pbox.Y = 0.0f;
-					_location.Y -= oldPboxY - _pbox.Y;
+					locY -= oldPboxY - _pbox.Y;
 				} else if(squishTimer <= 3.4375) {
 					_scale.Y = (float)(25.0 * (squishTimer - 3.125));
 					_pbox.Y = _scale.Y / 2.0f;
-					_location.Y += _pbox.Y - oldPboxY;
+					locY += _pbox.Y - oldPboxY;
 				} else {
 					_scale.Y = 25.0f;
 					_pbox.Y = 12.5f;
-					_location.Y += _pbox.Y - oldPboxY;
+					locY += _pbox.Y - oldPboxY;
 					squishTimer = -1.0;
 					isMobile = true;
 				}
@@ -256,9 +291,9 @@ namespace U5Designs {
 					spinning = false;
 					_speed = runSpeed;
 					if(velocity.X == 0) {
-						_cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
+						cycleNumber = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
 					} else {
-						_cycleNum = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
+						cycleNumber = (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d);
 					}
 				}
 			} else {
@@ -325,9 +360,14 @@ namespace U5Designs {
 					velocity.X = newVel.X * speed;
 					velocity.Z = newVel.Y * speed;
 
-					_animDirection = (velocity.X >= 0 ? 1 : -1);
+					//update current animation and flip scale if necessary
+					arms.animDirection = _animDirection = (velocity.X >= 0 ? 1 : -1);
 					if(!spinning) {
-						_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
+						cycleNumber = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
+					}
+
+					if(_scale.X < 0) {
+						_scale.X = -_scale.X;
 					}
 				} else {
 					if(keyboard[Key.A] == keyboard[Key.D]) {
@@ -338,9 +378,14 @@ namespace U5Designs {
 						velocity.X = -_speed;
 					}
 
-					_animDirection = (velocity.X >= 0 ? 1 : -1);
+					//update current animation and flip scale if necessary
+					arms.animDirection = _animDirection = 1;
 					if(!spinning) {
-						_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand2d : PlayerAnim.walk2d);
+						cycleNumber = (int)(velocity.X == 0 ? PlayerAnim.stand2d : PlayerAnim.walk2d);
+						if((velocity.X < 0 && _scale.X > 0) || (velocity.X > 0 && _scale.X < 0)) {
+							_scale.X = -_scale.X;
+							arms.scaleX = -arms.scaleX;
+						}
 					}
 				}
 
@@ -363,7 +408,7 @@ namespace U5Designs {
                     pDown = false;
 
                 if (keyboard[Key.BackSlash])
-                    _location = new Vector3(3779, 138, 43);
+                    location = new Vector3(3779, 138, 43);
 #endif
 
 				//Jump
@@ -405,7 +450,7 @@ namespace U5Designs {
 					velocity.X = 0.0f;
 					velocity.Z = 0.0f;
 					isMobile = false;
-					_cycleNum = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
+					cycleNumber = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
 				}
 				eDown = true;
 			} else if(!keyboard[Key.E]) {
@@ -415,7 +460,7 @@ namespace U5Designs {
 			//Secret skip to boss
 			if(keyboard[Key.Period] && keyboard[Key.Comma]) {
 				//floor at 125 + 12.5 player pbox
-				_location = new Vector3(playstate.bossSpawn) + Vector3.UnitY * (_pbox.Y + 0.1f);
+				location = new Vector3(playstate.bossSpawn) + Vector3.UnitY * (_pbox.Y + 0.1f);
 
 				//The following should maybe be moved to a function in Camera
 				playstate.camera.eye.Y = _location.Y + (enable3d ? 24.0f : 31.25f);
@@ -462,7 +507,7 @@ namespace U5Designs {
                 spinning = true;
 				spinTimer = 0.5;
                 _speed = spinSpeed;
-				_cycleNum = (int)(enable3d ? PlayerAnim.spin3d : PlayerAnim.spin2d);
+				cycleNumber = (int)(enable3d ? PlayerAnim.spin3d : PlayerAnim.spin2d);
             }
         }
 
@@ -930,12 +975,12 @@ namespace U5Designs {
 				if(endspin) {
 					spinning = false;
                     _speed = runSpeed;
-					_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
+					cycleNumber = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
 				}
 
-				Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
+				Vector3 startLoc = new Vector3(_location);
 				if(collidingAxis == -1) { //no collision
-					_location += velocity * (float)time;
+					location += velocity * (float)time;
 					time = 0.0;
 					deltax += _location.X - startLoc.X; //update this value for camera offset
 					if(viewSwitchJumpTimer <= 0.0 && !collidedWithGround) {
@@ -947,14 +992,14 @@ namespace U5Designs {
 						switch(collidingAxis) {
 							case 0: //x
 								if(_location.X < collidingObj.location.X) {
-									_location.X = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
+									locX = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
 								} else {
-									_location.X = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
+									locX = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
 								}
 								if(velocity.X != 0) {//should always be true, but just in case...
 									double deltaTime = (location.X - startLoc.X) / velocity.X;
-									_location.Y += (float)(velocity.Y * deltaTime);
-									_location.Z += (float)(velocity.Z * deltaTime);
+									locY += (float)(velocity.Y * deltaTime);
+									locZ += (float)(velocity.Z * deltaTime);
 									time -= deltaTime;
 								}
 								deltax += _location.X - startLoc.X; //update this value for camera offset
@@ -962,9 +1007,9 @@ namespace U5Designs {
 								break;
 							case 1: //y
 								if(_location.Y < collidingObj.location.Y) {
-									_location.Y = collidingObj.location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.0001f;
+									locY = collidingObj.location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.0001f;
 								} else {
-									_location.Y = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
+									locY = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
 									//Special case for landing on platforms
 									fallTimer = 0.0;
 									onGround = true;
@@ -976,8 +1021,8 @@ namespace U5Designs {
 								}
 								if(velocity.Y != 0) {//should always be true, but just in case...
 									double deltaTime = (location.Y - startLoc.Y) / velocity.Y;
-									_location.X += (float)(velocity.X * deltaTime);
-									_location.Z += (float)(velocity.Z * deltaTime);
+									locX += (float)(velocity.X * deltaTime);
+									locZ += (float)(velocity.Z * deltaTime);
 									time -= deltaTime;
 								}
 								deltax += _location.X - startLoc.X; //update this value for camera offset
@@ -985,14 +1030,14 @@ namespace U5Designs {
 								break;
 							case 2: //z
 								if(_location.Z < collidingObj.location.Z) {
-									_location.Z = collidingObj.location.Z - (pbox.Z + collidingObj.pbox.Z) - 0.0001f;
+									locZ = collidingObj.location.Z - (pbox.Z + collidingObj.pbox.Z) - 0.0001f;
 								} else {
-									_location.Z = collidingObj.location.Z + pbox.Z + collidingObj.pbox.Z + 0.0001f;
+									locZ = collidingObj.location.Z + pbox.Z + collidingObj.pbox.Z + 0.0001f;
 								}
 								if(velocity.Z != 0) {//should always be true, but just in case...
 									double deltaTime = (location.Z - startLoc.Z) / velocity.Z;
-									_location.X += (float)(velocity.X * deltaTime);
-									_location.Y += (float)(velocity.Y * deltaTime);
+									locX += (float)(velocity.X * deltaTime);
+									locY += (float)(velocity.Y * deltaTime);
 									time -= deltaTime;
 								}
 								deltax += _location.X - startLoc.X; //update this value for camera offset
@@ -1056,7 +1101,7 @@ namespace U5Designs {
 
 			if(fallTimer > 1.5) {
 				_health -= fallDamage;
-				_location = lastPosOnGround;
+				location = new Vector3(lastPosOnGround);
 				velocity = Vector3.Zero;
 				Invincible = true;
 				Invincibletimer = 2.0;
@@ -1166,12 +1211,12 @@ namespace U5Designs {
 				if(endspin) {
 					spinning = false;
 					_speed = runSpeed;
-					_cycleNum = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
+					cycleNumber = (int)(velocity.X == 0 ? PlayerAnim.stand2d : PlayerAnim.walk2d);
 				}
 
-				Vector3 startLoc = new Vector3(_location.X, _location.Y, _location.Z);
+				Vector3 startLoc = new Vector3(_location);
 				if(collidingAxis == -1) { //no collision
-					_location += velocity * (float)time;
+					location += velocity * (float)time;
 					time = 0.0;
 					deltax += _location.X - startLoc.X; //update this value for camera offset
 					if(viewSwitchJumpTimer <= 0.0 && !collidedWithGround) {
@@ -1183,13 +1228,13 @@ namespace U5Designs {
 						switch(collidingAxis) {
 							case 0: //x
 								if(_location.X < collidingObj.location.X) {
-									_location.X = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
+									locX = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
 								} else {
-									_location.X = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
+									locX = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
 								}
 								if(velocity.X != 0) {//should always be true, but just in case...
 									double deltaTime = (location.X - startLoc.X) / velocity.X;
-									_location.Y += (float)(velocity.Y * deltaTime);
+									locY += (float)(velocity.Y * deltaTime);
 									time -= deltaTime;
 								}
 								deltax += _location.X - startLoc.X; //update this value for camera offset
@@ -1197,9 +1242,9 @@ namespace U5Designs {
 								break;
 							case 1: //y
 								if(_location.Y < collidingObj.location.Y) {
-									_location.Y = collidingObj.location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.0001f;
+									locY = collidingObj.location.Y - (pbox.Y + collidingObj.pbox.Y) - 0.0001f;
 								} else {
-									_location.Y = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
+									locY = collidingObj.location.Y + pbox.Y + collidingObj.pbox.Y + 0.0001f;
 									//Special case for landing on platforms
 									fallTimer = 0.0;
 									onGround = true;
@@ -1215,7 +1260,7 @@ namespace U5Designs {
 								}
 								if(velocity.Y != 0) {//should always be true, but just in case...
 									double deltaTime = (location.Y - startLoc.Y) / velocity.Y;
-									_location.X += (float)(velocity.X * deltaTime);
+									locX += (float)(velocity.X * deltaTime);
 									time -= deltaTime;
 								}
 								deltax += _location.X - startLoc.X; //update this value for camera offset
@@ -1281,7 +1326,7 @@ namespace U5Designs {
 
 			if(fallTimer > 1.5) {
 				_health -= fallDamage;
-				_location = lastPosOnGround;
+				location = new Vector3(lastPosOnGround);
 				velocity = Vector3.Zero;
 				Invincible = true;
 				Invincibletimer = 2.0;
@@ -1303,7 +1348,7 @@ namespace U5Designs {
                 velocity = new Vector3(0, 0, 0);
                 accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
 
-				_cycleNum = (int)PlayerAnim.stand3d; //TODO: Change to player damage animation
+				cycleNumber = (int)PlayerAnim.stand3d; //TODO: Change to player damage animation
             } else {
                 Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, 0);
                 direction.Normalize();
@@ -1315,7 +1360,7 @@ namespace U5Designs {
                 velocity = new Vector3(0, 0, 0);
                 accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, 0);
 
-				_cycleNum = (int)PlayerAnim.stand2d; //TODO: Change to player damage animation
+				cycleNumber = (int)PlayerAnim.stand2d; //TODO: Change to player damage animation
             }
         }
 
@@ -1336,9 +1381,9 @@ namespace U5Designs {
             _cbox.X = _cbox.Z;
             _cbox.Z = temp;
         }
-        public Vector3 setLocation {
-            set { _location = value; }
-        }
+//         public Vector3 setLocation {
+//             set { _location = value; }
+//         }
 
         public bool canSquish {
             get { return false; }
@@ -1386,13 +1431,13 @@ namespace U5Designs {
         private int _cycleNum;
         public int cycleNumber {
             get { return _cycleNum; }
-            set { _cycleNum = value; }
+            set { arms.cycleNumber = _cycleNum = value; }
         }
 
         private double _frameNum; //index of the current animation frame
         public double frameNumber {
             get { return _frameNum; }
-            set { _frameNum = value; }
+            set { arms.frameNumber = _frameNum = value; }
         }
 
         public Billboarding billboards {

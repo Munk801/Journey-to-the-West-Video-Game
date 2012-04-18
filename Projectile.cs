@@ -225,7 +225,7 @@ namespace U5Designs {
                                 time = 0.0;
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
-                                player.knockback(false, this);
+                                player.knockback(true, this);
                             }
                             else {
                                 time = 0.0;

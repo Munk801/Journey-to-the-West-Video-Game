@@ -1,0 +1,30 @@
+﻿<sprite>
+	<bmp>monkey_arm_stand_side.png</bmp>
+	<c_starts>0</c_starts>
+	<c_lengths>1</c_lengths>
+  
+	<bmp>monkey_arm_stand_back.png</bmp>
+	<c_starts>0</c_starts>
+	<c_lengths>1</c_lengths>
+  
+	<bmp>monkey_arm_walk_side.png</bmp>
+	<c_starts>0</c_starts>
+	<c_lengths>8</c_lengths>
+  
+	<bmp>monkey_arm_walk_back.png</bmp>
+	<c_starts>0</c_starts>
+	<c_lengths>8</c_lengths>
+  
+	<bmp>monkey_spin.png</bmp>
+	<c_starts>0</c_starts>
+	<c_lengths>3</c_lengths>
+  
+	<bmp>monkey_spin.png</bmp>
+	<c_starts>0</c_starts>
+	<c_lengths>3</c_lengths>
+  
+	<t_width>600</t_width>
+	<t_height>600</t_height>
+	<hasAlpha>true</hasAlpha>
+	<fps>16</fps>
+</sprite>

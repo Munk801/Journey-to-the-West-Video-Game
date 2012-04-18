@@ -94,7 +94,6 @@ namespace U5Designs {
                     boxes[currentBossIndex] = boxes[index];
                     currentBossIndex = index;
                     boxes[index] = bossobject;
-                    Console.WriteLine(currentBossIndex);
                     switchdelaytimer = 0;
                     //end swap code
 
@@ -108,7 +107,6 @@ namespace U5Designs {
                     if (gethealth() == 4) {
                         // second stage, drop boss + either his row or column of boxes
                         int rows = rng.Next(0, 2);
-                        Console.WriteLine("rows :" + rows);
                         if (rows == 0) {
                             //row
                             for (int i = 0; i < 4; i++) {

@@ -66,7 +66,7 @@ namespace U5Designs {
 			playerProjectiles.Add(parseProjectileFile("banana_projectile.dat", ps));
 			playerProjectiles.Add(parseProjectileFile("coconut_grenade_projectile.dat", ps));
 
-			ps.player = new Player(parseSpriteFile("player_sprite.dat"), playerProjectiles, ps);
+			ps.player = new Player(parseSpriteFile("player_sprite.dat"), parseSpriteFile("player_arm_sprite.dat"), playerProjectiles, ps);
 			ps.player.marker = parseSpriteFile("marker_sprite.dat");
 			ps.physList.Add(ps.player);
 			ps.renderList.Add(ps.player);

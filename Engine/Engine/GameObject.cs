@@ -50,7 +50,7 @@ namespace Engine
 		}
 
 		protected Vector3 _location;
-		public Vector3 location {
+		public virtual Vector3 location {
 			get { return _location; }
 			set { _location = value; }
 		}
