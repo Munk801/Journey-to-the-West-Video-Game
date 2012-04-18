@@ -12,6 +12,7 @@ using Engine;
 using OpenTK.Input;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace U5Designs {
 	public enum PlayerAnim { stand2d=0, stand3d=1, walk2d=2, walk3d=3, spin2d=4, spin3d=5 };
@@ -170,6 +171,8 @@ namespace U5Designs {
         internal void updateState(bool enable3d, KeyboardDevice keyboard, double time) {
 			this.enable3d = enable3d;
 
+			Debug.Assert(_scale.X < 0 == arms.scaleX < 0, "Arms are backwards!");
+
 			//Update timers
 			if(stamina < maxStamina) {
 				stamina = Math.Min(stamina + time, maxStamina);
@@ -229,20 +232,20 @@ namespace U5Designs {
 			if(squishTimer >= 0.0) {
 				squishTimer += time;
 				float oldPboxY = _pbox.Y;
-				if(squishTimer <= 0.125) {
-					_scale.Y = (float)(25.0 * (0.125 - squishTimer));
+				if(squishTimer <= 0.1) {
+					arms.scaleY = _scale.Y = (float)(250.0 * (0.1 - squishTimer));
 					_pbox.Y = _scale.Y / 2.0f;
 					locY -= oldPboxY - _pbox.Y;
-				} else if(squishTimer <= 3.125) {
-					_scale.Y = _pbox.Y = 0.0f;
+				} else if(squishTimer <= 3.1) {
+					arms.scaleY = _scale.Y = _pbox.Y = 0.0f;
 					locY -= oldPboxY - _pbox.Y;
-				} else if(squishTimer <= 3.4375) {
-					_scale.Y = (float)(25.0 * (squishTimer - 3.125));
+				} else if(squishTimer <= 3.35) {
+					arms.scaleY = _scale.Y = (float)(100.0 * (squishTimer - 3.1));
 					_pbox.Y = _scale.Y / 2.0f;
 					locY += _pbox.Y - oldPboxY;
 				} else {
-					_scale.Y = 25.0f;
-					_pbox.Y = 12.5f;
+					arms.scaleY = _scale.Y = 25.0f;
+					_pbox.Y = 11.0f;
 					locY += _pbox.Y - oldPboxY;
 					squishTimer = -1.0;
 					isMobile = true;
@@ -368,6 +371,7 @@ namespace U5Designs {
 
 					if(_scale.X < 0) {
 						_scale.X = -_scale.X;
+						arms.scaleX = -arms.scaleX;
 					}
 				} else {
 					if(keyboard[Key.A] == keyboard[Key.D]) {

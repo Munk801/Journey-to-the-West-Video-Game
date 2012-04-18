@@ -44,7 +44,7 @@ namespace U5Designs {
 			_animDirection = 1;
 		}
 
-		//These four are only used by Player for his arms - they should not be called for other Decorations
+		//These five are only used by Player for his arms - they should not be called for other Decorations
 		internal float locX {
 			get { return _location.X; }
 			set { _location.X = value; }
@@ -60,6 +60,10 @@ namespace U5Designs {
 		internal float scaleX {
 			get { return _scale.X; }
 			set { _scale.X = value; }
+		}
+		internal float scaleY {
+			get { return _scale.Y; }
+			set { _scale.Y = value; }
 		}
 
 		private bool _is3dGeo;
