@@ -46,9 +46,10 @@ namespace U5Designs {
 			XmlNodeList _b_list = doc.GetElementsByTagName("background");
 			XmlNodeList _e_list = doc.GetElementsByTagName("enemy");
 			XmlNodeList _o_list = doc.GetElementsByTagName("obstaclelist")[0].ChildNodes;
-			XmlNodeList _d_list = doc.GetElementsByTagName("decoration");
+			XmlNodeList _d_list = doc.GetElementsByTagName("decorationlist")[0].ChildNodes;
             XmlNodeList _a_list = doc.GetElementsByTagName("audiofile");
 			XmlNodeList bossObstacleList = doc.GetElementsByTagName("bosslist")[0].ChildNodes;
+			XmlNodeList bossRemoveList = doc.GetElementsByTagName("bossremovelist")[0].ChildNodes;
 			fstream.Close();
 
 			//Regions and Boss Area
@@ -106,6 +107,9 @@ namespace U5Designs {
 			}
 
 			ps.bossList = parseObstacleFiles(bossObstacleList);
+			ps.bossRemoveList = parseDecorationFile(bossRemoveList);
+			ps.objList.AddRange(ps.bossRemoveList);
+			ps.renderList.AddRange(ps.bossRemoveList);
 
 			//TODO: When we have more than one boss type, adjust this
 			ps.bossAI = new ZookeeperAI(ps.player, ps);
