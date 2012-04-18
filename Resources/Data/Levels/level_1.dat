@@ -10,7 +10,7 @@
 	<backgroundlist>
 		<background>
       <scale x="250" y="96.43" z="1"/>
-			<sprite>zoo_side_background_sprite.dat</sprite>
+			<sprite>jungle_side_foreground_sprite.dat</sprite>
 			<speed>0.75</speed>
       <loc x="75" y="20" z="-150"/>
       <loc x="325" y="20" z="-150"/>
@@ -25,8 +25,42 @@
 		</background>
     <background>
       <scale x="75" y="57.86" z="1"/>
-      <sprite>city_side_background_sprite.dat</sprite>
+      <sprite>jungle_side_background_sprite.dat</sprite>
       <speed>0.9</speed>
+      <loc x="-20" y="30" z="-200"/>
+      <loc x="55" y="30" z="-200"/>
+      <loc x="130" y="30" z="-200"/>
+      <loc x="205" y="30" z="-200"/>
+      <loc x="280" y="30" z="-200"/>
+      <loc x="355" y="30" z="-200"/>
+      <loc x="430" y="30" z="-200"/>
+      <loc x="505" y="30" z="-200"/>
+      <loc x="580" y="30" z="-200"/>
+      <loc x="655" y="30" z="-200"/>
+      <loc x="730" y="30" z="-200"/>
+      <loc x="805" y="30" z="-200"/>
+      <loc x="880" y="30" z="-200"/>
+      <loc x="955" y="30" z="-200"/>
+      <loc x="1030" y="30" z="-200"/>
+      <loc x="1105" y="30" z="-200"/>
+      <loc x="1180" y="30" z="-200"/>
+      <loc x="1255" y="30" z="-200"/>
+      <loc x="1330" y="30" z="-200"/>
+      <loc x="1405" y="30" z="-200"/>
+      <loc x="1480" y="30" z="-200"/>
+      <loc x="1555" y="30" z="-200"/>
+      <loc x="1630" y="30" z="-200"/>
+      <loc x="1705" y="30" z="-200"/>
+      <loc x="1780" y="30" z="-200"/>
+      <loc x="1855" y="30" z="-200"/>
+      <loc x="1930" y="30" z="-200"/>
+      <loc x="2005" y="30" z="-200"/>
+      <loc x="2080" y="30" z="-200"/>
+    </background>
+	<background>
+      <scale x="75" y="57.86" z="1"/>
+      <sprite>jungle_farside_background_sprite.dat</sprite>
+      <speed>0.95</speed>
       <loc x="-20" y="30" z="-200"/>
       <loc x="55" y="30" z="-200"/>
       <loc x="130" y="30" z="-200"/>
@@ -61,13 +95,11 @@
 	<enemylist>
 		<enemy>
 			<path>Boy.dat</path>
-      <loc x="200" y="17.5" z="50"/>
-      <loc x="500" y="17.5" z="50"/>		
+      <loc x="200" y="17.5" z="50"/>	
 		</enemy>
 		<enemy>
 			<path>Bird.dat</path>
 			<loc x="200" y="60" z="50"/>
-			<loc x="709" y="71" z="50" />
 		</enemy>
 		<enemy>
 		  <path>Girl.dat</path>
@@ -76,13 +108,9 @@
 	</enemylist>
 	<obstaclelist>
 		<obstacle>
-			<path>test_obstacle.dat</path>
+			<path>jungle_obstacle.dat</path>
 			<loc x="50" y="-50" z="50"/>
-			<loc x="150" y="-50" z="50"/>
-			<loc x="250" y="-50" z="50"/>
-			<loc x="250" y="-50" z="150"/>
-			<loc x="250" y="-50" z="-50"/>
-			<loc x="350" y="-50" z="-50"/>
+			
       <!--Boss encounter area-->
   <!--<loc x="4100" y="75" z="0"/>
 			<loc x="4100" y="75" z="100"/>
@@ -107,9 +135,21 @@
       <loc x="4350" y="275" z="50"/>
     </obstacle>
 		<obstacle>
-			<path>tree.dat</path>
+			<path>jungle_tree.dat</path>
 			<loc x="100" y="37.9" z="0"/>
 			<loc x="250" y="37.9" z="-99"/>
+			<loc x="350" y="37.9" z="-99"/>
+			<loc x="450" y="37.9" z="-99"/>
+
+			<loc x="250" y="37.9" z="200"/>
+			<loc x="350" y="37.9" z="200"/>
+			<loc x="450" y="37.9" z="200"/>
+			
+			<loc x="3800" y="162.9" z="0"/>
+			<loc x="3900" y="162.9" z="0"/>
+			
+			<loc x="3800" y="162.9" z="100"/>
+			<loc x="3900" y="162.9" z="100"/>
 		</obstacle>
 		<obstacle>
 			<path>zoo_sign.dat</path>
