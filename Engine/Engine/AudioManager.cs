@@ -179,9 +179,9 @@ namespace Engine
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("AudioManager threw exception!");
-                    Console.WriteLine(e.StackTrace);
-                    currentSource = null;
+                    //Console.WriteLine("AudioManager threw exception!");
+                    //Console.WriteLine(e.StackTrace);
+                    //currentSource = null;
                 }
             }
         }

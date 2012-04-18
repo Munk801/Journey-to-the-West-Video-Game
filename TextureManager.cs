@@ -87,8 +87,6 @@ namespace U5Designs
 
         public void LoadTexture(string id, string path)
         {
-
-           
                 var bitmap = new Bitmap(path);
                 var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height),
                                                  ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);

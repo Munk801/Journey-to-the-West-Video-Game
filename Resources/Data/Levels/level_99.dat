@@ -1,16 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <level>
-	<obstaclelist>
-		<obstacle>
-			<path>bush.dat</path>
-			<loc x="436" y="82" z="0" />
-			<loc x="522" y="133" z="100" />
-			<loc x="563" y="135" z="100" />
-			<loc x="530" y="136" z="0" />
-			<loc x="639" y="78" z="20" />
-			<loc x="687" y="77" z="21" />
-			<loc x="1512" y="74" z="101" />
-			<loc x="1563" y="74" z="101" />
-		</obstacle>
-	</obstaclelist>
+	<enemylist>
+		<enemy>
+			<path>Girl.dat</path>
+			<loc x="578" y="131" z="40" />
+			<loc x="768" y="64" z="50" />
+			<loc x="952" y="57" z="-20" />
+			<loc x="1563" y="58" z="50" />
+		</enemy>
+	</enemylist>
 </level>
