@@ -413,6 +413,13 @@ namespace U5Designs {
 
                 if (keyboard[Key.BackSlash])
                     location = new Vector3(3779, 138, 43);
+
+                if (keyboard[Key.Semicolon]) {
+                    playstate.bossAI.killBoss(playstate);
+                    playstate.bossMode = false;
+                    //transition to next level
+                    playstate.waitingToSwitchLevels = true;
+                }
 #endif
 
 				//Jump

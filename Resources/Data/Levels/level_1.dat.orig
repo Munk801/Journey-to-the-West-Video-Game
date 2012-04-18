@@ -269,7 +269,11 @@
       <loc x="4150" y="275" z="50"/>
     </obstacle>
   </bosslist>
+<<<<<<< HEAD
   <bossremovelist>
+=======
+    <bossremovelist>
+>>>>>>> aeccbdacd68b112cfec5ff243243b913be3b133b
     <decoration>
       <path>brick_wall_door.dat</path>
       <loc x="4149" y="275" z="50"/>
