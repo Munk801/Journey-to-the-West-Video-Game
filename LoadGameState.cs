@@ -71,15 +71,15 @@ namespace U5Designs
 
             eng.StateTextureManager.LoadTexture("menu", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
             menu = eng.StateTextureManager.GetTexture("menu");
-            string s1 = "Fonts/myHappySans.qfont";
+            string s1 = "../../Fonts/myHappySans.qfont";
             saveFont = QFont.FromQFontFile(s1, new QFontLoaderConfiguration(true));
             saveFont.Options.DropShadowActive = true;
 
             //title = QFont.FromQFontFile("myHappySans.qfont", new QFontLoaderConfiguration(true));
-            title = new QFont("Fonts/Rock.TTF", 62, new QFontBuilderConfiguration(true));
+            title = new QFont("../../Fonts/Rock.TTF", 62, new QFontBuilderConfiguration(true));
             title.Options.DropShadowActive = true;
 
-            saveFontHighlighted = QFont.FromQFontFile("Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
+            saveFontHighlighted = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
             saveFont.Options.DropShadowActive = true;
 
             //QFont.CreateTextureFontFiles("Fonts/HappySans.ttf", 48, "myHappySans2");
