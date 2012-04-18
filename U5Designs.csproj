@@ -36,9 +36,6 @@
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="QuickFont">
-      <HintPath>QuickFont\bin\Debug\QuickFont.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -109,6 +106,10 @@
       <Project>{A37A7E14-0000-0000-0000-000000000000}</Project>
       <Name>OpenTK</Name>
     </ProjectReference>
+    <ProjectReference Include="QuickFont\QuickFont.csproj">
+      <Project>{BBECE6FC-EF63-40F8-A734-A500D1DFC1AF}</Project>
+      <Name>QuickFont</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Sprites\test_sprite.dat">
@@ -117,6 +118,7 @@
     <EmbeddedResource Include="Resources\Data\Sprites\test_floor_sprite.dat" />
     <EmbeddedResource Include="Resources\test.sav" />
     <EmbeddedResource Include="Resources\Textures\coconut_spin.png" />
+    <EmbeddedResource Include="Resources\Textures\jungleMiddleBackground.png" />
     <EmbeddedResource Include="Resources\Textures\u5_logo.png" />
   </ItemGroup>
   <ItemGroup>
@@ -510,12 +512,17 @@
     <EmbeddedResource Include="Resources\Textures\monkey_arm_stand_back.png" />
     <EmbeddedResource Include="Resources\Textures\monkey_arm_stand_side.png" />
     <EmbeddedResource Include="Resources\Textures\monkey_arm_walk_side.png" />
+    <EmbeddedResource Include="Resources\Textures\bush.png" />
+    <EmbeddedResource Include="Resources\Textures\jungle_far_mountain.png" />
+    <EmbeddedResource Include="Resources\Textures\jungle_middle_mountain.png" />
+    <EmbeddedResource Include="Resources\Textures\jungle_tree.png" />
+    <EmbeddedResource Include="Resources\Textures\jungle sky 2D.png" />
+    <EmbeddedResource Include="Resources\Textures\jungle sky 3D.png" />
+    <EmbeddedResource Include="Resources\Textures\jungle_ground.png" />
     <EmbeddedResource Include="Fonts\Anonymous.ttf" />
     <EmbeddedResource Include="Fonts\BURNSTOW.TTF" />
     <EmbeddedResource Include="Fonts\Comfortaa-Regular.ttf" />
-    <EmbeddedResource Include="Fonts\HappySans.ttf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Fonts\HappySans.ttf" />
     <EmbeddedResource Include="Fonts\NASHVILL.TTF" />
     <EmbeddedResource Include="Fonts\Rock.TTF" />
     <Content Include="Fonts\ScrumBucket.ttf" />
@@ -527,10 +534,34 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Sprites\player_arm_sprite.dat" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\jungle_tree_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Obstacles\jungle_obstacle.dat" />
+    <EmbeddedResource Include="Resources\Data\Obstacles\jungle_tree.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\jungle_side_background_sprite.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\jungle_side_foreground_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\jungle_farside_background_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Obstacles\jungle_tree_collides.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\bush_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Fonts\myHappySans.qfont" />
+    <EmbeddedResource Include="Fonts\myHappySans1.qfont" />
+    <EmbeddedResource Include="Fonts\myHappySans2.qfont" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy $(SolutionDir)Fonts\*.* $(SolutionDir)$(OutDir)Fonts\</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

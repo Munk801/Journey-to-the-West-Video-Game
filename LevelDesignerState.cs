@@ -395,7 +395,14 @@ namespace U5Designs
             if (New_Key_State.IsKeyDown(Key.BackSlash) && !Old_Key_State.IsKeyDown(Key.BackSlash))
             {
                 AllowSnapping = !AllowSnapping;
-                UnitsToMove = 10.0f;
+                if (AllowSnapping)
+                {
+                    UnitsToMove = 10.0f;
+                }
+                else
+                {
+                    UnitsToMove = 1.0f;
+                }
                 Console.WriteLine("Snapping is: {0}", AllowSnapping.ToString());
             }
             if (New_Key_State.IsKeyDown(Key.Semicolon) && !Old_Key_State.IsKeyDown(Key.Semicolon))
@@ -510,27 +517,27 @@ namespace U5Designs
             {
                 if (New_Key_State.IsKeyDown(Key.Up) && !Old_Key_State.IsKeyDown(Key.Up) && !eng.Keyboard[Key.ControlLeft])
                 {
-                    MoveObjects(SelectedObject, new Vector3(1.0f, 0.0f, 0.0f));
+                    MoveObjects(SelectedObject, new Vector3(UnitsToMove, 0.0f, 0.0f));
                 }
                 if (New_Key_State.IsKeyDown(Key.Down) && !Old_Key_State.IsKeyDown(Key.Down) && !eng.Keyboard[Key.ControlLeft])
                 {
-                    MoveObjects(SelectedObject, new Vector3(-1.0f, 0.0f, 0.0f));
+                    MoveObjects(SelectedObject, new Vector3(-UnitsToMove, 0.0f, 0.0f));
                 }
                 if (New_Key_State.IsKeyDown(Key.Left) && !Old_Key_State.IsKeyDown(Key.Left))
                 {
-                    MoveObjects(SelectedObject, new Vector3(0.0f, 0.0f, -1.0f));
+                    MoveObjects(SelectedObject, new Vector3(0.0f, 0.0f, -UnitsToMove));
                 }
                 if (New_Key_State.IsKeyDown(Key.Right) && !Old_Key_State.IsKeyDown(Key.Right))
                 {
-                    MoveObjects(SelectedObject, new Vector3(0.0f, 0.0f, 1.0f));
+                    MoveObjects(SelectedObject, new Vector3(0.0f, 0.0f, UnitsToMove));
                 }
                 if (New_Key_State.IsKeyDown(Key.Up) && !Old_Key_State.IsKeyDown(Key.Up) && eng.Keyboard[Key.ControlLeft])
                 {
-                    MoveObjects(SelectedObject, new Vector3(0.0f, 1.0f, 0.0f));
+                    MoveObjects(SelectedObject, new Vector3(0.0f, UnitsToMove, 0.0f));
                 }
                 if (New_Key_State.IsKeyDown(Key.Down) && !Old_Key_State.IsKeyDown(Key.Down) && eng.Keyboard[Key.ControlLeft])
                 {
-                    MoveObjects(SelectedObject, new Vector3(0.0f, -1.0f, 0.0f));
+                    MoveObjects(SelectedObject, new Vector3(0.0f, -UnitsToMove, 0.0f));
                 }
             }
             #endregion

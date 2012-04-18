@@ -1,9 +1,5 @@
-bush.dat
-cage_front.dat
-cage_side.dat
-test_obstacle.dat
-test_obstacle_sprite.dat
-tree.dat
-tree_collides.dat
+jungle_obstacle.dat
+jungle_tree.dat
+jungle_tree_collides.dat
 zoo_keeper_crate.dat
-zoo_sign.dat
+bush.dat
