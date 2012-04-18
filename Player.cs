@@ -364,7 +364,7 @@ namespace U5Designs {
 					velocity.Z = newVel.Y * speed;
 
 					//update current animation and flip scale if necessary
-					arms.animDirection = _animDirection = (velocity.X >= 0 ? 1 : -1);
+					//arms.animDirection = _animDirection = (velocity.X >= 0 ? 1 : 1);
 					if(!spinning) {
 						cycleNumber = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
 					}
@@ -383,7 +383,7 @@ namespace U5Designs {
 					}
 
 					//update current animation and flip scale if necessary
-					arms.animDirection = _animDirection = 1;
+					//arms.animDirection = _animDirection = 1;
 					if(!spinning) {
 						cycleNumber = (int)(velocity.X == 0 ? PlayerAnim.stand2d : PlayerAnim.walk2d);
 						if((velocity.X < 0 && _scale.X > 0) || (velocity.X > 0 && _scale.X < 0)) {
