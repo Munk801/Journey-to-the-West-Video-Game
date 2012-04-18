@@ -44,6 +44,7 @@ namespace U5Designs
 		internal List<CombatObject> combatList; // list of stuff that effects the player in combat, projectiles, enemies
 		internal List<Background> backgroundList;
 		internal List<Obstacle> bossList; //contains obstacles necessary to box the player in during the boss encounter
+		internal List<Decoration> bossRemoveList; //decorations which need to be removed when the boss encounter starts to allow the player to see
 		internal List<Effect> effectsList; //effects which need to be updated to determine when to delete themselves
         internal AudioFile levelMusic;
 
@@ -258,6 +259,12 @@ namespace U5Designs
 		public void enterBossMode() {
 			bossMode = true;
 			camera.enterBossMode(bossAreaCenter, bossAreaBounds);
+
+			foreach(Decoration d in bossRemoveList) {
+				objList.Remove(d);
+				renderList.Remove(d);
+			}
+
 			objList.AddRange(bossList);
 			renderList.AddRange(bossList);
 			physList.AddRange(bossList);
