@@ -16,12 +16,21 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 
+using QuickFont;
+
 namespace U5Designs
 {
     /** Main Menu State of the game that will be active while the Main Menu is up **/
     public class MainMenuState : GameState
     {
         internal GameEngine eng;
+
+        // Fonts
+        internal QFont title, button, buttonHighlight;
+        List<String> _buttons;
+        double cnt;
+        // End Fonts
+
         
         // A container which will hold the list of available saved games
         Stack<XmlNodeList> savedGameStates;
@@ -54,8 +63,11 @@ namespace U5Designs
             // Load all the textures
             eng.StateTextureManager.RenderSetup();
             Assembly assembly = Assembly.GetExecutingAssembly();
+
+            
             eng.StateTextureManager.LoadTexture("menu", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
             menu = eng.StateTextureManager.GetTexture("menu");
+            /*
             eng.StateTextureManager.LoadTexture("arrow", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.arrow.png"));
             arrow = eng.StateTextureManager.GetTexture("arrow");
             eng.StateTextureManager.LoadTexture("load", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel.png"));
@@ -74,6 +86,23 @@ namespace U5Designs
             ld_nopress = eng.StateTextureManager.GetTexture("ld");
             eng.StateTextureManager.LoadTexture("ldpress", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_leveldesign_hover.png"));
             ld_press = eng.StateTextureManager.GetTexture("ldpress");
+            */
+
+            // QFont
+            _buttons = new List<String>();
+            _buttons.Add("Play Game");
+            _buttons.Add("Load Saved Game");
+            _buttons.Add("Level Designer");
+            _buttons.Add("Quit");
+            button = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            button.Options.DropShadowActive = true;
+            //title = QFont.FromQFontFile("myHappySans.qfont", new QFontLoaderConfiguration(true));
+            title = QFont.FromQFontFile("../../Fonts/myRock.qfont", new QFontLoaderConfiguration(true));
+            title.Options.DropShadowActive = false;
+            buttonHighlight = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
+            buttonHighlight.Options.DropShadowActive = true;
+            //QFont.CreateTextureFontFiles("Fonts/Rock.TTF", 48, "myRock"); // Use this to create new Fonts that you will texture
+            // End QFonts
 
 			musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music.Menu.ogg"));
 			musicFile.Play();
@@ -123,6 +152,7 @@ namespace U5Designs
 
         public override void Update(FrameEventArgs e)
         {
+            cnt += e.Time;
             DealWithInput();
             MouseInput();
         }
@@ -135,8 +165,23 @@ namespace U5Designs
             Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref modelview);
-            menu.Draw2DTexture();
 
+            // Fonts
+            GL.Disable(EnableCap.DepthTest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
+            // End Fonts
+
+            menu.Draw2DTexture();
+            
+            // Font stuff
+            drawButtons();
+            // End Font stuff
+
+            /*
             switch (_cur_butn)
             {
                 case 0:
@@ -168,6 +213,10 @@ namespace U5Designs
                     ld_press.Draw2DTexture(0, b4Y);
                     break;
             }
+             * */
+
+            // Fonts
+            GL.Enable(EnableCap.DepthTest);
         }
 
 		internal void loadPlayState(int lvl) {
@@ -177,6 +226,44 @@ namespace U5Designs
 			LoadScreenState ls = new LoadScreenState(eng, ps, lvl);
 			eng.ChangeState(ls);
 		}
+
+        // Draw stuff
+        public void drawButtons()
+        {
+            QFont.Begin();
+            //GL.Translate(eng.Width * 0.5f, eng.Height*0.25f, 0f); 
+            float startY = eng.Height * 0.5f;
+            title.Print("Main Menu", new Vector2(eng.Width * 0.5f - (title.Measure("Main Menu").Width / 2), startY - (title.Measure("A").Height + 10)));
+            title.Options.DropShadowActive = true;
+            //float yOffset = startY + title.Measure("Available Save Points").Height; 
+            float yOffset = startY;// -title.Measure("A").Height;
+            int count = 0;
+            foreach (string s in _buttons)
+            {
+                if (count == _cur_butn)
+                {
+                    // Draw highlighted string                   
+
+                    GL.PushMatrix();
+                    buttonHighlight.Options.Colour = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
+                    GL.Translate(eng.Width * 0.5f - 16 * (float)(1 + Math.Sin(cnt * 4)), yOffset, 0f);
+                    buttonHighlight.Print(s, QFontAlignment.Centre);
+                    GL.PopMatrix();
+                }
+                else
+                {
+                    GL.PushMatrix();
+                    // Draw non highlighted string
+                    button.Options.DropShadowActive = false;
+                    button.Print(s, new Vector2(eng.Width * 0.5f - (button.Measure(s).Width / 2), yOffset));
+                    GL.PopMatrix();
+                }
+                yOffset += button.Measure(s).Height + (10);
+                count++;
+            }
+            //GL.PopMatrix();
+            QFont.End();
+        }
 
 		/// <summary>
 		/// Called by mouse or keyboard handlers when the user picked a button (by clicking or hitting enter)
@@ -191,16 +278,16 @@ namespace U5Designs
                     LoadGameState _L = new LoadGameState(eng, this);
                     musicFile.Stop();
                     eng.ChangeState(_L);
-					break;
-				case 2: //quit
-					eng.Exit();
-					break;
-				case 3: //level designer
+					break;				
+				case 2: //level designer
 					musicFile.Stop();
 					LevelDesignerState ls = new LevelDesignerState(eng, this, 13731);
 					eng.ChangeState(ls);
 					eng.GameInProgress = true;
 					break;
+                case 3: //quit
+                    eng.Exit();
+                    break;
 			}
 		}
 

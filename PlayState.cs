@@ -130,7 +130,7 @@ namespace U5Designs
             }
             //Next check if the player is dead. If he is, game over man
             if (player.health <= 0) {
-                GameOverState GGbro = new GameOverState(menustate, eng);
+                GameOverState GGbro = new GameOverState(menustate, eng, this);
                 levelMusic.Stop();
                 eng.ChangeState(GGbro);
             }
