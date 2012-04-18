@@ -96,7 +96,7 @@
 	</enemylist>
 	<obstaclelist>
 		<obstacle>
-			<path>test_obstacle.dat</path>
+			<path>zoo_ground.dat</path>
 			<loc x="50" y="-50" z="50"/>
 			<loc x="150" y="-50" z="50"/>
 			<loc x="250" y="-50" z="50"/>
@@ -182,20 +182,20 @@
     </obstacle>
 		<obstacle>
 			<path>tree.dat</path>
-			<loc x="100" y="37.9" z="0"/>
-			<loc x="250" y="37.9" z="-99"/>
-			<loc x="350" y="37.9" z="-99"/>
-			<loc x="450" y="37.9" z="-99"/>
+			<loc x="100" y="47.3" z="0"/>
+			<loc x="250" y="47.3" z="-99"/>
+			<loc x="350" y="47.3" z="-99"/>
+			<loc x="450" y="47.3" z="-99"/>
 
-			<loc x="250" y="37.9" z="200"/>
-			<loc x="350" y="37.9" z="200"/>
-			<loc x="450" y="37.9" z="200"/>
+			<loc x="250" y="47.3" z="200"/>
+			<loc x="350" y="47.3" z="200"/>
+			<loc x="450" y="47.3" z="200"/>
 			
-			<loc x="3800" y="162.9" z="0"/>
-			<loc x="3900" y="162.9" z="0"/>
+			<loc x="3800" y="172.3" z="0"/>
+			<loc x="3900" y="172.3" z="0"/>
 			
-			<loc x="3800" y="162.9" z="100"/>
-			<loc x="3900" y="162.9" z="100"/>
+			<loc x="3800" y="172.3" z="100"/>
+			<loc x="3900" y="172.3" z="100"/>
 		</obstacle>
 		<obstacle>
 			<path>zoo_sign.dat</path>
@@ -203,8 +203,8 @@
 		</obstacle>
 		<obstacle>
 		  <path>tree_collides.dat</path>
-		  <loc x="350" y="37.9" z="49.8"/>
-		  <loc x="1800" y="62.9" z="-40"/>
+		  <loc x="350" y="47.3" z="49.8"/>
+		  <loc x="1800" y="72.3" z="-40"/>
 		</obstacle>
 	</obstaclelist>
   <bosslist>

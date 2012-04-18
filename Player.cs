@@ -24,7 +24,7 @@ namespace U5Designs {
 
 		private PlayState playstate; //Keep a reference since we'll need this regularly
 
-		private Decoration arms;
+		internal Decoration arms;
 
         //Knockback physics constants:
         private Vector3 kbspeed;
@@ -77,7 +77,7 @@ namespace U5Designs {
 			_location = new Vector3(25, 12.5f, 50);
             _scale = new Vector3(25f, 25f, 25f);
             _pbox = new Vector3(5f, 11.0f, 5f);
-            _cbox = new Vector3(4f, 11.5f, 4f);
+            _cbox = new Vector3(4f, 10.0f, 4f);
             spinSize = 12; //?? experiment with this, TODO: change it to match the sprites size
 			velocity = new Vector3(0, 0, 0);
 			accel = new Vector3(0, 0, 0);

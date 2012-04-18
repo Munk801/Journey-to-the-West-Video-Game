@@ -290,6 +290,8 @@ namespace U5Designs
             //    GL.Clear(ClearBufferMask.AccumBufferBit);
             //}
 
+			//Console.WriteLine(player.arms.location - player.location);
+
 			camera.SetModelView();
 
 			for(int i = effectsList.Count - 1; i >= 0; i--) {

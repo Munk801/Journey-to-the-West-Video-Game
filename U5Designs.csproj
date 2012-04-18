@@ -150,7 +150,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Obstacles\test_obstacle.dat" />
+    <EmbeddedResource Include="Resources\Data\Obstacles\zoo_ground.dat" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Obstacles\test_obstacle_sprite.dat" />
