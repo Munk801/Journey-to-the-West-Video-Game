@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 // QuickFont
-//using QuickFont;
+using QuickFont;
 
 namespace U5Designs
 {
@@ -63,7 +63,7 @@ namespace U5Designs
         public int levelID;
 
 		internal bool tabDown;
-		public bool clickdown;        
+		public bool clickdown;       
 
 		/// <summary>
 		/// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
@@ -86,7 +86,7 @@ namespace U5Designs
             waitingToSwitchLevels = false;           
 
 			pms = new PauseMenuState(eng, menustate);
-			effectsList = new List<Effect>();
+			effectsList = new List<Effect>();            
 		}
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace U5Designs
         /// </summary>
         /// <param name="e">FrameEventArgs from OpenTK's update</param>
 		public override void Update(FrameEventArgs e) {
-			//e = new FrameEventArgs(e.Time * 0.1);
+			//e = new FrameEventArgs(e.Time * 0.1);           
             //First deal with hardware input
             DealWithInput();
 
@@ -282,7 +282,7 @@ namespace U5Designs
 		public override void Draw(FrameEventArgs e) {
 			//e = new FrameEventArgs(e.Time * 0.1);
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
+            
             // UNCOMMENT THIS AND LINE AFTER DRAW TO ADD MOTION BLUR
             //if (isInTransition)
             //{
@@ -334,7 +334,7 @@ namespace U5Designs
             //if (isInTransition)
             //{
             //    GL.Accum(AccumOp.Accum, 0.9f);
-            //}            
+            //}             
         }
 
 		public void drawStaminaBarAndCrosshair() {

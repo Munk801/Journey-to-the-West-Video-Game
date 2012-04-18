@@ -518,9 +518,7 @@
     <EmbeddedResource Include="Fonts\Anonymous.ttf" />
     <EmbeddedResource Include="Fonts\BURNSTOW.TTF" />
     <EmbeddedResource Include="Fonts\Comfortaa-Regular.ttf" />
-    <EmbeddedResource Include="Fonts\HappySans.ttf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Fonts\HappySans.ttf" />
     <EmbeddedResource Include="Fonts\NASHVILL.TTF" />
     <EmbeddedResource Include="Fonts\Rock.TTF" />
     <Content Include="Fonts\ScrumBucket.ttf" />
@@ -549,10 +547,14 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Sprites\bush_sprite.dat" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Fonts\myHappySans.qfont" />
+    <EmbeddedResource Include="Fonts\myHappySans1.qfont" />
+    <EmbeddedResource Include="Fonts\myHappySans2.qfont" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy $(SolutionDir)Fonts\*.* $(SolutionDir)$(OutDir)Fonts\</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

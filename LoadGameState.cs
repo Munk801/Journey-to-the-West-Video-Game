@@ -29,7 +29,7 @@ namespace U5Designs
         Stack<XmlNodeList> savedGameStates;
         Stack<string> savedGameChoices;
         MainMenuState _ms;
-        QFont saveFont;
+        QFont saveFont, title, saveFontHighlighted;
 
         // A container which will hold the list of available saved games        
         protected Vector3 eye, lookat;        
@@ -38,16 +38,15 @@ namespace U5Designs
 
         // testing buttons
         //Obstacle play_button_npress, play_button_press, load_button_npress, load_button_press, quit_button_press, quit_button_npress;
-        private int numOfButtons = 3;
+        private int numOfButtons;
         int _cur_butn = 0;
         OpenTK.Input.KeyboardState _old_state;
 
         // New Buttons
-        Texture menu, arrow, play_press, play_nopress, load_nopress, load_press, quit_nopress, quit_press, ld_nopress, ld_press;
-        float arX, b1Y, b2Y, b3Y, b4Y;
+        Texture menu;
         public bool enterdown, escapedown;
-
         public bool clickdown = false;
+        double cnt;
 
         public LoadGameState(GameEngine engine, MainMenuState ms)
         {
@@ -55,7 +54,7 @@ namespace U5Designs
             mouse = eng.Mouse;
             savedGameStates = new Stack<XmlNodeList>();
             savedGameChoices = new Stack<string>();
-            _ms = ms;
+            _ms = ms;            
 
             Assembly assembly = Assembly.GetExecutingAssembly();
             musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music.Menu.ogg"));
@@ -68,24 +67,32 @@ namespace U5Designs
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
 
-            _old_state = OpenTK.Input.Keyboard.GetState(); // Get the current state of the keyboard   
+            _old_state = OpenTK.Input.Keyboard.GetState(); // Get the current state of the keyboard
 
             eng.StateTextureManager.LoadTexture("menu", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
             menu = eng.StateTextureManager.GetTexture("menu");
+            string s1 = "Fonts/myHappySans.qfont";
+            saveFont = QFont.FromQFontFile(s1, new QFontLoaderConfiguration(true));
+            saveFont.Options.DropShadowActive = true;
+
+            //title = QFont.FromQFontFile("myHappySans.qfont", new QFontLoaderConfiguration(true));
+            title = new QFont("Fonts/Rock.TTF", 62, new QFontBuilderConfiguration(true));
+            title.Options.DropShadowActive = true;
+
+            saveFontHighlighted = QFont.FromQFontFile("Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
+            saveFont.Options.DropShadowActive = true;
+
+            //QFont.CreateTextureFontFiles("Fonts/HappySans.ttf", 48, "myHappySans2");
 
             // Load available saved games
             // Setup saved game data 
             SavedGameDataSetup();
-
-            // Display available saved game states
-            DisplayAvailableSaves();
+            
+            numOfButtons = savedGameChoices.Count - 1;
         }
 
         public override void MakeActive()
         {
-            saveFont = new QFont("Fonts/Rock.TTF", 32, new QFontBuilderConfiguration(true));
-            saveFont.Options.Colour = new Color4(1.0f, 0.2f, 0.2f, 1.0f);
-
             GL.Disable(EnableCap.Lighting);
             GL.Disable(EnableCap.Light0);
 
@@ -104,15 +111,25 @@ namespace U5Designs
         {
             DealWithInput();
             //MouseInput();
+            cnt += e.Time;
         }
 
         public override void Draw(FrameEventArgs e)
         {
-            GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-            GL.ClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+            GL.ClearColor(0.15f, 0.15f, 0.15f, 1.0f);
             //Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
             //GL.MatrixMode(MatrixMode.Modelview);
             //GL.LoadMatrix(ref modelview);  
+            GL.Disable(EnableCap.DepthTest);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Clamp);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
+            //glTexEnv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, /*color you want*/)
+            //GL.TexEnv(TextureEnvTarget.TextureEnv,TextureEnvParameter.TextureEnvColor, Color.Red);
 
             //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             Matrix4 modelview = Matrix4.LookAt(Vector3.Zero, Vector3.UnitZ, Vector3.UnitY);
@@ -120,24 +137,43 @@ namespace U5Designs
             GL.LoadMatrix(ref modelview);
 
             // Draw the background
-            menu.Draw2DTexture();            
+            //menu.Draw2DTexture();           
             drawSaves();
+            GL.Enable(EnableCap.DepthTest);
         }
 
         // Draw stuff
         public void drawSaves()
         {
-            QFont.Begin(); 
-            GL.PushMatrix();
-            //GL.Translate(eng.Width * 0.5f, eng.Height*0.25f, 0f);
-            float yOffset = 0;
+            QFont.Begin();
+            //GL.Translate(eng.Width * 0.5f, eng.Height*0.25f, 0f); 
+            float startY = title.Measure("Available").Height;      
+            title.Print("Available Save Points", new Vector2(0, startY));
+            float yOffset = startY + title.Measure("Available Save Points").Height;            
+            int count = 0;
             foreach (string s in savedGameChoices)
             {
-                //saveFont.Print(s, QFontAlignment.Centre);
-                saveFont.Print(s, new Vector2(eng.Width * 0.5f, yOffset));
+                if (count == _cur_butn)
+                {
+                    // Draw highlighted string                   
+
+                    GL.PushMatrix();
+                    saveFontHighlighted.Options.Colour = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
+                    GL.Translate(eng.Width * 0.5f - 16 * (float)(1 + Math.Sin(cnt * 4)), yOffset, 0f);                    
+                    saveFontHighlighted.Print(s, QFontAlignment.Centre);                    
+                    GL.PopMatrix();
+                }
+                else
+                {
+                    GL.PushMatrix();
+                    // Draw non highlighted string
+                    saveFont.Print(s, new Vector2(eng.Width * 0.5f - (saveFont.Measure(s).Width / 2), yOffset));
+                    GL.PopMatrix();
+                }                
                 yOffset += saveFont.Measure(s).Height + (0.5f * saveFont.Measure(s).Height);
+                count++;
             }
-            GL.PopMatrix();
+            //GL.PopMatrix();
             QFont.End(); 
         }
 
@@ -155,7 +191,7 @@ namespace U5Designs
                     _cur_butn += 1;
                     eng.selectSound.Play();
                 }
-                else if (_cur_butn >= numOfButtons)
+                else if (_cur_butn >= numOfButtons)                
                 {
                     // Were on the last button in the list so reset to the top of the button list
                     _cur_butn = 0;
@@ -194,7 +230,7 @@ namespace U5Designs
             if (eng.Keyboard[Key.Enter] && !enterdown)
             {
                 enterdown = true;
-                //handleButtonPress();
+                handleButtonPress();
             }
             else if (!eng.Keyboard[Key.Enter])
             {
@@ -206,6 +242,19 @@ namespace U5Designs
             {
                 eng.toggleFullScreen();
             }
+        }
+
+        /// <summary>
+        /// Called by mouse or keyboard handlers when the user picked a button (by clicking or hitting enter)
+        /// </summary>
+        internal void handleButtonPress()
+        {
+            // _cur_butn represents the index into SavedGames list, and Enter was just pressed so the user
+            // wishes to load that indexed game.  So get the index and call LoadLevel
+            String[] tmp = savedGameChoices.ElementAt(_cur_butn).Split(' ');
+            String _pname = tmp[1];
+            String _zone = tmp[3];
+            loadPlayState(Convert.ToInt16(_zone));            
         }
 
         /**
@@ -244,20 +293,6 @@ namespace U5Designs
                 }
                 //Console.WriteLine(str);
                 savedGameChoices.Push(str);
-            }
-        }
-
-        /**
-         * This method will display the available saved games to the user and allow for them to choose.  The choice will be used to load the correct
-         * saved game state into play
-         * */
-        public void DisplayAvailableSaves()
-        {
-            Console.WriteLine("Available Saved Games:");
-            foreach (string s in savedGameChoices)
-            {
-                // Need to use this data to create button graphics during the Load Game stage                
-                Console.WriteLine(s);
             }
         }
 
