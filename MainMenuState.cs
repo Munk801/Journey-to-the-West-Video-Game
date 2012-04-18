@@ -276,6 +276,7 @@ namespace U5Designs
 				case 1: //load saved game
 					//loadPlayState(saved_level_index);
                     LoadGameState _L = new LoadGameState(eng, this);
+                    musicFile.Stop();
                     eng.ChangeState(_L);
 					break;				
 				case 2: //level designer
