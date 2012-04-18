@@ -21,7 +21,7 @@
   
 	<bmp>monkey_spin.png</bmp>
   <c_starts>0</c_starts>
-	<c_lengths>3</c_lengths>
+	<c_lengths>6</c_lengths>
   
 	<t_width>600</t_width>
 	<t_height>600</t_height>
