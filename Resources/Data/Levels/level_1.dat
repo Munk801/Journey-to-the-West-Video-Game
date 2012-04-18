@@ -269,8 +269,6 @@
       <loc x="4150" y="275" z="50"/>
     </obstacle>
   </bosslist>
-		</obstacle>
-	</obstaclelist>
   <bosslist>
     <obstacle>
       <path>brick_wall_left.dat</path>
