@@ -22,7 +22,7 @@ namespace U5Designs {
         internal QFont title, button, buttonHighlight;
         List<String> _buttons;
         double cnt;
-        private int numOfButtons = 3;
+        private int numOfButtons = 2;
         PlayState _ps;
         // End Fonts
 

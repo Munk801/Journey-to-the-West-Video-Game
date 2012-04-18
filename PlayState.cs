@@ -60,7 +60,7 @@ namespace U5Designs
 
         //next level timer
         private double nextLevelTimer;
-        private bool waitingToSwitchLevels;
+        internal bool waitingToSwitchLevels;
         public int levelID;
 
 		internal bool tabDown;
