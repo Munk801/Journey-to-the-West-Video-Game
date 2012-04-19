@@ -49,10 +49,10 @@ namespace U5Designs
             menu = menustate;
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
-            _p1 = eng.StateTextureManager.GetTexture("p1");
-            _p2 = eng.StateTextureManager.GetTexture("p2");
-            _p3 = eng.StateTextureManager.GetTexture("p3");
-            _p4 = eng.StateTextureManager.GetTexture("p4");
+//             _p1 = eng.StateTextureManager.GetTexture("p1");
+//             _p2 = eng.StateTextureManager.GetTexture("p2");
+//             _p3 = eng.StateTextureManager.GetTexture("p3");
+//             _p4 = eng.StateTextureManager.GetTexture("p4");
 
             // QFont
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -61,13 +61,14 @@ namespace U5Designs
 
             _buttons = new List<String>();            
             _buttons.Add("Continue??");
+			_buttons.Add("Main Menu");
             _buttons.Add("Quit");            
-            button = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            button = QFont.FromQFontFile("Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
             button.Options.DropShadowActive = true;
             //title = QFont.FromQFontFile("myHappySans.qfont", new QFontLoaderConfiguration(true));
-            title = QFont.FromQFontFile("../../Fonts/myRock.qfont", new QFontLoaderConfiguration(true));
+            title = QFont.FromQFontFile("Fonts/myRock.qfont", new QFontLoaderConfiguration(true));
             title.Options.DropShadowActive = false;
-            buttonHighlight = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
+            buttonHighlight = QFont.FromQFontFile("Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
             buttonHighlight.Options.DropShadowActive = true;
             //QFont.CreateTextureFontFiles("Fonts/Rock.TTF", 48, "myRock"); // Use this to create new Fonts that you will texture
             // End QFonts
@@ -156,7 +157,12 @@ namespace U5Designs
                     // Exit Paused Menu state and return to playing				
                     eng.PopState();
                     break;
-                case 1: //Quit
+				case 1: //Main menu
+					eng.GameInProgress = false;
+					menu.enterdown = true;
+					eng.ChangeState(menu);
+					break;
+                case 2: //Quit
                     eng.Exit();
                     break;
                 
@@ -166,10 +172,12 @@ namespace U5Designs
         // Draw stuff
         public void drawButtons()
         {
-            QFont.Begin();
+            //QFont.Begin();
+			GL.PushMatrix();
+			GL.Scale(1, -1, 1);
             //GL.Translate(eng.Width * 0.5f, eng.Height*0.25f, 0f); 
-            float startY = eng.Height * 0.5f;
-            title.Print("PAUSED", new Vector2(eng.Width * 0.5f - (title.Measure("PAUSED").Width / 2), startY - (title.Measure("A").Height + 10)));
+            float startY = 0.0f;
+            title.Print("PAUSED", new Vector2(-(title.Measure("PAUSED").Width / 2), startY - (title.Measure("A").Height + 10)));
             //float yOffset = startY + title.Measure("Available Save Points").Height; 
             float yOffset = startY;// -title.Measure("A").Height;
             int count = 0;
@@ -181,7 +189,7 @@ namespace U5Designs
 
                     GL.PushMatrix();
                     buttonHighlight.Options.Colour = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
-                    GL.Translate(eng.Width * 0.5f - 16 * (float)(1 + Math.Sin(cnt * 4)), yOffset, 0f);
+                    GL.Translate(-16 * (float)Math.Sin(cnt * 4), yOffset, 0f);
                     buttonHighlight.Print(s, QFontAlignment.Centre);
                     GL.PopMatrix();
                 }
@@ -190,14 +198,14 @@ namespace U5Designs
                     GL.PushMatrix();
                     // Draw non highlighted string
                     button.Options.DropShadowActive = false;
-                    button.Print(s, new Vector2(eng.Width * 0.5f - (button.Measure(s).Width / 2), yOffset));
+                    button.Print(s, new Vector2(-(button.Measure(s).Width / 2), yOffset));
                     GL.PopMatrix();
                 }
                 yOffset += button.Measure(s).Height + (10);
                 count++;
             }
-            //GL.PopMatrix();
-            QFont.End();
+            GL.PopMatrix();
+            //QFont.End();
         }
 
         private void DealWithInput()

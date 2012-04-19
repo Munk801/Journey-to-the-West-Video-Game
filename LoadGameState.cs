@@ -72,14 +72,14 @@ namespace U5Designs
             eng.StateTextureManager.LoadTexture("menu", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
             menu = eng.StateTextureManager.GetTexture("menu");
 
-            saveFont = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            saveFont = QFont.FromQFontFile("Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
             saveFont.Options.DropShadowActive = true;
 
             //title = QFont.FromQFontFile("myHappySans.qfont", new QFontLoaderConfiguration(true));
-            title = QFont.FromQFontFile("../../Fonts/myRock.qfont", new QFontLoaderConfiguration(true));
+            title = QFont.FromQFontFile("Fonts/myRock.qfont", new QFontLoaderConfiguration(true));
             title.Options.DropShadowActive = true;
 
-            saveFontHighlighted = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
+            saveFontHighlighted = QFont.FromQFontFile("Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
             saveFont.Options.DropShadowActive = true;
 
             //QFont.CreateTextureFontFiles("Fonts/HappySans.ttf", 48, "myHappySans2");
@@ -118,9 +118,9 @@ namespace U5Designs
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             GL.ClearColor(0.15f, 0.15f, 0.15f, 1.0f);
-            //Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
-            //GL.MatrixMode(MatrixMode.Modelview);
-            //GL.LoadMatrix(ref modelview);  
+            Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadMatrix(ref modelview);  
             GL.Disable(EnableCap.DepthTest);
 
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
@@ -132,14 +132,14 @@ namespace U5Designs
             //GL.TexEnv(TextureEnvTarget.TextureEnv,TextureEnvParameter.TextureEnvColor, Color.Red);
 
             //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            Matrix4 modelview = Matrix4.LookAt(Vector3.Zero, Vector3.UnitZ, Vector3.UnitY);
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadMatrix(ref modelview);
+//             Matrix4 modelview = Matrix4.LookAt(Vector3.Zero, Vector3.UnitZ, Vector3.UnitY);
+//             GL.MatrixMode(MatrixMode.Modelview);
+//             GL.LoadMatrix(ref modelview);
 
             // Draw the background
             GL.PushMatrix();
-            GL.Scale(-1, 1, 1);
-            GL.Translate(0, 0, 2);
+            //GL.Scale(-1, 1, 1);
+            //GL.Translate(0, 0, 2);
             menu.Draw2DTexture();
             GL.PopMatrix();
             drawSaves();
@@ -149,10 +149,12 @@ namespace U5Designs
         // Draw stuff
         public void drawSaves()
         {
-            QFont.Begin();
+            //QFont.Begin();
+			GL.PushMatrix();
+			GL.Scale(1, -1, 1);
             //GL.Translate(eng.Width * 0.5f, eng.Height*0.25f, 0f); 
-            float startY = eng.Height * 0.5f - (title.Measure("Available").Height * 2.0f);
-            title.Print("Available Save Games", new Vector2(eng.Width * 0.5f - (title.Measure("Available Save Games").Width / 2), startY));
+            float startY = -(title.Measure("Available").Height * 2.0f);
+            title.Print("Available Save Games", new Vector2(-(title.Measure("Available Save Games").Width / 2), startY));
             title.Options.DropShadowActive = false;
             float yOffset = startY + title.Measure("Available Save Points").Height + 10;
             int count = 0;
@@ -164,7 +166,7 @@ namespace U5Designs
 
                     GL.PushMatrix();
                     saveFontHighlighted.Options.Colour = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
-                    GL.Translate(eng.Width * 0.5f - 16 * (float)(1 + Math.Sin(cnt * 4)), yOffset, 0f);
+                    GL.Translate(-16 * (float)(1 + Math.Sin(cnt * 4)), yOffset, 0f);
                     saveFontHighlighted.Print(s, QFontAlignment.Centre);
                     GL.PopMatrix();
                 }
@@ -173,14 +175,14 @@ namespace U5Designs
                     GL.PushMatrix();
                     // Draw non highlighted string
                     saveFont.Options.DropShadowActive = false;
-                    saveFont.Print(s, new Vector2(eng.Width * 0.5f - (saveFont.Measure(s).Width / 2), yOffset));
+                    saveFont.Print(s, new Vector2(-(saveFont.Measure(s).Width / 2), yOffset));
                     GL.PopMatrix();
                 }
                 yOffset += saveFont.Measure(s).Height + (0.5f * saveFont.Measure(s).Height);
                 count++;
             }
-            //GL.PopMatrix();
-            QFont.End();
+            GL.PopMatrix();
+            //QFont.End();
         }
 
         private void DealWithInput()

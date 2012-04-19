@@ -276,10 +276,13 @@ namespace U5Designs
                 levelMusic.Stop();
             }
             int nextlevelID = levelID + 1;
-            PlayState ps = new PlayState(eng, menustate, nextlevelID);
-            LoadScreenState ls = new LoadScreenState(eng, ps, nextlevelID);
-            eng.ChangeState(ls);
-
+			if(nextlevelID <= 1) {
+				PlayState ps = new PlayState(eng, menustate, nextlevelID);
+				LoadScreenState ls = new LoadScreenState(eng, ps, nextlevelID);
+				eng.ChangeState(ls);
+			} else { //Don't load the next level if the next level doesn't exist
+				eng.ChangeState(new MainMenuState(eng));
+			}
         }
 
         /// <summary>
