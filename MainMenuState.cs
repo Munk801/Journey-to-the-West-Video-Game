@@ -160,7 +160,11 @@ namespace U5Designs
         public override void Draw(FrameEventArgs e)
         {
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+			GL.MatrixMode(MatrixMode.Projection);
+			Matrix4 projection = Matrix4.CreateOrthographic(1280, 720, 1.0f, 6400.0f);
+			GL.LoadMatrix(ref projection);
 
             Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
             GL.MatrixMode(MatrixMode.Modelview);
@@ -230,10 +234,13 @@ namespace U5Designs
         // Draw stuff
         public void drawButtons()
         {
-            QFont.Begin();
+            //QFont.Begin();
             //GL.Translate(eng.Width * 0.5f, eng.Height*0.25f, 0f); 
-            float startY = eng.Height * 0.5f;
-            title.Print("Main Menu", new Vector2(eng.Width * 0.5f - (title.Measure("Main Menu").Width / 2), startY - (title.Measure("A").Height + 10)));
+			GL.PushMatrix();
+			GL.Scale(1, -1, 1);
+
+            float startY = 0.0f;
+            title.Print("Main Menu", new Vector2(-(title.Measure("Main Menu").Width / 2), startY - (title.Measure("A").Height + 10)));
             title.Options.DropShadowActive = true;
             //float yOffset = startY + title.Measure("Available Save Points").Height; 
             float yOffset = startY;// -title.Measure("A").Height;
@@ -246,7 +253,7 @@ namespace U5Designs
 
                     GL.PushMatrix();
                     buttonHighlight.Options.Colour = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
-                    GL.Translate(eng.Width * 0.5f - 16 * (float)(1 + Math.Sin(cnt * 4)), yOffset, 0f);
+                    GL.Translate(-16 * (float)(Math.Sin(cnt * 4)), yOffset, 0f);
                     buttonHighlight.Print(s, QFontAlignment.Centre);
                     GL.PopMatrix();
                 }
@@ -255,14 +262,14 @@ namespace U5Designs
                     GL.PushMatrix();
                     // Draw non highlighted string
                     button.Options.DropShadowActive = false;
-                    button.Print(s, new Vector2(eng.Width * 0.5f - (button.Measure(s).Width / 2), yOffset));
+                    button.Print(s, new Vector2(-(button.Measure(s).Width / 2), yOffset));
                     GL.PopMatrix();
                 }
                 yOffset += button.Measure(s).Height + (10);
                 count++;
             }
-            //GL.PopMatrix();
-            QFont.End();
+            //QFont.End();
+			GL.PopMatrix();
         }
 
 		/// <summary>
