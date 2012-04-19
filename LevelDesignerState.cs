@@ -18,8 +18,10 @@ using System.Drawing;
 using System.Threading;
 using System.Windows.Markup;
 using System.IO;
+using QuickFont;
 using KeyboardState = OpenTK.Input.KeyboardState;
 using Keyboard = OpenTK.Input.Keyboard;
+using System.Text;
 
 namespace U5Designs
 {
@@ -28,10 +30,13 @@ namespace U5Designs
     {
         // Our current selected object for movement
         internal GameObject SelectedObject = null;
-        
+        QFont currentObj, controls, ahSnap, whichList;
+        bool showUI = true;
+        double timer = 0;
+        StringBuilder controlsText;
         System.Windows.Application app;
         MainWindow window;
-        
+
         bool windowInit;
         // Changes ortho projection
         double orthoWidth = 192;
@@ -43,14 +48,11 @@ namespace U5Designs
         // Number of items and current item in the Enemies List
 
 
-        Dictionary<int, List<string>> ObjectList = new Dictionary<int,List<string>>();
+        Dictionary<int, List<string>> ObjectList = new Dictionary<int, List<string>>();
         int listKey = 0;
 
         // Switches to control keyboard presses
-        bool leftBDown = false;
-        bool rightBDown = false;
         bool AllowSnapping = false;
-        bool MoveKeyDown = false;
         KeyboardState Old_Key_State;
         float UnitsToMove = 1.0f;
         /** These Dictionarys will map Vector3's to different game objects that will then be written out to a level file.  When the user adds
@@ -74,40 +76,40 @@ namespace U5Designs
         Dictionary<Vector3, int> _xml_boss_center_list;
         List<Vector3> _xml_end_region;
 
-        MyTextWriter textWriter;
-
         #region Constructor
         /// <summary>
         /// PlayState is the state in which the game is actually playing, this should only be called once when a new game is made.
         /// </summary>
         /// <param name="engine">Pointer to the game engine</param>
         /// <param name="lvl">the level ID</param>
-		public LevelDesignerState(GameEngine engine, MainMenuState menustate, int lvl)
+        public LevelDesignerState(GameEngine engine, MainMenuState menustate, int lvl)
             : base(engine, menustate, lvl)
         {
-            eng.WindowState = WindowState.Normal;
-            eng.WindowBorder = WindowBorder.Fixed;
-			current_level = lvl;
-			LoadLevel.Load(lvl, this);
+            //eng.WindowState = WindowState.Normal;
+            //eng.WindowBorder = WindowBorder.Fixed;
+            current_level = lvl;
+            LoadLevel.Load(lvl, this);
 
             Old_Key_State = Keyboard.GetState();
-			//Have to load the next few things here for now because they require the GraphicsContext
-			foreach(RenderObject ro in renderList) {
-				if(ro.is3dGeo) {
-					ro.texture.init();
-				}
-			}
+            //Have to load the next few things here for now because they require the GraphicsContext
+            foreach (RenderObject ro in renderList)
+            {
+                if (ro.is3dGeo)
+                {
+                    ro.texture.init();
+                }
+            }
 
-			//HUD Health Bar
-			Assembly assembly = Assembly.GetExecutingAssembly();
-			eng.StateTextureManager.LoadTexture("Healthbar", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_top.png"));
-			Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
-			eng.StateTextureManager.LoadTexture("bHealth", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_bottom.png"));
-			bHealth = eng.StateTextureManager.GetTexture("bHealth");
+            //HUD Health Bar
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            eng.StateTextureManager.LoadTexture("Healthbar", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_top.png"));
+            Healthbar = eng.StateTextureManager.GetTexture("Healthbar");
+            eng.StateTextureManager.LoadTexture("bHealth", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.healthbar_bottom.png"));
+            bHealth = eng.StateTextureManager.GetTexture("bHealth");
 
-			//initialize camera
-			camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player, this);
-			player.cam = camera;
+            //initialize camera
+            camera = new Camera(eng.ClientRectangle.Width, eng.ClientRectangle.Height, player, this);
+            player.cam = camera;
 
 
 
@@ -132,17 +134,34 @@ namespace U5Designs
             //    }
             //}
 
-            _xml_dec_list = new Dictionary<Vector3,int>();
+            _xml_dec_list = new Dictionary<Vector3, int>();
             _xml_enemy_list = new Dictionary<int, List<Vector3>>();
-            _xml_sound_list = new Dictionary<string,int>();
-            _xml_bg_list = new Dictionary<BackGroundData,int>();
-            _xml_boss_area_list = new Dictionary<Vector3,int>();
+            _xml_sound_list = new Dictionary<string, int>();
+            _xml_bg_list = new Dictionary<BackGroundData, int>();
+            _xml_boss_area_list = new Dictionary<Vector3, int>();
             _xml_boss_bounds_list = new Dictionary<Vector3, int>();
             _xml_boss_center_list = new Dictionary<Vector3, int>();
             _xml_end_region = new List<Vector3>();
 
             //StartDesignerThread();
-            textWriter = new MyTextWriter(eng.ClientSize, new Size(200, 200));
+            currentObj = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            currentObj.Options.DropShadowActive = false;
+            controls = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            controls.Options.DropShadowActive = false;
+            ahSnap = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            ahSnap.Options.DropShadowActive = false;
+            whichList = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            whichList.Options.DropShadowActive = false;
+
+            controlsText = new StringBuilder();
+            controlsText.AppendLine("WASD - Camera/Character Movement");
+            controlsText.AppendLine("Up,Down,Left,Right - Movement selected object");
+            controlsText.AppendLine("Mouse Click Left/Right - Select/Add/Remove Objects");
+            controlsText.AppendLine("[ ] - Switch Objects");
+            controlsText.AppendLine("; - Switch between different objects");
+            controlsText.AppendLine("\\ - Switch number of units to move");
+
+
         }
         #endregion
 
@@ -262,7 +281,6 @@ namespace U5Designs
             }
             //Update the camera whether we're transitioning or not
             camera.Update(e.Time);
-            //textWriter.UpdateText();
         }
 
         //Called by camera for parallaxing
@@ -286,31 +304,39 @@ namespace U5Designs
         /// <param name="e">FrameEventArgs from OpenTK's update</param>
         public override void Draw(FrameEventArgs e)
         {
-            //e = new FrameEventArgs(e.Time * 0.1);
-            
+            ////e = new FrameEventArgs(e.Time * 0.1);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-           
             camera.SetModelView();
+
+
+            for (int i = effectsList.Count - 1; i >= 0; i--)
+            {
+                effectsList[i].update(e.Time);
+            }
 
             foreach (RenderObject obj in renderList)
             {
-                if ((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d) || camera.isInTransition)
+                if (obj.ScreenRegion == GameObject.ON_SCREEN || obj.drawWhenOffScreen)
                 {
-                    if (obj.is3dGeo)
+                    if ((camera.isInTransition && ((!nowBillboarding && obj.existsIn2d) || (nowBillboarding && obj.existsIn3d))) ||
+                        (!camera.isInTransition && ((enable3d && obj.existsIn3d) || (!enable3d && obj.existsIn2d))))
                     {
-                        obj.doScaleTranslateAndTexture();
-                        obj.mesh.Render();
-                    }
-                    else
-                    {
-                        obj.doScaleTranslateAndTexture();
-                        if (camera.isInTransition)
-                        { //Pause all animations in transition
-                            obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+                        if (obj.is3dGeo)
+                        {
+                            obj.doScaleTranslateAndTexture();
+                            obj.mesh.Render();
                         }
                         else
                         {
-                            obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+                            obj.doScaleTranslateAndTexture();
+                            if (camera.isInTransition)
+                            { //Pause all animations in transition
+                                obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+                            }
+                            else
+                            {
+                                obj.frameNumber = obj.sprite.draw(nowBillboarding, obj.billboards, obj.cycleNumber, obj.frameNumber + obj.animDirection * e.Time);
+                            }
                         }
                     }
                 }
@@ -322,7 +348,17 @@ namespace U5Designs
                 m.doScaleTranslateAndTexture();
                 m.frameNumber = m.sprite.draw(nowBillboarding, m.billboards, m.cycleNumber, m.frameNumber + m.animDirection * e.Time);
             }
-            //textWriter.Draw();
+
+            if (showUI)
+            {
+                DrawUI();
+                timer = timer + e.Time;
+                if (timer > 3.0)
+                {
+                    showUI = false;
+                    timer = 0;
+                }
+            }
         }
 
 
@@ -385,6 +421,13 @@ namespace U5Designs
         {
             KeyboardState New_Key_State = Keyboard.GetState();
             // SAVE THE CURRENT LEVEL TO A NEW LEVEL
+            if (New_Key_State.IsKeyDown(Key.Period) && !Old_Key_State.IsKeyDown(Key.Period) ||
+                New_Key_State.IsKeyDown(Key.BracketLeft) && !Old_Key_State.IsKeyDown(Key.BracketLeft) ||
+                New_Key_State.IsKeyDown(Key.BracketRight) && !Old_Key_State.IsKeyDown(Key.BracketRight) ||
+                New_Key_State.IsKeyDown(Key.BackSlash) && !Old_Key_State.IsKeyDown(Key.BackSlash) ||
+                New_Key_State.IsKeyDown(Key.Semicolon) && !Old_Key_State.IsKeyDown(Key.Semicolon))
+                showUI = true;
+
             if (New_Key_State.IsKeyDown(Key.Period) && !Old_Key_State.IsKeyDown(Key.Period))
             {
                 _write_level_file("TestLevelWrite", 99);
@@ -499,15 +542,15 @@ namespace U5Designs
                     if (objectIter - 1 < 0)
                         objectIter = ObjectList[listKey].Count - 1;
                     else objectIter--;
-                    
+
                     Console.WriteLine("Using {0}", ObjectList[listKey][objectIter]);
                 }
                 if (New_Key_State.IsKeyDown(Key.BracketRight) && !Old_Key_State.IsKeyDown(Key.BracketRight))
                 {
-                    if (objectIter + 1 > ObjectList[listKey].Count -1)
+                    if (objectIter + 1 > ObjectList[listKey].Count - 1)
                         objectIter = 0;
                     else objectIter++;
-                    
+
 
                     Console.WriteLine("Using {0}", ObjectList[listKey][objectIter]);
                 }
@@ -546,7 +589,7 @@ namespace U5Designs
             Old_Key_State = New_Key_State;
         }
 
-        private void MoveObjects( GameObject gameObj, Vector3 newLoc)
+        private void MoveObjects(GameObject gameObj, Vector3 newLoc)
         {
             if (gameObj == null) return;
 
@@ -582,7 +625,7 @@ namespace U5Designs
                 objList[index].location += newLoc;
                 // Alter the dictionary location when we move objects
             }
-            
+
         }
         private void HandleMouseInput()
         {
@@ -615,7 +658,7 @@ namespace U5Designs
                 }
 
                 Vector3 loc = new Vector3((float)mouseWorld.X, (float)mouseWorld.Y, 50.0f);
-                
+
                 // Handle adding enemies
                 if (listKey == 1)
                 {
@@ -738,7 +781,7 @@ namespace U5Designs
                             objToRemove = (Obstacle)obj;
                             foreach (int key in _xml_obstacle_list.Keys)
                             {
-                                if(_xml_obstacle_list[key].Contains(objToRemove.location))
+                                if (_xml_obstacle_list[key].Contains(objToRemove.location))
                                 {
                                     _xml_obstacle_list[key].Remove(objToRemove.location);
                                 }
@@ -796,7 +839,7 @@ namespace U5Designs
                     physList.Remove((PhysicsObject)objToRemove);
                     renderList.Remove((RenderObject)objToRemove);
                 }
-                
+
             }
 
         }
@@ -824,6 +867,44 @@ namespace U5Designs
         #endregion
 
 
+        public void DrawUI()
+        {
+            float startY = eng.Height * 0.1f;
+            float startX = eng.Width * 0.3f;
+            float contrStartX = eng.Width * 0.7f;
+            string list = "Obstacles";
+            if (listKey == 1)
+            {
+                list = "Enemies";
+            }
+            GL.Disable(EnableCap.DepthTest);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.PushMatrix();
+            GL.LoadIdentity();
+            GL.Ortho(0, 1280, 0, 720, 0, 1);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.PushMatrix();
+            GL.LoadIdentity();
+            GL.PushMatrix();
+            QFont.Begin();
+            currentObj.Print(ObjectList[listKey][objectIter], new Vector2(startX - (currentObj.Measure(ObjectList[listKey][objectIter]).Width / 2), startY - (currentObj.Measure("A").Height + 10)));
+            ahSnap.Print("Units to Move: " + UnitsToMove.ToString(), new Vector2(eng.Width * 0.1f, eng.Height - (currentObj.Measure("A").Height + 10)));
+            whichList.Print(list, new Vector2(eng.Width * 0.8f, eng.Height - (currentObj.Measure("A").Height + 10)));
+
+            GL.Scale(0.4, 0.4, 0.4);
+            GL.Translate((double)contrStartX, 0, 0);
+            controls.Print(controlsText.ToString(), new Vector2(contrStartX, startY - (currentObj.Measure("A").Height + 10)));
+            QFont.End();
+            GL.PopMatrix();
+
+            GL.PopMatrix();
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.PopMatrix();
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.Enable(EnableCap.DepthTest);
+
+        }
+
         /*--------------------------------------------------------------------------------------------------------------
          * 
          *                                              LEVEL DESIGNER FILE METHODS
@@ -834,12 +915,12 @@ namespace U5Designs
         public List<string> GetItemsFromDir(string filename)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
-            string _o_path ="U5Designs.Resources.Data." + filename;
+            string _o_path = "U5Designs.Resources.Data." + filename;
             Stream fstream = assembly.GetManifestResourceStream(_o_path);
             StreamReader r = new StreamReader(fstream);
             List<string> obstacleList = new List<string>();
             string obs = r.ReadLine();
-            while( obs != null)
+            while (obs != null)
             {
                 obstacleList.Add(obs);
                 obs = r.ReadLine();
@@ -902,12 +983,13 @@ namespace U5Designs
                 ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
 
                 XmlNodeList _b = doc.GetElementsByTagName("bmp");
-				List<Bitmap> texFrames = new List<Bitmap>();
-				foreach(XmlNode n in _b) {
-					texFrames.Add(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + n.InnerText)));
-				}
+                List<Bitmap> texFrames = new List<Bitmap>();
+                foreach (XmlNode n in _b)
+                {
+                    texFrames.Add(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + n.InnerText)));
+                }
                 MeshTexture _bmp = new MeshTexture(texFrames);
-				_bmp.init();
+                _bmp.init();
 
                 dec = new Decoration(loc, scale, _draw2, _draw3, _mesh, _bmp);
             }
@@ -974,12 +1056,13 @@ namespace U5Designs
                 ObjMesh _mesh = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry." + _m.Item(0).InnerText));
 
                 XmlNodeList _b = doc.GetElementsByTagName("bmp");
-				List<Bitmap> texFrames = new List<Bitmap>();
-				foreach(XmlNode n in _b) {
-					texFrames.Add(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + n.InnerText)));
-				}
+                List<Bitmap> texFrames = new List<Bitmap>();
+                foreach (XmlNode n in _b)
+                {
+                    texFrames.Add(new Bitmap(assembly.GetManifestResourceStream("U5Designs.Resources.Textures." + n.InnerText)));
+                }
                 MeshTexture _tex = new MeshTexture(texFrames);
-				_tex.init();
+                _tex.init();
 
                 o = new Obstacle(loc, scale, pbox, _draw2, _draw3, _collides2d, _collides3d, _mesh, _tex);
                 fstream.Close();
@@ -994,37 +1077,40 @@ namespace U5Designs
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             XmlReaderSettings settings = new XmlReaderSettings();
-			settings.IgnoreComments = true;
+            settings.IgnoreComments = true;
 
-			string _e_path = "U5Designs.Resources.Data.Enemies." + path;
-			Stream fstream = assembly.GetManifestResourceStream(_e_path);
-			XmlDocument doc = new XmlDocument();
-			XmlReader reader = XmlReader.Create(fstream, settings);
-			doc.Load(reader);
+            string _e_path = "U5Designs.Resources.Data.Enemies." + path;
+            Stream fstream = assembly.GetManifestResourceStream(_e_path);
+            XmlDocument doc = new XmlDocument();
+            XmlReader reader = XmlReader.Create(fstream, settings);
+            doc.Load(reader);
 
-			Vector3 scale = LoadLevel.parseVector3(doc.GetElementsByTagName("scale")[0]);
-			Vector3 pbox = LoadLevel.parseVector3(doc.GetElementsByTagName("pbox")[0]);
-			Vector3 cbox = LoadLevel.parseVector3(doc.GetElementsByTagName("cbox")[0]);
-			bool draw_2d = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
-			bool draw_3d = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
-			int _health = Convert.ToInt32(doc.GetElementsByTagName("health")[0].InnerText);
-			int _damage = Convert.ToInt32(doc.GetElementsByTagName("damage")[0].InnerText);
-			float _speed = Convert.ToSingle(doc.GetElementsByTagName("speed")[0].InnerText);
-			int _AI = Convert.ToInt32(doc.GetElementsByTagName("AI")[0].InnerText);
-			string _sprite_path = doc.GetElementsByTagName("sprite")[0].InnerText;
-			string _death_path = doc.GetElementsByTagName("death")[0].InnerText;
-			XmlNodeList _proj = doc.GetElementsByTagName("proj");
-			fstream.Close();
+            Vector3 scale = LoadLevel.parseVector3(doc.GetElementsByTagName("scale")[0]);
+            Vector3 pbox = LoadLevel.parseVector3(doc.GetElementsByTagName("pbox")[0]);
+            Vector3 cbox = LoadLevel.parseVector3(doc.GetElementsByTagName("cbox")[0]);
+            bool draw_2d = Convert.ToBoolean(doc.GetElementsByTagName("draw2")[0].InnerText);
+            bool draw_3d = Convert.ToBoolean(doc.GetElementsByTagName("draw3")[0].InnerText);
+            int _health = Convert.ToInt32(doc.GetElementsByTagName("health")[0].InnerText);
+            int _damage = Convert.ToInt32(doc.GetElementsByTagName("damage")[0].InnerText);
+            float _speed = Convert.ToSingle(doc.GetElementsByTagName("speed")[0].InnerText);
+            int _AI = Convert.ToInt32(doc.GetElementsByTagName("AI")[0].InnerText);
+            string _sprite_path = doc.GetElementsByTagName("sprite")[0].InnerText;
+            string _death_path = doc.GetElementsByTagName("death")[0].InnerText;
+            XmlNodeList _proj = doc.GetElementsByTagName("proj");
+            fstream.Close();
 
-			SpriteSheet ss = LoadLevel.parseSpriteFile(_sprite_path);
-			Effect death = LoadLevel.parseEffectFile(_death_path, this);
+            SpriteSheet ss = LoadLevel.parseSpriteFile(_sprite_path);
+            Effect death = LoadLevel.parseEffectFile(_death_path, this);
 
-			if(_proj.Count == 0) {
-				return new Enemy(player, location, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, death);
-			} else {
-				ProjectileProperties proj = LoadLevel.parseProjectileFile(_proj[0].InnerText, this);
-				return new Enemy(player, location, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, death, proj);
-			}
+            if (_proj.Count == 0)
+            {
+                return new Enemy(player, location, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, death);
+            }
+            else
+            {
+                ProjectileProperties proj = LoadLevel.parseProjectileFile(_proj[0].InnerText, this);
+                return new Enemy(player, location, scale, pbox, cbox, draw_2d, draw_3d, _health, _damage, _speed, _AI, ss, death, proj);
+            }
         }
         #endregion
 
@@ -1078,7 +1164,7 @@ namespace U5Designs
                 }
 
                 if (_xml_end_region.Count > 0)
-                {                    
+                {
                     foreach (Vector3 v in _xml_end_region)
                     {
                         writer.WriteStartElement("endRegion");
@@ -1086,7 +1172,7 @@ namespace U5Designs
                         writer.WriteAttributeString("y", ((int)(v.Y)).ToString());
                         writer.WriteAttributeString("z", ((int)(v.Z)).ToString());
                         writer.WriteEndElement();
-                    }                    
+                    }
                 }
 
                 if (_xml_sound_list.Count > 0)
