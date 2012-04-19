@@ -182,6 +182,9 @@ namespace U5Designs {
             string[] splits = file.Split('.');
             String fname = splits[splits.Length-2] + "." + splits[splits.Length-1];
             saveDoc.Save(fname);
+
+            // Set player name
+            p.p_state.setName(p.p_state.getName());
         }
 
 		//Takes an XmlNode with attributes x, y, and z and turns it into a Vector3
