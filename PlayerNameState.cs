@@ -300,6 +300,8 @@ namespace U5Designs
             musicFile.Stop();            
             name = name.Substring(name.IndexOf(' ') + 1);
             eng._player_name = name;
+            //StoryInstructionState sis = new StoryInstructionState(eng, _ms);
+            //eng.ChangeState(sis);
             PlayState ps = new PlayState(eng, _ms, lvl);            
             LoadScreenState ls = new LoadScreenState(eng, ps, lvl);
             eng.ChangeState(ls);

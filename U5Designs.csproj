@@ -70,6 +70,7 @@
     <Compile Include="LoadScreenState.cs" />
     <Compile Include="MyTextWriter.cs" />
     <Compile Include="PlayerNameState.cs" />
+    <Compile Include="StoryInstructionState.cs" />
     <Compile Include="ZookeeperAI.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Decoration.cs" />

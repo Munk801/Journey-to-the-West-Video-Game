@@ -275,7 +275,15 @@ namespace U5Designs
             XmlDocument doc = new XmlDocument();
 
             Assembly assembly = Assembly.GetExecutingAssembly();
-            Stream fstream = assembly.GetManifestResourceStream("U5Designs.Resources.test.sav");
+            Stream fstream;
+            if (!File.Exists("test.sav"))
+            {
+                fstream = assembly.GetManifestResourceStream("U5Designs.Resources.test.sav");
+            }
+            else
+            {
+                fstream = File.OpenRead("test.sav");
+            }
             doc.Load(fstream);
             XmlNodeList games = doc.GetElementsByTagName("save");
 

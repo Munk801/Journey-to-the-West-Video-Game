@@ -101,7 +101,7 @@ namespace U5Designs
             title.Options.DropShadowActive = false;
             buttonHighlight = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
             buttonHighlight.Options.DropShadowActive = true;
-            //QFont.CreateTextureFontFiles("Fonts/Rock.TTF", 48, "myRock"); // Use this to create new Fonts that you will texture
+            //QFont.CreateTextureFontFiles("../../Fonts/HappySans.TTF", 32, "myStory"); // Use this to create new Fonts that you will texture
             // End QFonts
 
 			musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music.Menu.ogg"));
@@ -130,7 +130,7 @@ namespace U5Designs
             enterdown = false;
 
             // TEST //
-            LoadSavedState(1);
+            //LoadSavedState(1);
 
         }
 
@@ -179,47 +179,10 @@ namespace U5Designs
             GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
             // End Fonts
 
-            menu.Draw2DTexture();
-            
-            // Font stuff
+            menu.Draw2DTexture();            
+           
             drawButtons();
-            // End Font stuff
-
-            /*
-            switch (_cur_butn)
-            {
-                case 0:
-                    arrow.Draw2DTexture(arX, b1Y, 1.0f, 1.0f);
-                    play_press.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
-                    load_nopress.Draw2DTexture(0, b2Y);
-                    quit_nopress.Draw2DTexture(0, b3Y);
-                    ld_nopress.Draw2DTexture(0, b4Y);
-                    break;
-                case 1:
-                    arrow.Draw2DTexture(arX, b2Y);
-                    play_nopress.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
-                    load_press.Draw2DTexture(0, b2Y);
-                    quit_nopress.Draw2DTexture(0, b3Y);
-                    ld_nopress.Draw2DTexture(0, b4Y);
-                    break;
-                case 2:
-                    arrow.Draw2DTexture(arX, b3Y);
-                    play_nopress.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
-                    load_nopress.Draw2DTexture(0, b2Y);
-                    quit_press.Draw2DTexture(0, b3Y);
-                    ld_nopress.Draw2DTexture(0, b4Y);
-                    break;
-                case 3:
-                    arrow.Draw2DTexture(arX, b4Y);
-                    play_nopress.Draw2DTexture(0, b1Y, 1.0f, 1.0f);
-                    load_nopress.Draw2DTexture(0, b2Y);
-                    quit_nopress.Draw2DTexture(0, b3Y);
-                    ld_press.Draw2DTexture(0, b4Y);
-                    break;
-            }
-             * */
-
-            // Fonts
+            
             GL.Enable(EnableCap.DepthTest);
         }
 
