@@ -327,6 +327,8 @@ namespace U5Designs
 				}
 			}
 
+			player.animUpdate();
+
 			//Draw the parabola if grenade is active
 			player.addMarkers();
 			foreach(Decoration m in player.markerList) {

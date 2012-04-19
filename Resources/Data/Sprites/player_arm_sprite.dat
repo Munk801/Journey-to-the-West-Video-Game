@@ -22,6 +22,24 @@
 	<bmp>monkey_arm_invisible.png</bmp>
 	<c_starts>0</c_starts>
 	<c_lengths>3</c_lengths>
+
+  <bmp>monkey_arm_throw_side_run.png</bmp>
+  <c_starts>0</c_starts>
+  <c_lengths>4</c_lengths>
+
+  <!--Change this one to back-->
+  <bmp>monkey_arm_throw_back_run.png</bmp>
+  <c_starts>0</c_starts>
+  <c_lengths>4</c_lengths>
+
+  <bmp>monkey_arm_throw_side_stand.png</bmp>
+  <c_starts>0</c_starts>
+  <c_lengths>4</c_lengths>
+
+  <!--Change this one to back-->
+  <bmp>monkey_arm_throw_back_stand.png</bmp>
+  <c_starts>0</c_starts>
+  <c_lengths>4</c_lengths>
   
 	<t_width>600</t_width>
 	<t_height>600</t_height>

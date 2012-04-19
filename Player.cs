@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 
 namespace U5Designs {
-	public enum PlayerAnim { stand2d=0, stand3d=1, walk2d=2, walk3d=3, spin2d=4, spin3d=5 };
+	public enum PlayerAnim { stand2d=0, stand3d=1, walk2d=2, walk3d=3, spin2d=4, spin3d=5, throwRun2d=6, throwRun3d=7, throwStand2d=8, throwStand3d=9 };
 
     public class Player : GameObject, RenderObject, PhysicsObject, CombatObject
     {
@@ -170,8 +170,6 @@ namespace U5Designs {
         /// <param name="time">time elapsed since last update</param>
         internal void updateState(bool enable3d, KeyboardDevice keyboard, double time) {
 			this.enable3d = enable3d;
-
-			Debug.Assert(_scale.X < 0 == arms.scaleX < 0, "Arms are backwards!");
 
 			//Update timers
 			if(stamina < maxStamina) {
@@ -342,6 +340,27 @@ namespace U5Designs {
         }
 		#endregion
 
+		private double prevArmFrameNum;
+
+		/// <summary>
+		/// Called during draw; decides if an animation needs to change cycles
+		/// </summary>
+		public void animUpdate() {
+			switch((PlayerAnim)arms.cycleNumber) {
+				case PlayerAnim.throwRun2d:
+				case PlayerAnim.throwRun3d:
+				case PlayerAnim.throwStand2d:
+				case PlayerAnim.throwStand3d:
+					if(arms.frameNumber < prevArmFrameNum) {
+						arms.cycleNumber = _cycleNum;
+						arms.frameNumber = _frameNum;
+					} else {
+						prevArmFrameNum = arms.frameNumber;
+					}
+					break;
+			}
+		}
+
 		/// <summary>
 		/// Handles all keyboard input from the player
 		/// </summary>
@@ -367,6 +386,9 @@ namespace U5Designs {
 					//arms.animDirection = _animDirection = (velocity.X >= 0 ? 1 : 1);
 					if(!spinning) {
 						cycleNumber = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
+						if(arms.cycleNumber != _cycleNum) {
+							arms.cycleNumber = (int)(velocity.X == 0 ? PlayerAnim.throwStand3d : PlayerAnim.throwRun3d);
+						}
 					}
 
 					if(_scale.X < 0) {
@@ -389,6 +411,9 @@ namespace U5Designs {
 						if((velocity.X < 0 && _scale.X > 0) || (velocity.X > 0 && _scale.X < 0)) {
 							_scale.X = -_scale.X;
 							arms.scaleX = -arms.scaleX;
+						}
+						if(arms.cycleNumber != _cycleNum) {
+							arms.cycleNumber = (int)(velocity.X == 0 ? PlayerAnim.throwStand2d : PlayerAnim.throwRun2d);
 						}
 					}
 				}
@@ -462,6 +487,9 @@ namespace U5Designs {
 					velocity.Z = 0.0f;
 					isMobile = false;
 					cycleNumber = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
+					if(arms.cycleNumber != _cycleNum) {
+						arms.cycleNumber = (int)(enable3d ? PlayerAnim.throwStand3d : PlayerAnim.throwStand2d);
+					}
 				}
 				eDown = true;
 			} else if(!keyboard[Key.E]) {
@@ -497,6 +525,14 @@ namespace U5Designs {
 					stamina -= curProjectile.staminaCost;
 					projectileTimer = 0.25;
 
+					if(_cycleNum == (int)(enable3d ? PlayerAnim.walk3d : PlayerAnim.walk2d)) {
+						arms.cycleNumber = (int)(enable3d ? PlayerAnim.throwRun3d : PlayerAnim.throwRun2d);
+					} else { //standing
+						arms.cycleNumber = (int)(enable3d ? PlayerAnim.throwStand3d : PlayerAnim.throwStand2d);
+					}
+					arms.frameNumber = 0;
+					prevArmFrameNum = -1.0;
+
 					bananaSound.Play();
 				}
 				//TODO: If the player was out of stamina, flash the stamina bar to let them know what happened
@@ -518,7 +554,7 @@ namespace U5Designs {
                 spinning = true;
 				spinTimer = 0.5;
                 _speed = spinSpeed;
-				cycleNumber = (int)(enable3d ? PlayerAnim.spin3d : PlayerAnim.spin2d);
+				arms.cycleNumber = cycleNumber = (int)(enable3d ? PlayerAnim.spin3d : PlayerAnim.spin2d); //explicitly set arms to clear possible throw animation
             }
         }
 
@@ -1359,7 +1395,7 @@ namespace U5Designs {
                 velocity = new Vector3(0, 0, 0);
                 accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, kbspeed.Z * direction.Z);
 
-				cycleNumber = (int)PlayerAnim.stand3d; //TODO: Change to player damage animation
+				arms.cycleNumber = cycleNumber = (int)PlayerAnim.stand3d; //TODO: Change to player damage animation
             } else {
                 Vector3 direction = new Vector3(location.X - collidingObj.location.X, 0, 0);
                 direction.Normalize();
@@ -1371,7 +1407,7 @@ namespace U5Designs {
                 velocity = new Vector3(0, 0, 0);
                 accel = new Vector3(kbspeed.X * direction.X, kbspeed.Y, 0);
 
-				cycleNumber = (int)PlayerAnim.stand2d; //TODO: Change to player damage animation
+				arms.cycleNumber = cycleNumber = (int)PlayerAnim.stand2d; //TODO: Change to player damage animation
             }
         }
 
@@ -1441,14 +1477,24 @@ namespace U5Designs {
 
         private int _cycleNum;
         public int cycleNumber {
-            get { return _cycleNum; }
-            set { arms.cycleNumber = _cycleNum = value; }
+			get { return _cycleNum; }
+			set {
+				if(arms.cycleNumber == _cycleNum) {
+					arms.cycleNumber = value;
+				}
+				_cycleNum = value;
+			}
         }
 
         private double _frameNum; //index of the current animation frame
         public double frameNumber {
             get { return _frameNum; }
-            set { arms.frameNumber = _frameNum = value; }
+			set {
+				if(arms.cycleNumber == _cycleNum) {
+					arms.frameNumber = value;
+				}
+				_frameNum = value;
+			}
         }
 
         public Billboarding billboards {

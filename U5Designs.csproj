@@ -508,6 +508,10 @@
     <EmbeddedResource Include="Resources\Textures\zookeeper.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\monkey_arm_throw_back_run.png" />
+    <EmbeddedResource Include="Resources\Textures\monkey_arm_throw_back_stand.png" />
+    <EmbeddedResource Include="Resources\Textures\monkey_arm_throw_side_stand.png" />
+    <EmbeddedResource Include="Resources\Textures\monkey_arm_throw_side_run.png" />
     <EmbeddedResource Include="Resources\Textures\brick_wall_with_door.png" />
     <EmbeddedResource Include="Resources\Textures\monkey_arm_invisible.png" />
     <EmbeddedResource Include="Resources\Textures\monkey_arm_walk_back.png" />
