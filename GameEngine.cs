@@ -30,6 +30,8 @@ namespace U5Designs
         internal Assembly assembly;
 		internal int xOffset, yOffset; //Used for interpreting mouse coordinates when letterboxing
 
+        internal String _player_name; // Used to avoid passing this through multiple states
+
         /// <summary>Creates a 1280x720 window.</summary>
         public GameEngine() : base(1280, 720, GraphicsMode.Default, "Journey to the East") {
             VSync = VSyncMode.On;

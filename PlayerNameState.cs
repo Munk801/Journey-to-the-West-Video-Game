@@ -23,13 +23,20 @@ using System.IO;
 
 namespace U5Designs
 {
-    public class LoadGameState : GameState
+    class PlayerNameState : GameState
     {
         internal GameEngine eng;
         Stack<XmlNodeList> savedGameStates;
         Stack<string> savedGameChoices;
         MainMenuState _ms;
         QFont saveFont, title, saveFontHighlighted;
+
+
+        /** Naming Stuff **/
+        String name;
+        char[] alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();        
+        int _max_name_length = 20; // Set the max length for the character name here
+        float start_x;
 
         // A container which will hold the list of available saved games        
         protected Vector3 eye, lookat;
@@ -48,7 +55,7 @@ namespace U5Designs
         public bool clickdown = false;
         double cnt;
 
-        public LoadGameState(GameEngine engine, MainMenuState ms)
+        public PlayerNameState(GameEngine engine, MainMenuState ms)
         {
             eng = engine;
             mouse = eng.Mouse;
@@ -59,9 +66,7 @@ namespace U5Designs
             Assembly assembly = Assembly.GetExecutingAssembly();
             musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music.Menu.ogg"));
             musicFile.Play();
-
-            // Clear the color to work with the SplashScreen so it doesn't white out
-            //GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             lookat = new Vector3(0, 0, 2);
@@ -75,18 +80,13 @@ namespace U5Designs
             saveFont = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
             saveFont.Options.DropShadowActive = true;
 
+            start_x = saveFont.Measure("Name: ").Width;
+
             //title = QFont.FromQFontFile("myHappySans.qfont", new QFontLoaderConfiguration(true));
             title = QFont.FromQFontFile("../../Fonts/myRock.qfont", new QFontLoaderConfiguration(true));
             title.Options.DropShadowActive = true;
 
-            saveFontHighlighted = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
-            saveFont.Options.DropShadowActive = true;
-
-            //QFont.CreateTextureFontFiles("Fonts/HappySans.ttf", 48, "myHappySans2");
-
-            // Load available saved games
-            // Setup saved game data 
-            SavedGameDataSetup();
+            name = "Name: ";          
 
             numOfButtons = savedGameChoices.Count - 1;
         }
@@ -153,35 +153,37 @@ namespace U5Designs
 			GL.PushMatrix();
 			GL.Scale(1, -1, 1);
             //GL.Translate(eng.Width * 0.5f, eng.Height*0.25f, 0f); 
-            float startY = -(title.Measure("Available").Height * 2.0f);
-            title.Print("Available Save Games", new Vector2(-(title.Measure("Available Save Games").Width / 2), startY));
+            float startY = -(title.Measure("A").Height * 2.0f);
+            title.Print("Character Name", new Vector2(-(title.Measure("Character Name").Width / 2), startY));
             title.Options.DropShadowActive = false;
-            float yOffset = startY + title.Measure("Available Save Points").Height + 10;
+            float yOffset = startY + title.Measure("C").Height + 10;
             int count = 0;
-            foreach (string s in savedGameChoices)
-            {
-                if (count == _cur_butn)
-                {
+            //foreach (string s in savedGameChoices)
+            //{
+                //if (count == _cur_butn)
+                //{
                     // Draw highlighted string                   
 
-                    GL.PushMatrix();
-                    saveFontHighlighted.Options.Colour = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
-                    GL.Translate(-16 * (float)(1 + Math.Sin(cnt * 4)), yOffset, 0f);
-                    saveFontHighlighted.Print(s, QFontAlignment.Centre);
-                    GL.PopMatrix();
-                }
-                else
-                {
-                    GL.PushMatrix();
-                    // Draw non highlighted string
-                    saveFont.Options.DropShadowActive = false;
-                    saveFont.Print(s, new Vector2(-(saveFont.Measure(s).Width / 2), yOffset));
-                    GL.PopMatrix();
-                }
-                yOffset += saveFont.Measure(s).Height + (0.5f * saveFont.Measure(s).Height);
+                    //GL.PushMatrix();
+                    //saveFontHighlighted.Options.Colour = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
+                    //GL.Translate(-16 * (float)(1 + Math.Sin(cnt * 4)), yOffset, 0f);
+                    //saveFontHighlighted.Print(s, QFontAlignment.Centre);
+                    //GL.PopMatrix();
+                //}
+                //else
+                //{            
+                GL.PushMatrix();
+                // Draw non highlighted string
+                saveFont.Options.DropShadowActive = false;
+                saveFont.Print(name, new Vector2(-(start_x), yOffset));
+                GL.PopMatrix();
+                //}
+                yOffset += saveFont.Measure(name).Height + (0.5f * saveFont.Measure(name).Height);
                 count++;
-            }
-            GL.PopMatrix();
+                //}
+                GL.PopMatrix();          
+                
+            
             //QFont.End();
         }
 
@@ -192,7 +194,7 @@ namespace U5Designs
             if ((_new_state.IsKeyDown(Key.Down) && !_old_state.IsKeyDown(Key.Down)) ||
                 (_new_state.IsKeyDown(Key.S) && !_old_state.IsKeyDown(Key.S)))
             {
-                // Down key was just pressed
+                // Down key was just pressed                
                 if (_cur_butn < numOfButtons)
                 {
                     // Increment the current button index so you draw the highlighted button of the next button 
@@ -223,6 +225,38 @@ namespace U5Designs
                     eng.selectSound.Play();
                 }
             }
+
+            // Loop over all available keys and type out to the screen
+            for (int i = 0; i < (int)Key.LastKey; i++)
+            {
+                 Key k = (Key)i; // 49 = enter 
+                 bool current = _new_state.IsKeyDown(k);
+                 bool previous = _old_state.IsKeyDown(k);
+                 if (current && !previous)
+                 {
+                     // new key pressed
+                     //NewKeyDownDetected(k);
+                     for (int i2 = 0; i2 < alpha.Length; i2++)
+                     {
+                         if (k.ToString().CompareTo(alpha[i2].ToString()) == 0)
+                         {
+                             name += k.ToString();
+                         }
+                     }
+                     if (i == 53)
+                     {
+                         name = name.Remove(name.Length - 1);
+                     }
+                 }
+                 else if (!current && previous)
+                 {
+                     //NewKeyUpDetected(k);                     
+                 }
+                 else
+                 {
+                     // Constant keypress
+                 }
+            }
             _old_state = _new_state;
 
             if (eng.Keyboard[Key.Escape] && !escapedown)
@@ -238,12 +272,12 @@ namespace U5Designs
             if (eng.Keyboard[Key.Enter] && !enterdown)
             {
                 enterdown = true;
-                handleButtonPress();
+                handleButtonPress();  // Load game
             }
             else if (!eng.Keyboard[Key.Enter])
             {
                 enterdown = false;
-            }
+            }            
 
             //Minus - Toggle fullscreen
             if (eng.Keyboard[Key.Minus])
@@ -257,59 +291,16 @@ namespace U5Designs
         /// </summary>
         internal void handleButtonPress()
         {
-            // _cur_butn represents the index into SavedGames list, and Enter was just pressed so the user
-            // wishes to load that indexed game.  So get the index and call LoadLevel
-            String[] tmp = savedGameChoices.ElementAt(_cur_butn).Split(' ');
-            String _pname = tmp[1];
-            String _zone = tmp[3];
-            loadPlayState(Convert.ToInt16(_zone));
-        }
-
-        /**
-         * This method will handle setting up the needed structures for Saved Game states.  It will populate the choices data structure, and the state data 
-         * structure.
-        * */
-        public void SavedGameDataSetup()
-        {
-            // Parse XML saved game data file and store the information             
-            XmlDocument doc = new XmlDocument();
-
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            Stream fstream = assembly.GetManifestResourceStream("U5Designs.Resources.test.sav");
-            doc.Load(fstream);
-            XmlNodeList games = doc.GetElementsByTagName("save");
-
-            foreach (XmlNode n in games)
-            {
-                // Create a new list of nodes that will contain each data element from a particular saved game state
-                XmlNodeList nd = n.ChildNodes;
-
-                // Push each "saved" game state onto the stack
-                savedGameStates.Push(nd);
-
-                string str = "";
-                foreach (XmlNode n2 in nd)
-                {
-                    if (n2.Name.CompareTo("p_name") == 0)
-                    {
-                        str += "Name: " + n2.InnerText;
-                    }
-                    if (n2.Name.CompareTo("p_current_zone") == 0)
-                    {
-                        str += " Zone: " + n2.InnerText;
-                    }
-                }
-                //Console.WriteLine(str);
-                savedGameChoices.Push(str);
-            }
+            loadPlayState(0);
         }
 
         /** This loads the chosen game **/
         internal void loadPlayState(int lvl)
         {
-            musicFile.Stop();
-
-            PlayState ps = new PlayState(eng, _ms, lvl);
+            musicFile.Stop();            
+            name = name.Substring(name.IndexOf(' ') + 1);
+            eng._player_name = name;
+            PlayState ps = new PlayState(eng, _ms, lvl);            
             LoadScreenState ls = new LoadScreenState(eng, ps, lvl);
             eng.ChangeState(ls);
         }

@@ -94,12 +94,12 @@ namespace U5Designs
             _buttons.Add("Load Saved Game");
             _buttons.Add("Level Designer");
             _buttons.Add("Quit");
-            button = QFont.FromQFontFile("Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            button = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
             button.Options.DropShadowActive = true;
             //title = QFont.FromQFontFile("myHappySans.qfont", new QFontLoaderConfiguration(true));
-            title = QFont.FromQFontFile("Fonts/myRock.qfont", new QFontLoaderConfiguration(true));
+            title = QFont.FromQFontFile("../../Fonts/myRock.qfont", new QFontLoaderConfiguration(true));
             title.Options.DropShadowActive = false;
-            buttonHighlight = QFont.FromQFontFile("Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
+            buttonHighlight = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
             buttonHighlight.Options.DropShadowActive = true;
             //QFont.CreateTextureFontFiles("Fonts/Rock.TTF", 48, "myRock"); // Use this to create new Fonts that you will texture
             // End QFonts
@@ -278,7 +278,10 @@ namespace U5Designs
 		internal void handleButtonPress() {
 			switch(_cur_butn) {
 				case 0: //new game
-					loadPlayState(0);
+					//loadPlayState(0);
+                    PlayerNameState _PS = new PlayerNameState(eng, this);
+                    musicFile.Stop();
+                    eng.ChangeState(_PS);
 					break;
 				case 1: //load saved game
 					//loadPlayState(saved_level_index);

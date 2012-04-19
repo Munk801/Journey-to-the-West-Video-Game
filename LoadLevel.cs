@@ -67,8 +67,10 @@ namespace U5Designs {
 			playerProjectiles.Add(parseProjectileFile("banana_projectile.dat", ps));
 			playerProjectiles.Add(parseProjectileFile("coconut_grenade_projectile.dat", ps));
 
-			ps.player = new Player(parseSpriteFile("player_sprite.dat"), parseSpriteFile("player_arm_sprite.dat"), playerProjectiles, ps);
+			ps.player = new Player(parseSpriteFile("player_sprite.dat"), parseSpriteFile("player_arm_sprite.dat"), playerProjectiles, ps);            
 			ps.player.marker = parseSpriteFile("marker_sprite.dat");
+            GameEngine ge = ps.eng;
+            ps.player.p_state.setName(ge._player_name);
 			ps.physList.Add(ps.player);
 			ps.renderList.Add(ps.player);
 
@@ -120,7 +122,65 @@ namespace U5Designs {
 			ps.staminaBack = parseSpriteFile("stamina_back.dat");
 			ps.staminaBar = parseSpriteFile("stamina_bar.dat");
 			ps.staminaFrame = parseSpriteFile("stamina_frame.dat");
+
+            // Auto Save
+            autoSave(ps.player, level_to_load);
 		}
+
+        ///
+        // This auto saves the current level and player name
+        //
+        public static void autoSave(Player p, int lvl_index)
+        {
+            // Root node
+            XmlNode root;
+            
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string file = "U5Designs.Resources.test.sav";
+            Stream fstream = assembly.GetManifestResourceStream(file);
+            XmlDocument saveDoc = new XmlDocument();
+            saveDoc.Load(fstream);
+
+            // Set root node
+            root = saveDoc.DocumentElement;
+
+            // Create children nodes and set their InnerText values
+            XmlNode save_node = saveDoc.CreateNode(XmlNodeType.Element, "save", "");
+            XmlNode pname_node = saveDoc.CreateNode(XmlNodeType.Element, "p_name", "");
+            pname_node.InnerText = p.p_state.getName();
+            XmlNode p_current_zone_node = saveDoc.CreateNode(XmlNodeType.Element, "p_current_zone", "");
+            p_current_zone_node.InnerText = lvl_index.ToString();
+            XmlNode p_health_node = saveDoc.CreateNode(XmlNodeType.Element, "p_health", "");
+            p_health_node.InnerText = p.p_state.getHealth().ToString();
+            XmlNode p_damage_node = saveDoc.CreateNode(XmlNodeType.Element, "p_damage", "");
+            p_damage_node.InnerText = p.p_state.getDamage().ToString();
+            XmlNode p_speed_node = saveDoc.CreateNode(XmlNodeType.Element, "p_speed", "");
+            p_speed_node.InnerText = p.p_state.getSpeed().ToString();
+            XmlNode abilities_node = saveDoc.CreateNode(XmlNodeType.Element, "abilities", "");
+            String tmp_abil = "";
+            for(int i = 0; i < p.p_state.getAbilities().Count; i++)
+            {
+                tmp_abil += p.p_state.getAbilities().ElementAt(i).ToString();
+                tmp_abil += " ";
+            }
+            abilities_node.InnerText = tmp_abil;
+
+            // Append childredn to <save> node
+            save_node.AppendChild(pname_node);
+            save_node.AppendChild(p_current_zone_node);
+            save_node.AppendChild(p_health_node);
+            save_node.AppendChild(p_damage_node);
+            save_node.AppendChild(p_speed_node);
+            save_node.AppendChild(abilities_node);
+
+            // Append new Save to root node
+            root.AppendChild(save_node);
+            
+            // save file
+            string[] splits = file.Split('.');
+            String fname = splits[splits.Length-2] + "." + splits[splits.Length-1];
+            saveDoc.Save(fname);
+        }
 
 		//Takes an XmlNode with attributes x, y, and z and turns it into a Vector3
 		public static Vector3 parseVector3(XmlNode n) {
