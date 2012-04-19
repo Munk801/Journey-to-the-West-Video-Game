@@ -424,7 +424,7 @@ namespace U5Designs
             if (New_Key_State.IsKeyDown(Key.Period) && !Old_Key_State.IsKeyDown(Key.Period) ||
                 New_Key_State.IsKeyDown(Key.BracketLeft) && !Old_Key_State.IsKeyDown(Key.BracketLeft) ||
                 New_Key_State.IsKeyDown(Key.BracketRight) && !Old_Key_State.IsKeyDown(Key.BracketRight) ||
-                New_Key_State.IsKeyDown(Key.BackSlash) && !Old_Key_State.IsKeyDown(Key.BackSlash) ||
+                New_Key_State.IsKeyDown(Key.Slash) && !Old_Key_State.IsKeyDown(Key.Slash) ||
                 New_Key_State.IsKeyDown(Key.Semicolon) && !Old_Key_State.IsKeyDown(Key.Semicolon))
                 showUI = true;
 
@@ -435,7 +435,7 @@ namespace U5Designs
             }
 
             // Allow snapping for movement
-            if (New_Key_State.IsKeyDown(Key.BackSlash) && !Old_Key_State.IsKeyDown(Key.BackSlash))
+            if (New_Key_State.IsKeyDown(Key.Slash) && !Old_Key_State.IsKeyDown(Key.Slash))
             {
                 AllowSnapping = !AllowSnapping;
                 if (AllowSnapping)
