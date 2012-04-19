@@ -77,16 +77,16 @@ namespace U5Designs
             eng.StateTextureManager.LoadTexture("menu", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
             menu = eng.StateTextureManager.GetTexture("menu");
 
-            saveFont = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            saveFont = QFont.FromQFontFile("Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
             saveFont.Options.DropShadowActive = true;
 
             start_x = saveFont.Measure("Name: ").Width;
 
             //title = QFont.FromQFontFile("myHappySans.qfont", new QFontLoaderConfiguration(true));
-            title = QFont.FromQFontFile("../../Fonts/myRock.qfont", new QFontLoaderConfiguration(true));
+            title = QFont.FromQFontFile("Fonts/myRock.qfont", new QFontLoaderConfiguration(true));
             title.Options.DropShadowActive = true;
 
-            name = "Name: ";          
+            name = "";          
 
             numOfButtons = savedGameChoices.Count - 1;
         }
@@ -128,20 +128,10 @@ namespace U5Designs
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
-            //glTexEnv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, /*color you want*/)
-            //GL.TexEnv(TextureEnvTarget.TextureEnv,TextureEnvParameter.TextureEnvColor, Color.Red);
-
-            //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-//             Matrix4 modelview = Matrix4.LookAt(Vector3.Zero, Vector3.UnitZ, Vector3.UnitY);
-//             GL.MatrixMode(MatrixMode.Modelview);
-//             GL.LoadMatrix(ref modelview);
 
             // Draw the background
-            GL.PushMatrix();
-            //GL.Scale(-1, 1, 1);
-            //GL.Translate(0, 0, 2);
             menu.Draw2DTexture();
-            GL.PopMatrix();
+
             drawSaves();
             GL.Enable(EnableCap.DepthTest);
         }
@@ -149,82 +139,57 @@ namespace U5Designs
         // Draw stuff
         public void drawSaves()
         {
-            //QFont.Begin();
 			GL.PushMatrix();
 			GL.Scale(1, -1, 1);
-            //GL.Translate(eng.Width * 0.5f, eng.Height*0.25f, 0f); 
+
             float startY = -(title.Measure("A").Height * 2.0f);
             title.Print("Character Name", new Vector2(-(title.Measure("Character Name").Width / 2), startY));
             title.Options.DropShadowActive = false;
-            float yOffset = startY + title.Measure("C").Height + 10;
-            int count = 0;
-            //foreach (string s in savedGameChoices)
-            //{
-                //if (count == _cur_butn)
-                //{
-                    // Draw highlighted string                   
 
-                    //GL.PushMatrix();
-                    //saveFontHighlighted.Options.Colour = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
-                    //GL.Translate(-16 * (float)(1 + Math.Sin(cnt * 4)), yOffset, 0f);
-                    //saveFontHighlighted.Print(s, QFontAlignment.Centre);
-                    //GL.PopMatrix();
-                //}
-                //else
-                //{            
-                GL.PushMatrix();
-                // Draw non highlighted string
-                saveFont.Options.DropShadowActive = false;
-                saveFont.Print(name, new Vector2(-(start_x), yOffset));
-                GL.PopMatrix();
-                //}
-                yOffset += saveFont.Measure(name).Height + (0.5f * saveFont.Measure(name).Height);
-                count++;
-                //}
-                GL.PopMatrix();          
-                
-            
-            //QFont.End();
+			// Draw non highlighted string
+            float yOffset = startY + title.Measure("C").Height + 10;
+            saveFont.Options.DropShadowActive = false;
+            saveFont.Print("Name: " + name, new Vector2(-(start_x), yOffset));
+            GL.PopMatrix();
         }
 
         private void DealWithInput()
         {
-            // Testing buttons
             OpenTK.Input.KeyboardState _new_state = OpenTK.Input.Keyboard.GetState();
-            if ((_new_state.IsKeyDown(Key.Down) && !_old_state.IsKeyDown(Key.Down)) ||
-                (_new_state.IsKeyDown(Key.S) && !_old_state.IsKeyDown(Key.S)))
-            {
-                // Down key was just pressed                
-                if (_cur_butn < numOfButtons)
-                {
-                    // Increment the current button index so you draw the highlighted button of the next button 
-                    _cur_butn += 1;
-                    eng.selectSound.Play();
-                }
-                else if (_cur_butn >= numOfButtons)
-                {
-                    // Were on the last button in the list so reset to the top of the button list
-                    _cur_butn = 0;
-                    eng.selectSound.Play();
-                }
-            }
-            if ((_new_state.IsKeyDown(Key.Up) && !_old_state.IsKeyDown(Key.Up)) ||
-                (_new_state.IsKeyDown(Key.W) && !_old_state.IsKeyDown(Key.W)))
-            {
-                // Down key was just pressed
-                if (_cur_butn > 0)
-                {
-                    // Increment the current button index so you draw the highlighted button of the next button 
-                    _cur_butn -= 1;
-                    eng.selectSound.Play();
-                }
-                else if (_cur_butn <= 0)
-                {
-                    // Were on the last button in the list so reset to the top of the button list
-                    _cur_butn = numOfButtons;
-                    eng.selectSound.Play();
-                }
-            }
+//             if ((_new_state.IsKeyDown(Key.Down) && !_old_state.IsKeyDown(Key.Down)) ||
+//                 (_new_state.IsKeyDown(Key.S) && !_old_state.IsKeyDown(Key.S)))
+//             {
+//                 // Down key was just pressed                
+//                 if (_cur_butn < numOfButtons)
+//                 {
+//                     // Increment the current button index so you draw the highlighted button of the next button 
+//                     _cur_butn += 1;
+//                     eng.selectSound.Play();
+//                 }
+//                 else if (_cur_butn >= numOfButtons)
+//                 {
+//                     // Were on the last button in the list so reset to the top of the button list
+//                     _cur_butn = 0;
+//                     eng.selectSound.Play();
+//                 }
+//             }
+//             if ((_new_state.IsKeyDown(Key.Up) && !_old_state.IsKeyDown(Key.Up)) ||
+//                 (_new_state.IsKeyDown(Key.W) && !_old_state.IsKeyDown(Key.W)))
+//             {
+//                 // Down key was just pressed
+//                 if (_cur_butn > 0)
+//                 {
+//                     // Increment the current button index so you draw the highlighted button of the next button 
+//                     _cur_butn -= 1;
+//                     eng.selectSound.Play();
+//                 }
+//                 else if (_cur_butn <= 0)
+//                 {
+//                     // Were on the last button in the list so reset to the top of the button list
+//                     _cur_butn = numOfButtons;
+//                     eng.selectSound.Play();
+//                 }
+//             }
 
             // Loop over all available keys and type out to the screen
             for (int i = 0; i < (int)Key.LastKey; i++)
@@ -243,7 +208,7 @@ namespace U5Designs
                              name += k.ToString();
                          }
                      }
-                     if (i == 53)
+                     if (i == 53 && name.Length > 0)
                      {
                          name = name.Remove(name.Length - 1);
                      }
@@ -272,7 +237,7 @@ namespace U5Designs
             if (eng.Keyboard[Key.Enter] && !enterdown)
             {
                 enterdown = true;
-                handleButtonPress();  // Load game
+				loadPlayState(0);  // Load game
             }
             else if (!eng.Keyboard[Key.Enter])
             {
@@ -286,19 +251,10 @@ namespace U5Designs
             }
         }
 
-        /// <summary>
-        /// Called by mouse or keyboard handlers when the user picked a button (by clicking or hitting enter)
-        /// </summary>
-        internal void handleButtonPress()
-        {
-            loadPlayState(0);
-        }
-
         /** This loads the chosen game **/
         internal void loadPlayState(int lvl)
         {
-            musicFile.Stop();            
-            name = name.Substring(name.IndexOf(' ') + 1);
+            musicFile.Stop();
             eng._player_name = name;
             //StoryInstructionState sis = new StoryInstructionState(eng, _ms);
             //eng.ChangeState(sis);

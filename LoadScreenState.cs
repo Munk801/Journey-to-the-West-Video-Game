@@ -44,6 +44,19 @@ namespace U5Designs {
 			// Set the current image to be displayed at 0 which is the first in the sequence
 			curFrame = 0.0;
 
+			//Free up any old textures so we have more VRAM available to load new stuff
+			for(int i = SpriteSheet.allSprites.Count - 1; i >= 0; i-- ) {
+					SpriteSheet.allSprites[i].releaseTexture();
+			}
+			SpriteSheet.allSprites.Clear();
+			foreach(Int32 i in SpriteSheet.texIDsToRemove) {
+				GL.DeleteTexture(i);
+			}
+			SpriteSheet.texIDsToRemove = new List<int>();
+
+			GC.Collect();
+
+			//Start loading in separate thread
 			Thread loaderThread = new Thread(new ThreadStart(loadLevel));
 			loaderThread.Start();
         }
@@ -91,6 +104,8 @@ namespace U5Designs {
 				//initialize camera
 				playstate.camera = new Camera(playstate.eng.ClientRectangle.Width, playstate.eng.ClientRectangle.Height, playstate.player, playstate);
 				playstate.player.cam = playstate.camera;
+
+				GC.Collect();
 
 				eng.GameInProgress = true;
 				eng.ChangeState(playstate);

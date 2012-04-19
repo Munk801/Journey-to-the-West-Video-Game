@@ -57,7 +57,7 @@
       <loc x="2005" y="30" z="-200"/>
       <loc x="2080" y="30" z="-200"/>
     </background>
-	<background>
+    <!--<background>
       <scale x="75" y="57.86" z="1"/>
       <sprite>jungle_farside_background_sprite.dat</sprite>
       <speed>0.95</speed>
@@ -90,7 +90,7 @@
       <loc x="1930" y="30" z="-200"/>
       <loc x="2005" y="30" z="-200"/>
       <loc x="2080" y="30" z="-200"/>
-    </background>
+    </background>-->
 	</backgroundlist>
 	<enemylist>
 		<enemy>

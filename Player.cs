@@ -133,6 +133,10 @@ namespace U5Designs {
             HitSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.hit.ogg"));
 		}
 
+		~Player() {
+			projectiles.Clear();
+		}
+
 		private float locX {
 			get { return _location.X; }
 			set {

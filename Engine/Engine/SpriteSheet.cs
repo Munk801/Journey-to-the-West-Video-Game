@@ -28,6 +28,9 @@ namespace Engine {
 		//private static readonly byte[] indices = {0, 1, 2, 3};
 		public static ObjMesh quad;
 
+		public static List<SpriteSheet> allSprites = new List<SpriteSheet>();
+		public static List<int> texIDsToRemove = new List<int>();
+
 		private byte[][][] tex; //tex[cycleNumber][frameNumber][y*w + x]
 		private int texw, texh;
 		public double framesPerSecond;
@@ -66,6 +69,15 @@ namespace Engine {
 // 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[0][0]);
 			prevCycleNum = -1;
 			prevFrameNum = -1;
+
+			allSprites.Add(this);
+		}
+
+		~SpriteSheet() {
+			if(texID != -1) {
+				texIDsToRemove.Add(texID);
+				allSprites.Remove(this);
+			}
 		}
 
 		//For this constructor, each cycle must be in its own Bitmap
@@ -100,6 +112,14 @@ namespace Engine {
 // 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, texw, texh, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tex[0][0]);
 			prevCycleNum = -1;
 			prevFrameNum = -1;
+		}
+
+		public void releaseTexture() {
+			if(texID != -1) {
+				GL.DeleteTexture(texID);
+				texID = -1;
+				allSprites.Remove(this);
+			}
 		}
 
 		/// <summary>
@@ -210,6 +230,7 @@ namespace Engine {
 		public double draw(bool viewIs3d, Billboarding bb, int cycleNumber = 0, double frameTime = 0.0) {
 			if(texID == -1) {
 				texID = GL.GenTexture();
+				allSprites.Add(this);
 			}
 
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Clamp);
