@@ -32,7 +32,7 @@ namespace U5Designs
         QFont saveFont, title, saveFontHighlighted;
 
         // A container which will hold the list of available saved games        
-        protected Vector3 eye, lookat;        
+        protected Vector3 eye, lookat;
         MouseDevice mouse;
         public AudioFile musicFile;
 
@@ -54,7 +54,7 @@ namespace U5Designs
             mouse = eng.Mouse;
             savedGameStates = new Stack<XmlNodeList>();
             savedGameChoices = new Stack<string>();
-            _ms = ms;            
+            _ms = ms;
 
             Assembly assembly = Assembly.GetExecutingAssembly();
             musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music.Menu.ogg"));
@@ -71,12 +71,12 @@ namespace U5Designs
 
             eng.StateTextureManager.LoadTexture("menu", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
             menu = eng.StateTextureManager.GetTexture("menu");
-            string s1 = "../../Fonts/myHappySans.qfont";
-            saveFont = QFont.FromQFontFile(s1, new QFontLoaderConfiguration(true));
+
+            saveFont = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
             saveFont.Options.DropShadowActive = true;
 
             //title = QFont.FromQFontFile("myHappySans.qfont", new QFontLoaderConfiguration(true));
-            title = new QFont("../../Fonts/Rock.TTF", 62, new QFontBuilderConfiguration(true));
+            title = QFont.FromQFontFile("../../Fonts/myRock.qfont", new QFontLoaderConfiguration(true));
             title.Options.DropShadowActive = true;
 
             saveFontHighlighted = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
@@ -87,7 +87,7 @@ namespace U5Designs
             // Load available saved games
             // Setup saved game data 
             SavedGameDataSetup();
-            
+
             numOfButtons = savedGameChoices.Count - 1;
         }
 
@@ -137,7 +137,11 @@ namespace U5Designs
             GL.LoadMatrix(ref modelview);
 
             // Draw the background
-            //menu.Draw2DTexture();           
+            GL.PushMatrix();
+            GL.Scale(-1, 1, 1);
+            GL.Translate(0, 0, 2);
+            menu.Draw2DTexture();
+            GL.PopMatrix();
             drawSaves();
             GL.Enable(EnableCap.DepthTest);
         }
@@ -147,9 +151,10 @@ namespace U5Designs
         {
             QFont.Begin();
             //GL.Translate(eng.Width * 0.5f, eng.Height*0.25f, 0f); 
-            float startY = title.Measure("Available").Height;      
-            title.Print("Available Save Points", new Vector2(0, startY));
-            float yOffset = startY + title.Measure("Available Save Points").Height;            
+            float startY = eng.Height * 0.5f - (title.Measure("Available").Height * 2.0f);
+            title.Print("Available Save Games", new Vector2(eng.Width * 0.5f - (title.Measure("Available Save Games").Width / 2), startY));
+            title.Options.DropShadowActive = false;
+            float yOffset = startY + title.Measure("Available Save Points").Height + 10;
             int count = 0;
             foreach (string s in savedGameChoices)
             {
@@ -159,22 +164,23 @@ namespace U5Designs
 
                     GL.PushMatrix();
                     saveFontHighlighted.Options.Colour = new Color4(1.0f, 1.0f, 0.0f, 1.0f);
-                    GL.Translate(eng.Width * 0.5f - 16 * (float)(1 + Math.Sin(cnt * 4)), yOffset, 0f);                    
-                    saveFontHighlighted.Print(s, QFontAlignment.Centre);                    
+                    GL.Translate(eng.Width * 0.5f - 16 * (float)(1 + Math.Sin(cnt * 4)), yOffset, 0f);
+                    saveFontHighlighted.Print(s, QFontAlignment.Centre);
                     GL.PopMatrix();
                 }
                 else
                 {
                     GL.PushMatrix();
                     // Draw non highlighted string
+                    saveFont.Options.DropShadowActive = false;
                     saveFont.Print(s, new Vector2(eng.Width * 0.5f - (saveFont.Measure(s).Width / 2), yOffset));
                     GL.PopMatrix();
-                }                
+                }
                 yOffset += saveFont.Measure(s).Height + (0.5f * saveFont.Measure(s).Height);
                 count++;
             }
             //GL.PopMatrix();
-            QFont.End(); 
+            QFont.End();
         }
 
         private void DealWithInput()
@@ -191,7 +197,7 @@ namespace U5Designs
                     _cur_butn += 1;
                     eng.selectSound.Play();
                 }
-                else if (_cur_butn >= numOfButtons)                
+                else if (_cur_butn >= numOfButtons)
                 {
                     // Were on the last button in the list so reset to the top of the button list
                     _cur_butn = 0;
@@ -254,7 +260,7 @@ namespace U5Designs
             String[] tmp = savedGameChoices.ElementAt(_cur_butn).Split(' ');
             String _pname = tmp[1];
             String _zone = tmp[3];
-            loadPlayState(Convert.ToInt16(_zone));            
+            loadPlayState(Convert.ToInt16(_zone));
         }
 
         /**
