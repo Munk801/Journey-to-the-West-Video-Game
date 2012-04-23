@@ -106,8 +106,8 @@ namespace U5Designs {
 				playstate.player.cam = playstate.camera;
 
 				GC.Collect();
-
 				eng.GameInProgress = true;
+                
 				eng.ChangeState(playstate);
 			}
         }

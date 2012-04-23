@@ -224,7 +224,13 @@ namespace Engine
             DisposeResources();
         }
 
-
+        public void StopAll()
+        {
+            foreach (AudioSource source in AudioSources)
+            {
+                source.Dispose();
+            }
+        }
         /// <summary>
         /// Removes any unused audio sources
         /// </summary>

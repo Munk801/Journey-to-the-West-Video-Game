@@ -41,7 +41,6 @@ namespace U5Designs
         // A container which will hold the list of available saved games        
         protected Vector3 eye, lookat;
         MouseDevice mouse;
-        public AudioFile musicFile;
 
         // testing buttons
         //Obstacle play_button_npress, play_button_press, load_button_npress, load_button_press, quit_button_press, quit_button_npress;
@@ -64,8 +63,6 @@ namespace U5Designs
             _ms = ms;
 
             Assembly assembly = Assembly.GetExecutingAssembly();
-            musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music.Menu.ogg"));
-            musicFile.Play();
             
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -254,11 +251,10 @@ namespace U5Designs
         /** This loads the chosen game **/
         internal void loadPlayState(int lvl)
         {
-            musicFile.Stop();
             eng._player_name = name;
             //StoryInstructionState sis = new StoryInstructionState(eng, _ms);
             //eng.ChangeState(sis);
-            PlayState ps = new PlayState(eng, _ms, lvl);            
+            PlayState ps = new PlayState(eng, _ms, lvl);
             LoadScreenState ls = new LoadScreenState(eng, ps, lvl);
             eng.ChangeState(ls);
         }

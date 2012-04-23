@@ -74,7 +74,8 @@ namespace U5Designs
 			eng = engine;
 			this.menustate = menustate;
             this.levelID = levelID;
-
+            AudioManager.Manager.StopAll();
+            AudioManager.Manager = new AudioManager();
 			bossMode = false;
 			enable3d = false;
 			tabDown = false;
