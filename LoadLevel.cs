@@ -116,8 +116,10 @@ namespace U5Designs {
 			ps.renderList.AddRange(ps.bossRemoveList);
 
 			//TODO: When we have more than one boss type, adjust this
-			ps.bossAI = new ZookeeperAI(ps.player, ps);
-
+            if ( level_to_load == 0)
+			    ps.bossAI = new ZookeeperAI(ps.player, ps);
+            if (level_to_load == 1)
+                ps.bossAI = new GorillaAI(ps.player, ps);
 			SpriteSheet.quad = new ObjMesh(assembly.GetManifestResourceStream("U5Designs.Resources.Geometry.quad.obj"));
 
 			//HUD Stamina Bar

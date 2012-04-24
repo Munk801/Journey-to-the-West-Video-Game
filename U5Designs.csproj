@@ -57,8 +57,10 @@
     <Compile Include="AI.cs" />
     <Compile Include="AIObject.cs" />
     <Compile Include="Background.cs" />
+    <Compile Include="BossAI.cs" />
     <Compile Include="CombatObject.cs" />
     <Compile Include="Effect.cs" />
+    <Compile Include="GorillaAI.cs" />
     <Compile Include="LevelDesignerForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -31,7 +31,7 @@ namespace U5Designs
 		internal MainMenuState menustate;
 		internal PauseMenuState pms;
 		internal Player player;
-        internal ZookeeperAI bossAI;
+        internal BossAI bossAI;
         public bool bossMode;
 		internal Camera camera;
 

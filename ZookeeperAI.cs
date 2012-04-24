@@ -18,7 +18,7 @@ namespace U5Designs {
      * floor is at 125
      * */
 
-    public class ZookeeperAI {
+    public class ZookeeperAI : BossAI{
         Boss bossobject;
         int maxHeight = 225;
         internal FallingBox[] boxes;
