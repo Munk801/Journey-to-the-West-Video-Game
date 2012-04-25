@@ -173,8 +173,8 @@
       <!--Boss encounter area-->
 			<loc x="4200" y="75" z="0"/>
 			<loc x="4200" y="75" z="100"/>
-			<loc x="4300" y="75" z="0"/>
-			<loc x="4300" y="75" z="100"/>
+			<loc x="4260" y="75" z="0"/>
+			<loc x="4260" y="75" z="100"/>
 
 		</obstacle>
     <obstacle>

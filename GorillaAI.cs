@@ -16,8 +16,11 @@ namespace U5Designs {
         Random rng;
 
         GorillaBossobject boss;
+        bool barrelDelayed;
+        double delayTimer, delayTime; // timer = running time, time = time we are waiting
 
         public GorillaAI(Player player, PlayState ps) {
+            rng = new Random(System.DateTime.Now.Millisecond);
             //TODO: fix art
             SpriteSheet gorillaSprite = LoadLevel.parseSpriteFile("zoo_keeper_sprite.dat");
             ProjectileProperties barrel = LoadLevel.parseProjectileFile("banana_projectile.dat", ps);
@@ -31,15 +34,34 @@ namespace U5Designs {
             ps.collisionList.Add(boss);
             ps.renderList.Add(boss);
             ps.combatList.Add(boss);
+
+            delayTime = 3;
+            delayTimer = 0;
+            barrelDelayed = true;
         }
-        /*
-         * World cordinates for the boss area are 4150x to 4350x -50z to 150z
-         * 
-         * "barrel throw kill zone" is 4275 - 4310 
-         * */
+        /*World cordinates for the boss area are 4150x to 4350x -50z to 150z
+         * "barrel throw kill zone" is 4275 - 4310 */
         public void update(double time, PlayState playstate, Vector3 playerposn, bool enable3d) {
             if (active) {
-                //do Ai code
+                if (barrelDelayed) {
+                    delayTimer = delayTimer + time;
+                    if (delayTimer > delayTime) {
+                        delayTimer = 0;
+                        barrelDelayed = false;
+                    }
+                }
+                else {
+                    //throw barrels
+                    int inverseHP = (6 - boss.health) + 1; // used as a multiplier, the lower the bosses health gets, the higher this value becomes.
+                    for (int i = 0; i < inverseHP + 2; i++) { // throw at least 3 barrles + more the weaker boss gets
+                        Vector3 Target = new Vector3(rng.Next(4275, 4310), 75, rng.Next(-50, 150));
+                        spawnProjetile(Target);
+                    }
+
+                    //set delaytime based on health
+                    delayTime = 1 + (2 / inverseHP);
+                    barrelDelayed = true;
+                }
             }
         }
 

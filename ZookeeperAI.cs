@@ -46,7 +46,7 @@ namespace U5Designs {
 			List<Obstacle> groundObstacles = LoadLevel.parseSingleObstacleFile("zookeeper_boss_ground.dat", locs);
             List<Obstacle> ropeObstacles = LoadLevel.parseSingleObstacleFile("zookeeper_boss_rope.dat", locs);
 
-			rng = new Random();
+            rng = new Random(System.DateTime.Now.Millisecond);
             //initialize arrays of crates + boss(FallingBox)
             boxes = new FallingBox[16];
             currentBossIndex = 9;
