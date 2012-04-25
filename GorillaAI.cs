@@ -22,10 +22,10 @@ namespace U5Designs {
         public GorillaAI(Player player, PlayState ps) {
             rng = new Random(System.DateTime.Now.Millisecond);
             //TODO: fix art
-            SpriteSheet gorillaSprite = LoadLevel.parseSpriteFile("zoo_keeper_sprite.dat");
+            SpriteSheet gorillaSprite = LoadLevel.parseSpriteFile("gorilla_sprite.dat");
             ProjectileProperties barrel = LoadLevel.parseProjectileFile("banana_projectile.dat", ps);
-            Vector3 location = new Vector3(4320,195,51);
-            Vector3 scale = new Vector3(30.0f, 33.84f, 30.0f);
+            Vector3 location = new Vector3(4370,162.5f,51);
+            Vector3 scale = new Vector3(50.0f, 50.0f, 50.0f);
             Vector3 pbox = new Vector3(6, 6, 6);
             Vector3 cbox = new Vector3(6, 6, 6);
             boss = new GorillaBossobject(player, location, pbox, cbox, scale, true, true, 6, 2, 1, gorillaSprite);
@@ -39,6 +39,7 @@ namespace U5Designs {
             delayTimer = 0;
             barrelDelayed = true;
         }
+
         /*World cordinates for the boss area are 4150x to 4350x -50z to 150z
          * "barrel throw kill zone" is 4275 - 4310 */
         public void update(double time, PlayState playstate, Vector3 playerposn, bool enable3d) {
