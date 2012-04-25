@@ -181,18 +181,6 @@
       <path>rope_bridge.dat</path>
       <loc x="4050" y="123.945" z="50"/>
     </obstacle>
-    <obstacle>
-      <path>brick_wall_back.dat</path>
-      <loc x="4250" y="275" z="-50"/>
-    </obstacle>
-    <obstacle>
-      <path>brick_wall_front.dat</path>
-      <loc x="4250" y="275" z="150"/>
-    </obstacle>
-    <obstacle>
-      <path>brick_wall_right.dat</path>
-      <loc x="4350" y="275" z="50"/>
-    </obstacle>
 		<obstacle>
 			<path>jungle_tree.dat</path>
 			<loc x="14" y="36" z="100" />
@@ -270,10 +258,6 @@
     </obstacle>
   </bosslist>
   <bossremovelist>
-    <decoration>
-      <path>brick_wall_door.dat</path>
-      <loc x="4149" y="275" z="50"/>
-    </decoration>
   </bossremovelist>
   <decorationlist>
     <decoration>

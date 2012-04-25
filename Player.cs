@@ -982,7 +982,7 @@ namespace U5Designs {
                                 }
                             }
                             else if (((CombatObject)obj).type ==3){ // obj is zookeeper
-                                ((Boss)obj).dodamage(spinDamage);
+                                ((BossAI)obj).dodamage(spinDamage);
                                 HasControl = false;
                                 NoControlTimer = 0.5;
                                 knockback(true, obj);
@@ -1218,7 +1218,7 @@ namespace U5Designs {
 									((CombatObject)obj).health = 0;
 								}
 							} else if(((CombatObject)obj).type == 3) { // obj is zookeeper
-								((Boss)obj).dodamage(spinDamage);
+								((BossAI)obj).dodamage(spinDamage);
 								HasControl = false;
 								NoControlTimer = 0.5;
 								knockback(false, obj);

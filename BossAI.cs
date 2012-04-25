@@ -17,6 +17,8 @@ namespace U5Designs {
         int gethealth();
 
         void killBoss(PlayState ps);
+
+        void dodamage(int hit);
     }
 
 }

@@ -36,6 +36,10 @@ namespace U5Designs {
             active = false;
         }
 
+        public void dodamage(int hit) {
+            
+        }
+
         public void spawnProjetile(Vector3 point) {
 
 

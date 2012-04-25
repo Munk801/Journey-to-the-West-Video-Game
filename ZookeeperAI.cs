@@ -250,6 +250,10 @@ namespace U5Designs {
             return bossobject.health;
         }
 
+        public void dodamage(int hit) {
+            bossobject.dealDamage(hit);
+        }
+
         public void killBoss(PlayState ps) {
             //TODO: whatever happens when the boss dies
             ps.objList.Remove(bossobject);
@@ -579,7 +583,7 @@ namespace U5Designs {
 			}
 		}
 
-        public void dodamage(int hit) {
+        public void dealDamage(int hit) {
             if (!invincible) {
                 health = health - 1;
 				cycleNumber = 1;
