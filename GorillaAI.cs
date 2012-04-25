@@ -24,7 +24,7 @@ namespace U5Designs {
             //TODO: fix art
             SpriteSheet gorillaSprite = LoadLevel.parseSpriteFile("zoo_keeper_sprite.dat");
             ProjectileProperties barrel = LoadLevel.parseProjectileFile("banana_projectile.dat", ps);
-            Vector3 location = new Vector3(4337,195,50);
+            Vector3 location = new Vector3(4320,195,51);
             Vector3 scale = new Vector3(30.0f, 33.84f, 30.0f);
             Vector3 pbox = new Vector3(6, 6, 6);
             Vector3 cbox = new Vector3(6, 6, 6);

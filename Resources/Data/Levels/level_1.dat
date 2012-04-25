@@ -249,6 +249,11 @@
 			<loc x="1124" y="114" z="80" />
 			<loc x="1138" y="109" z="40" />
 			<loc x="1101" y="115" z="33" />
+			<loc x="4300" y="164" z="50" />
+		</obstacle>
+		<obstacle>
+			<path>barrel_stack.dat</path>
+			<loc x="4325" y="175" z="50" />
 		</obstacle>
 	</obstaclelist>
   <bosslist>

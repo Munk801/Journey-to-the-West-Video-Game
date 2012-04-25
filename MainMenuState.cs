@@ -242,20 +242,24 @@ namespace U5Designs
 			switch(_cur_butn) {
 				case 0: //new game
 					//loadPlayState(0);
+                    musicFile.Stop();
                     PlayerNameState _PS = new PlayerNameState(eng, this);
                     eng.ChangeState(_PS);
 					break;
 				case 1: //load saved game
 					//loadPlayState(saved_level_index);
+                    musicFile.Stop();
                     LoadGameState _L = new LoadGameState(eng, this);
                     eng.ChangeState(_L);
 					break;				
 				case 2: //level designer
+                    musicFile.Stop();
 					LevelDesignerState ls = new LevelDesignerState(eng, this, 13731);
 					eng.ChangeState(ls);
 					eng.GameInProgress = true;
 					break;
                 case 3: //quit
+                    musicFile.Stop();
                     eng.Exit();
                     break;
 			}
