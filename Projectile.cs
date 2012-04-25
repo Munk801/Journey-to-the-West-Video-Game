@@ -248,7 +248,7 @@ namespace U5Designs {
                             }
                         }
                         if (((CombatObject)collidingObj).type == (int)CombatType.boss) {
-                            ((BossAI)collidingObj).dodamage(damage);
+                            ((BossObject)collidingObj).dodamage(damage);
                             time = 0.0;
                             health = 0;
                         }
@@ -417,7 +417,7 @@ namespace U5Designs {
                             }
                         }
                         if (((CombatObject)collidingObj).type == 3) { // obj is zookeeper
-                            ((BossAI)collidingObj).dodamage(damage);
+                            ((BossObject)collidingObj).dodamage(damage);
                             time = 0.0;
                             health = 0;
                         }

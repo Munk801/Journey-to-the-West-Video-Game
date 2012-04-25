@@ -18,7 +18,11 @@ namespace U5Designs {
 
         void killBoss(PlayState ps);
 
-        void dodamage(int hit);
+        //void dodamage(int hit);
     }
 
+    public interface BossObject {
+        void dodamage(int hit);
+
+    }
 }

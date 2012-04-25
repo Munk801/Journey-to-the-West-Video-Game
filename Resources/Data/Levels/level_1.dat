@@ -171,10 +171,10 @@
 			<loc x="1127" y="26" z="27" />
 			<loc x="1133" y="26" z="46" />
       <!--Boss encounter area-->
-  <!--<loc x="4100" y="75" z="0"/>
-			<loc x="4100" y="75" z="100"/>
 			<loc x="4200" y="75" z="0"/>
-			<loc x="4200" y="75" z="100"/>-->
+			<loc x="4200" y="75" z="100"/>
+			<loc x="4300" y="75" z="0"/>
+			<loc x="4300" y="75" z="100"/>
 
 		</obstacle>
     <obstacle>
@@ -252,10 +252,6 @@
 		</obstacle>
 	</obstaclelist>
   <bosslist>
-    <obstacle>
-      <path>brick_wall_left.dat</path>
-      <loc x="4150" y="275" z="50"/>
-    </obstacle>
   </bosslist>
   <bossremovelist>
   </bossremovelist>

@@ -19,7 +19,7 @@ namespace U5Designs {
      * */
 
     public class ZookeeperAI : BossAI{
-        Boss bossobject;
+        ZooBoss bossobject;
         int maxHeight = 225;
         internal FallingBox[] boxes;
         internal int currentBossIndex;
@@ -62,7 +62,7 @@ namespace U5Designs {
 				if(i != currentBossIndex) {
                     newcrate = new Crate(player, ps, new Vector3(box.location), maxHeight, invisProj, box, groundObstacles[i], ropeObstacles[i]);
 				} else {
-                    newcrate = bossobject = new Boss(player, ps, new Vector3(box.location), maxHeight, invisProj, box, groundObstacles[i], ropeObstacles[i], zookeeperSprite);
+                    newcrate = bossobject = new ZooBoss(player, ps, new Vector3(box.location), maxHeight, invisProj, box, groundObstacles[i], ropeObstacles[i], zookeeperSprite);
 					ps.combatList.Add(bossobject);
                     ps.renderList.Add(bossobject);
 				}
@@ -250,9 +250,6 @@ namespace U5Designs {
             return bossobject.health;
         }
 
-        public void dodamage(int hit) {
-            bossobject.dealDamage(hit);
-        }
 
         public void killBoss(PlayState ps) {
             //TODO: whatever happens when the boss dies
@@ -525,13 +522,13 @@ namespace U5Designs {
     }
 
 	//Boss, the crate he's standing on, and the ground under him
-	internal class Boss : FallingBox, CombatObject {
+	internal class ZooBoss : FallingBox, CombatObject, BossObject {
 
 		public bool invincible;
 		public Vector3 centerLoc;
 		private bool in3d;
 
-		internal Boss(Player player, PlayState ps, Vector3 location, int maxheight, ProjectileProperties invisProj, Obstacle crate, Obstacle ground, Obstacle rope, SpriteSheet bossSprite)
+		internal ZooBoss(Player player, PlayState ps, Vector3 location, int maxheight, ProjectileProperties invisProj, Obstacle crate, Obstacle ground, Obstacle rope, SpriteSheet bossSprite)
             : base(player, ps, location, maxheight, invisProj, crate, ground, rope) {
 
             //animation
@@ -583,7 +580,7 @@ namespace U5Designs {
 			}
 		}
 
-        public void dealDamage(int hit) {
+        public void dodamage(int hit) {
             if (!invincible) {
                 health = health - 1;
 				cycleNumber = 1;

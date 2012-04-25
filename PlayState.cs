@@ -173,6 +173,7 @@ namespace U5Designs
                 nextLevelTimer = nextLevelTimer + e.Time;
                 if (nextLevelTimer > 3) {
                     loadNextLevel();//loads the next level
+                    return;
                 }
             }
 
@@ -287,11 +288,16 @@ namespace U5Designs
 		}
 
         private void loadNextLevel() {
-            //TODO: make sure everything that needs to die in this state is dead(music etc..) here before moving to next level.
             if (musicenabled) {
                 levelMusic.Stop();
             }
             int nextlevelID = levelID + 1;
+
+            if (nextlevelID == 2) {//Temp   
+                //TODO: push thanks for playing state
+            }
+
+
 			if(nextlevelID <= 1) {
 				PlayState ps = new PlayState(eng, menustate, nextlevelID);
 				LoadScreenState ls = new LoadScreenState(eng, ps, nextlevelID);
