@@ -133,7 +133,21 @@ namespace U5Designs
             if (player.health <= 0) {
                 GameOverState GGbro = new GameOverState(menustate, eng, this);
                 levelMusic.Stop();
+
+				//Null all the lists to speed up garbage collection
+				for(int i = objList.Count - 1; i >= 0; i--) { objList[i] = null; }
+				for(int i = renderList.Count - 1; i >= 0; i--) { renderList[i] = null; }
+				for(int i = collisionList.Count - 1; i >= 0; i--) { collisionList[i] = null; }
+				for(int i = physList.Count - 1; i >= 0; i--) { physList[i] = null; }
+				for(int i = aiList.Count - 1; i >= 0; i--) { aiList[i] = null; }
+				for(int i = combatList.Count - 1; i >= 0; i--) { combatList[i] = null; }
+				for(int i = backgroundList.Count - 1; i >= 0; i--) { backgroundList[i] = null; }
+				for(int i = bossList.Count - 1; i >= 0; i--) { bossList[i] = null; }
+				for(int i = bossRemoveList.Count - 1; i >= 0; i--) { bossRemoveList[i] = null; }
+				for(int i = effectsList.Count - 1; i >= 0; i--) { effectsList[i] = null; }
+
                 eng.ChangeState(GGbro);
+				return;
             }
 
 			//See if we need to trigger an event (like the end of the level or a boss)

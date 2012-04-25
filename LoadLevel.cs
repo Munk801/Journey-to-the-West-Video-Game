@@ -560,8 +560,10 @@ namespace U5Designs {
 							break;
 					}
 				}
+
+				SpriteSheet ss = parseSpriteFile(spritePath);
 				foreach(Vector3 loc in locs) {
-					_b.Add(new Background(loc, scale, parseSpriteFile(spritePath), speed, spritePath));
+					_b.Add(new Background(loc, scale, ss, speed, spritePath));
 				}
 			}
 

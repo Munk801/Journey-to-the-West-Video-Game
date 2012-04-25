@@ -46,13 +46,13 @@ namespace U5Designs {
 
 			//Free up any old textures so we have more VRAM available to load new stuff
 			for(int i = SpriteSheet.allSprites.Count - 1; i >= 0; i-- ) {
-					SpriteSheet.allSprites[i].releaseTexture();
+				SpriteSheet.allSprites[i].releaseTexture();
 			}
-			SpriteSheet.allSprites.Clear();
-			foreach(Int32 i in SpriteSheet.texIDsToRemove) {
+
+			foreach(int i in SpriteSheet.texIDsToRemove) {
 				GL.DeleteTexture(i);
 			}
-			SpriteSheet.texIDsToRemove = new List<int>();
+			SpriteSheet.texIDsToRemove.Clear();
 
 			GC.Collect();
 
