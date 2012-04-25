@@ -22,17 +22,21 @@ namespace U5Designs {
             SpriteSheet gorillaSprite = LoadLevel.parseSpriteFile("zoo_keeper_sprite.dat");
             ProjectileProperties barrel = LoadLevel.parseProjectileFile("banana_projectile.dat", ps);
             Vector3 location = new Vector3(4337,195,50);
-            //Vector3 scale = new Vector3(0,0,0);
+            Vector3 scale = new Vector3(30.0f, 33.84f, 30.0f);
             Vector3 pbox = new Vector3(6, 6, 6);
             Vector3 cbox = new Vector3(6, 6, 6);
-            boss = new GorillaBossobject(player, location, pbox, cbox, true, true, 6, 2, 1, gorillaSprite);
+            boss = new GorillaBossobject(player, location, pbox, cbox, scale, true, true, 6, 2, 1, gorillaSprite);
             ps.objList.Add(boss);
             ps.physList.Add(boss);
             ps.collisionList.Add(boss);
             ps.renderList.Add(boss);
             ps.combatList.Add(boss);
         }
-
+        /*
+         * World cordinates for the boss area are 4150x to 4350x -50z to 150z
+         * 
+         * "barrel throw kill zone" is 4275 - 4310 
+         * */
         public void update(double time, PlayState playstate, Vector3 playerposn, bool enable3d) {
             if (active) {
                 //do Ai code
@@ -53,7 +57,10 @@ namespace U5Designs {
             active = false;
         }
 
-
+        /// <summary>
+        /// Fires a projectile at the specific point, which is a world cordinate
+        /// </summary>
+        /// <param name="point">The point at which to fire a projectile</param>
         public void spawnProjetile(Vector3 point) {
 
 
@@ -80,7 +87,7 @@ namespace U5Designs {
         public Player player;
 
 
-        public GorillaBossobject(Player player, Vector3 location, Vector3 pbox, Vector3 cbox, bool existsIn2d, bool existsIn3d, int health, int damage, float speed,
+        public GorillaBossobject(Player player, Vector3 location, Vector3 pbox, Vector3 cbox, Vector3 scale, bool existsIn2d, bool existsIn3d, int health, int damage, float speed,
             SpriteSheet sprite) {
             _location = location;
             _scale = scale;
