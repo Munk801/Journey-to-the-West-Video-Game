@@ -88,7 +88,8 @@ namespace U5Designs
             waitingToSwitchLevels = false;           
 
 			pms = new PauseMenuState(eng, menustate);
-			effectsList = new List<Effect>();            
+			effectsList = new List<Effect>(); 
+            
 		}
 
         /// <summary>

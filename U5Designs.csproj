@@ -66,6 +66,7 @@
       <DependentUpon>LevelDesignerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="LevelSelect.cs" />
+    <Compile Include="LevelStoryState.cs" />
     <Compile Include="LoadGameState.cs" />
     <Compile Include="LoadScreenState.cs" />
     <Compile Include="MyTextWriter.cs" />

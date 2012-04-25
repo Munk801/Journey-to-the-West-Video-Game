@@ -154,7 +154,8 @@ namespace U5Designs
 			GL.Scale(1, -1, 1);
             //GL.Translate(eng.Width * 0.5f, eng.Height*0.25f, 0f); 
             float startY = -(title.Measure("Available").Height * 2.0f);
-            title.Print("Available Save Games", new Vector2(-(title.Measure("Available Save Games").Width / 2), startY));
+            
+            title.Print("Available Games", new Vector2(-(title.Measure("Available Games").Width / 2), startY));
             title.Options.DropShadowActive = false;
             float yOffset = startY + title.Measure("Available Save Points").Height + 10;
             int count = 0;
@@ -317,8 +318,8 @@ namespace U5Designs
         internal void loadPlayState(int lvl)
         {
             musicFile.Stop();
-
-            PlayState ps = new PlayState(eng, _ms, lvl);
+            
+PlayState ps = new PlayState(eng, _ms, lvl);
             LoadScreenState ls = new LoadScreenState(eng, ps, lvl);
             eng.ChangeState(ls);
         }

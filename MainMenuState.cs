@@ -101,7 +101,7 @@ namespace U5Designs
             title.Options.DropShadowActive = false;
             buttonHighlight = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
             buttonHighlight.Options.DropShadowActive = true;
-            //QFont.CreateTextureFontFiles("../../Fonts/HappySans.TTF", 32, "myStory"); // Use this to create new Fonts that you will texture
+            //QFont.CreateTextureFontFiles("../../Fonts/HappySans.TTF", 32, "myStoryWhite"); // Use this to create new Fonts that you will texture
             // End QFonts
 
 			musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music.Menu.ogg"));
