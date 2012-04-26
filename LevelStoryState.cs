@@ -20,16 +20,16 @@ using QuickFont;
 
 namespace U5Designs
 {
-    class StoryInstructionState : GameState
+    class LevelStoryState : GameState
     {
         internal GameEngine eng;
-        
+
         protected Vector3 eye, lookat;
         Obstacle background;
         MainMenuState menu;
 
         Texture _p1, _p2, _p3, _p4;
-		double curFrame;
+        double curFrame;
         bool escapedown;
         internal int cur_page;
 
@@ -40,68 +40,51 @@ namespace U5Designs
         double cnt;
         Texture bg;
         int _cur_butn = 0;
-        private int numOfButtons = 2;        
+        private int numOfButtons = 2;
         OpenTK.Input.KeyboardState _old_state;
         public bool enterdown;
 
         String page1 = @"Once upon a time lived a young monkey in a dreary metropolitan Zoo.  He spent his life trapped within the cold iron bars of his cage watching the world pass him by.  But there was more to this monkey than the strangers moving past him could realize..." + Environment.NewLine;
-               
-               
+
+
         String page2 = "For within this monkey lived a spirit that no cage could contain, though he had yet to fully realize this.  All he knew was that there was more to his life than this.  That somewhere, out there in the strange and wonderful world, was his Destiny." + Environment.NewLine;
         String page3 = "And so it was one fateful night when the mean Zoo Keeper was not watching the monkey snatched the key to his cage off his belt.  And when the Zoo Keeper turned his back the monkey quitely unlocked his cage door and took the first steps on a path that would change his life forever...";
         String instructions;
         // End Fonts
 
-        public StoryInstructionState(GameEngine engine, MainMenuState menustate)
+        public LevelStoryState(GameEngine engine, MainMenuState menustate)
         {
             cur_page = 0;
             eng = engine;
             menu = menustate;
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
-//             _p1 = eng.StateTextureManager.GetTexture("p1");
-//             _p2 = eng.StateTextureManager.GetTexture("p2");
-//             _p3 = eng.StateTextureManager.GetTexture("p3");
-//             _p4 = eng.StateTextureManager.GetTexture("p4");
+            //             _p1 = eng.StateTextureManager.GetTexture("p1");
+            //             _p2 = eng.StateTextureManager.GetTexture("p2");
+            //             _p3 = eng.StateTextureManager.GetTexture("p3");
+            //             _p4 = eng.StateTextureManager.GetTexture("p4");
 
             // QFont
             Assembly assembly = Assembly.GetExecutingAssembly();
             eng.StateTextureManager.LoadTexture("menu", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
             bg = eng.StateTextureManager.GetTexture("menu");
 
-            _buttons = new List<String>();
-            instructions = "W - Moves Forward in 3D" + Environment.NewLine + "A - Moves Left in 3D" + Environment.NewLine + "D - Moves Right in 3D" + Environment.NewLine +
-                "    Forward in 2D" + Environment.NewLine + "S - Moves Back in 3D" + Environment.NewLine + "Space - Jump" + Environment.NewLine + "C - Fly if you have the Nimbus Cloud" + Environment.NewLine +
-                "Left Mouse - Fire Projectile" + Environment.NewLine + "Right Mouse - Spin Attack" + Environment.NewLine + "E - Coconut Grenade" + Environment.NewLine +
-                "ESC - Pause";
-            //_buttons.Add("W - Moves Forward in 3D");
-            //_buttons.Add("A - Moves Left in 3D");
-            //_buttons.Add("D - Moves Right in 3D");
-            //_buttons.Add("    Forward in 2D");
-            //_buttons.Add("S - Moves Back in 3D");
-            //_buttons.Add("Space - Jump");
-            //_buttons.Add("C - Fly if you have the Nimbus Cloud");
-            //_buttons.Add("Left Mouse - Fire Projectile");
-            //_buttons.Add("Right Mouse - Spin Attack");
-            //_buttons.Add("E - Coconut Grenade");
-            //_buttons.Add("ESC - Pause");
             
-            button = QFont.FromQFontFile("../../Fonts/myStoryWhite.qfont", new QFontLoaderConfiguration(true, false));
-            button.Options.DropShadowActive = false;
+
+            button = QFont.FromQFontFile("../../Fonts/myStory.qfont", new QFontLoaderConfiguration(true, false));
+            button.Options.DropShadowActive = true;
             //title = QFont.FromQFontFile("myHappySans.qfont", new QFontLoaderConfiguration(true));
             title = QFont.FromQFontFile("../../Fonts/myRock.qfont", new QFontLoaderConfiguration(true, false));
             title.Options.DropShadowActive = false;
-            //buttonHighlight = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
-            //buttonHighlight.Options.DropShadowActive = true;
             //QFont.CreateTextureFontFiles("Fonts/Rock.TTF", 48, "myRock"); // Use this to create new Fonts that you will texture
-            // End QFonts
-
-			// Set the current image to be displayed at 0 which is the first in the sequence
-			curFrame = 0.0;
+            
+            // Set the current image to be displayed at 0 which is the first in the sequence
+            curFrame = 0.0;
         }
 
-		public override void MakeActive() {
-			GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        public override void MakeActive()
+        {
+            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
             // Fonts
             GL.Disable(EnableCap.Lighting);
@@ -109,13 +92,14 @@ namespace U5Designs
             // Fonts
 
 
-			GL.MatrixMode(MatrixMode.Projection);
-			Matrix4d projection = Matrix4d.CreateOrthographic(1280, 720, 1.0f, 6400.0f);
-			GL.LoadMatrix(ref projection);
-            if (eng.Keyboard[Key.Escape]) {
+            GL.MatrixMode(MatrixMode.Projection);
+            Matrix4d projection = Matrix4d.CreateOrthographic(1280, 720, 1.0f, 6400.0f);
+            GL.LoadMatrix(ref projection);
+            if (eng.Keyboard[Key.Escape])
+            {
                 escapedown = true;
             }
-		}
+        }
 
         public override void Update(FrameEventArgs e)
         {
@@ -132,7 +116,7 @@ namespace U5Designs
             Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref modelview);
-			curFrame = (curFrame + e.Time * 2) % 4;
+            curFrame = (curFrame + e.Time * 2) % 4;
 
             // Fonts
             GL.Disable(EnableCap.DepthTest);
@@ -141,11 +125,11 @@ namespace U5Designs
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
-            
+
             bg.Draw2DTexture();
-            
-            drawButtons();            
-            
+
+            drawButtons();
+
             // Fonts
             GL.Enable(EnableCap.DepthTest);
         }
@@ -176,8 +160,8 @@ namespace U5Designs
 
             // Go to next page
             switch (cur_page)
-            { 
-                
+            {
+
                 case 3:
                     PlayState ps = new PlayState(eng, menu, 0);
                     LoadScreenState ls = new LoadScreenState(eng, ps, 0);
@@ -191,9 +175,9 @@ namespace U5Designs
         {
             GL.PushMatrix();
             GL.Translate(new Vector3(-100, 170, 0));
-			GL.Scale(1, -1, 1);            
+            GL.Scale(1, -1, 1);
             float yOffset = 720 / (button.Measure("S").Height + 10);
-            
+
             // Draw non highlighted string
             button.Options.DropShadowActive = true;
             //button.Print(s, new Vector2(eng.Width * 0.5f - (button.Measure(s).Width / 2), yOffset));
@@ -202,7 +186,7 @@ namespace U5Designs
             {
                 button.Print(instructions, new Vector2(-button.Measure(instructions).Width / 2, yOffset));
             }
-            else if(cur_page == 1)
+            else if (cur_page == 1)
             {
                 //button.Print(page1, new Vector2(-button.Measure(page1).Width / 2, yOffset));
                 PrintWithBounds(button, page1, new RectangleF(-530, 10, 1280, 300), QFontAlignment.Left, ref yOffset);
@@ -217,8 +201,8 @@ namespace U5Designs
                 //button.Print(page1, new Vector2(-button.Measure(page1).Width / 2, yOffset));
                 PrintWithBounds(button, page3, new RectangleF(-530, 10, 1280, 300), QFontAlignment.Left, ref yOffset);
             }
-            yOffset += yOffset;              
-            GL.PopMatrix();            
+            yOffset += yOffset;
+            GL.PopMatrix();
         }
 
         private void PrintWithBounds(QFont font, string text, RectangleF bounds, QFontAlignment alignment, ref float yOffset)
@@ -243,14 +227,14 @@ namespace U5Designs
 
             // Print ENTER
             string s = "[ Press Enter ]";
-            font.Print(s, maxWidth, alignment, new Vector2(-bounds.X - (font.Measure(s).Width+10), bounds.Height + 2*font.Measure(text).Height));
+            font.Print(s, maxWidth, alignment, new Vector2(-bounds.X - (font.Measure(s).Width + 10), bounds.Height + 2 * font.Measure(text).Height));
             //font.Print(s, maxWidth, QFontAlignment.Right, new Vector2(bounds.X + bounds.Width - font.Measure(s).Height, bounds.Y + bounds.Height - font.Measure(s).Height));
 
             yOffset += height;
 
         }
         private void DealWithInput()
-        {            
+        {
             // Fonts
             // Testing buttons
             OpenTK.Input.KeyboardState _new_state = OpenTK.Input.Keyboard.GetState();
@@ -303,7 +287,7 @@ namespace U5Designs
             if (eng.Keyboard[Key.Enter] && !enterdown)
             {
                 enterdown = true;
-                                
+
                 handleButtonPress();
 
                 // Move to next page
@@ -328,7 +312,7 @@ namespace U5Designs
         * */
         public void SavedGameDataSetup()
         {
-                        
+
         }
 
         /**
@@ -337,7 +321,7 @@ namespace U5Designs
          * */
         public void DisplayAvailableSaves()
         {
-            
+
         }
 
         /**

@@ -18,8 +18,8 @@ namespace U5Designs {
      * floor is at 125
      * */
 
-    public class ZookeeperAI {
-        Boss bossobject;
+    public class ZookeeperAI : BossAI{
+        ZooBoss bossobject;
         int maxHeight = 225;
         internal FallingBox[] boxes;
         internal int currentBossIndex;
@@ -46,7 +46,7 @@ namespace U5Designs {
 			List<Obstacle> groundObstacles = LoadLevel.parseSingleObstacleFile("zookeeper_boss_ground.dat", locs);
             List<Obstacle> ropeObstacles = LoadLevel.parseSingleObstacleFile("zookeeper_boss_rope.dat", locs);
 
-			rng = new Random();
+            rng = new Random(System.DateTime.Now.Millisecond);
             //initialize arrays of crates + boss(FallingBox)
             boxes = new FallingBox[16];
             currentBossIndex = 9;
@@ -62,7 +62,7 @@ namespace U5Designs {
 				if(i != currentBossIndex) {
                     newcrate = new Crate(player, ps, new Vector3(box.location), maxHeight, invisProj, box, groundObstacles[i], ropeObstacles[i]);
 				} else {
-                    newcrate = bossobject = new Boss(player, ps, new Vector3(box.location), maxHeight, invisProj, box, groundObstacles[i], ropeObstacles[i], zookeeperSprite);
+                    newcrate = bossobject = new ZooBoss(player, ps, new Vector3(box.location), maxHeight, invisProj, box, groundObstacles[i], ropeObstacles[i], zookeeperSprite);
 					ps.combatList.Add(bossobject);
                     ps.renderList.Add(bossobject);
 				}
@@ -249,6 +249,7 @@ namespace U5Designs {
         public int gethealth() {
             return bossobject.health;
         }
+
 
         public void killBoss(PlayState ps) {
             //TODO: whatever happens when the boss dies
@@ -521,13 +522,13 @@ namespace U5Designs {
     }
 
 	//Boss, the crate he's standing on, and the ground under him
-	internal class Boss : FallingBox, CombatObject {
+	internal class ZooBoss : FallingBox, CombatObject, BossObject {
 
 		public bool invincible;
 		public Vector3 centerLoc;
 		private bool in3d;
 
-		internal Boss(Player player, PlayState ps, Vector3 location, int maxheight, ProjectileProperties invisProj, Obstacle crate, Obstacle ground, Obstacle rope, SpriteSheet bossSprite)
+		internal ZooBoss(Player player, PlayState ps, Vector3 location, int maxheight, ProjectileProperties invisProj, Obstacle crate, Obstacle ground, Obstacle rope, SpriteSheet bossSprite)
             : base(player, ps, location, maxheight, invisProj, crate, ground, rope) {
 
             //animation

@@ -221,22 +221,24 @@ namespace U5Designs {
                     else { //this is a combat collision
                         //time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
                         if (((CombatObject)collidingObj).type == (int)CombatType.player) {
-                            if (type != (int)CombatType.squish) {
-                                time = 0.0;
-                                ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
-                                health = 0;
+                            if (playerspawned) {
+                                if (type != (int)CombatType.squish) {
+                                    time = 0.0;
+                                    ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
+                                    health = 0;
                                 player.HurtSound.Play();
-                                player.knockback(true, this);
-                            }
-                            else {
-                                time = 0.0;
-                                if (player.onGround)
-                                    player.squish();
-                                else {
-                                    player.squish();
-                                    player.accelerate(velocity);
+                                    player.knockback(true, this);
                                 }
-                                health = 0;
+                                else {
+                                    time = 0.0;
+                                    if (player.onGround)
+                                        player.squish();
+                                    else {
+                                        player.squish();
+                                        player.accelerate(velocity);
+                                    }
+                                    health = 0;
+                                }
                             }
                         }
                         if (((CombatObject)collidingObj).type == (int)CombatType.enemy) {
@@ -248,7 +250,7 @@ namespace U5Designs {
                             }
                         }
                         if (((CombatObject)collidingObj).type == (int)CombatType.boss) {
-                            ((Boss)collidingObj).dodamage(damage);
+                            ((BossObject)collidingObj).dodamage(damage);
                             player.HurtSound.Play();
                             time = 0.0;
                             health = 0;
@@ -420,7 +422,7 @@ namespace U5Designs {
                             }
                         }
                         if (((CombatObject)collidingObj).type == 3) { // obj is zookeeper
-                            ((Boss)collidingObj).dodamage(damage);
+                            ((BossObject)collidingObj).dodamage(damage);
                             player.HitSound.Play();
                             time = 0.0;
                             health = 0;

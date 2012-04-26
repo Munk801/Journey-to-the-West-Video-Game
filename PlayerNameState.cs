@@ -252,11 +252,12 @@ namespace U5Designs
         internal void loadPlayState(int lvl)
         {
             eng._player_name = name;
-            //StoryInstructionState sis = new StoryInstructionState(eng, _ms);
-            //eng.ChangeState(sis);
-            PlayState ps = new PlayState(eng, _ms, lvl);
-            LoadScreenState ls = new LoadScreenState(eng, ps, lvl);
-            eng.ChangeState(ls);
+            
+            StoryInstructionState sis = new StoryInstructionState(eng, _ms);
+            eng.ChangeState(sis);
+            //PlayState ps = new PlayState(eng, _ms, lvl);
+            //LoadScreenState ls = new LoadScreenState(eng, ps, lvl);
+            //eng.ChangeState(ls);
         }
     }
 }

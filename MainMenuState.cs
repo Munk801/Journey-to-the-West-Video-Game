@@ -101,7 +101,7 @@ namespace U5Designs
             title.Options.DropShadowActive = false;
             buttonHighlight = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
             buttonHighlight.Options.DropShadowActive = true;
-            //QFont.CreateTextureFontFiles("../../Fonts/HappySans.TTF", 32, "myStory"); // Use this to create new Fonts that you will texture
+            //QFont.CreateTextureFontFiles("../../Fonts/HappySans.TTF", 32, "myStoryWhite"); // Use this to create new Fonts that you will texture
             // End QFonts
 
 			musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music.Menu.ogg"));
@@ -242,6 +242,7 @@ namespace U5Designs
 			switch(_cur_butn) {
 				case 0: //new game
 					//loadPlayState(0);
+                    musicFile.Stop();
                     PlayerNameState _PS = new PlayerNameState(eng, this);
                     eng.ChangeState(_PS);
 					break;
@@ -252,11 +253,13 @@ namespace U5Designs
                     eng.ChangeState(_L);
 					break;				
 				case 2: //level designer
+                    musicFile.Stop();
 					LevelDesignerState ls = new LevelDesignerState(eng, this, 13731);
 					eng.ChangeState(ls);
 					eng.GameInProgress = true;
 					break;
                 case 3: //quit
+                    musicFile.Stop();
                     eng.Exit();
                     break;
 			}

@@ -981,8 +981,8 @@ namespace U5Designs {
                                     ((CombatObject)obj).health = 0;
                                 }
                             }
-                            else if (((CombatObject)obj).type ==3){ // obj is zookeeper
-                                ((Boss)obj).dodamage(spinDamage);
+                            else if (((CombatObject)obj).type == 3){ // obj is boss
+                                ((BossObject)obj).dodamage(spinDamage);
                                 HasControl = false;
                                 NoControlTimer = 0.5;
                                 knockback(true, obj);
@@ -1217,8 +1217,8 @@ namespace U5Designs {
 									//despawn the projectile
 									((CombatObject)obj).health = 0;
 								}
-							} else if(((CombatObject)obj).type == 3) { // obj is zookeeper
-								((Boss)obj).dodamage(spinDamage);
+							} else if(((CombatObject)obj).type == 3) { // obj is boss
+                                ((BossObject)obj).dodamage(spinDamage);
 								HasControl = false;
 								NoControlTimer = 0.5;
 								knockback(false, obj);

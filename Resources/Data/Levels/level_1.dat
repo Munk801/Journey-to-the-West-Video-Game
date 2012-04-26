@@ -4,8 +4,8 @@
   <audiofile>
 		<file>Level01.ogg</file>
   </audiofile>
-  <bossAreaCenter x="4250" y="125" z="50" />
-  <bossAreaBounds x="100" y="200" z="100" />
+  <bossAreaCenter x="4287.5" y="125" z="50" />
+  <bossAreaBounds x="137.5" y="200" z="100" />
   <bossSpawn x="3850" y="125" z="50" />
 	<backgroundlist>
 		<background>
@@ -131,6 +131,8 @@
 			<loc x="687" y="77" z="21" />
 			<loc x="1512" y="74" z="101" />
 			<loc x="1563" y="74" z="101" />
+      <loc x="4372" y="167.6" z="0"/>
+      <loc x="4422" y="167.6" z="0.1"/>
 		</obstacle>
 		<obstacle>
 			<path>jungle_obstacle.dat</path>
@@ -159,7 +161,7 @@
 			<loc x="2764" y="-103" z="50" />
 			<loc x="2887" y="-115" z="50" />
 			<loc x="2991" y="-95" z="50" />
-			<loc x="3153" y="-35" z="50" />
+			<loc x="3153" y="-45" z="50" /> <!--was -35-->
 			<loc x="3310" y="-10" z="50" />
 			<loc x="3450" y="7" z="50" />
 			<loc x="3592" y="-1" z="50" />
@@ -171,27 +173,25 @@
 			<loc x="1127" y="26" z="27" />
 			<loc x="1133" y="26" z="46" />
       <!--Boss encounter area-->
-  <!--<loc x="4100" y="75" z="0"/>
-			<loc x="4100" y="75" z="100"/>
 			<loc x="4200" y="75" z="0"/>
-			<loc x="4200" y="75" z="100"/>-->
+			<loc x="4200" y="75" z="100"/>
+			<loc x="4300" y="75" z="0"/>
+			<loc x="4300" y="75" z="100"/>
+      <loc x="4400" y="100" z="50"/>
 
 		</obstacle>
     <obstacle>
+      <path>bush3d.dat</path>
+      <loc x="4350.099" y="167.6" z="22"/>
+      <loc x="4350.089" y="167.6" z="72"/>
+    </obstacle>
+    <obstacle>
+      <path>barrel_stack.dat</path>
+      <loc x="4400" y="175" z="5" />
+    </obstacle>
+    <obstacle>
       <path>rope_bridge.dat</path>
       <loc x="4050" y="123.945" z="50"/>
-    </obstacle>
-    <obstacle>
-      <path>brick_wall_back.dat</path>
-      <loc x="4250" y="275" z="-50"/>
-    </obstacle>
-    <obstacle>
-      <path>brick_wall_front.dat</path>
-      <loc x="4250" y="275" z="150"/>
-    </obstacle>
-    <obstacle>
-      <path>brick_wall_right.dat</path>
-      <loc x="4350" y="275" z="50"/>
     </obstacle>
 		<obstacle>
 			<path>jungle_tree.dat</path>
@@ -264,16 +264,8 @@
 		</obstacle>
 	</obstaclelist>
   <bosslist>
-    <obstacle>
-      <path>brick_wall_left.dat</path>
-      <loc x="4150" y="275" z="50"/>
-    </obstacle>
   </bosslist>
   <bossremovelist>
-    <decoration>
-      <path>brick_wall_door.dat</path>
-      <loc x="4149" y="275" z="50"/>
-    </decoration>
   </bossremovelist>
   <decorationlist>
     <decoration>
