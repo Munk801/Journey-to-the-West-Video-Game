@@ -245,7 +245,7 @@ namespace U5Designs {
                     else { //this is a combat collision
                         //time = 0.0; //WARNING: Ending early like this is a bit lazy, so if we have problems later, do like physics collisions instead
                         if (((CombatObject)collidingObj).type == (int)CombatType.player) {
-                            if (playerspawned) {
+                            if (!playerspawned) {
                                 if (type != (int)CombatType.squish) {
                                     time = 0.0;
                                     ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
@@ -253,7 +253,7 @@ namespace U5Designs {
                                 player.HurtSound.Play();
                                     player.knockback(true, this);
                                 }
-                                else {
+                                else { //squish
                                     time = 0.0;
                                     if (player.onGround)
                                         player.squish();

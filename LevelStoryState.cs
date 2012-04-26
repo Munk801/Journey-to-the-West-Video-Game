@@ -46,7 +46,7 @@ namespace U5Designs
         OpenTK.Input.KeyboardState _old_state;
         public bool enterdown;
 
-        String level_1 = "With the defeat of the Zoo Keeper our hero finally escapes the Zoo.\nHe now finds himself in a mysterious Jungle.  With no \ngoing back he pushes onward into the unknown...";
+        String level_1 = "With the defeat of the Zoo Keeper our hero finally escapes the Zoo.  He now finds himself in a mysterious Jungle.  With no going back he pushes onward into the unknown...";
         String credits = "Game Finished\nThanks For Playing\n\n\nDylan Riddle - Game Designer\nKendal Gifford - Game Designer\nSeth Walsh - Game Designer\nStephen Lu - Game Designer\nKacy Shearer - Artist\n\n(Press Enter to return to Main Menu)";
         // End Fonts
 
@@ -165,7 +165,7 @@ namespace U5Designs
 
                 // Draw non highlighted string
                 button.Options.DropShadowActive = true;
-                PrintWithBounds(button, level_1, new RectangleF(-530, 10, 1280, 300), QFontAlignment.Left, ref yOffset);
+                PrintWithBounds(button, level_1, new RectangleF(-530, 10, 1060, 300), QFontAlignment.Left, ref yOffset);
             }
             yOffset += yOffset;
             GL.PopMatrix();

@@ -2,8 +2,19 @@
 	<bmp>gorilla_side_throw.png</bmp>
 	<c_starts>0</c_starts>
 	<c_lengths>1</c_lengths>
+
+  <bmp>gorilla_front_cycle.png</bmp>
 	<c_starts>0</c_starts>
 	<c_lengths>1</c_lengths>
+  
+  <bmp>gorilla_side_throw.png</bmp>
+  <c_starts>1</c_starts>
+  <c_lengths>9</c_lengths>
+
+  <bmp>gorilla_front_cycle.png</bmp>
+  <c_starts>1</c_starts>
+  <c_lengths>4</c_lengths>
+  
 	<t_width>512</t_width>
 	<t_height>512</t_height>
 	<hasAlpha>true</hasAlpha>

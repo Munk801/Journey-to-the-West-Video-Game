@@ -44,12 +44,12 @@ namespace U5Designs
         OpenTK.Input.KeyboardState _old_state;
         public bool enterdown;
 
-        String page1 = @"Once upon a time lived a young monkey in a dreary metropolitan Zoo.  He spent his life trapped within the cold iron bars of his cage watching the world pass him by.  But there was more to this monkey than the strangers moving past him could realize..." + Environment.NewLine;
+        String page1 = @"Once upon a time lived a young monkey in a dreary metropolitan zoo.  He spent his life trapped within the cold iron bars of his cage watching the world pass him by.  But there was more to this monkey than the strangers moving past him could realize..." + Environment.NewLine;
                
                
-        String page2 = "For within this monkey lived a spirit that no cage could contain, though he had yet to fully realize this.  All he knew was there had to be more to life than this.  That somewhere, out there in the strange and wonderful world, was his Destiny." + Environment.NewLine;
-        String page3 = "And so it was one fateful night when the mean Zoo Keeper was not watching the monkey snatched the key to his cage off his belt.  And when the Zoo Keeper turned his back the monkey quitely unlocked his cage door and took the first steps on a path that would change his life forever...";
-        String instructions;
+        String page2 = "For within this monkey lived a spirit that no cage could contain, though he had yet to fully realize this.  All he knew was that there had to be more to life than this.  That somewhere, out there in the strange and wonderful world, was his Destiny." + Environment.NewLine;
+        String page3 = "And so it was one fateful night, when the mean Zoo Keeper was not watching, the monkey snatched the key to his cage off his belt.  And when the Zoo Keeper turned his back the monkey quietly unlocked his cage door and took the first steps on a path that would change his life forever...";
+        String instructions1, instructions2, instructions3;
         // End Fonts
 
         public StoryInstructionState(GameEngine engine, MainMenuState menustate)
@@ -67,10 +67,16 @@ namespace U5Designs
             //bg = eng.StateTextureManager.GetTexture("menu");
 
             _buttons = new List<String>();
-            instructions = "W - Moves Forward in 3D" + Environment.NewLine + "A - Moves Left in 3D" + Environment.NewLine + "D - Moves Right in 3D" + Environment.NewLine +
-                "    Forward in 2D" + Environment.NewLine + "S - Moves Back in 3D" + Environment.NewLine + "Space - Jump" + Environment.NewLine + "C - Fly if you have the Nimbus Cloud" + Environment.NewLine +
-                "Left Mouse - Fire Projectile" + Environment.NewLine + "Right Mouse - Spin Attack" + Environment.NewLine + "E - Coconut Grenade" + Environment.NewLine +
-                "ESC - Pause";
+			instructions1 = "D - Moves Forward" + Environment.NewLine + "A - Moves Back" + Environment.NewLine + "S - Looks Down";
+			instructions2 = "W - Moves Forward" + Environment.NewLine + "A - Moves Left" + Environment.NewLine + "D - Moves Right" + Environment.NewLine +
+				"S - Moves Back";
+			instructions3 = "Tab - Switch Views" + Environment.NewLine + "Space - Jump" + Environment.NewLine + "Left Mouse - Fire Projectile" + Environment.NewLine +
+				"Right Mouse - Spin Attack" + Environment.NewLine + "E - Coconut Grenade" + Environment.NewLine + "ESC - Pause";
+
+//             instructions = "W - Moves Forward in 3D" + Environment.NewLine + "A - Moves Left in 3D" + Environment.NewLine + "D - Moves Right in 3D" + Environment.NewLine +
+//                 "    Forward in 2D" + Environment.NewLine + "S - Moves Back in 3D" + Environment.NewLine + "Space - Jump" + Environment.NewLine +
+//                 "Left Mouse - Fire Projectile" + Environment.NewLine + "Right Mouse - Spin Attack" + Environment.NewLine + "E - Coconut Grenade" + Environment.NewLine +
+//                 "ESC - Pause";
             
             
             //button = QFont.FromQFontFile("../../Fonts/myStoryWhite.qfont", new QFontLoaderConfiguration(true, false));
@@ -160,7 +166,7 @@ namespace U5Designs
         public void drawButtons()
         {
             GL.PushMatrix();
-            GL.Translate(new Vector3(-100, 350, 0));
+            GL.Translate(new Vector3(0, 350, 0));
 			GL.Scale(1, -1, 1);            
             float yOffset = 720 / (button.Measure("S").Height + 10);
             
@@ -170,7 +176,11 @@ namespace U5Designs
 
             if (cur_page == 0)
             {
-                button.Print(instructions, new Vector2(-button.Measure(instructions).Width / 2, yOffset));
+				button.Print("2D", new Vector2(-320 - button.Measure("2D").Width / 2, yOffset));
+				button.Print(instructions1, new Vector2(-320 - button.Measure(instructions1).Width / 2, yOffset + button.Measure("2D").Height));
+				button.Print("3D", new Vector2(320 - button.Measure("3D").Width / 2, yOffset));
+				button.Print(instructions2, new Vector2(320 - button.Measure(instructions2).Width / 2, yOffset + button.Measure("3D").Height));
+				button.Print(instructions3, new Vector2(-button.Measure(instructions3).Width / 2, yOffset + 360));
                 //PrintWithBounds(button, instructions, new RectangleF(-530, 10, 1280, 300), QFontAlignment.Left, ref yOffset);
                 // Test
                 //button.Print("[ Press Enter ] ", new Vector2(-button.Measure(instructions).Width - button.Measure("[ Press Enter ]").Width, button.Measure(instructions).Height + 10));
@@ -178,17 +188,17 @@ namespace U5Designs
             else if(cur_page == 1)
             {
                 //button.Print(page1, new Vector2(-button.Measure(page1).Width / 2, yOffset));
-                PrintWithBounds(button, page1, new RectangleF(-530, 10, 1280, 300), QFontAlignment.Left, ref yOffset);
+                PrintWithBounds(button, page1, new RectangleF(-530, 10, 1060, 300), QFontAlignment.Left, ref yOffset);
             }
             else if (cur_page == 2)
             {
                 //button.Print(page1, new Vector2(-button.Measure(page1).Width / 2, yOffset));
-                PrintWithBounds(button, page2, new RectangleF(-530, 10, 1280, 300), QFontAlignment.Left, ref yOffset);
+                PrintWithBounds(button, page2, new RectangleF(-530, 10, 1060, 300), QFontAlignment.Left, ref yOffset);
             }
             else if (cur_page == 3)
             {
                 //button.Print(page1, new Vector2(-button.Measure(page1).Width / 2, yOffset));
-                PrintWithBounds(button, page3, new RectangleF(-530, 10, 1280, 300), QFontAlignment.Left, ref yOffset);
+                PrintWithBounds(button, page3, new RectangleF(-530, 10, 1060, 300), QFontAlignment.Left, ref yOffset);
             }
             yOffset += yOffset;              
             GL.PopMatrix();            

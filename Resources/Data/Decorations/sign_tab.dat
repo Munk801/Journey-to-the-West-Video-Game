@@ -1,0 +1,8 @@
+﻿<decoration>
+	<is2d>true</is2d>
+	<scale x="60" y="24" z="60"/>
+	<draw2>true</draw2>
+	<draw3>true</draw3>
+	<sprite>sign_tab_sprite.dat</sprite>
+	<billboards>lock2d</billboards>
+</decoration>

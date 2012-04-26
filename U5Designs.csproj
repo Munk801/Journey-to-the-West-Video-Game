@@ -513,6 +513,11 @@
     <EmbeddedResource Include="Resources\Textures\zookeeper.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Textures\gorilla_front_cycle.png" />
+    <EmbeddedResource Include="Resources\Textures\sign_hold_s.png" />
+    <EmbeddedResource Include="Resources\Textures\sign_tab.png" />
+    <EmbeddedResource Include="Resources\Textures\sign_mouse.png" />
+    <EmbeddedResource Include="Resources\Textures\sign_wsad.png" />
     <EmbeddedResource Include="Resources\Textures\bush_side.png" />
     <EmbeddedResource Include="Resources\Textures\barrel.png" />
     <EmbeddedResource Include="Resources\Textures\gorilla_side_throw.png" />
@@ -611,6 +616,22 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Decorations\bush_side.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\sign_mouse_sprite.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\sign_wsad_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Decorations\sign_mouse.dat" />
+    <EmbeddedResource Include="Resources\Data\Decorations\sign_wsad.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Sprites\sign_hold_s_sprite.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\sign_tab_sprite.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Data\Decorations\sign_hold_s.dat" />
+    <EmbeddedResource Include="Resources\Data\Decorations\sign_tab.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

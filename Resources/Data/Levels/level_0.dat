@@ -219,6 +219,22 @@
   </bossremovelist>
   <decorationlist>
     <decoration>
+      <path>sign_wsad.dat</path>
+      <loc x="30" y="40" z="-50"/>
+    </decoration>
+    <decoration>
+      <path>sign_mouse.dat</path>
+      <loc x="175" y="40" z="-50"/>
+    </decoration>
+    <decoration>
+      <path>sign_tab.dat</path>
+      <loc x="353" y="50" z="202"/>
+    </decoration>
+    <decoration>
+      <path>sign_hold_s.dat</path>
+      <loc x="1120" y="115" z="-50"/>
+    </decoration>
+    <decoration>
       <path>zoo_sky_front.dat</path>
       <loc x="5500" y="80" z="350"/>
     </decoration>

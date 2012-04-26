@@ -226,7 +226,7 @@ namespace U5Designs {
 
 			if(lookDownTimer >= 0.0) {
 				lookDownTimer += time;
-				if(lookDownTimer >= 0.75) {
+				if(lookDownTimer >= 0.35) {
 					cam.moveToYPos(_location.Y - 50.0f);
 					lookDownTimer = -2.0;
 					isMobile = false;
@@ -967,7 +967,7 @@ namespace U5Designs {
                         //note: we cant do collisions the 'good' way like below with a cbox or pbox
                         // because we may start spinning with an enemy already inside of our box. Thus we must just simply check whether an enemy
                         // is inside our 'zone'(location + spinSize in x and z)
-                        //Note: if we impliment an enemy with a not square cbox this may look... odd. until then, doing zones is very fast/easy
+                        //Note: if we implement an enemy with a not square cbox this may look... odd. until then, doing zones is very fast/easy
                         double enemyZone = (((CombatObject)obj).cbox.X + ((CombatObject)obj).cbox.Z) / 2; // avg(in case z and x are not equal)
                         double xdist = Math.Abs(obj.location.X - location.X);
                         double zdist = Math.Abs(obj.location.Z - location.Z);
@@ -1032,6 +1032,7 @@ namespace U5Designs {
 					spinning = false;
                     _speed = runSpeed;
 					cycleNumber = (int)(velocity.X == 0 ? PlayerAnim.stand3d : PlayerAnim.walk3d);
+					HitSound.Play();
 				}
 
 				Vector3 startLoc = new Vector3(_location);
@@ -1268,6 +1269,7 @@ namespace U5Designs {
 					spinning = false;
 					_speed = runSpeed;
 					cycleNumber = (int)(velocity.X == 0 ? PlayerAnim.stand2d : PlayerAnim.walk2d);
+					HitSound.Play();
 				}
 
 				Vector3 startLoc = new Vector3(_location);
