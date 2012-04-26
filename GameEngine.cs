@@ -22,6 +22,8 @@ namespace U5Designs
          * will call the corresponding methods in the State class that is on the "stack" List<>
          * */
 
+        internal int max_level = 2;  // Change this when you add new levels
+
         Stack<GameState> states; // This is the "Stack" of states with an LIFO structure mimicking an actual memory Stack
         internal bool GameInProgress; // this bool tracks if a game is in progress, mostly for the menu state to know if its the first menu, or has been brought up ingame
         internal TextureManager StateTextureManager;
@@ -42,6 +44,8 @@ namespace U5Designs
 
 			xOffset = 0;
 			yOffset = 0;
+
+
         }
 
         /// <summary>Load resources here. This gets called ONCE at the start of the entire process(not once a state)</summary>

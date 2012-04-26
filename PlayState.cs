@@ -293,17 +293,21 @@ namespace U5Designs
             }
             int nextlevelID = levelID + 1;
 
-            if (nextlevelID == 2) {//Temp   
+            if (nextlevelID == eng.max_level) {//Temp   
                 //TODO: push thanks for playing state
+                //PlayState ps = new PlayState(eng, menustate, nextlevelID);
+                LevelStoryState lss = new LevelStoryState(eng, nextlevelID);
+                eng.ChangeState(lss);
             }
 
 
-			if(nextlevelID <= 1) {
-				PlayState ps = new PlayState(eng, menustate, nextlevelID);
-				LoadScreenState ls = new LoadScreenState(eng, ps, nextlevelID);
-				eng.ChangeState(ls);
+			if(nextlevelID <= eng.max_level) {
+				//PlayState ps = new PlayState(eng, menustate, nextlevelID);
+				//LoadScreenState ls = new LoadScreenState(eng, ps, nextlevelID);
+                LevelStoryState lss = new LevelStoryState(eng, nextlevelID);
+				eng.ChangeState(lss);
 			} else { //Don't load the next level if the next level doesn't exist
-				eng.ChangeState(new MainMenuState(eng));
+				//eng.ChangeState(new MainMenuState(eng));
 			}
         }
 

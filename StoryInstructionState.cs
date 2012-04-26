@@ -47,7 +47,7 @@ namespace U5Designs
         String page1 = @"Once upon a time lived a young monkey in a dreary metropolitan Zoo.  He spent his life trapped within the cold iron bars of his cage watching the world pass him by.  But there was more to this monkey than the strangers moving past him could realize..." + Environment.NewLine;
                
                
-        String page2 = "For within this monkey lived a spirit that no cage could contain, though he had yet to fully realize this.  All he knew was that there was more to his life than this.  That somewhere, out there in the strange and wonderful world, was his Destiny." + Environment.NewLine;
+        String page2 = "For within this monkey lived a spirit that no cage could contain, though he had yet to fully realize this.  All he knew was there had to be more to life than this.  That somewhere, out there in the strange and wonderful world, was his Destiny." + Environment.NewLine;
         String page3 = "And so it was one fateful night when the mean Zoo Keeper was not watching the monkey snatched the key to his cage off his belt.  And when the Zoo Keeper turned his back the monkey quitely unlocked his cage door and took the first steps on a path that would change his life forever...";
         String instructions;
         // End Fonts
@@ -59,34 +59,23 @@ namespace U5Designs
             menu = menustate;
             lookat = new Vector3(0, 0, 2);
             eye = new Vector3(0, 0, 5);
-//             _p1 = eng.StateTextureManager.GetTexture("p1");
-//             _p2 = eng.StateTextureManager.GetTexture("p2");
-//             _p3 = eng.StateTextureManager.GetTexture("p3");
-//             _p4 = eng.StateTextureManager.GetTexture("p4");
 
+          
             // QFont
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            eng.StateTextureManager.LoadTexture("menu", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
-            bg = eng.StateTextureManager.GetTexture("menu");
+           // Assembly assembly = Assembly.GetExecutingAssembly();
+            //eng.StateTextureManager.LoadTexture("menu", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu_plain.png"));
+            //bg = eng.StateTextureManager.GetTexture("menu");
 
             _buttons = new List<String>();
             instructions = "W - Moves Forward in 3D" + Environment.NewLine + "A - Moves Left in 3D" + Environment.NewLine + "D - Moves Right in 3D" + Environment.NewLine +
                 "    Forward in 2D" + Environment.NewLine + "S - Moves Back in 3D" + Environment.NewLine + "Space - Jump" + Environment.NewLine + "C - Fly if you have the Nimbus Cloud" + Environment.NewLine +
                 "Left Mouse - Fire Projectile" + Environment.NewLine + "Right Mouse - Spin Attack" + Environment.NewLine + "E - Coconut Grenade" + Environment.NewLine +
                 "ESC - Pause";
-            //_buttons.Add("W - Moves Forward in 3D");
-            //_buttons.Add("A - Moves Left in 3D");
-            //_buttons.Add("D - Moves Right in 3D");
-            //_buttons.Add("    Forward in 2D");
-            //_buttons.Add("S - Moves Back in 3D");
-            //_buttons.Add("Space - Jump");
-            //_buttons.Add("C - Fly if you have the Nimbus Cloud");
-            //_buttons.Add("Left Mouse - Fire Projectile");
-            //_buttons.Add("Right Mouse - Spin Attack");
-            //_buttons.Add("E - Coconut Grenade");
-            //_buttons.Add("ESC - Pause");
             
-            button = QFont.FromQFontFile("../../Fonts/myStoryWhite.qfont", new QFontLoaderConfiguration(true, false));
+            
+            //button = QFont.FromQFontFile("../../Fonts/myStoryWhite.qfont", new QFontLoaderConfiguration(true, false));
+            button = QFont.FromQFontFile("../../Fonts/myStoryBright.qfont", new QFontLoaderConfiguration(true, false));
+            
             button.Options.DropShadowActive = false;
             //title = QFont.FromQFontFile("myHappySans.qfont", new QFontLoaderConfiguration(true));
             title = QFont.FromQFontFile("../../Fonts/myRock.qfont", new QFontLoaderConfiguration(true, false));
@@ -127,7 +116,7 @@ namespace U5Designs
         public override void Draw(FrameEventArgs e)
         {
             GL.Clear(ClearBufferMask.AccumBufferBit | ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            GL.ClearColor(0.1f, 0.1f, 0.1f, 0.1f);
 
             Matrix4 modelview = Matrix4.LookAt(eye, lookat, Vector3.UnitY);
             GL.MatrixMode(MatrixMode.Modelview);
@@ -142,7 +131,7 @@ namespace U5Designs
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
             
-            bg.Draw2DTexture();
+            //bg.Draw2DTexture();
             
             drawButtons();            
             
@@ -154,26 +143,7 @@ namespace U5Designs
         /// Called by mouse or keyboard handlers when the user picked a button (by clicking or hitting enter)
         /// </summary>
         internal void handleButtonPress()
-        {
-            /*
-            switch (_cur_butn)
-            {
-                case 0: //Continue
-                    // Exit Paused Menu state and return to playing				
-                    eng.PopState();
-                    break;
-				case 1: //Main menu
-					eng.GameInProgress = false;
-					menu.enterdown = true;
-					eng.ChangeState(menu);
-					break;
-                case 2: //Quit
-                    eng.Exit();
-                    break;
-                
-            }
-             * */
-
+        {            
             // Go to next page
             switch (cur_page)
             { 
@@ -190,7 +160,7 @@ namespace U5Designs
         public void drawButtons()
         {
             GL.PushMatrix();
-            GL.Translate(new Vector3(-100, 170, 0));
+            GL.Translate(new Vector3(-100, 350, 0));
 			GL.Scale(1, -1, 1);            
             float yOffset = 720 / (button.Measure("S").Height + 10);
             
@@ -201,6 +171,9 @@ namespace U5Designs
             if (cur_page == 0)
             {
                 button.Print(instructions, new Vector2(-button.Measure(instructions).Width / 2, yOffset));
+                //PrintWithBounds(button, instructions, new RectangleF(-530, 10, 1280, 300), QFontAlignment.Left, ref yOffset);
+                // Test
+                //button.Print("[ Press Enter ] ", new Vector2(-button.Measure(instructions).Width - button.Measure("[ Press Enter ]").Width, button.Measure(instructions).Height + 10));
             }
             else if(cur_page == 1)
             {
