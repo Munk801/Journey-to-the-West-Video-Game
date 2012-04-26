@@ -594,6 +594,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Data\Sprites\gorilla_sprite.dat" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Sound\spin.ogg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(SolutionDir)Fonts" "$(TargetDir)Fonts" /S /I /Y</PostBuildEvent>

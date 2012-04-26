@@ -240,6 +240,7 @@ namespace U5Designs {
                                     time = 0.0;
                                     ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                     health = 0;
+                                player.HurtSound.Play();
                                     player.knockback(true, this);
                                 }
                                 else {
@@ -257,12 +258,14 @@ namespace U5Designs {
                         if (((CombatObject)collidingObj).type == (int)CombatType.enemy) {
                             if (playerspawned) {
                                 time = 0.0;
+                                player.HurtSound.Play();
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
                             }
                         }
                         if (((CombatObject)collidingObj).type == (int)CombatType.boss) {
                             ((BossObject)collidingObj).dodamage(damage);
+                            player.HurtSound.Play();
                             time = 0.0;
                             health = 0;
                         }
@@ -406,6 +409,7 @@ namespace U5Designs {
                             if (!playerspawned) {
                                 if (type != 4) {
                                     time = 0.0;
+                                    player.HurtSound.Play();
                                     ((CombatObject)collidingObj).health -= this.damage;
                                     health = 0;
                                     player.knockback(false, this);
@@ -425,12 +429,14 @@ namespace U5Designs {
                         if (((CombatObject)collidingObj).type == 1) { //hit an enemy or boss
                             if (playerspawned) {
                                 time = 0.0;
+                                player.HitSound.Play();
                                 ((CombatObject)collidingObj).health = ((CombatObject)collidingObj).health - this.damage;
                                 health = 0;
                             }
                         }
                         if (((CombatObject)collidingObj).type == 3) { // obj is zookeeper
                             ((BossObject)collidingObj).dodamage(damage);
+                            player.HitSound.Play();
                             time = 0.0;
                             health = 0;
                         }

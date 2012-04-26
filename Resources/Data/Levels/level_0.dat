@@ -61,7 +61,6 @@
 	<enemylist>
 		<enemy>
 			<path>Boy.dat</path>
-      <loc x="200" y="17.5" z="50"/>
       <loc x="500" y="17.5" z="50"/>
       <loc x="800" y="62.5" z="50"/>
       <loc x="1100" y="112.5" z="50"/>
@@ -73,7 +72,6 @@
 		</enemy>
 		<enemy>
 			<path>Bird.dat</path>
-			<loc x="200" y="60" z="50"/>
 			<loc x="709" y="71" z="50" />
 			<loc x="1680" y="62" z="50" />
 			<loc x="2114" y="-5" z="110" />
