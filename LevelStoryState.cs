@@ -65,10 +65,10 @@ namespace U5Designs
             //eng.StateTextureManager.LoadTexture("menu", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
             //bg = eng.StateTextureManager.GetTexture("menu");
 
-            credit = QFont.FromQFontFile("../../Fonts/myStoryWhite.qfont", new QFontLoaderConfiguration(true, false));
+            credit = QFont.FromQFontFile("Fonts/myStoryWhite.qfont", new QFontLoaderConfiguration(true, false));
             credit.Options.DropShadowActive = false;
 
-            button = QFont.FromQFontFile("../../Fonts/myStoryBright.qfont", new QFontLoaderConfiguration(true, false));
+            button = QFont.FromQFontFile("Fonts/myStoryBright.qfont", new QFontLoaderConfiguration(true, false));
             button.Options.DropShadowActive = true;
             
             // Set the current image to be displayed at 0 which is the first in the sequence

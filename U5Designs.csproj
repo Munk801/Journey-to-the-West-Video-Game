@@ -599,7 +599,9 @@
     <EmbeddedResource Include="Resources\Data\Obstacles\bush3d.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Data\Sprites\gorilla_sprite.dat" />
+    <EmbeddedResource Include="Resources\Data\Sprites\gorilla_sprite.dat">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Sound\spin.ogg" />

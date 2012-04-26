@@ -79,14 +79,14 @@ namespace U5Designs
 //                 "ESC - Pause";
             
             
-            //button = QFont.FromQFontFile("../../Fonts/myStoryWhite.qfont", new QFontLoaderConfiguration(true, false));
-            button = QFont.FromQFontFile("../../Fonts/myStoryBright.qfont", new QFontLoaderConfiguration(true, false));
+            //button = QFont.FromQFontFile("Fonts/myStoryWhite.qfont", new QFontLoaderConfiguration(true, false));
+            button = QFont.FromQFontFile("Fonts/myStoryBright.qfont", new QFontLoaderConfiguration(true, false));
             
             button.Options.DropShadowActive = false;
             //title = QFont.FromQFontFile("myHappySans.qfont", new QFontLoaderConfiguration(true));
-            title = QFont.FromQFontFile("../../Fonts/myRock.qfont", new QFontLoaderConfiguration(true, false));
+            title = QFont.FromQFontFile("Fonts/myRock.qfont", new QFontLoaderConfiguration(true, false));
             title.Options.DropShadowActive = false;
-            //buttonHighlight = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
+            //buttonHighlight = QFont.FromQFontFile("Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
             //buttonHighlight.Options.DropShadowActive = true;
             //QFont.CreateTextureFontFiles("Fonts/Rock.TTF", 48, "myRock"); // Use this to create new Fonts that you will texture
             // End QFonts

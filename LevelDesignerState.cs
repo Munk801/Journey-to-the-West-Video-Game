@@ -144,13 +144,13 @@ namespace U5Designs
             _xml_end_region = new List<Vector3>();
 
             //StartDesignerThread();
-            currentObj = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            currentObj = QFont.FromQFontFile("Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
             currentObj.Options.DropShadowActive = false;
-            controls = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            controls = QFont.FromQFontFile("Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
             controls.Options.DropShadowActive = false;
-            ahSnap = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            ahSnap = QFont.FromQFontFile("Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
             ahSnap.Options.DropShadowActive = false;
-            whichList = QFont.FromQFontFile("../../Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
+            whichList = QFont.FromQFontFile("Fonts/myHappySans.qfont", new QFontLoaderConfiguration(true));
             whichList.Options.DropShadowActive = false;
 
             controlsText = new StringBuilder();

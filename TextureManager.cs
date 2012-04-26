@@ -16,11 +16,11 @@ namespace U5Designs
     class TextureManager : IDisposable
     {
         /** DLL P/Invoke **/
-        [DllImport("../../Resources/lib/DevIL.dll")]
+		[DllImport("Tao DevIL/DevIL.dll")]
         public static extern void ilInit();
-        [DllImport("../../Resources/lib/ILU.dll")]
+		[DllImport("Tao DevIL/ILU.dll")]
         public static extern void iluInit();
-        [DllImport("../../Resources/lib/ILUT.dll")]
+		[DllImport("Tao DevIL/lib/ILUT.dll")]
         public static extern void ilutInit();
         // CAN BE REPLACED WITH AN XML LATER ON
         Dictionary<string, Texture> Textures = new Dictionary<string, Texture>();
