@@ -62,12 +62,12 @@ namespace U5Designs {
         public int spinDamage;
 
 		private bool spaceDown, eDown, pDown;
-
+        public bool oldMouseState = false;
         public bool inLevelDesignMode = false; // THIS IS ONLY USED FOR LEVEL DESIGNER
         
         // SOUND FILES
         AudioFile jumpSound, bananaSound;
-		public AudioFile HitSound, HurtSound;
+		public AudioFile HitSound, HurtSound, SpinSound;
 
         public Player(SpriteSheet sprite, SpriteSheet arms, List<ProjectileProperties> projectiles, PlayState ps) : base(Int32.MaxValue) //player always has largest ID for rendering purposes
         {
@@ -131,6 +131,7 @@ namespace U5Designs {
 			bananaSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.banana2.ogg"));
 			HurtSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.hurt.ogg"));
             HitSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.hit.ogg"));
+            SpinSound = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Sound.spin.ogg"));
 		}
 
 		~Player() {
@@ -174,6 +175,7 @@ namespace U5Designs {
         /// <param name="time">time elapsed since last update</param>
         internal void updateState(bool enable3d, KeyboardDevice keyboard, double time) {
 			this.enable3d = enable3d;
+            
 
 			//Update timers
 			if(stamina < maxStamina) {
@@ -559,6 +561,7 @@ namespace U5Designs {
 				spinTimer = 0.5;
                 _speed = spinSpeed;
 				arms.cycleNumber = cycleNumber = (int)(enable3d ? PlayerAnim.spin3d : PlayerAnim.spin2d); //explicitly set arms to clear possible throw animation
+                oldMouseState = playstate.eng.ThisMouse.RightPressed();
             }
         }
 
