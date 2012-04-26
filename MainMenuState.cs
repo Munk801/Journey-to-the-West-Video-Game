@@ -67,27 +67,7 @@ namespace U5Designs
             
             eng.StateTextureManager.LoadTexture("menu", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.menu.png"));
             menu = eng.StateTextureManager.GetTexture("menu");
-            /*
-            eng.StateTextureManager.LoadTexture("arrow", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.arrow.png"));
-            arrow = eng.StateTextureManager.GetTexture("arrow");
-            eng.StateTextureManager.LoadTexture("load", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel.png"));
-            load_nopress = eng.StateTextureManager.GetTexture("load");
-            eng.StateTextureManager.LoadTexture("loadpress", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_loadlevel_hover.png"));
-            load_press = eng.StateTextureManager.GetTexture("loadpress");
-            eng.StateTextureManager.LoadTexture("quit", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_exit.png"));
-            quit_nopress = eng.StateTextureManager.GetTexture("quit");
-            eng.StateTextureManager.LoadTexture("quitpress", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_exit_hover.png"));
-            quit_press = eng.StateTextureManager.GetTexture("quitpress");
-            eng.StateTextureManager.LoadTexture("play", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play.png"));
-            play_nopress = eng.StateTextureManager.GetTexture("play");
-            eng.StateTextureManager.LoadTexture("playpress", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_play_hover.png"));
-            play_press = eng.StateTextureManager.GetTexture("playpress");
-            eng.StateTextureManager.LoadTexture("ld", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_leveldesign.png"));
-            ld_nopress = eng.StateTextureManager.GetTexture("ld");
-            eng.StateTextureManager.LoadTexture("ldpress", assembly.GetManifestResourceStream("U5Designs.Resources.Textures.btn_leveldesign_hover.png"));
-            ld_press = eng.StateTextureManager.GetTexture("ldpress");
-            */
-
+            
             // QFont
             _buttons = new List<String>();
             _buttons.Add("Play Game");
@@ -101,7 +81,9 @@ namespace U5Designs
             title.Options.DropShadowActive = false;
             buttonHighlight = QFont.FromQFontFile("../../Fonts/myHappySans2.qfont", new QFontLoaderConfiguration(true));
             buttonHighlight.Options.DropShadowActive = true;
-            //QFont.CreateTextureFontFiles("../../Fonts/HappySans.TTF", 32, "myStoryWhite"); // Use this to create new Fonts that you will texture
+           // QFont.CreateTextureFontFiles("../../Fonts/HappySans.TTF", 32, "myStoryBright"); // Use this to create new Fonts that you will texture
+           // QFont.CreateTextureFontFiles("../../Fonts/Comfortaa-Regular.ttf", 32, "myComfort"); // Use this to create new Fonts that you will texture
+            
             // End QFonts
 
 			musicFile = new AudioFile(assembly.GetManifestResourceStream("U5Designs.Resources.Music.Menu.ogg"));
