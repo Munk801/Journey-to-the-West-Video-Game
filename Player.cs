@@ -425,25 +425,25 @@ namespace U5Designs {
 				}
 
 #if true
-				//Cloud
-				//TODO: Implement animation etc, possibly change which key triggers this
-				if(keyboard[Key.C]) {
-					velocity.Y = _speed;
-					fallTimer = 0.0;
-				}
-                //TMP PHYSICS TEST BUTTON suicide button
-                if (keyboard[Key.X]) {
-                    _health = 0;
-                }
-                if (keyboard[Key.P] && !pDown) {
-                    pDown = true;
-                    Console.WriteLine("Player position: (" + location.X + ", " + location.Y + ", " + location.Z + ")");
-                }
-                else if (!keyboard[Key.P])
-                    pDown = false;
-
-                if (keyboard[Key.BackSlash])
-                    location = new Vector3(3779, 138, 43);
+// 				//Cloud
+// 				//TODO: Implement animation etc, possibly change which key triggers this
+// 				if(keyboard[Key.C]) {
+// 					velocity.Y = _speed;
+// 					fallTimer = 0.0;
+// 				}
+//                 //TMP PHYSICS TEST BUTTON suicide button
+//                 if (keyboard[Key.X]) {
+//                     _health = 0;
+//                 }
+//                 if (keyboard[Key.P] && !pDown) {
+//                     pDown = true;
+//                     Console.WriteLine("Player position: (" + location.X + ", " + location.Y + ", " + location.Z + ")");
+//                 }
+//                 else if (!keyboard[Key.P])
+//                     pDown = false;
+// 
+//                 if (keyboard[Key.BackSlash])
+//                     location = new Vector3(3779, 138, 43);
 
                 if (keyboard[Key.Semicolon]) {
                     playstate.bossAI.killBoss(playstate);

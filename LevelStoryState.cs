@@ -47,7 +47,7 @@ namespace U5Designs
         public bool enterdown;
 
         String level_1 = "With the defeat of the Zoo Keeper our hero finally escapes the Zoo.  He now finds himself in a mysterious Jungle.  With no going back he pushes onward into the unknown...";
-        String credits = "Game Finished\nThanks For Playing\n\n\nDylan Riddle - Game Designer\nKendal Gifford - Game Designer\nSeth Walsh - Game Designer\nStephen Lu - Game Designer\nKacy Shearer - Artist\n\n(Press Enter to return to Main Menu)";
+		String credits = "Game Finished\nThanks For Playing\n\n\nDylan Riddle - Game Designer\nKendal Gifford - Game Designer\nSeth Walsh - Game Designer\nStephen Lu - Game Designer\nKacy Shearer - Artist\nRae Montilla - Artist\n\n(Press Enter to return to Main Menu)";
         // End Fonts
 
         public LevelStoryState(GameEngine engine, int lvl_being_loaded)
