@@ -34,7 +34,7 @@ namespace U5Designs {
 
 		public Player player;
 
-		public Projectile(Vector3 location, Vector3 direction, bool playerSpawned, ProjectileProperties p, Player player) {
+		public Projectile(Vector3 location, Vector3 direction, bool playerSpawned, ProjectileProperties p, Player player, int type=-1) {
 			_location = location;
 			this.direction = direction;
 			_scale = new Vector3(p.scale);
@@ -51,11 +51,16 @@ namespace U5Designs {
 			this.duration = p.duration;
 			liveTime = 0.0;
 
-			if(p.gravity) {
-				_type = (int)CombatType.grenade;
-				_hascbox = false; //Has normal pbox collisions until detonation
+			if(type == -1) {
+				if(p.gravity) {
+					_type = (int)CombatType.grenade;
+					_hascbox = false; //Has normal pbox collisions until detonation
+				} else {
+					_type = (int)CombatType.projectile;
+					_hascbox = true;
+				}
 			} else {
-				_type = (int)CombatType.projectile;
+				_type = type;
 				_hascbox = true;
 			}
 
@@ -82,13 +87,12 @@ namespace U5Designs {
 				if(liveTime >= duration) {
 					if(type == (int)CombatType.grenade) {
 						foreach(PhysicsObject po in physList) {
-							if(po.hascbox && ((CombatObject)po).type == (int)CombatType.enemy) {
+							if(po.hascbox && (((CombatObject)po).type == (int)CombatType.enemy || ((CombatObject)po).type == (int)CombatType.boss)) {
 								if(VectorUtil.dist(_location, po.location) < 75.0f) { //TODO: Tweak this value (grenade range)
 									((CombatObject)po).health -= damage;
 								}
 							}
 						}
-						//TODO: Explode animation
 					}
 					health = 0;
 					return;
@@ -153,7 +157,7 @@ namespace U5Designs {
                 }
                 else {
 					alreadyCollidedList.Add(collidingObj);
-					if(!this.hascbox) { //grenade collision, bounce
+					if(_type == (int)CombatType.barrel || !this.hascbox) { //grenade or barrel collision, bounce
 						if(collidingObj.hascbox && ((CombatObject)collidingObj).type == (int)CombatType.projectile) {
 							continue; //Grenades shouldn't bounce off of other projectiles
 						}
@@ -170,8 +174,10 @@ namespace U5Designs {
 									_location.Z += (float)(velocity.Z * deltaTime);
 									time -= deltaTime;
 								}
-								velocity.X *= -0.6f; //bounce
-								_animDirection = -_animDirection;
+								if(_type == (int)CombatType.grenade) {
+									velocity.X *= -0.6f; //bounce
+									_animDirection = -_animDirection;
+								}
 								break;
 							case 1: //y
 								if(_location.Y < collidingObj.location.Y) {
@@ -188,11 +194,17 @@ namespace U5Designs {
 								
 								velocity.Y *= -0.6f; //bounce
 								if(_location.Y > collidingObj.location.Y) {
-									//Simulate friction for rolling
-									velocity.X = (velocity.X >= 0 ? velocity.X - (float)(friction * time) : velocity.X + (float)(friction * time));
-									velocity.Z = (velocity.Z >= 0 ? velocity.Z - (float)(friction * time) : velocity.Z + (float)(friction * time));
-									if(velocity.Y < 25.0f) {
-										velocity.Y = 0.0f; //stop bounces when they get too small
+									if(_type == (int)CombatType.grenade) {
+										//Simulate friction for rolling
+										velocity.X = (velocity.X >= 0 ? velocity.X - (float)(friction * time) : velocity.X + (float)(friction * time));
+										velocity.Z = (velocity.Z >= 0 ? velocity.Z - (float)(friction * time) : velocity.Z + (float)(friction * time));
+										if(velocity.Y < 25.0f) {
+											velocity.Y = 0.0f; //stop bounces when they get too small
+										}
+									} else { //barrel
+										velocity.X = -20.0f;
+										velocity.Y = 0.0f;
+										velocity.Z = 0.0f;
 									}
 								}
 								break;
@@ -208,8 +220,10 @@ namespace U5Designs {
 									_location.Y += (float)(velocity.Y * deltaTime);
 									time -= deltaTime;
 								}
-								velocity.Z *= -0.6f; //bounce
-								_animDirection = -_animDirection;
+								if(_type == (int)CombatType.grenade) {
+									velocity.Z *= -0.6f; //bounce
+									_animDirection = -_animDirection;
+								}
 								break;
 						}
 					} else if(!collidingObj.hascbox) { //normal projectile colliding with normal physics object
@@ -269,13 +283,12 @@ namespace U5Designs {
 				if(liveTime >= duration) {
 					if(type == (int)CombatType.grenade) {
 						foreach(PhysicsObject po in physList) {
-							if(po.hascbox && ((CombatObject)po).type == (int)CombatType.enemy) {
+							if(po.hascbox && (((CombatObject)po).type == (int)CombatType.enemy || ((CombatObject)po).type == (int)CombatType.boss)) {
 								if(VectorUtil.dist(_location, po.location) < 75.0f) { //TODO: Tweak this value (grenade range)
 									((CombatObject)po).health -= damage;
 								}
 							}
 						}
-						//TODO: Explode animation
 					}
 					health = 0;
 					return;

@@ -11,7 +11,7 @@ using Engine;
  * Any object that has health or the ability to do damage.
  */
 namespace U5Designs {
-	public enum CombatType { player=0, enemy=1, projectile=2, boss=3, squish=4, grenade=5 };
+	public enum CombatType { player=0, enemy=1, projectile=2, boss=3, squish=4, grenade=5, barrel=6 };
 
 	public interface CombatObject {
 		//duplicated from GameObject
