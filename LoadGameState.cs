@@ -228,6 +228,7 @@ namespace U5Designs
             if (eng.Keyboard[Key.Escape] && !escapedown)
             {
                 //eng.Exit();
+                musicFile.Stop();
                 eng.PushState(_ms);
             }
             else if (!eng.Keyboard[Key.Escape])
