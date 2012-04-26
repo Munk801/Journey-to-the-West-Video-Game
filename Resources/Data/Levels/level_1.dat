@@ -57,7 +57,7 @@
       <loc x="2005" y="30" z="-200"/>
       <loc x="2080" y="30" z="-200"/>
     </background>
-    <!--<background>
+    <background>
       <scale x="75" y="57.86" z="1"/>
       <sprite>jungle_farside_background_sprite.dat</sprite>
       <speed>0.95</speed>
@@ -90,7 +90,7 @@
       <loc x="1930" y="30" z="-200"/>
       <loc x="2005" y="30" z="-200"/>
       <loc x="2080" y="30" z="-200"/>
-    </background>-->
+    </background>
 	</backgroundlist>
 	<enemylist>
 		<enemy>
@@ -104,14 +104,14 @@
 		</enemy>
 		<enemy>
 		  <path>Girl.dat</path>
-			<loc x="578" y="121" z="40" />
+      <loc x="578" y="123" z="40" />
 			<loc x="768" y="64" z="50" />
 			<loc x="952" y="57" z="-20" />
 			<loc x="1563" y="58" z="50" />
-			<loc x="566" y="121" z="50" />
+      <loc x="566" y="121" z="50" />
 			<loc x="748" y="64" z="50" />
-			<loc x="144" y="17" z="51" />
-			<loc x="573" y="121" z="50" />
+      <!--<loc x="144" y="17" z="51" />-->
+			<loc x="573" y="123" z="50" />
 			<loc x="970" y="57" z="-13" />
 			<loc x="1144" y="92" z="-70" />
 			<loc x="1566" y="58" z="49" />
@@ -123,14 +123,14 @@
 	<obstaclelist>
 		<obstacle>
 			<path>bush.dat</path>
-			<loc x="436" y="82" z="0" />
-			<loc x="522" y="133" z="100" />
-			<loc x="563" y="135" z="100" />
-			<loc x="530" y="136" z="0" />
-			<loc x="639" y="78" z="20" />
-			<loc x="687" y="77" z="21" />
-			<loc x="1512" y="74" z="101" />
-			<loc x="1563" y="74" z="101" />
+			<loc x="436" y="71.6" z="0" />
+			<loc x="522" y="120.6" z="100" />
+			<loc x="563" y="120.6" z="100" />
+			<loc x="530" y="120.6" z="0" />
+			<loc x="639" y="64.6" z="20" />
+			<loc x="687" y="63.6" z="21" />
+			<loc x="1512" y="60.6" z="101" />
+			<loc x="1563" y="60.6" z="101" />
       <loc x="4372" y="167.6" z="0"/>
       <loc x="4422" y="167.6" z="0.1"/>
 		</obstacle>
@@ -161,24 +161,24 @@
 			<loc x="2764" y="-103" z="50" />
 			<loc x="2887" y="-115" z="50" />
 			<loc x="2991" y="-95" z="50" />
-			<loc x="3153" y="-45" z="50" /> <!--was -35-->
+			<loc x="3153" y="-45" z="50" />
 			<loc x="3310" y="-10" z="50" />
 			<loc x="3450" y="7" z="50" />
 			<loc x="3592" y="-1" z="50" />
 			<loc x="3734" y="-6" z="50" />
 			<loc x="3838" y="52" z="50" />
-			<loc x="1229" y="24" z="13" />
-			<loc x="1034" y="26" z="46" />
-			<loc x="1231" y="125" z="113" />
-			<loc x="1127" y="26" z="27" />
-			<loc x="1133" y="26" z="46" />
+      <loc x="1229" y="24" z="13" />
+      <loc x="1034" y="26" z="46" />
+      <loc x="1231" y="125" z="113" />
+      <loc x="1127" y="26" z="27" />
+      <loc x="1133" y="26" z="46" />
+      <loc x="3900" y="75" z="50"/>
       <!--Boss encounter area-->
 			<loc x="4200" y="75" z="0"/>
 			<loc x="4200" y="75" z="100"/>
 			<loc x="4300" y="75" z="0"/>
 			<loc x="4300" y="75" z="100"/>
       <loc x="4400" y="100" z="50"/>
-
 		</obstacle>
     <obstacle>
       <path>bush3d.dat</path>
@@ -264,6 +264,10 @@
 		</obstacle>
 	</obstaclelist>
   <bosslist>
+    <obstacle>
+      <path>invisible_wall.dat</path>
+      <loc x="4150" y="275" z="50"/>
+    </obstacle>
   </bosslist>
   <bossremovelist>
   </bossremovelist>
@@ -283,6 +287,10 @@
     <decoration>
       <path>zoo_sky_top.dat</path>
       <loc x="5500" y="600" z="50"/>
+    </decoration>
+    <decoration>
+      <path>bush_side.dat</path>
+      <loc x="4350" y="167.6" z="100"/>
     </decoration>
   </decorationlist>
   <!--

@@ -153,40 +153,6 @@ namespace U5Designs
         private void DealWithInput()
         {
             OpenTK.Input.KeyboardState _new_state = OpenTK.Input.Keyboard.GetState();
-//             if ((_new_state.IsKeyDown(Key.Down) && !_old_state.IsKeyDown(Key.Down)) ||
-//                 (_new_state.IsKeyDown(Key.S) && !_old_state.IsKeyDown(Key.S)))
-//             {
-//                 // Down key was just pressed                
-//                 if (_cur_butn < numOfButtons)
-//                 {
-//                     // Increment the current button index so you draw the highlighted button of the next button 
-//                     _cur_butn += 1;
-//                     eng.selectSound.Play();
-//                 }
-//                 else if (_cur_butn >= numOfButtons)
-//                 {
-//                     // Were on the last button in the list so reset to the top of the button list
-//                     _cur_butn = 0;
-//                     eng.selectSound.Play();
-//                 }
-//             }
-//             if ((_new_state.IsKeyDown(Key.Up) && !_old_state.IsKeyDown(Key.Up)) ||
-//                 (_new_state.IsKeyDown(Key.W) && !_old_state.IsKeyDown(Key.W)))
-//             {
-//                 // Down key was just pressed
-//                 if (_cur_butn > 0)
-//                 {
-//                     // Increment the current button index so you draw the highlighted button of the next button 
-//                     _cur_butn -= 1;
-//                     eng.selectSound.Play();
-//                 }
-//                 else if (_cur_butn <= 0)
-//                 {
-//                     // Were on the last button in the list so reset to the top of the button list
-//                     _cur_butn = numOfButtons;
-//                     eng.selectSound.Play();
-//                 }
-//             }
 
             // Loop over all available keys and type out to the screen
             for (int i = 0; i < (int)Key.LastKey; i++)
@@ -221,11 +187,11 @@ namespace U5Designs
             }
             _old_state = _new_state;
 
-            if (eng.Keyboard[Key.Escape] && !escapedown)
+            if ((eng.Keyboard[Key.Escape] || (eng.Keyboard[Key.Tilde])) && !escapedown)
             {
                 eng.Exit();
             }
-            else if (!eng.Keyboard[Key.Escape])
+            else if (!eng.Keyboard[Key.Escape] && !eng.Keyboard[Key.Tilde])
             {
                 escapedown = false;
             }

@@ -424,7 +424,7 @@ namespace U5Designs {
 					}
 				}
 
-#if DEBUG
+#if true
 				//Cloud
 				//TODO: Implement animation etc, possibly change which key triggers this
 				if(keyboard[Key.C]) {
@@ -488,13 +488,15 @@ namespace U5Designs {
 					isMobile = true;
 					markerList.Clear();
 				} else { //Turn grenades on
-					curProjectile = projectiles[1];
-					velocity.X = 0.0f;
-					velocity.Z = 0.0f;
-					isMobile = false;
-					cycleNumber = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
-					if(arms.cycleNumber != _cycleNum) {
-						arms.cycleNumber = (int)(enable3d ? PlayerAnim.throwStand3d : PlayerAnim.throwStand2d);
+					if(onGround) {
+						curProjectile = projectiles[1];
+						velocity.X = 0.0f;
+						velocity.Z = 0.0f;
+						isMobile = false;
+						cycleNumber = (int)(enable3d ? PlayerAnim.stand3d : PlayerAnim.stand2d);
+						if(arms.cycleNumber != _cycleNum) {
+							arms.cycleNumber = (int)(enable3d ? PlayerAnim.throwStand3d : PlayerAnim.throwStand2d);
+						}
 					}
 				}
 				eDown = true;

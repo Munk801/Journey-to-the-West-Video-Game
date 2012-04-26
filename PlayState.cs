@@ -285,6 +285,8 @@ namespace U5Designs
 			objList.AddRange(bossList);
 			renderList.AddRange(bossList);
 			physList.AddRange(bossList);
+
+			bossAI.makeActive();
 		}
 
         private void loadNextLevel() {

@@ -1,0 +1,11 @@
+﻿<sprite>
+	<bmp>barrel.png</bmp>
+	<c_starts>0</c_starts>
+	<c_lengths>6</c_lengths>
+	<c_starts>6</c_starts>
+	<c_lengths>3</c_lengths>
+	<t_width>135</t_width>
+	<t_height>104</t_height>
+	<hasAlpha>true</hasAlpha>
+	<fps>12.0</fps>
+</sprite>

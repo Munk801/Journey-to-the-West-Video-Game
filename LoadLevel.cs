@@ -115,8 +115,7 @@ namespace U5Designs {
 			ps.objList.AddRange(ps.bossRemoveList);
 			ps.renderList.AddRange(ps.bossRemoveList);
 
-			//TODO: When we have more than one boss type, adjust this
-            if ( level_to_load == 0)
+			if ( level_to_load == 0)
 			    ps.bossAI = new ZookeeperAI(ps.player, ps);
             if (level_to_load == 1)
                 ps.bossAI = new GorillaAI(ps.player, ps);

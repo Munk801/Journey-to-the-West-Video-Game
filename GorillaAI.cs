@@ -18,12 +18,16 @@ namespace U5Designs {
         GorillaBossobject boss;
         bool barrelDelayed;
         double delayTimer, delayTime; // timer = running time, time = time we are waiting
+		ProjectileProperties barrelProp;
+		PlayState ps;
+
+		List<Projectile> barrels; //keep this so we can delete barrels when they're offscreen
 
         public GorillaAI(Player player, PlayState ps) {
+			this.ps = ps;
             rng = new Random(System.DateTime.Now.Millisecond);
-            //TODO: fix art
             SpriteSheet gorillaSprite = LoadLevel.parseSpriteFile("gorilla_sprite.dat");
-            ProjectileProperties barrel = LoadLevel.parseProjectileFile("banana_projectile.dat", ps);
+            barrelProp = LoadLevel.parseProjectileFile("barrel_projectile.dat", ps);
             Vector3 location = new Vector3(4370,162.5f,51);
             Vector3 scale = new Vector3(50.0f, 50.0f, 50.0f);
             Vector3 pbox = new Vector3(6, 6, 6);
@@ -34,11 +38,16 @@ namespace U5Designs {
             ps.collisionList.Add(boss);
             ps.renderList.Add(boss);
             ps.combatList.Add(boss);
+			barrels = new List<Projectile>();
 
             delayTime = 3;
             delayTimer = 0;
             barrelDelayed = true;
         }
+
+		public void makeActive() {
+			active = true;
+		}
 
         /*World cordinates for the boss area are 4150x to 4350x -50z to 150z
          * "barrel throw kill zone" is 4275 - 4310 */
@@ -54,9 +63,9 @@ namespace U5Designs {
                 else {
                     //throw barrels
                     int inverseHP = (6 - boss.health) + 1; // used as a multiplier, the lower the bosses health gets, the higher this value becomes.
-                    for (int i = 0; i < inverseHP + 2; i++) { // throw at least 3 barrles + more the weaker boss gets
+                    for (int i = 0; i < inverseHP + 2; i++) { // throw at least 3 barrels + more the weaker boss gets
                         Vector3 Target = new Vector3(rng.Next(4275, 4310), 75, rng.Next(-50, 150));
-                        spawnProjetile(Target);
+                        spawnProjectile(Target);
                     }
 
                     //set delaytime based on health
@@ -64,9 +73,20 @@ namespace U5Designs {
                     barrelDelayed = true;
                 }
             }
+			for(int i = barrels.Count - 1; i >= 0; i--) {
+				Projectile cur = barrels[i];
+				if(cur.location.X <= 4100.0f) {
+					ps.objList.Remove(cur);
+					ps.renderList.Remove(cur);
+					ps.collisionList.Remove(cur);
+					ps.physList.Remove(cur);
+					ps.combatList.Remove(cur);
+					barrels.RemoveAt(i);
+				}
+			}
         }
 
-        public int gethealth() {
+		public int gethealth() {
             return boss.health;
         }
 
@@ -84,10 +104,63 @@ namespace U5Designs {
         /// Fires a projectile at the specific point, which is a world cordinate
         /// </summary>
         /// <param name="point">The point at which to fire a projectile</param>
-        public void spawnProjetile(Vector3 point) {
+		public void spawnProjectile(Vector3 point) {
+			//Move the calculation into the x plane for simplicity
+			Vector3 projDir = new Vector3((float)Math.Sqrt(Math.Pow(point.X - boss.location.X, 2) + Math.Pow(point.Z - boss.location.Z, 2)),
+											(point.Y - boss.location.Y), 0.0f);
+			double gravity = GameObject.gravity;
+
+			//Following is adapted from http://en.wikipedia.org/wiki/Trajectory_of_a_projectile#Angle_required_to_hit_coordinate_.28x.2Cy.29
+			double velsquared = barrelProp.speed * barrelProp.speed;
+			double sqrtPart = -Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
+			double theta;
+			if(sqrtPart == sqrtPart) { //false when sqrtPart == NaN
+				theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+			} else {
+				//Calculate how far in that direction we can get
+				if(projDir.X == 0) { //Avoid divide by zero
+					theta = Math.PI / 2;
+				} else {
+					double phi = Math.Atan(projDir.Y / projDir.X);
+					double cosphi = Math.Cos(phi);
+					double r = (gravity * velsquared * (1 - Math.Sin(phi))) / (gravity * gravity * cosphi * cosphi);
+					r -= 0.01f; //This prevents a floating point roundoff bug
+					projDir.X = (float)(r * cosphi);
+					projDir.Y = (float)(r * Math.Sin(phi));
+					sqrtPart = -Math.Sqrt(velsquared * velsquared - gravity * (gravity * projDir.X * projDir.X + 2 * projDir.Y * velsquared));
+					theta = Math.Atan((velsquared - sqrtPart) / (gravity * projDir.X));
+				}
+			}
+
+			projDir.X = (float)Math.Cos(theta);
+			projDir.Y = (float)Math.Sin(theta);
+
+			//Take the x coordinate and restore it to the proper x/z direction
+			double phi2 = Math.Atan((point.X - boss.location.X) / (point.Z - boss.location.Z));
+			if(point.Z < boss.location.Z) {
+				phi2 += Math.PI;
+			}
+			projDir.Z = (float)(projDir.X * Math.Cos(phi2));
+			projDir.X = (float)(projDir.X * Math.Sin(phi2));
 
 
-        }
+			Vector3 projlocation = new Vector3(boss.location);
+
+			//break the rendering tie between boss and projectile, or else they flicker
+			projlocation.Z -= 0.001f;
+
+			Projectile shot = new Projectile(projlocation, projDir, false, barrelProp, ps.player, (int)CombatType.barrel); // spawn the actual projectile
+			if(ps.enable3d) {
+				shot.cycleNumber = 1;
+			}
+			
+			// add projectile to appropriate lists
+			ps.objList.Add(shot);
+			ps.renderList.Add(shot);
+			ps.collisionList.Add(shot);
+			ps.physList.Add(shot);
+			ps.combatList.Add(shot);
+		}
     }
 
 

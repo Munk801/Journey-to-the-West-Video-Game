@@ -22,6 +22,7 @@ namespace U5Designs {
     class Projectile : GameObject, RenderObject, CombatObject, PhysicsObject {
 
 		public const double friction = 2000.0;
+		public static float barrelSpeed = -100.0f;
 
         //physics vars
         internal Vector3 velocity;
@@ -87,8 +88,13 @@ namespace U5Designs {
 				if(liveTime >= duration) {
 					if(type == (int)CombatType.grenade) {
 						foreach(PhysicsObject po in physList) {
-							if(po.hascbox && (((CombatObject)po).type == (int)CombatType.enemy || ((CombatObject)po).type == (int)CombatType.boss)) {
-								if(VectorUtil.dist(_location, po.location) < 75.0f) { //TODO: Tweak this value (grenade range)
+							if(po is GorillaBossobject) {
+								//If this is the gorilla, we must be over the barrier to do damage
+								if(VectorUtil.dist(_location, po.location) < 75.0f && po.location.X - _location.X < 20.0f) {
+									((CombatObject)po).health -= 1;
+								}
+							} else if(po.hascbox && (((CombatObject)po).type == (int)CombatType.enemy || ((CombatObject)po).type == (int)CombatType.boss)) {
+								if(VectorUtil.dist(_location, po.location) < 75.0f) {
 									((CombatObject)po).health -= damage;
 								}
 							}
@@ -157,26 +163,30 @@ namespace U5Designs {
                 }
                 else {
 					alreadyCollidedList.Add(collidingObj);
-					if(_type == (int)CombatType.barrel || !this.hascbox) { //grenade or barrel collision, bounce
+					if((_type == (int)CombatType.barrel && !collidingObj.hascbox) || !this.hascbox) { //grenade or barrel collision, bounce
 						if(collidingObj.hascbox && ((CombatObject)collidingObj).type == (int)CombatType.projectile) {
 							continue; //Grenades shouldn't bounce off of other projectiles
 						}
 						switch(collidingAxis) {
 							case 0: //x
-								if(_location.X < collidingObj.location.X) {
-									_location.X = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
-								} else {
-									_location.X = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
-								}
-								if(velocity.X != 0) { //should always be true, but just in case...
-									double deltaTime = (location.X - startLoc.X) / velocity.X;
-									_location.Y += (float)(velocity.Y * deltaTime);
-									_location.Z += (float)(velocity.Z * deltaTime);
-									time -= deltaTime;
-								}
-								if(_type == (int)CombatType.grenade) {
-									velocity.X *= -0.6f; //bounce
-									_animDirection = -_animDirection;
+								if(_type != (int)CombatType.barrel) {
+									if(_location.X < collidingObj.location.X) {
+										_location.X = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
+									} else {
+										_location.X = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
+									}
+									if(velocity.X != 0) { //should always be true, but just in case...
+										double deltaTime = (location.X - startLoc.X) / velocity.X;
+										_location.Y += (float)(velocity.Y * deltaTime);
+										_location.Z += (float)(velocity.Z * deltaTime);
+										time -= deltaTime;
+									}
+									if(_type == (int)CombatType.grenade) {
+										velocity.X *= -0.6f; //bounce
+										_animDirection = -_animDirection;
+									} else {
+										velocity.X *= -1.0f; //bounce
+									}
 								}
 								break;
 							case 1: //y
@@ -202,7 +212,7 @@ namespace U5Designs {
 											velocity.Y = 0.0f; //stop bounces when they get too small
 										}
 									} else { //barrel
-										velocity.X = -20.0f;
+										velocity.X = barrelSpeed;
 										velocity.Y = 0.0f;
 										velocity.Z = 0.0f;
 									}
@@ -286,7 +296,12 @@ namespace U5Designs {
 				if(liveTime >= duration) {
 					if(type == (int)CombatType.grenade) {
 						foreach(PhysicsObject po in physList) {
-							if(po.hascbox && (((CombatObject)po).type == (int)CombatType.enemy || ((CombatObject)po).type == (int)CombatType.boss)) {
+							if(po is GorillaBossobject) {
+								//If this is the gorilla, we must be over the barrier to do damage
+								if(VectorUtil.dist(_location, po.location) < 75.0f && po.location.X - _location.X < 20.0f) {
+									((CombatObject)po).health -= 1;
+								}
+							} else if(po.hascbox && (((CombatObject)po).type == (int)CombatType.enemy || ((CombatObject)po).type == (int)CombatType.boss)) {
 								if(VectorUtil.dist(_location, po.location) < 75.0f) { //TODO: Tweak this value (grenade range)
 									((CombatObject)po).health -= damage;
 								}
@@ -359,22 +374,28 @@ namespace U5Designs {
                 }
                 else {
 					alreadyCollidedList.Add(collidingObj);
-					if(!this.hascbox) { //grenade collision, bounce
+					if((_type == (int)CombatType.barrel && !collidingObj.hascbox) || !this.hascbox) { //grenade or barrel collision, bounce
 						switch(collidingAxis) {
 							case 0: //x
-								if(_location.X < collidingObj.location.X) {
-									_location.X = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
-								} else {
-									_location.X = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
+								if(_type != (int)CombatType.barrel) {
+									if(_location.X < collidingObj.location.X) {
+										_location.X = collidingObj.location.X - (pbox.X + collidingObj.pbox.X) - 0.0001f;
+									} else {
+										_location.X = collidingObj.location.X + pbox.X + collidingObj.pbox.X + 0.0001f;
+									}
+									if(velocity.X != 0) { //should always be true, but just in case...
+										double deltaTime = (location.X - startLoc.X) / velocity.X;
+										_location.Y += (float)(velocity.Y * deltaTime);
+										_location.Z += (float)(velocity.Z * deltaTime);
+										time -= deltaTime;
+									}
+									if(_type == (int)CombatType.grenade) {
+										velocity.X *= -0.6f; //bounce
+										_animDirection = -_animDirection;
+									} else {
+										velocity.X *= -1.0f; //bounce
+									}
 								}
-								if(velocity.X != 0) { //should always be true, but just in case...
-									double deltaTime = (location.X - startLoc.X) / velocity.X;
-									_location.Y += (float)(velocity.Y * deltaTime);
-									_location.Z += (float)(velocity.Z * deltaTime);
-									time -= deltaTime;
-								}
-								velocity.X *= -0.6f; //bounce
-								_animDirection = -_animDirection;
 								break;
 							case 1: //y
 								if(_location.Y < collidingObj.location.Y) {
@@ -391,12 +412,18 @@ namespace U5Designs {
 								
 								velocity.Y *= -0.6f; //bounce
 								if(_location.Y > collidingObj.location.Y) {
-									//Simulate friction for rolling
-									if(Math.Abs(velocity.X) >= 50.0f) {
-										velocity.X = (velocity.X >= 0 ? velocity.X - (float)(friction * time) : velocity.X + (float)(friction * time));
-									}
-									if(velocity.Y < 25.0f) {
-										velocity.Y = 0.0f; //stop bounces when they get too small
+									if(_type == (int)CombatType.grenade) {
+										//Simulate friction for rolling
+										if(Math.Abs(velocity.X) >= 50.0f) {
+											velocity.X = (velocity.X >= 0 ? velocity.X - (float)(friction * time) : velocity.X + (float)(friction * time));
+										}
+										if(velocity.Y < 25.0f) {
+											velocity.Y = 0.0f; //stop bounces when they get too small
+										}
+									} else { //barrel
+										velocity.X = barrelSpeed;
+										velocity.Y = 0.0f;
+										velocity.Z = 0.0f;
 									}
 								}
 								break;
@@ -452,16 +479,20 @@ namespace U5Designs {
 
 		//swaps physics box x and z coordinates (used for sprites that billboard)
 		public void swapPBox() {
-			float temp = _pbox.X;
-			_pbox.X = _pbox.Z;
-			_pbox.Z = temp;
+			if(_type != (int)CombatType.barrel) {
+				float temp = _pbox.X;
+				_pbox.X = _pbox.Z;
+				_pbox.Z = temp;
+			}
 		}
 
 		//swaps combat box x and z coordinates (used for sprites that billboard)
 		public void swapCBox() {
-			float temp = _cbox.X;
-			_cbox.X = _cbox.Z;
-			_cbox.Z = temp;
+			if(_type != (int)CombatType.barrel) {
+				float temp = _cbox.X;
+				_cbox.X = _cbox.Z;
+				_cbox.Z = temp;
+			}
 		}
 
         public bool canSquish {
@@ -564,7 +595,7 @@ namespace U5Designs {
         }
 
 		public bool hasTwoAnims {
-			get { return false; } //Change later if we want to add this functionality
+			get { return _type == (int)CombatType.barrel; }
 		}
 
         public int ScreenRegion {

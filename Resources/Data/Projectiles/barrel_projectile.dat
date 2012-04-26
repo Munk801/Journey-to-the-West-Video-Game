@@ -1,0 +1,12 @@
+﻿<projectile>
+	<scale x="25.96" y="20" z="25.96" />
+	<pbox x="10" y="10" z="12.92" />
+	<cbox x="9.5" y="9.5" z="12.5" />
+	<draw2>true</draw2>
+	<draw3>true</draw3>
+  <damage>2</damage>
+  <staminaCost>0.0</staminaCost>
+	<speed>300.0</speed>
+	<gravity>true</gravity>
+	<sprite>barrel_projectile_sprite.dat</sprite>
+</projectile>

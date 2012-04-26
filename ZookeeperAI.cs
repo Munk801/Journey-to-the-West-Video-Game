@@ -72,8 +72,11 @@ namespace U5Designs {
 			    ps.collisionList.Add(newcrate);
 				//ps.renderList.Add(newcrate);
 			}
-            active = true;
         }
+
+		public void makeActive() {
+			active = true;
+		}
 
         double switchdelaytimer;
         double switchtime = 1.5;

@@ -18,6 +18,8 @@ namespace U5Designs {
 
         void killBoss(PlayState ps);
 
+		void makeActive();
+
         //void dodamage(int hit);
     }
 
